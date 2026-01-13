@@ -3,16 +3,17 @@
 **Context:** Next.js 16 Classifieds Marketplace (App Router)
 
 ## OVERVIEW
-Boli is the frontend application built with Next.js 16.1.1, utilizing React 19 and Server Components by default. It features a mobile-first design for a classifieds marketplace with seller dashboard and bidding mechanics.
+Boliyan Web is the frontend application built with Next.js 16.1.1, utilizing React 19 and Server Components by default. It features a mobile-first design for a classifieds marketplace with seller dashboard and bidding mechanics.
 
 ## STRUCTURE
 ```
 src/
-├── app/               # App Router pages (/, /dashboard, /list)
+├── app/               # App Router pages (/, /dashboard, /list, /inbox)
 ├── components/
 │   ├── ui/            # Shadcn/Radix primitives (visual only)
 │   ├── marketplace/   # Domain logic (Grid, Cards)
-│   └── seller/        # Dashboard components
+│   ├── seller/        # Dashboard components
+│   └── inbox/         # Messaging components
 ├── lib/               # Utilities & State (store.tsx)
 └── types/             # TypeScript definitions
 ```
@@ -28,10 +29,11 @@ src/
 ## CONVENTIONS
 - **Rendering**: Server Components default. Use `'use client'` only when interaction is needed.
 - **Styling**: Tailwind CSS v4. Mobile-first (hidden sidebar on small screens).
-- **UI**: Shadcn UI. Component logic lives in `components/marketplace`.
+- **UI**: Shadcn UI. Component logic lives in `components/marketplace` or `components/inbox`.
 - **Navigation**: `next/link` for internal, `<a>` for external.
 
 ## UNIQUE STYLES
+- **Strict Messaging**: Users cannot chat until a bid is accepted (enforced in Store and UI).
 - **Secret Bidding**: Sellers toggle between public auction/private bids.
 - **Price Intelligence**: AI-driven recommendations in `src/app/list`.
 - **Location**: Radius slider filter in Sidebar.
