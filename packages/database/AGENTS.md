@@ -1,25 +1,18 @@
-# PROJECT KNOWLEDGE BASE
+# DATABASE KNOWLEDGE BASE
 
-**Context:** PostgreSQL Data Layer
+**Context:** Raw SQL Schema (Supabase-compatible).
 
 ## OVERVIEW
-Raw SQL schema definitions compatible with Supabase (PostgreSQL). Handles core entities for the marketplace.
+Single source of truth for database structure.
 
 ## STRUCTURE
-```
-.
-└── schema.sql       # Single source of truth for DDL
-```
+- `schema.sql`: Contains ALL table definitions, triggers, and RLS policies.
 
 ## CONVENTIONS
-- **ORM**: None. Raw SQL only.
-- **Auth**: References `auth.users` (Supabase managed).
-- **Tables**: `profiles`, `listings`, `bids`, `conversations`.
-- **IDs**: UUIDs used for primary keys.
+- **DDL**: Manual SQL writing.
+- **Auth**: References `auth.users` (Supabase).
+- **RLS**: Row Level Security MUST be enabled on all tables.
 
-## ANTI-PATTERNS (THIS PACKAGE)
-- **DO NOT** introduce Prisma, Drizzle, or TypeORM.
-- **DO NOT** split schema into multiple files unless complexity demands it.
-
-## NOTES
-- Migrations are currently manual. Apply `schema.sql` changes directly to the database.
+## ANTI-PATTERNS
+- **DO NOT** use Prisma, Drizzle, or TypeORM.
+- **DO NOT** split schema into multiple files (keep `schema.sql` unified).
