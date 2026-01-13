@@ -14,8 +14,13 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-2xl font-bold tracking-tighter text-blue-600">
-            Boliyan
+          <Link href="/" className="flex flex-col items-center justify-center gap-0 group select-none transition-transform duration-200 active:scale-95">
+            <span className="text-3xl font-[900] tracking-tight transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-slate-950 via-slate-800 to-slate-900 group-hover:from-blue-600 group-hover:via-blue-500 group-hover:to-indigo-600">
+              Boliyan
+            </span>
+            <span className="text-sm font-black transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200">
+              بولیاں
+            </span>
           </Link>
           
           <div className="hidden md:flex relative w-[400px]">

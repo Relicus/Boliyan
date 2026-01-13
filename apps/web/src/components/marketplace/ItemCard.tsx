@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +19,11 @@ export default function ItemCard({ item }: ItemCardProps) {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
 
-  const distance = (Math.random() * 10).toFixed(1);
+  // Stable "random" distance based on item ID to prevent hydration mismatch
+  const distance = useMemo(() => {
+    const hash = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return ((hash % 80) / 10 + 1.2).toFixed(1);
+  }, [item.id]);
 
   const handleBid = () => {
     const amount = parseFloat(bidAmount);

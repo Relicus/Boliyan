@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Bid, User } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,11 @@ interface SellerBidCardProps {
 }
 
 export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
-  // Mocked distance
-  const distance = (Math.random() * 5 + 1).toFixed(1);
+  // Stable "random" distance based on bidder ID to prevent hydration mismatch
+  const distance = useMemo(() => {
+    const hash = bidder.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return ((hash % 40) / 10 + 1.1).toFixed(1);
+  }, [bidder.id]);
   const duration = Math.round(Number(distance) * 2.5);
 
   return (
