@@ -1,29 +1,62 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Outfit, Noto_Sans_Arabic } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import { AppProvider } from "@/lib/store";
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: "../../public/fonts/geist-sans.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "../../public/fonts/geist-mono.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
-const outfit = Outfit({
+const outfit = localFont({
+  src: [
+    {
+      path: "../../public/fonts/outfit-400.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/outfit-500.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/outfit-600.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/outfit-700.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-outfit",
-  subsets: ["latin"],
 });
 
-const notoUrdu = Noto_Sans_Arabic({
+const notoUrdu = localFont({
+  src: [
+    {
+      path: "../../public/fonts/noto-sans-arabic-400.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/noto-sans-arabic-700.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-noto-urdu",
-  subsets: ["arabic"],
 });
+
 
 export const metadata: Metadata = {
   title: "Boliyan - Speak Your Price",

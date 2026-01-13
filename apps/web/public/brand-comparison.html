@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brand Comparison: Boliyan vs Dihari</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@400;700;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    
+    .container {
+      display: flex;
+      gap: 60px;
+      padding: 60px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 20px; /* gap-1.5 is ~6px in tailwind, but scaled up here for presentation */
+      padding: 30px;
+      border: 1px dashed #e2e8f0;
+      border-radius: 16px;
+      min-width: 300px;
+    }
+
+    .brand-block:hover {
+      background: #f8fafc;
+    }
+
+    /* Logo Common Styles */
+    svg {
+      width: 80px;
+      height: 80px;
+      stroke-width: 7;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    .text-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .urdu {
+      font-family: 'Noto Nastaliq Urdu', serif;
+      font-weight: 900;
+      font-size: 3rem; /* text-2xl scaled */
+      line-height: .8;
+      margin-bottom: -4px;
+    }
+
+    .english {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem; /* text-[10px] scaled */
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+    }
+
+    /* Boliyan Theme */
+    .boliyan svg {
+      stroke: #1e293b; /* slate-800 */
+    }
+    .boliyan .dot {
+      fill: #1e293b;
+      stroke: none;
+    }
+    .boliyan:hover svg { stroke: #2563eb; /* blue-600 */ }
+    .boliyan:hover .dot { fill: #2563eb; }
+    
+    .boliyan .urdu {
+      background: linear-gradient(135deg, #020617, #1e293b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .boliyan:hover .urdu {
+      background: linear-gradient(135deg, #2563eb, #4f46e5); /* blue-600 to indigo-600 */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .boliyan .english {
+      background: linear-gradient(135deg, #475569, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .boliyan:hover .english {
+      background: linear-gradient(135deg, #60a5fa, #bfdbfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+
+    /* Dihari Theme */
+    .dihari svg {
+      stroke: #1e293b;
+    }
+    .dihari:hover svg { stroke: #d97706; /* amber-600 */ }
+    
+    .dihari .urdu {
+      background: linear-gradient(135deg, #020617, #1e293b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .dihari:hover .urdu {
+      background: linear-gradient(135deg, #d97706, #ea580c); /* amber-600 to orange-600 */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .dihari .english {
+      background: linear-gradient(135deg, #475569, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .dihari:hover .english {
+      background: linear-gradient(135deg, #fbbf24, #fde68a); /* amber-400 to amber-200 */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: white;
+      padding: 0 10px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .wrapper {
+      position: relative;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Boliyan Logo -->
+    <div class="wrapper">
+      <span class="label">Primary Brand</span>
+      <div class="brand-block boliyan">
+        <svg viewBox="0 0 40 40">
+           <!-- Geometric Ba -->
+          <path d="M32,10 C32,20 28,26 16,26 C12,26 8,24 8,24" />
+          <circle cx="18" cy="36" r="4" class="dot"/>
+        </svg>
+        <div class="text-container">
+          <span class="urdu">بولیاں</span>
+          <span class="english">Boliyan</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dihari Logo -->
+    <div class="wrapper">
+      <span class="label">Labor Vertical</span>
+      <div class="brand-block dihari">
+        <svg viewBox="0 0 40 40">
+          <!-- Boliyan Arch (Ba-style) -->
+          <path d="M32,12 C32,22 28,28 16,28 C12,28 8,26 8,26" />
+          <!-- 'Arda' (To'e) Glyph - b-shape mark -->
+          <path d="M16 2 V 9 C 21 9 21 4 16 4 Z" class="dot" style="fill: #1e293b; stroke: none;"/>
+        </svg>
+        <div class="text-container">
+          <span class="urdu" style="font-family: 'Noto Sans Arabic', sans-serif;">دہاڑی</span>
+          <span class="english">Dihari</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p style="margin-top: 40px; color: #64748b; font-size: 0.9rem;">
+    Hover over the logos to see the interaction states.
+  </p>
+
+</body>
+</html>

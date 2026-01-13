@@ -15,9 +15,9 @@ export default function Navbar() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <Link href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
-            {/* Geometric 'Ba' (ب) Logomark - Fixed clipping and spacing */}
-            <svg viewBox="0 0 40 40" className="h-10 w-10 shrink-0">
-              {/* Shallower curve moved up to avoid overlap with dot */}
+            {/* Geometric 'Ba' (ب) Logomark */}
+            <svg viewBox="0 0 40 40" className="h-10 w-10 shrink-0 transition-all duration-300 group-hover:drop-shadow-md">
+              {/* Ba Curve */}
               <path
                 d="M32,10 C32,20 28,26 16,26 C12,26 8,24 8,24"
                 stroke="currentColor"
@@ -26,7 +26,7 @@ export default function Navbar() {
                 strokeLinecap="round"
                 className="transition-all duration-300 text-slate-800 group-hover:text-blue-600"
               />
-              {/* Dot moved down with breathing room */}
+              {/* Dot at bottom */}
               <circle
                 cx="18"
                 cy="36"
@@ -41,7 +41,7 @@ export default function Navbar() {
                 بولیاں
               </span>
               {/* English: Much smaller, wide spacing */}
-              <span className="text-[10px] font-bold tracking-[0.3em] uppercase transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200">
+              <span className="text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200">
                 Boliyan
               </span>
             </div>
