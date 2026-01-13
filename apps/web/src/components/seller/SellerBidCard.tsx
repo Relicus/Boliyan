@@ -28,21 +28,21 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   }, [bidder.id]);
 
   return (
-    <div className="bg-slate-50 border border-slate-200 rounded-xl hover:shadow-md transition-all p-3">
+    <div id={`bid-card-${bid.id}`} className="bg-slate-50 border border-slate-200 rounded-xl hover:shadow-md transition-all p-3">
       {/* MOBILE Layout (md:hidden) */}
-      <div className="flex flex-col gap-2 md:hidden">
+      <div id={`bid-card-mobile-${bid.id}`} className="flex flex-col gap-2 md:hidden">
         {/* Top Row: User (65%) | Price (35%) */}
-        <div className="flex items-start">
-          <div className="flex items-center gap-2 w-[65%]">
+        <div id={`bid-card-mobile-top-row-${bid.id}`} className="flex items-start">
+          <div id={`bid-card-mobile-user-info-${bid.id}`} className="flex items-center gap-2 w-[65%]">
             <Avatar className="h-9 w-9 border-2 border-slate-50 shrink-0">
-              <AvatarImage src={bidder.avatar} />
-              <AvatarFallback>{bidder.name[0]}</AvatarFallback>
+              <AvatarImage id={`bidder-avatar-img-mobile-${bid.id}`} src={bidder.avatar} />
+              <AvatarFallback id={`bidder-avatar-fallback-mobile-${bid.id}`}>{bidder.name[0]}</AvatarFallback>
             </Avatar>
             
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <h4 className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
-                <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-100 shrink-0">
+                <h4 id={`bidder-name-mobile-${bid.id}`} className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
+                <div id={`bidder-rating-mobile-${bid.id}`} className="flex items-center gap-1.5 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-100 shrink-0">
                   <div className="flex items-center gap-0.5 text-xs text-amber-600 font-black">
                       <Star className="h-3 w-3 fill-amber-500" />
                       {bidder.rating}
@@ -51,7 +51,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                 </div>
               </div>
               <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-0.5 min-w-0">
+                  <div id={`bidder-location-mobile-${bid.id}`} className="flex items-center gap-0.5 min-w-0">
                     <MapPin className="h-3 w-3 text-red-400 shrink-0" />
                     <span className="truncate">{location}</span>
                   </div>
@@ -59,9 +59,9 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             </div>
           </div>
 
-          <div className="text-right w-[35%]">
-            <p className="text-xl font-black text-blue-600 leading-none truncate">Rs. {bid.amount.toLocaleString()}</p>
-            <div className="flex items-center justify-end gap-2 mt-0.5 text-xs text-muted-foreground font-medium whitespace-nowrap">
+          <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right w-[35%]">
+            <p id={`bid-amount-mobile-${bid.id}`} className="text-xl font-black text-blue-600 leading-none truncate">Rs. {bid.amount.toLocaleString()}</p>
+            <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-0.5 text-xs text-muted-foreground font-medium whitespace-nowrap">
                <div className="flex items-center gap-0.5">
                  <MapPin className="h-3 w-3 text-red-400" />
                  <span>{distance} km</span>
@@ -75,11 +75,11 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
         </div>
 
         {/* Bottom Row: Actions */}
-        <div className="grid grid-cols-2 gap-3 mt-1">
-          <Button variant="outline" className="w-full h-10 border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold">
+        <div id={`bid-card-mobile-actions-${bid.id}`} className="grid grid-cols-2 gap-3 mt-1">
+          <Button id={`bid-reject-btn-mobile-${bid.id}`} variant="outline" className="w-full h-10 border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold">
             Reject
           </Button>
-          <Button className="w-full h-10 bg-blue-600 hover:bg-blue-700 font-bold">
+          <Button id={`bid-unlock-btn-mobile-${bid.id}`} className="w-full h-10 bg-blue-600 hover:bg-blue-700 font-bold">
             <MessageSquare className="h-4 w-4 mr-2" />
             Unlock Chat
           </Button>
@@ -87,24 +87,24 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
       </div>
 
       {/* DESKTOP Layout (hidden md:flex) */}
-      <div className="hidden md:flex flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+      <div id={`bid-card-desktop-${bid.id}`} className="hidden md:flex flex-row items-center justify-between gap-4">
+          <div id={`bid-card-desktop-left-${bid.id}`} className="flex items-center gap-4">
             <Avatar className="h-12 w-12 border-2 border-slate-50">
-              <AvatarImage src={bidder.avatar} />
-              <AvatarFallback>{bidder.name[0]}</AvatarFallback>
+              <AvatarImage id={`bidder-avatar-img-desktop-${bid.id}`} src={bidder.avatar} />
+              <AvatarFallback id={`bidder-avatar-fallback-desktop-${bid.id}`}>{bidder.name[0]}</AvatarFallback>
             </Avatar>
             
-            <div>
+            <div id={`bidder-info-desktop-${bid.id}`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
-                  <div className="flex items-center gap-0.5 text-xs text-amber-500 font-bold">
+                  <h4 id={`bidder-name-desktop-${bid.id}`} className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
+                  <div id={`bidder-rating-desktop-${bid.id}`} className="flex items-center gap-0.5 text-xs text-amber-500 font-bold">
                     <Star className="h-3 w-3 fill-amber-500" />
                     {bidder.rating}
                   </div>
                   <span className="text-xs text-amber-600/70 font-semibold">(24)</span>
                 </div>
                 
-                <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                <div id={`bidder-stats-desktop-${bid.id}`} className="flex items-center gap-3 text-[11px] text-muted-foreground">
                    <div className="flex items-center gap-1">
                     <MapPin className="h-3 w-3 text-red-400" />
                     {location}
@@ -121,16 +121,16 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             </div>
           </div>
 
-          <div className="flex flex-row items-center gap-6">
+          <div id={`bid-card-desktop-right-${bid.id}`} className="flex flex-row items-center gap-6">
               <div className="text-left">
-                <p className="text-2xl font-black text-blue-600">Rs. {bid.amount.toLocaleString()}</p>
+                <p id={`bid-amount-desktop-${bid.id}`} className="text-2xl font-black text-blue-600">Rs. {bid.amount.toLocaleString()}</p>
               </div>
 
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="h-9 px-4 border-slate-200 hover:bg-slate-50">
+              <div id={`bid-actions-desktop-${bid.id}`} className="flex gap-2">
+                <Button id={`bid-reject-btn-desktop-${bid.id}`} size="sm" variant="outline" className="h-9 px-4 border-slate-200 hover:bg-slate-50">
                   Reject
                 </Button>
-                <Button size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold">
+                <Button id={`bid-unlock-btn-desktop-${bid.id}`} size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Unlock Chat
                 </Button>

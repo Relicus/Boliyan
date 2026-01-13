@@ -9,13 +9,14 @@ import ItemCardSkeleton from "./ItemCardSkeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import SmartFilterBar from "./SmartFilterBar";
 import CategoryBar from "./CategoryBar";
-import { LayoutGrid, Grid3x3, Grid2x2 } from "lucide-react";
+import { LayoutGrid, Grid3x3, Grid2x2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
 export default function MarketplaceGrid() {
-  const { items, filters } = useApp();
+  const { items, filters, setFilter } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>('comfortable');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -63,6 +64,10 @@ export default function MarketplaceGrid() {
       return false;
     }
     
+    // Listing Type Filter
+    if (filters.listingType === 'public' && !item.isPublicBid) return false;
+    if (filters.listingType === 'sealed' && item.isPublicBid) return false;
+    
     return true;
   }).sort((a, b) => {
     switch (filters.sortBy) {
@@ -100,16 +105,27 @@ export default function MarketplaceGrid() {
   };
 
   return (
-    <div className="p-4">
-      <div className="mb-4 sticky top-0 z-30 bg-slate-50/95 backdrop-blur -mx-4 border-b border-slate-200/50 flex flex-col gap-1">
-        <div className="flex flex-row items-center justify-between gap-4 px-4 py-2">
-          <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide flex-1">
-            <SmartFilterBar />
-          </div>
+    <div id="marketplace-grid-root" className="px-4 pb-4 pt-0 md:px-4 md:pb-4 md:pt-0">
+      <div className="mb-2 sticky top-0 md:top-16 z-30 bg-white md:bg-slate-50/95 backdrop-blur -mx-4 border-b border-slate-200/50 flex flex-col gap-0">
+        <div className="flex flex-col gap-2 pt-0 pb-1">
+          {/* Top Row: Search & View Toggles */}
+          <div id="toolbar-top-row" className="flex items-center gap-2 px-4 py-2">
+             <div id="search-input-wrapper" className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input 
+                  id="search-input-field"
+                  type="search" 
+                  placeholder="Search items..." 
+                  className="w-full pl-9 bg-white border-slate-200 h-10 shadow-sm focus-visible:ring-blue-500"
+                  value={filters.search}
+                  onChange={(e) => setFilter('search', e.target.value)}
+                />
+             </div>
 
-          {/* View Toggle Controls */}
-          <div className="flex items-center bg-white p-1 rounded-lg border border-slate-200 shadow-sm shrink-0">
+             {/* View Toggle Controls */}
+             <div id="view-mode-toggles" className="flex items-center bg-white p-1 rounded-lg border border-slate-200 shadow-sm shrink-0">
                   <Button
+                  id="view-mode-compact-btn"
                   variant={viewMode === 'compact' ? 'default' : 'ghost'}
                   size="icon"
                   className={`h-8 w-8 rounded-md ${viewMode === 'compact' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
@@ -119,6 +135,7 @@ export default function MarketplaceGrid() {
                   <Grid3x3 className="h-4 w-4" />
                 </Button>
                 <Button
+                  id="view-mode-comfortable-btn"
                   variant={viewMode === 'comfortable' ? 'default' : 'ghost'}
                   size="icon"
                   className={`h-8 w-8 rounded-md ${viewMode === 'comfortable' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
@@ -128,6 +145,7 @@ export default function MarketplaceGrid() {
                   <Grid2x2 className="h-4 w-4" />
                 </Button>
                 <Button
+                  id="view-mode-spacious-btn"
                   variant={viewMode === 'spacious' ? 'default' : 'ghost'}
                   size="icon"
                   className={`h-8 w-8 rounded-md ${viewMode === 'spacious' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
@@ -136,16 +154,23 @@ export default function MarketplaceGrid() {
                   >
                   <LayoutGrid className="h-4 w-4" />
                 </Button>
+            </div>
+          </div>
+
+          {/* Second Row: Smart Filters */}
+          <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide px-4">
+            <SmartFilterBar />
           </div>
         </div>
 
         {/* Category Bar Row */}
-        <div className="px-4 pb-2">
+        <div className="hidden md:block px-4 pb-2">
            <CategoryBar />
         </div>
       </div>
       
       <motion.div 
+        id="marketplace-grid-container"
         className={`grid gap-3 ${getGridClasses()}`}
         style={getGridStyle()}
       >

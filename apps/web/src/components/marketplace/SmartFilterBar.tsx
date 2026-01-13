@@ -16,7 +16,7 @@ export default function SmartFilterBar() {
   const { filters, setFilter } = useApp();
 
   return (
-    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-1">
+    <div id="smart-filter-bar-root" className="w-full flex items-center justify-between md:justify-start gap-4 overflow-x-auto scrollbar-hide px-4 py-1">
       {FILTERS.map((f) => {
         const Icon = f.icon;
         const isActive = filters.sortBy === f.id;
@@ -24,6 +24,7 @@ export default function SmartFilterBar() {
         return (
           <button
             key={f.id}
+            id={`smart-filter-btn-${f.id}`}
             onClick={() => setFilter('sortBy', f.id)}
             className={cn(
               // Base / Mobile Styles (Vertical, Borderless)
@@ -36,6 +37,7 @@ export default function SmartFilterBar() {
             )}
           >
             <Icon 
+              id={`smart-filter-icon-${f.id}`}
               className={cn(
                 "h-6 w-6 mb-0.5 md:mb-0 md:h-4 md:w-4 transition-all duration-200",
                 isActive 
@@ -44,7 +46,9 @@ export default function SmartFilterBar() {
               )} 
               strokeWidth={2}
             />
-            <span className={cn(
+            <span 
+              id={`smart-filter-label-${f.id}`}
+              className={cn(
               "text-[10px] leading-none tracking-wide whitespace-nowrap md:text-sm md:font-bold",
               isActive ? "font-bold" : "font-medium"
             )}>

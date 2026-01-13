@@ -17,37 +17,39 @@ export default function Dashboard() {
   const itemsWithBids = myItems.filter(item => bids.some(b => b.itemId === item.id));
 
   return (
-    <div className="p-4 md:p-8 max-w-5xl mx-auto">
+    <div id="dashboard-root" className="p-4 md:p-8 max-w-5xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Seller Dashboard</h1>
-          <p className="text-slate-500">Manage your listings and bids.</p>
+          <h1 id="dashboard-title" className="text-3xl font-black text-slate-900 tracking-tight">Seller Dashboard</h1>
+          <p id="dashboard-subtitle" className="text-slate-500">Manage your listings and bids.</p>
         </div>
-        <Button asChild className="w-full md:w-auto bg-blue-600 hover:bg-blue-700">
+        <Button id="dashboard-new-listing-btn" asChild className="w-full md:w-auto bg-blue-600 hover:bg-blue-700">
           <Link href="/list">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus id="dashboard-new-listing-plus" className="h-4 w-4 mr-2" />
             New Listing
           </Link>
         </Button>
       </div>
 
-      <Tabs defaultValue="bids" className="space-y-6">
-        <TabsList className="bg-transparent border-b rounded-none h-auto w-full justify-start p-0 gap-4 overflow-x-auto flex-nowrap">
+      <Tabs id="dashboard-tabs" defaultValue="bids" className="space-y-6">
+        <TabsList id="dashboard-tabs-list" className="bg-transparent border-b rounded-none h-auto w-full justify-start p-0 gap-4 overflow-x-auto flex-nowrap">
           <TabsTrigger 
+            id="tab-trigger-bids"
             value="bids" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600"
           >
             Active Bids
-            <Badge className="ml-2 bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">
+            <Badge id="tab-badge-bids" className="ml-2 bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">
               {bids.filter(b => myItems.some(i => i.id === b.itemId)).length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger 
+            id="tab-trigger-items"
             value="items" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600"
           >
             My Listings
-            <Badge className="ml-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border-none">
+            <Badge id="tab-badge-items" className="ml-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border-none">
               {myItems.length}
             </Badge>
           </TabsTrigger>
@@ -96,14 +98,14 @@ export default function Dashboard() {
         <TabsContent value="items">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {myItems.map(item => (
-              <div key={item.id} className="p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm">
-                <img src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover shrink-0 bg-slate-100" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-slate-900 truncate mb-1">{item.title}</h3>
-                  <p className="text-sm text-blue-600 font-semibold mb-2">Rs. {item.askPrice.toLocaleString()}</p>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="h-8 text-[11px] px-3">Edit</Button>
-                    <Button variant="outline" size="sm" className="h-8 text-[11px] px-3 text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100">Delete</Button>
+              <div key={item.id} id={`listing-card-${item.id}`} className="p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm">
+                <img id={`listing-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover shrink-0 bg-slate-100" />
+                <div id={`listing-content-${item.id}`} className="flex-1 min-w-0">
+                  <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-1">{item.title}</h3>
+                  <p id={`listing-price-${item.id}`} className="text-sm text-blue-600 font-semibold mb-2">Rs. {item.askPrice.toLocaleString()}</p>
+                  <div id={`listing-actions-${item.id}`} className="flex gap-2">
+                    <Button id={`listing-edit-btn-${item.id}`} variant="outline" size="sm" className="h-8 text-[11px] px-3">Edit</Button>
+                    <Button id={`listing-delete-btn-${item.id}`} variant="outline" size="sm" className="h-8 text-[11px] px-3 text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100">Delete</Button>
                   </div>
                 </div>
               </div>

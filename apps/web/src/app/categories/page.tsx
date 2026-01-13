@@ -2,20 +2,35 @@
 
 import { useApp } from "@/lib/store";
 import { useRouter } from "next/navigation";
-import { Tag, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { 
+  Tag, 
+  ArrowLeft,
+  LayoutGrid,
+  Laptop,
+  Armchair,
+  Wrench,
+  Music,
+  Camera,
+  Car,
+  Home,
+  Shirt,
+  Tv
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const categories = [
-  "All Items",
-  "Electronics",
-  "Furniture",
-  "Auto Parts",
-  "Audio",
-  "Cameras",
-  "Vehicles",
-  "Property",
-  "Fashion",
-  "Home Appliances",
+const CATEGORY_ITEMS = [
+  { label: "All Items", icon: LayoutGrid },
+  { label: "Electronics", icon: Laptop },
+  { label: "Furniture", icon: Armchair },
+  { label: "Auto Parts", icon: Wrench },
+  { label: "Audio", icon: Music },
+  { label: "Cameras", icon: Camera },
+  { label: "Vehicles", icon: Car },
+  { label: "Property", icon: Home },
+  { label: "Fashion", icon: Shirt },
+  { label: "Home Appliances", icon: Tv },
 ];
 
 export default function CategoriesPage() {
@@ -23,8 +38,8 @@ export default function CategoriesPage() {
   const router = useRouter();
 
   const handleCategoryClick = (cat: string) => {
-    setFilter('category', cat);
-    router.push('/');
+    setFilter('category', cat === "All Items" ? null : cat);
+    // Navigation is handled by Link
   };
 
   return (
@@ -40,21 +55,33 @@ export default function CategoriesPage() {
       </div>
 
       <div className="p-4 grid grid-cols-2 gap-3">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => handleCategoryClick(cat)}
-            className={`
-              flex flex-col items-center justify-center p-6 rounded-xl border text-center transition-all active:scale-95
-              ${filters.category === cat
-                ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm'
-                : 'bg-white border-slate-200 text-slate-600 hover:border-blue-200 hover:bg-slate-50'
-              }
-            `}
-          >
-            <span className="font-semibold text-sm">{cat}</span>
-          </button>
-        ))}
+        {CATEGORY_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive = filters.category === item.label || (item.label === "All Items" && !filters.category);
+          
+          return (
+            <Link
+              key={item.label}
+              href="/"
+              onClick={() => handleCategoryClick(item.label)}
+              className={cn(
+                "flex flex-col items-center justify-center p-6 rounded-xl border text-center transition-all active:scale-95",
+                isActive
+                  ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"
+                  : "bg-white border-slate-200 text-slate-600 hover:border-blue-200 hover:bg-slate-50"
+              )}
+            >
+              <Icon 
+                className={cn(
+                  "h-8 w-8 mb-3 transition-colors",
+                  isActive ? "text-blue-600" : "text-slate-400 group-hover:text-blue-500"
+                )} 
+                strokeWidth={1.5}
+              />
+              <span className="font-semibold text-sm">{item.label}</span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

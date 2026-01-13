@@ -72,13 +72,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
+        id="root-body-01"
         className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${notoUrdu.variable} antialiased bg-slate-50`}
       >
         <AppProvider>
           <Navbar />
-          <div className="flex">
+          <div id="layout-wrapper-02" className="flex">
             <Sidebar />
-            <main className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100vh-64px)] pb-16 md:pb-0">
+            <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-screen md:min-h-[calc(100vh-64px)] pb-16 md:pb-0">
               {children}
             </main>
           </div>

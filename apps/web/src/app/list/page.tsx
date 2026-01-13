@@ -62,19 +62,19 @@ export default function ListPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl py-12 px-4">
-      <Card className="border-none shadow-lg bg-white">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-slate-900">List an Item</CardTitle>
-          <CardDescription>
+    <div id="list-page-container" className="container mx-auto max-w-2xl py-12 px-4">
+      <Card id="list-item-card" className="border-none shadow-lg bg-white">
+        <CardHeader id="list-item-header" className="space-y-1">
+          <CardTitle id="list-item-title-heading" className="text-2xl font-bold text-slate-900">List an Item</CardTitle>
+          <CardDescription id="list-item-description-text">
             Minimalist listing. Set your price and choose your bidding style.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent id="list-item-form" className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="title">Item Title</Label>
             <Input 
-              id="title" 
+              id="title-input" 
               placeholder="e.g. Sony Headphones, Wood Table..." 
               className="bg-slate-50 border-slate-100" 
               value={title}
@@ -86,10 +86,10 @@ export default function ListPage() {
             <div className="space-y-2">
               <Label>Category</Label>
               <Select onValueChange={setCategory}>
-                <SelectTrigger className="bg-slate-50 border-slate-100">
+                <SelectTrigger id="category-select" className="bg-slate-50 border-slate-100">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent id="category-select-content">
                   <SelectItem value="Electronics">Electronics</SelectItem>
                   <SelectItem value="Furniture">Furniture</SelectItem>
                   <SelectItem value="Auto Parts">Auto Parts</SelectItem>
@@ -100,9 +100,9 @@ export default function ListPage() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="price">Ask Price (Rs.)</Label>
+              <Label htmlFor="price-input">Ask Price (Rs.)</Label>
               <Input 
-                id="price" 
+                id="price-input" 
                 type="number" 
                 placeholder="0" 
                 value={askPrice}
@@ -113,13 +113,14 @@ export default function ListPage() {
           </div>
 
           {recommended && (
-            <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3">
-              <Sparkles className="h-5 w-5 text-blue-600 animate-pulse" />
+            <div id="recommended-price-banner" className="p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3">
+              <Sparkles id="recommended-sparkles-icon" className="h-5 w-5 text-blue-600 animate-pulse" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-blue-900">Recommended Market Price</p>
-                <p className="text-xs text-blue-700">Based on recent sales: <span className="font-bold">Rs. {recommended.toLocaleString()}</span></p>
+                <p id="recommended-title" className="text-sm font-semibold text-blue-900">Recommended Market Price</p>
+                <p id="recommended-text" className="text-xs text-blue-700">Based on recent sales: <span className="font-bold">Rs. {recommended.toLocaleString()}</span></p>
               </div>
               <Button 
+                id="apply-recommended-price-btn"
                 variant="ghost" 
                 size="sm" 
                 className="text-xs text-blue-600 hover:bg-blue-100"
@@ -131,9 +132,9 @@ export default function ListPage() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="desc">Description</Label>
+            <Label htmlFor="description-textarea">Description</Label>
             <Textarea 
-              id="desc" 
+              id="description-textarea" 
               placeholder="Tell buyers about condition, usage, and any defects..." 
               className="bg-slate-50 border-slate-100 min-h-[100px]"
               value={description}
@@ -142,9 +143,10 @@ export default function ListPage() {
           </div>
 
           <div className="space-y-4 pt-4">
-            <h3 className="text-sm font-semibold text-slate-900">Bidding Style</h3>
+            <h3 id="bidding-style-heading" className="text-sm font-semibold text-slate-900">Bidding Style</h3>
             
             <div 
+              id="public-auction-option"
               className={`flex items-center justify-between p-3 border rounded-lg transition-colors cursor-pointer ${isPublic ? 'bg-blue-50 border-blue-200' : 'bg-slate-50'}`}
               onClick={() => setIsPublic(true)}
             >
@@ -159,6 +161,7 @@ export default function ListPage() {
             </div>
 
             <div 
+              id="sealed-bids-option"
               className={`flex items-center justify-between p-3 border rounded-lg transition-colors cursor-pointer ${!isPublic ? 'bg-blue-50 border-blue-200' : 'bg-slate-50'}`}
               onClick={() => setIsPublic(false)}
             >
@@ -174,6 +177,7 @@ export default function ListPage() {
           </div>
 
           <Button 
+            id="post-listing-btn"
             className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold"
             onClick={handleSubmit}
           >

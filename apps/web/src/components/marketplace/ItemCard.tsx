@@ -159,6 +159,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Card
+          id={`item-card-${item.id}`}
           className="group border-none shadow-sm hover:shadow-md transition-shadow duration-200 bg-white rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer"
           style={{ backfaceVisibility: 'hidden' }}
         >
@@ -170,10 +171,12 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
             */}
             <motion.div
               layout
+              id={`item-card-${item.id}-image-wrapper`}
               className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0`}
               style={{ backfaceVisibility: 'hidden' }}
             >
               <img
+                id={`item-card-${item.id}-image`}
                 src={item.images[0]}
                 alt={item.title}
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 will-change-transform"
@@ -222,7 +225,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
             */}
             <CardContent className="p-2 flex flex-col gap-1.5 flex-1 z-10 bg-white transition-all">
               {/* Title */}
-              <h3 className={`font-bold ${getTitleClass()} text-slate-900 leading-tight ${viewMode === 'compact' ? 'line-clamp-1' : 'line-clamp-2'} transition-all`} title={item.title}>
+              <h3 id={`item-card-${item.id}-title`} className={`font-bold ${getTitleClass()} text-slate-900 leading-tight ${viewMode === 'compact' ? 'line-clamp-1' : 'line-clamp-2'} transition-all`} title={item.title}>
                 {item.title}
               </h3>
 
@@ -230,7 +233,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               <div className="flex items-end justify-between transition-all">
                 <div className="flex flex-col">
                   <span className={`${getLabelClass()} text-slate-500 font-bold uppercase tracking-wider transition-all`}>Asking</span>
-                  <span className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all`}>
+                  <span id={`item-card-${item.id}-ask-price`} className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all`}>
                     {formatDisplayPrice(item.askPrice)}
                   </span>
                 </div>
@@ -240,11 +243,11 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                     {item.isPublicBid ? "High Bid" : "Sealed Bids"}
                   </span>
                   {item.isPublicBid && item.currentHighBid ? (
-                    <span className={`${getPriceClass()} font-black text-blue-600 leading-none transition-all`}>
+                    <span id={`item-card-${item.id}-high-bid`} className={`${getPriceClass()} font-black text-blue-600 leading-none transition-all`}>
                       {formatDisplayPrice(item.currentHighBid)}
                     </span>
                   ) : (
-                    <Badge variant="outline" className={`px-1.5 py-0 min-h-0 h-auto ${getPriceClass()} leading-none font-black bg-amber-50 text-amber-700 border-amber-200 transition-all`}>
+                    <Badge id={`item-card-${item.id}-bid-count`} variant="outline" className={`px-1.5 py-0 min-h-0 h-auto ${getPriceClass()} leading-none font-black bg-amber-50 text-amber-700 border-amber-200 transition-all`}>
                       {item.bidCount} Active
                     </Badge>
                   )}
@@ -276,6 +279,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                   <div className="flex flex-1 border border-slate-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600">
                     {/* Decrement Button - Large Touch Target */}
                     <button
+                      id={`item-card-${item.id}-decrement-btn`}
                       onClick={(e) => handleSmartAdjust(e, -1)}
                       className="w-10 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200"
                     >
@@ -284,6 +288,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
                     {/* Input */}
                     <input
+                      id={`item-card-${item.id}-bid-input`}
                       type="text"
                       value={bidAmount}
                       onClick={handleInputClick}
@@ -296,6 +301,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
                     {/* Increment Button - Large Touch Target */}
                     <button
+                      id={`item-card-${item.id}-increment-btn`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
                       className="w-10 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-green-600 transition-colors active:bg-slate-200"
                     >
@@ -305,6 +311,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                 </div>
 
                 <button
+                  id={`item-card-${item.id}-place-bid-btn`}
                   onClick={handleBid}
                   disabled={isSuccess}
                   className={`w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold text-sm tracking-wide
@@ -314,7 +321,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                     }`}
                 >
                   {isSuccess ? (
-                    <span className="flex items-center gap-2">
+                    <span id={`item-card-${item.id}-success-msg`} className="flex items-center gap-2">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                       Bid Placed!
                     </span>

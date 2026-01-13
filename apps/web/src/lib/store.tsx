@@ -21,6 +21,7 @@ interface AppContextType {
     sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest';
     minPrice: number | null;
     maxPrice: number | null;
+    listingType: 'all' | 'public' | 'sealed';
   };
   setFilter: (key: keyof AppContextType['filters'], value: any) => void;
 }
@@ -49,6 +50,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     sortBy: 'trending',
     minPrice: null,
     maxPrice: null,
+    listingType: 'all',
   });
 
   const addItem = (newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => {
