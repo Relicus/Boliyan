@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
+import ScrollToTop from "@/components/layout/ScrollToTop";
 import { AppProvider } from "@/lib/store";
 
 const geistSans = localFont({
@@ -84,6 +85,7 @@ export default function RootLayout({
             </main>
           </div>
           <BottomNav />
+          <ScrollToTop />
         </AppProvider>
       </body>
     </html>

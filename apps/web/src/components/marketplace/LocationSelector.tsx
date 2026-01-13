@@ -32,7 +32,7 @@ export function LocationSelector({ className, align = "end" }: LocationSelectorP
             <div className="flex items-center gap-2 truncate">
               <MapPin className="h-4 w-4 text-blue-500 fill-blue-500/10 shrink-0" />
               <span className="truncate text-sm font-medium">
-                {filters.locationMode === "current" ? "Near Me" : filters.city}
+                {filters.locationMode === "current" ? "Current" : filters.city}
               </span>
               {filters.locationMode === "city" && (
                 <span className="text-[10px] text-muted-foreground shrink-0">({filters.radius}km)</span>
@@ -55,7 +55,7 @@ export function LocationSelector({ className, align = "end" }: LocationSelectorP
                   className="cursor-pointer"
                 >
                   <MapPin className="mr-2 h-4 w-4 text-blue-500" />
-                  <span>Near Me (Karachi)</span>
+                  <span>Current (Karachi)</span>
                   {filters.locationMode === "current" && <Check className="ml-auto h-4 w-4" />}
                 </CommandItem>
               </CommandGroup>

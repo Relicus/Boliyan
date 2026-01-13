@@ -107,7 +107,7 @@ export default function MarketplaceGrid() {
 
   return (
     <div id="marketplace-grid-root" className="px-4 pb-4 pt-0 md:px-4 md:pb-4 md:pt-0">
-      <div className="mb-2 sticky top-0 md:top-16 z-30 bg-white md:bg-slate-50/95 backdrop-blur -mx-4 border-b border-slate-200/50 flex flex-col gap-0">
+      <div className="mb-2 top-0 md:top-16 z-30 bg-white md:bg-slate-50/95 backdrop-blur -mx-4 border-b border-slate-200/50 flex flex-col gap-0">
         <div className="flex flex-col gap-2 pt-0 pb-1">
           {/* Top Row: Search & View Toggles */}
           <div id="toolbar-top-row" className="flex items-center gap-2 px-4 py-2">
