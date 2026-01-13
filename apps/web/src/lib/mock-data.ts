@@ -151,20 +151,7 @@ export const mockItems: Item[] = [
     bidCount: 9,
     createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
   },
-  {
-    id: "i11",
-    title: "Yamaha YBR 125 G - 2022",
-    description: "Black color. 12,000 km driven. Recently serviced. Smooth engine, no work required.",
-    images: ["https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=1000&auto=format&fit=crop"],
-    sellerId: "u2",
-    askPrice: 280000,
-    recommendedPrice: 270000,
-    category: "Bikes",
-    isPublicBid: true,
-    currentHighBid: 265000,
-    bidCount: 11,
-    createdAt: new Date(Date.now() - 86400000 * 2.5).toISOString(),
-  },
+  // Removed Yamaha YBR 125 G
   {
     id: "i12",
     title: "Antique Brass Telescope",

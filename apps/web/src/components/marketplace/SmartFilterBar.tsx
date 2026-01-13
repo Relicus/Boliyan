@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 import { Flame, MapPin, Timer, Gem, Sparkles } from "lucide-react";
 
 const FILTERS = [
-  { id: 'trending', label: 'Trending', icon: Flame },
-  { id: 'nearest', label: 'Near Me', icon: MapPin },
-  { id: 'ending_soon', label: 'Ending Soon', icon: Timer },
-  { id: 'luxury', label: 'High Value', icon: Gem },
-  { id: 'newest', label: 'New Arrivals', icon: Sparkles },
+  { id: 'trending', label: 'Trending', icon: Flame, color: "text-orange-500", fill: "fill-orange-500/10" },
+  { id: 'nearest', label: 'Near Me', icon: MapPin, color: "text-blue-500", fill: "fill-blue-500/10" },
+  { id: 'ending_soon', label: 'Ending Soon', icon: Timer, color: "text-rose-500", fill: "fill-rose-500/10" },
+  { id: 'luxury', label: 'High Value', icon: Gem, color: "text-purple-500", fill: "fill-purple-500/10" },
+  { id: 'newest', label: 'Just Listed', icon: Sparkles, color: "text-emerald-500", fill: "fill-emerald-500/10" },
 ];
 
 export default function SmartFilterBar() {
@@ -38,10 +38,11 @@ export default function SmartFilterBar() {
             <Icon 
               className={cn(
                 "h-6 w-6 mb-0.5 md:mb-0 md:h-4 md:w-4 transition-all duration-200",
-                isActive && "stroke-[2.5px] md:stroke-2"
+                isActive 
+                  ? "stroke-[2.5px] md:stroke-2 text-blue-600 fill-blue-600/20 md:text-white md:fill-white/20" 
+                  : cn(f.color, f.fill)
               )} 
               strokeWidth={2}
-              fill={isActive ? "currentColor" : "none"}
             />
             <span className={cn(
               "text-[10px] leading-none tracking-wide whitespace-nowrap md:text-sm md:font-bold",

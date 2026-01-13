@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import { useState, useMemo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,6 +42,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
   const [bidAmount, setBidAmount] = useState<string>(initialBid.toLocaleString());
   const [error, setError] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Stable "random" distance based on item ID to prevent hydration mismatch
@@ -71,9 +73,30 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
       return;
     }
 
+    // Optimistic UI Success
     placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
-    // Don't reset bid amount completely, just keep it ready for next bid or update
-    setIsDialogOpen(false);
+    setIsSuccess(true);
+
+    // Confetti Effect
+    // If event exists, spawn from click position, otherwise center
+    const x = e ? e.clientX / window.innerWidth : 0.5;
+    const y = e ? e.clientY / window.innerHeight : 0.5;
+
+    confetti({
+      origin: { x, y },
+      particleCount: 150,
+      spread: 70,
+      gravity: 1.2,
+      scalar: 1,
+      zIndex: 9999, // Ensure it pops over the modal
+      colors: ['#2563eb', '#3b82f6', '#60a5fa', '#ffffff'], // Blue theme
+    });
+
+    // Close after delay
+    setTimeout(() => {
+      setIsDialogOpen(false);
+      setIsSuccess(false);
+    }, 1500); 
   };
 
   const handleInputClick = (e: React.MouseEvent) => {
@@ -281,12 +304,21 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                   </div>
                 </div>
 
-                {/* Submit Bid Button - Full Width New Line */}
                 <button
                   onClick={handleBid}
-                  className="w-full h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center shadow-sm transition-colors active:scale-95 font-bold text-sm tracking-wide"
+                  disabled={isSuccess}
+                  className={`w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold text-sm tracking-wide
+                    ${isSuccess 
+                      ? 'bg-green-500 text-white scale-105' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
                 >
-                  Place Bid
+                  {isSuccess ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                      Bid Placed!
+                    </span>
+                  ) : "Place Bid"}
                 </button>
               </div>
             </CardContent>
@@ -417,11 +449,28 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                 </div>
 
                 {/* Submit Bid Button */}
+                {/* Submit Bid Button */}
                 <button
-                  onClick={() => handleBid()}
-                  className="px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-r-md font-bold shadow-sm transition-colors active:scale-95 text-lg"
+                  onClick={(e) => handleBid(e)}
+                  disabled={isSuccess}
+                  className={`px-6 rounded-r-md font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg min-w-[120px] flex items-center justify-center
+                    ${isSuccess 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
                 >
-                  Bid
+                  {isSuccess ? (
+                    <motion.svg 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-6 h-6" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </motion.svg>
+                  ) : "Bid"}
                 </button>
               </div>
 
