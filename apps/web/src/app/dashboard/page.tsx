@@ -14,6 +14,7 @@ export default function Dashboard() {
   
   // Filter items created by current user
   const myItems = items.filter(item => item.sellerId === user.id);
+  const itemsWithBids = myItems.filter(item => bids.some(b => b.itemId === item.id));
 
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto">
@@ -53,28 +54,28 @@ export default function Dashboard() {
         </TabsList>
 
         <TabsContent value="bids" className="space-y-8">
-          {myItems.length === 0 && (
+          {itemsWithBids.length === 0 && (
              <div className="p-12 text-center border-2 border-dashed rounded-xl bg-slate-50/50">
-                <p className="text-slate-400">You haven't listed any items yet.</p>
+                <p className="text-slate-400">No active bids at the moment.</p>
              </div>
           )}
 
-          {myItems.map(item => (
-            <div key={item.id} className="space-y-4">
-              <div className="flex items-center justify-between">
+          {itemsWithBids.map(item => (
+            <div key={item.id} className="border border-slate-200 rounded-xl overflow-hidden mb-6 bg-white">
+              <div className="flex items-center justify-between p-4 bg-slate-100 border-b border-slate-200 w-full">
                 <div className="flex items-center gap-3">
-                  <img src={item.images[0]} alt="" className="h-10 w-10 rounded-md object-cover" />
+                  <img src={item.images[0]} alt="" className="h-10 w-10 rounded-md object-cover border border-slate-200" />
                   <div>
                     <h3 className="font-bold text-slate-900">{item.title}</h3>
                     <p className="text-xs text-muted-foreground">Asking: Rs. {item.askPrice.toLocaleString()}</p>
                   </div>
                 </div>
-                <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none">
+                <Badge variant="secondary" className="bg-white text-slate-600 border border-slate-200 shadow-sm">
                   {item.bidCount} Bids Total
                 </Badge>
               </div>
 
-              <div className="grid gap-3">
+              <div className="p-4 space-y-3 bg-white">
                 {bids.filter(b => b.itemId === item.id).map(bid => {
                   const bidder = mockUsers.find(u => u.id === bid.bidderId) || mockUsers[0];
                   return (
@@ -83,7 +84,7 @@ export default function Dashboard() {
                 })}
                 
                 {bids.filter(b => b.itemId === item.id).length === 0 && (
-                  <div className="p-8 text-center border rounded-xl bg-slate-50/30">
+                  <div className="p-8 text-center border-2 border-dashed rounded-xl bg-slate-50/50">
                     <p className="text-slate-400 text-xs">No bids yet for this item.</p>
                   </div>
                 )}

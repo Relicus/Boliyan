@@ -13,75 +13,128 @@ interface SellerBidCardProps {
 }
 
 export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
-  // Stable "random" distance based on bidder ID to prevent hydration mismatch
-  const distance = useMemo(() => {
+  // Stable "random" derived values based on bidder ID
+  const { distance, location, duration } = useMemo(() => {
     const hash = bidder.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return ((hash % 40) / 10 + 1.1).toFixed(1);
+    const dist = ((hash % 40) / 10 + 1.1).toFixed(1);
+    
+    const locations = ["Satellite Town, Sargodha", "Model Town, Lahore", "DHA, Karachi", "Blue Area, Islamabad", "Civil Lines, Faisalabad", "Cantt, Rawalpindi"];
+    const loc = locations[hash % locations.length];
+    
+    // Duration approx 2.5 mins per km
+    const dur = Math.round(Number(dist) * 2.5);
+    
+    return { distance: dist, location: loc, duration: dur };
   }, [bidder.id]);
-  const duration = Math.round(Number(distance) * 2.5);
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 bg-white border border-slate-100 rounded-xl hover:shadow-md transition-all">
-      <div className="flex items-center gap-4 w-full md:w-auto">
-        <Avatar className="h-12 w-12 border-2 border-slate-50">
-          <AvatarImage src={bidder.avatar} />
-          <AvatarFallback>{bidder.name[0]}</AvatarFallback>
-        </Avatar>
-        
-        <div className="md:hidden flex-1">
-            <div className="flex items-center gap-2 mb-1">
-            <h4 className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
-            <div className="flex items-center gap-0.5 text-xs text-amber-500 font-bold">
-                <Star className="h-3 w-3 fill-amber-500" />
-                {bidder.rating}
+    <div className="bg-slate-50 border border-slate-200 rounded-xl hover:shadow-md transition-all p-3">
+      {/* MOBILE Layout (md:hidden) */}
+      <div className="flex flex-col gap-2 md:hidden">
+        {/* Top Row: User (65%) | Price (35%) */}
+        <div className="flex items-start">
+          <div className="flex items-center gap-2 w-[65%]">
+            <Avatar className="h-9 w-9 border-2 border-slate-50 shrink-0">
+              <AvatarImage src={bidder.avatar} />
+              <AvatarFallback>{bidder.name[0]}</AvatarFallback>
+            </Avatar>
+            
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h4 className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
+                <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-100 shrink-0">
+                  <div className="flex items-center gap-0.5 text-xs text-amber-600 font-black">
+                      <Star className="h-3 w-3 fill-amber-500" />
+                      {bidder.rating}
+                  </div>
+                  <span className="text-xs text-amber-600/70 font-semibold">(24)</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-0.5 min-w-0">
+                    <MapPin className="h-3 w-3 text-red-400 shrink-0" />
+                    <span className="truncate">{location}</span>
+                  </div>
+              </div>
             </div>
+          </div>
+
+          <div className="text-right w-[35%]">
+            <p className="text-xl font-black text-blue-600 leading-none truncate">Rs. {bid.amount.toLocaleString()}</p>
+            <div className="flex items-center justify-end gap-2 mt-0.5 text-xs text-muted-foreground font-medium whitespace-nowrap">
+               <div className="flex items-center gap-0.5">
+                 <MapPin className="h-3 w-3 text-red-400" />
+                 <span>{distance} km</span>
+               </div>
+               <div className="flex items-center gap-0.5">
+                 <Clock className="h-3 w-3 text-blue-400" />
+                 <span>{duration} min</span>
+               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Bottom Row: Actions */}
+        <div className="grid grid-cols-2 gap-3 mt-1">
+          <Button variant="outline" className="w-full h-10 border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold">
+            Reject
+          </Button>
+          <Button className="w-full h-10 bg-blue-600 hover:bg-blue-700 font-bold">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Unlock Chat
+          </Button>
         </div>
       </div>
 
-      <div className="flex-1 min-w-0 w-full">
-        <div className="hidden md:flex items-center gap-2 mb-1">
-          <h4 className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
-          <div className="flex items-center gap-0.5 text-xs text-amber-500 font-bold">
-            <Star className="h-3 w-3 fill-amber-500" />
-            {bidder.rating}
+      {/* DESKTOP Layout (hidden md:flex) */}
+      <div className="hidden md:flex flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12 border-2 border-slate-50">
+              <AvatarImage src={bidder.avatar} />
+              <AvatarFallback>{bidder.name[0]}</AvatarFallback>
+            </Avatar>
+            
+            <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
+                  <div className="flex items-center gap-0.5 text-xs text-amber-500 font-bold">
+                    <Star className="h-3 w-3 fill-amber-500" />
+                    {bidder.rating}
+                  </div>
+                  <span className="text-xs text-amber-600/70 font-semibold">(24)</span>
+                </div>
+                
+                <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                   <div className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3 text-red-400" />
+                    {location}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3 text-red-400" />
+                    {distance} km away
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-3 w-3 text-blue-400" />
+                    {duration} mins drive
+                  </div>
+                </div>
+            </div>
           </div>
-          <Badge variant="outline" className="text-[10px] py-0 h-4 border-slate-200 text-slate-500 font-normal">
-            Buyer
-          </Badge>
-        </div>
-        
-        <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <MapPin className="h-3 w-3 text-red-400" />
-            {distance} km away
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3 text-blue-400" />
-            {duration} mins drive
-          </div>
-           <div className="md:hidden flex items-center gap-1">
-             <Badge variant="outline" className="text-[10px] py-0 h-4 border-slate-200 text-slate-500 font-normal">
-                Buyer
-              </Badge>
-           </div>
-        </div>
-      </div>
 
-      <div className="flex flex-row items-center justify-between w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 gap-6 mt-2 md:mt-0">
-          <div className="text-left">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Offer</p>
-            <p className="text-lg font-black text-blue-600">Rs. {bid.amount.toLocaleString()}</p>
-          </div>
+          <div className="flex flex-row items-center gap-6">
+              <div className="text-left">
+                <p className="text-2xl font-black text-blue-600">Rs. {bid.amount.toLocaleString()}</p>
+              </div>
 
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" className="h-9 px-4 border-slate-200 hover:bg-slate-50">
-              Reject
-            </Button>
-            <Button size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Unlock Chat
-            </Button>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" className="h-9 px-4 border-slate-200 hover:bg-slate-50">
+                  Reject
+                </Button>
+                <Button size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Unlock Chat
+                </Button>
+              </div>
           </div>
       </div>
     </div>
