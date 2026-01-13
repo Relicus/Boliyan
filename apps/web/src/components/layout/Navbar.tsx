@@ -14,31 +14,35 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <Link href="/" className="group flex items-center gap-3 select-none transition-transform duration-200 active:scale-95">
-            {/* Geometric 'Ba' Logomark */}
+          <Link href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
+            {/* Geometric 'Ba' (ب) Logomark - Fixed clipping and spacing */}
             <svg viewBox="0 0 40 40" className="h-10 w-10 shrink-0">
+              {/* Shallower curve moved up to avoid overlap with dot */}
               <path
-                d="M5,15 Q20,35 35,15"
+                d="M32,10 C32,20 28,26 16,26 C12,26 8,24 8,24"
                 stroke="currentColor"
-                strokeWidth="4.5"
+                strokeWidth="7"
                 fill="none"
                 strokeLinecap="round"
                 className="transition-all duration-300 text-slate-800 group-hover:text-blue-600"
               />
+              {/* Dot moved down with breathing room */}
               <circle
-                cx="20"
-                cy="32"
-                r="3"
+                cx="18"
+                cy="36"
+                r="4"
                 className="transition-all duration-300 fill-slate-800 group-hover:fill-blue-600"
               />
             </svg>
             
-            <div className="flex flex-col items-center justify-center gap-0">
-              <span className="text-3xl font-[900] tracking-tight transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-slate-950 via-slate-800 to-slate-900 group-hover:from-blue-600 group-hover:via-blue-500 group-hover:to-indigo-600">
-                Boliyan
-              </span>
-              <span className="text-sm font-black transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200">
+            <div className="flex flex-col items-center justify-center gap-0 py-0.5">
+              {/* Urdu: Larger, on top */}
+              <span className="text-2xl font-black mb-[-2px] transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-slate-950 via-slate-800 to-slate-900 group-hover:from-blue-600 group-hover:via-blue-500 group-hover:to-indigo-600">
                 بولیاں
+              </span>
+              {/* English: Much smaller, wide spacing */}
+              <span className="text-[10px] font-bold tracking-[0.3em] uppercase transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200">
+                Boliyan
               </span>
             </div>
           </Link>
