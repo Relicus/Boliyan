@@ -37,9 +37,15 @@ export default function MarketplaceGrid() {
         return "grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
       case 'compact':
       default:
-        // Original: grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6
-        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6";
+        return ""; // Handled via style for auto-fit behavior
     }
+  };
+
+  const getGridStyle = () => {
+    if (viewMode === 'compact') {
+        return { gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" };
+    }
+    return {};
   };
 
   return (
@@ -88,6 +94,7 @@ export default function MarketplaceGrid() {
       
       <motion.div 
         className={`grid gap-3 ${getGridClasses()}`}
+        style={getGridStyle()}
       >
         <AnimatePresence>
         {filteredItems.map((item) => {

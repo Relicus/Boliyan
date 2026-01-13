@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useMemo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,25 @@ interface ItemCardProps {
 
 export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCardProps) {
   const { placeBid } = useApp();
-  const [bidAmount, setBidAmount] = useState<string>("");
+  
+  // Helper for compact price display (e.g. 185.5k)
+  const formatCompactPrice = (price: number) => {
+    return (price / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  };
+
+  // Smart Step Logic
+  const getSmartStep = (price: number) => {
+    if (price >= 100000) return 1000;
+    if (price >= 10000) return 500;
+    return 100;
+  };
+
+  // Initialize with Ask Price or Current High Bid
+  const initialBid = item.isPublicBid && item.currentHighBid 
+    ? item.currentHighBid + getSmartStep(item.currentHighBid) 
+    : item.askPrice;
+
+  const [bidAmount, setBidAmount] = useState<string>(initialBid.toString());
   const [error, setError] = useState<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -26,6 +44,15 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
     const hash = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return ((hash % 80) / 10 + 1.2).toFixed(1);
   }, [item.id]);
+
+  const handleSmartAdjust = (e: React.MouseEvent, direction: 1 | -1) => {
+    e.stopPropagation();
+    const current = parseFloat(bidAmount) || 0;
+    const step = getSmartStep(current);
+    const newValue = Math.max(0, current + (step * direction));
+    setBidAmount(newValue.toString());
+    setError(false);
+  };
 
   const handleBid = (e?: React.MouseEvent) => {
     e?.stopPropagation(); // Prevent dialog from opening when clicking bid button
@@ -39,12 +66,19 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
     }
 
     placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
-    setBidAmount("");
-    setIsDialogOpen(false); // Close dialog if bid comes from there
+    // Don't reset bid amount completely, just keep it ready for next bid or update
+    setIsDialogOpen(false); 
   };
 
   const handleInputClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent dialog from opening when clicking input
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Prevent 'e', 'E', '+', '-'
+    if (['e', 'E', '+', '-'].includes(e.key)) {
+      e.preventDefault();
+    }
   };
 
   const getHeightClass = () => {
@@ -140,7 +174,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               <div className="flex flex-col">
                 <span className={`${getLabelClass()} text-slate-500 font-bold uppercase tracking-wider transition-all`}>Asking</span>
                 <span className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all`}>
-                  {Math.round(item.askPrice/1000)}k
+                  {formatCompactPrice(item.askPrice)}
                 </span>
               </div>
               
@@ -150,7 +184,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                 </span>
                 {item.isPublicBid && item.currentHighBid ? (
                   <span className={`${getPriceClass()} font-black text-blue-600 leading-none transition-all`}>
-                    {Math.round(item.currentHighBid/1000)}k
+                    {formatCompactPrice(item.currentHighBid)}
                   </span>
                 ) : (
                   <Badge variant="outline" className={`h-4 px-1.5 ${getLabelClass()} font-bold border-slate-300 text-slate-600 transition-all`}>
@@ -160,30 +194,50 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               </div>
             </div>
 
-            {/* Input Row - Removed mt-auto */}
-            <div className="flex gap-1">
-              <div className="relative flex-1">
-                <Input 
-                    type="number" 
-                    placeholder="Your Offer..."
-                    value={bidAmount}
-                    onClick={handleInputClick}
-                    onChange={(e) => {
-                      setBidAmount(e.target.value);
-                      setError(false);
-                    }}
-                    className={`h-9 px-2 text-sm font-bold bg-slate-50 border-slate-300 focus-visible:ring-2 focus-visible:ring-blue-600 
-                      ${error ? 'border-red-500 bg-red-50 text-red-900 placeholder:text-red-400' : 'text-slate-900'}
-                    `}
-                  />
-              </div>
-              <Button 
-                size="sm" 
-                className="h-9 w-10 p-0 bg-blue-600 hover:bg-blue-700 rounded-md shrink-0 shadow-sm active:scale-95 transition-transform"
-                onClick={handleBid}
-              >
-                <ArrowRight className="h-5 w-5 text-white stroke-[3px]" />
-              </Button>
+            {/* Smart Stepper Input Row - Stacked Layout */}
+            <div className="flex flex-col gap-2 mt-1">
+                <div className="flex h-9 shadow-sm w-full">
+                    <div className="flex flex-1 border border-slate-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600">
+                        {/* Decrement Button - Large Touch Target */}
+                        <button 
+                          onClick={(e) => handleSmartAdjust(e, -1)}
+                          className="w-10 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200"
+                        >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6"/></svg>
+                        </button>
+                        
+                        {/* Input */}
+                        <input 
+                          type="number" 
+                          value={bidAmount}
+                          onClick={handleInputClick}
+                          onKeyDown={handleKeyDown}
+                          onChange={(e) => {
+                            setBidAmount(e.target.value);
+                            setError(false);
+                          }}
+                          className={`flex-1 w-full text-center text-sm font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                            ${error ? 'bg-red-50 text-red-900 placeholder:text-red-400' : 'bg-white'}
+                          `}
+                        />
+                        
+                        {/* Increment Button - Large Touch Target */}
+                        <button 
+                          onClick={(e) => handleSmartAdjust(e, 1)}
+                          className="w-10 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-green-600 transition-colors active:bg-slate-200"
+                        >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6"/></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                {/* Submit Bid Button - Full Width New Line */}
+                <button 
+                  onClick={handleBid}
+                  className="w-full h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center shadow-sm transition-colors active:scale-95 font-bold text-sm tracking-wide"
+                >
+                    Place Bid
+                </button>
             </div>
           </CardContent>
         </Card>
@@ -197,7 +251,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-12">
                <div className="flex justify-between items-end">
-                  <h2 className="text-xl font-bold text-white leading-tight">{item.title}</h2>
+                  <DialogTitle className="text-xl font-bold text-white leading-tight">{item.title}</DialogTitle>
                   <Badge variant={item.isPublicBid ? "default" : "secondary"} className="font-bold">
                     {item.isPublicBid ? "Public Bid" : "Sealed Bid"}
                   </Badge>
@@ -252,27 +306,52 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               </div>
            </div>
 
-           {/* Bidding Section */}
+           {/* Smart Stepper Bidding Section in Modal */}
            <div className="space-y-2">
               <label className="text-sm font-bold text-slate-900">Place Your Bid</label>
-              <div className="flex gap-2">
-                 <Input 
-                    type="number" 
-                    placeholder="Enter amount..."
-                    value={bidAmount}
-                    onChange={(e) => {
-                      setBidAmount(e.target.value);
-                      setError(false);
-                    }}
-                    className={`font-bold ${error ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                 />
-                 <Button 
-                    className="bg-blue-600 hover:bg-blue-700 font-bold px-6"
-                    onClick={() => handleBid()}
-                 >
-                    Bid Now
-                 </Button>
-              </div>
+              
+              <div className="flex h-12 shadow-sm">
+                <div className="flex flex-1 border border-slate-300 rounded-l-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600">
+                    {/* Decrement Button - Extra Large for Modal */}
+                    <button 
+                      onClick={(e) => handleSmartAdjust(e, -1)}
+                      className="w-14 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200"
+                    >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6"/></svg>
+                    </button>
+                    
+                    {/* Input */}
+                    <input 
+                      type="number" 
+                      value={bidAmount}
+                      onKeyDown={handleKeyDown}
+                      onChange={(e) => {
+                        setBidAmount(e.target.value);
+                        setError(false);
+                      }}
+                      className={`flex-1 w-full text-center text-xl font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                        ${error ? 'bg-red-50 text-red-900 placeholder:text-red-400' : 'bg-white'}
+                      `}
+                    />
+                    
+                    {/* Increment Button - Extra Large for Modal */}
+                    <button 
+                      onClick={(e) => handleSmartAdjust(e, 1)}
+                      className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-green-600 transition-colors active:bg-slate-200"
+                    >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6"/></svg>
+                    </button>
+                </div>
+                
+                {/* Submit Bid Button */}
+                <button 
+                  onClick={() => handleBid()}
+                  className="px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-r-md font-bold shadow-sm transition-colors active:scale-95 text-lg"
+                >
+                    Bid
+                </button>
+            </div>
+
               {error && (
                  <p className="text-xs text-red-500 font-bold">
                     Bid must be at least {Math.round(item.askPrice * 0.7).toLocaleString()}
