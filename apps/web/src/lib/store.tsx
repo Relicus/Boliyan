@@ -11,6 +11,8 @@ interface AppContextType {
   conversations: Conversation[];
   messages: Message[];
   addItem: (item: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => void;
+  updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => void;
+  deleteItem: (id: string) => void;
   placeBid: (itemId: string, amount: number, type: 'public' | 'private') => void;
   sendMessage: (conversationId: string, content: string) => void;
   getUser: (id: string) => User | undefined;
@@ -67,6 +69,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
     };
     setItems(prev => [item, ...prev]);
+  };
+  const updateItem = (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => {
+    setItems(prev => prev.map(item => 
+      item.id === id ? { ...item, ...updates } : item
+    ));
+  };
+
+  const deleteItem = (id: string) => {
+    setItems(prev => prev.filter(item => item.id !== id));
+    // Also clean up bids associated with this item
+    setBids(prev => prev.filter(bid => bid.itemId !== id));
   };
 
   const placeBid = (itemId: string, amount: number, type: 'public' | 'private') => {
@@ -128,7 +141,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AppContext.Provider value={{ user, items, bids, conversations, messages, addItem, placeBid, sendMessage, getUser, filters, setFilter }}>
+    <AppContext.Provider value={{ user, items, bids, conversations, messages, addItem, updateItem, deleteItem, placeBid, sendMessage, getUser, filters, setFilter }}>
       {children}
     </AppContext.Provider>
   );

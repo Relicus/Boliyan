@@ -16,6 +16,7 @@ src/
 ```
 
 ## CONVENTIONS
+- **AI Referencing**: Always assign unique, descriptive `id` attributes to main containers, sections, and significant UI elements. This is mandatory for AI agents to accurately target, reference, and modify specific parts of the UI.
 - **Imports**: Use `@/` alias. Manual imports from `packages/shared`.
 - **State**: React Context + Zustand-like stores.
 - **Data**: Fetch in Server Components, pass to Client Components.

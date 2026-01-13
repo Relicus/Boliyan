@@ -3,35 +3,9 @@
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { useRef, useState, useEffect } from "react";
-import { 
-  Smartphone, 
-  Laptop, 
-  Armchair, 
-  Shirt, 
-  Dumbbell, 
-  Watch,
-  Gamepad2,
-  Users,
-  LayoutGrid,
-  Music,
-  Camera,
-  ChevronLeft,
-  ChevronRight
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CATEGORIES } from "@/lib/constants";
 
-const CATEGORIES = [
-  { label: "All Items", icon: LayoutGrid },
-  { label: "Mobiles", icon: Smartphone },
-  { label: "Electronics", icon: Laptop },
-  { label: "Furniture", icon: Armchair },
-  { label: "Fashion", icon: Shirt },
-  { label: "Sports", icon: Dumbbell },
-  { label: "Gaming", icon: Gamepad2 },
-  { label: "Watches", icon: Watch },
-  { label: "Audio", icon: Music },
-  { label: "Cameras", icon: Camera },
-  { label: "Community", icon: Users }
-];
 
 export default function CategoryBar() {
   const { filters, setFilter } = useApp();

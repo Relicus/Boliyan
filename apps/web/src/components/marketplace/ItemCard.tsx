@@ -3,11 +3,11 @@ import confetti from "canvas-confetti";
 import { useState, useMemo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MapPin, ArrowRight, Lock, Globe, Clock } from "lucide-react";
+import { MapPin, ArrowRight, Lock, Globe, Clock, X } from "lucide-react";
 import { useApp } from "@/lib/store";
 
 interface ItemCardProps {
@@ -331,7 +331,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
             </CardContent>
           </Card>
         </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-transparent border-none shadow-none sm:bg-white sm:border sm:shadow-lg sm:block gap-0">
+      <DialogContent showCloseButton={false} className="sm:max-w-[500px] p-0 overflow-visible bg-transparent border-none shadow-none sm:bg-white sm:border sm:shadow-lg sm:block gap-0">
         <motion.div
           drag="y"
           dragConstraints={{ top: 0, bottom: 0 }}
@@ -341,18 +341,53 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               setIsDialogOpen(false);
             }
           }}
-          className="bg-white rounded-lg overflow-hidden w-full h-full max-h-[85vh] sm:max-h-full sm:h-auto flex flex-col"
+          className="relative bg-white rounded-lg overflow-hidden w-full h-full max-h-[85vh] sm:max-h-full sm:h-auto flex flex-col"
         >
+          {/* Custom Close Button - Premium Sticky Style */}
+          <DialogClose asChild>
+            <motion.button
+              id={`close-listing-btn-${item.id}`}
+              className="absolute top-4 right-4 z-[60] p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] text-slate-600 hover:text-red-500 border border-slate-100/50 group"
+              initial={{ opacity: 0, scale: 0.2, rotate: -45 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ delay: 0.1, type: "spring", damping: 15 }}
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <X className="h-4.5 w-4.5" />
+              <span className="sr-only">Close</span>
+            </motion.button>
+          </DialogClose>
+
           {/* Mobile Drag Handle */}
           <div className="h-1.5 w-12 bg-slate-300 rounded-full mx-auto my-2 absolute top-1 left-1/2 -translate-x-1/2 z-20 sm:hidden" />
           
-          <div className="relative h-52 sm:h-60 w-full bg-slate-100 shrink-0">
-            <img
-              src={item.images[0]}
-              alt={item.title}
-              className="object-cover w-full h-full"
-            />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-12">
+          <div className="relative h-60 sm:h-72 w-full bg-slate-100 shrink-0">
+            {item.images.length > 1 ? (
+              <div id={`item-card-${item.id}-gallery`} className="flex h-full w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+                {item.images.map((src, i) => (
+                  <img
+                    key={i}
+                    id={`item-card-${item.id}-image-${i}`}
+                    src={src}
+                    alt={`${item.title} - ${i + 1}`}
+                    className="object-cover w-full h-full snap-center shrink-0"
+                  />
+                ))}
+                {/* Visual indicator for horizontal scroll */}
+                <div className="absolute bottom-16 right-4 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-[10px] text-white font-bold pointer-events-none">
+                  1 / {item.images.length}
+                </div>
+              </div>
+            ) : (
+              <img
+                id={`item-card-${item.id}-image-single`}
+                src={item.images[0]}
+                alt={item.title}
+                className="object-cover w-full h-full"
+              />
+            )}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 pt-16">
               <div className="flex justify-between items-end">
                 <DialogTitle className="text-xl font-bold text-white leading-tight">{item.title}</DialogTitle>
                 {item.isPublicBid ? (
@@ -490,6 +525,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
           </div>
         </motion.div>
       </DialogContent>
+
     </Dialog>
   );
 }

@@ -18,10 +18,11 @@ export default function BottomNav() {
       href: "/",
     },
     {
-      label: "Market",
+      label: "Categories",
       icon: LayoutGrid,
-      href: "/categories", // Placeholder for categories view
+      href: "/categories",
     },
+
     {
       label: "Post",
       icon: PlusCircle,
@@ -40,7 +41,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <div id="bottom-nav-container-01" className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-t border-slate-200 h-16 safe-area-pb">
+    <div id="bottom-nav-container-01" className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 h-16 safe-area-pb">
       <div id="bottom-nav-wrapper-02" className="flex items-center justify-around h-full px-2">
         {navItems.map((item, index) => {
           const isActive = pathname === item.href;

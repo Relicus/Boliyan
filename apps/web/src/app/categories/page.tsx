@@ -5,33 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   Tag, 
-  ArrowLeft,
-  LayoutGrid,
-  Laptop,
-  Armchair,
-  Wrench,
-  Music,
-  Camera,
-  Car,
-  Home,
-  Shirt,
-  Tv
+  ArrowLeft
 } from "lucide-react";
+import { CATEGORIES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const CATEGORY_ITEMS = [
-  { label: "All Items", icon: LayoutGrid },
-  { label: "Electronics", icon: Laptop },
-  { label: "Furniture", icon: Armchair },
-  { label: "Auto Parts", icon: Wrench },
-  { label: "Audio", icon: Music },
-  { label: "Cameras", icon: Camera },
-  { label: "Vehicles", icon: Car },
-  { label: "Property", icon: Home },
-  { label: "Fashion", icon: Shirt },
-  { label: "Home Appliances", icon: Tv },
-];
 
 export default function CategoriesPage() {
   const { filters, setFilter } = useApp();
@@ -43,7 +22,9 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 pb-20 md:hidden">
+    <div className="flex flex-col min-h-screen bg-slate-50 pb-20">
+      <div className="container mx-auto max-w-5xl">
+
       <div className="sticky top-0 z-10 bg-white border-b px-4 h-16 flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-5 w-5 text-slate-600" />
@@ -55,7 +36,7 @@ export default function CategoriesPage() {
       </div>
 
       <div className="p-4 grid grid-cols-2 gap-3">
-        {CATEGORY_ITEMS.map((item) => {
+        {CATEGORIES.map((item) => {
           const Icon = item.icon;
           const isActive = filters.category === item.label || (item.label === "All Items" && !filters.category);
           
@@ -82,6 +63,7 @@ export default function CategoriesPage() {
             </Link>
           );
         })}
+      </div>
       </div>
     </div>
   );

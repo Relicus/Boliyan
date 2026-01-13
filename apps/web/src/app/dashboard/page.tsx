@@ -5,12 +5,27 @@ import { mockUsers } from "@/lib/mock-data";
 import SellerBidCard from "@/components/seller/SellerBidCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus } from "lucide-react";
+import { Plus, Trash2, Edit } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import DeleteConfirmationDialog from "@/components/seller/DeleteConfirmationDialog";
+import { Item } from "@/types";
 
 export default function Dashboard() {
-  const { items, bids, user } = useApp();
+  const { items, bids, user, deleteItem } = useApp();
+  const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
+
+  const handleDeleteClick = (item: Item) => {
+    setItemToDelete(item);
+  };
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      deleteItem(itemToDelete.id);
+      setItemToDelete(null);
+    }
+  };
   
   // Filter items created by current user
   const myItems = items.filter(item => item.sellerId === user.id);
@@ -99,13 +114,40 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {myItems.map(item => (
               <div key={item.id} id={`listing-card-${item.id}`} className="p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm">
-                <img id={`listing-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover shrink-0 bg-slate-100" />
+              <div className="relative shrink-0">
+                <img id={`listing-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
+                {item.images.length > 1 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-blue-600 text-[10px] font-bold border-2 border-white">
+                    {item.images.length}
+                  </Badge>
+                )}
+              </div>
                 <div id={`listing-content-${item.id}`} className="flex-1 min-w-0">
                   <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-1">{item.title}</h3>
                   <p id={`listing-price-${item.id}`} className="text-sm text-blue-600 font-semibold mb-2">Rs. {item.askPrice.toLocaleString()}</p>
                   <div id={`listing-actions-${item.id}`} className="flex gap-2">
-                    <Button id={`listing-edit-btn-${item.id}`} variant="outline" size="sm" className="h-8 text-[11px] px-3">Edit</Button>
-                    <Button id={`listing-delete-btn-${item.id}`} variant="outline" size="sm" className="h-8 text-[11px] px-3 text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100">Delete</Button>
+                    <Button 
+                      id={`listing-edit-btn-${item.id}`} 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 text-[11px] px-3"
+                      asChild
+                    >
+                      <Link href={`/list?id=${item.id}`}>
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Link>
+                    </Button>
+                    <Button 
+                      id={`listing-delete-btn-${item.id}`} 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 text-[11px] px-3 text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100"
+                      onClick={() => handleDeleteClick(item)}
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Delete
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -113,6 +155,13 @@ export default function Dashboard() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <DeleteConfirmationDialog 
+        isOpen={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        onConfirm={confirmDelete}
+        itemTitle={itemToDelete?.title || ""}
+      />
     </div>
   );
 }

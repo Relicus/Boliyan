@@ -30,6 +30,7 @@ Boliyan: Classifieds marketplace. Next.js 16 frontend (`apps/web`), raw SQL data
 | **Logic** | `packages/shared` | Bidding rules (Manual import) |
 
 ## CONVENTIONS
+- **AI Referencing**: Always assign unique, descriptive `id` attributes to major UI elements (containers, sections, key classes) to facilitate AI interaction and precise code targeting.
 - **Monorepo**: Manual. No `pnpm-workspace`. Run npm inside dirs.
 - **Styling**: Tailwind v4 + Shadcn.
 - **Database**: Raw SQL. No ORM.

@@ -107,7 +107,7 @@ export default function MarketplaceGrid() {
 
   return (
     <div id="marketplace-grid-root" className="px-4 pb-4 pt-0 md:px-4 md:pb-4 md:pt-0">
-      <div className="mb-2 top-0 md:top-16 z-30 bg-white md:bg-slate-50/95 backdrop-blur -mx-4 border-b border-slate-200/50 flex flex-col gap-0">
+      <div className="mb-2 top-0 md:top-16 z-30 bg-white -mx-4 border-b border-slate-200/50 flex flex-col gap-0">
         <div className="flex flex-col gap-2 pt-0 pb-1">
           {/* Top Row: Search & View Toggles */}
           <div id="toolbar-top-row" className="flex items-center gap-2 px-4 py-2">
@@ -164,13 +164,13 @@ export default function MarketplaceGrid() {
           </div>
 
           {/* Second Row: Smart Filters */}
-          <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide px-4">
+          <div id="smart-filters-row" className="flex items-center gap-4 overflow-x-auto scrollbar-hide px-4">
             <SmartFilterBar />
           </div>
         </div>
 
         {/* Category Bar Row */}
-        <div className="hidden md:block px-4 pb-2">
+        <div id="category-bar-row" className="hidden md:block px-4 pb-2">
            <CategoryBar />
         </div>
       </div>
