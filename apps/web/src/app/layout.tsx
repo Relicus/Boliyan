@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
+import BottomNav from "@/components/layout/BottomNav";
 import { AppProvider } from "@/lib/store";
 
 const geistSans = localFont({
@@ -77,10 +78,11 @@ export default function RootLayout({
           <Navbar />
           <div className="flex">
             <Sidebar />
-            <main className="flex-1 min-h-[calc(100vh-64px)]">
+            <main className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100vh-64px)] pb-16 md:pb-0">
               {children}
             </main>
           </div>
+          <BottomNav />
         </AppProvider>
       </body>
     </html>

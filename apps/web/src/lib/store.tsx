@@ -35,7 +35,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Current user is hardcoded as 'u1' (Ahmed Ali) for now
   const user = mockUsers[0];
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<{
+    category: string | null;
+    search: string;
+    radius: number;
+    sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest';
+  }>({
     category: null,
     search: "",
     radius: 15,

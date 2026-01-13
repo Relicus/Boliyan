@@ -15,7 +15,7 @@ type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
 export default function MarketplaceGrid() {
   const { items, filters } = useApp();
-  const [viewMode, setViewMode] = useState<ViewMode>('compact');
+  const [viewMode, setViewMode] = useState<ViewMode>('comfortable');
   const [isLoading, setIsLoading] = useState(true);
 
   // Simulate loading on mount
@@ -80,20 +80,17 @@ export default function MarketplaceGrid() {
         return "grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
       case 'compact':
       default:
-        return ""; // Handled via style for auto-fit behavior
+        return "grid-cols-[repeat(auto-fill,minmax(165px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]";
     }
   };
 
   const getGridStyle = () => {
-    if (viewMode === 'compact') {
-        return { gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" };
-    }
     return {};
   };
 
   return (
     <div className="p-4">
-      <div className="mb-4 flex flex-col xl:flex-row xl:items-center justify-between gap-4 sticky top-0 bg-slate-50/95 backdrop-blur z-30 py-2 -mx-4 px-4 border-b border-slate-200/50">
+      <div className="mb-4 flex flex-row items-center justify-between gap-4 sticky top-0 bg-slate-50/95 backdrop-blur z-30 py-2 -mx-4 px-4 border-b border-slate-200/50">
         <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide flex-1">
           <SmartFilterBar />
         </div>
