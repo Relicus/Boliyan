@@ -68,8 +68,8 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
         </div>
       </div>
 
-      <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 gap-4 mt-2 md:mt-0">
-          <div className="text-left md:text-right">
+      <div className="flex flex-row items-center justify-between w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 gap-6 mt-2 md:mt-0">
+          <div className="text-left">
             <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Offer</p>
             <p className="text-lg font-black text-blue-600">Rs. {bid.amount.toLocaleString()}</p>
           </div>
