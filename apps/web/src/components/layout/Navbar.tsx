@@ -12,7 +12,7 @@ export default function Navbar() {
 
   return (
     <nav id="navbar-01" className="relative md:sticky md:top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
-      <div id="navbar-container-02" className="container mx-auto flex h-16 items-center justify-center md:justify-between px-4">
+      <div id="navbar-container-02" className="w-full flex h-16 items-center justify-center md:justify-between px-4 lg:px-6">
         <div id="navbar-left-section-03" className="flex items-center gap-8">
           <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
             {/* Geometric 'Ba' (ب) Logomark */}
