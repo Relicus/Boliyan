@@ -52,7 +52,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     search: "",
     radius: 15,
     locationMode: 'current',
-    city: 'Dubai',
+    city: 'Karachi',
     sortBy: 'trending',
     minPrice: null,
     maxPrice: null,

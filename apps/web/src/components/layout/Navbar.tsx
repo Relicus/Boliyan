@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useApp } from "@/lib/store";
+import { LocationSelector } from "@/components/marketplace/LocationSelector";
 
 export default function Navbar() {
   const { filters, setFilter, user } = useApp();
 
   return (
     <nav id="navbar-01" className="relative md:sticky md:top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
-      <div id="navbar-container-02" className="w-full flex h-16 items-center justify-center md:justify-between px-4 lg:px-6">
+      <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-6">
         <div id="navbar-left-section-03" className="flex items-center gap-8">
           <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
             {/* Geometric 'Ba' (ب) Logomark */}
@@ -53,8 +54,6 @@ export default function Navbar() {
         </div>
 
         <div id="navbar-right-section-11" className="hidden md:flex items-center gap-2">
-
-          
           <Button id="navbar-sell-btn-12" asChild variant="outline" className="hidden sm:flex items-center gap-2 border-blue-100 hover:bg-blue-50 text-blue-600">
             <Link href="/list">
               <Plus id="navbar-sell-plus-icon-13" className="h-4 w-4" />
@@ -73,6 +72,11 @@ export default function Navbar() {
               <AvatarFallback id="navbar-avatar-fallback-20">{user.name[0]}</AvatarFallback>
             </Avatar>
           </Link>
+        </div>
+
+        {/* Mobile View: Location Selection */}
+        <div id="navbar-mobile-location-21" className="flex md:hidden items-center">
+           <LocationSelector align="end" />
         </div>
       </div>
     </nav>
