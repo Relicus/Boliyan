@@ -25,6 +25,10 @@ src/
 - **DO NOT** leak server secrets to client components.
 - **DO NOT** assume `packages/` are symlinked.
 
+## ROADMAP
+- **UI/UX Enhancements**: See [ui_ux_roadmap.md](file:///C:/Users/ASUS/.gemini/antigravity/brain/bf3cb565-0ea7-4e77-9077-7adcdb4d1347/ui_ux_roadmap.md) for planned platform-level improvements.
+- **Backend Integration**: Planned transition from mock data to Supabase/PostgreSQL.
+
 ## COMMANDS
 ```bash
 npm run dev    # Localhost:3000

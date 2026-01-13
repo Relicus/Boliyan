@@ -18,6 +18,7 @@ interface AppContextType {
     category: string | null;
     search: string;
     radius: number;
+    sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest';
   };
   setFilter: (key: keyof AppContextType['filters'], value: any) => void;
 }
@@ -38,6 +39,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     category: null,
     search: "",
     radius: 15,
+    sortBy: 'trending',
   });
 
   const addItem = (newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => {
