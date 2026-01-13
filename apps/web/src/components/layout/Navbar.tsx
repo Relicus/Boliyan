@@ -14,13 +14,33 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex flex-col items-center justify-center gap-0 group select-none transition-transform duration-200 active:scale-95">
-            <span className="text-3xl font-[900] tracking-tight transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-slate-950 via-slate-800 to-slate-900 group-hover:from-blue-600 group-hover:via-blue-500 group-hover:to-indigo-600">
-              Boliyan
-            </span>
-            <span className="text-sm font-black transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200">
-              بولیاں
-            </span>
+          <Link href="/" className="group flex items-center gap-3 select-none transition-transform duration-200 active:scale-95">
+            {/* Geometric 'Ba' Logomark */}
+            <svg viewBox="0 0 40 40" className="h-10 w-10 shrink-0">
+              <path
+                d="M5,15 Q20,35 35,15"
+                stroke="currentColor"
+                strokeWidth="4.5"
+                fill="none"
+                strokeLinecap="round"
+                className="transition-all duration-300 text-slate-800 group-hover:text-blue-600"
+              />
+              <circle
+                cx="20"
+                cy="32"
+                r="3"
+                className="transition-all duration-300 fill-slate-800 group-hover:fill-blue-600"
+              />
+            </svg>
+            
+            <div className="flex flex-col items-center justify-center gap-0">
+              <span className="text-3xl font-[900] tracking-tight transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-slate-950 via-slate-800 to-slate-900 group-hover:from-blue-600 group-hover:via-blue-500 group-hover:to-indigo-600">
+                Boliyan
+              </span>
+              <span className="text-sm font-black transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200">
+                بولیاں
+              </span>
+            </div>
           </Link>
           
           <div className="hidden md:flex relative w-[400px]">
