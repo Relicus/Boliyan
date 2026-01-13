@@ -39,6 +39,10 @@ export default function CategoryBar() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
@@ -71,20 +75,41 @@ export default function CategoryBar() {
     }
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+    setIsDragging(true);
+    setHasMoved(false);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeft(scrollContainerRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll speed multiplier
+    if (Math.abs(walk) > 5) {
+      setHasMoved(true);
+    }
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
   return (
     <div className="relative w-full group overflow-hidden">
-      {/* Scroll Gradient - Left */}
-      <div className={cn(
-        "absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none transition-opacity duration-300",
-        "bg-gradient-to-r from-white md:from-slate-50 via-white/80 md:via-slate-50/80 to-transparent",
-        showLeftArrow ? "opacity-100" : "opacity-0"
-      )} />
 
       {/* Navigation Button - Left */}
       {showLeftArrow && (
         <button
           onClick={() => scroll("left")}
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-xl text-slate-600 hover:text-slate-900 transition-all active:scale-95"
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-md text-slate-600 hover:text-slate-900 transition-all active:scale-95"
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -95,7 +120,14 @@ export default function CategoryBar() {
       <div 
         id="category-bar-root" 
         ref={scrollContainerRef}
-        className="flex w-full overflow-x-auto scrollbar-hide gap-3 px-4 py-2 scroll-smooth items-center"
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        className={cn(
+          "flex w-full overflow-x-auto scrollbar-hide gap-3 px-4 py-2 scroll-smooth items-center select-none",
+          isDragging ? "cursor-grabbing" : "cursor-grab"
+        )}
       >
         {CATEGORIES.map((category) => {
           const Icon = category.icon;
@@ -106,7 +138,11 @@ export default function CategoryBar() {
             <button
               key={category.label}
               id={`category-btn-${slug}`}
-              onClick={() => setFilter('category', category.label === "All Items" ? null : category.label)}
+              onClick={() => {
+                if (!hasMoved) {
+                  setFilter('category', category.label === "All Items" ? null : category.label);
+                }
+              }}
               className={cn(
                 "flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-300 border shrink-0",
                 isSelected
@@ -121,18 +157,12 @@ export default function CategoryBar() {
         })}
       </div>
 
-       {/* Scroll Gradient - Right */}
-       <div className={cn(
-        "absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none transition-opacity duration-300",
-        "bg-gradient-to-l from-white md:from-slate-50 via-white/80 md:via-slate-50/80 to-transparent",
-        showRightArrow ? "opacity-100" : "opacity-0"
-      )} />
 
       {/* Navigation Button - Right */}
       {showRightArrow && (
         <button
           onClick={() => scroll("right")}
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-xl text-slate-600 hover:text-slate-900 transition-all active:scale-95"
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-md text-slate-600 hover:text-slate-900 transition-all active:scale-95"
           aria-label="Scroll right"
         >
           <ChevronRight className="h-6 w-6" />

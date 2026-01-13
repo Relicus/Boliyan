@@ -18,6 +18,8 @@ interface AppContextType {
     category: string | null;
     search: string;
     radius: number;
+    locationMode: 'current' | 'city';
+    city: string;
     sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest';
     minPrice: number | null;
     maxPrice: number | null;
@@ -42,11 +44,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     category: string | null;
     search: string;
     radius: number;
+    locationMode: 'current' | 'city';
+    city: string;
     sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest';
   }>({
     category: null,
     search: "",
     radius: 15,
+    locationMode: 'current',
+    city: 'Dubai',
     sortBy: 'trending',
     minPrice: null,
     maxPrice: null,

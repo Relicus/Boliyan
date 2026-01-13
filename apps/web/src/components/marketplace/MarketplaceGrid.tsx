@@ -9,9 +9,16 @@ import ItemCardSkeleton from "./ItemCardSkeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import SmartFilterBar from "./SmartFilterBar";
 import CategoryBar from "./CategoryBar";
-import { LayoutGrid, Grid3x3, Grid2x2, Search } from "lucide-react";
+import { LayoutGrid, Grid3x3, Grid2x2, Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
@@ -120,6 +127,35 @@ export default function MarketplaceGrid() {
                   value={filters.search}
                   onChange={(e) => setFilter('search', e.target.value)}
                 />
+             </div>
+             
+             {/* Location Selection */}
+             <div id="location-selector-wrapper" className="hidden sm:flex items-center gap-2">
+                <Select 
+                  value={filters.locationMode} 
+                  onValueChange={(val) => setFilter('locationMode', val)}
+                >
+                  <SelectTrigger id="location-select-trigger" className="h-10 px-3 bg-white border-slate-200 shadow-sm min-w-[140px]">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-blue-500 fill-blue-500/10" />
+                      <SelectValue placeholder="Location" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="current">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Near Me</span>
+                        <span className="text-xs text-muted-foreground">({filters.radius}km)</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="city">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{filters.city}</span>
+                        <span className="text-xs text-muted-foreground">({filters.radius}km)</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
              </div>
 
              {/* View Toggle Controls */}
