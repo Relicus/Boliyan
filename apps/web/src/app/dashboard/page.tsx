@@ -6,7 +6,8 @@ import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Clock } from "lucide-react";
+import { Plus, Trash2, Edit, Clock, Eye } from "lucide-react";
+import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const { items, bids, user, deleteItem, getUser } = useApp();
   const [activeTab, setActiveTab] = useState("my-bids");
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
+  const [viewingItem, setViewingItem] = useState<Item | null>(null);
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -260,6 +262,16 @@ export default function Dashboard() {
                         </div>
                         <div id={`listing-actions-${item.id}`} className="flex gap-2">
                           <Button 
+                            id={`listing-view-btn-${item.id}`} 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 text-[11px] px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
+                            onClick={() => setViewingItem(item)}
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            View
+                          </Button>
+                          <Button 
                             id={`listing-edit-btn-${item.id}`} 
                             variant="outline" 
                             size="sm" 
@@ -305,6 +317,15 @@ export default function Dashboard() {
         onConfirm={confirmDelete}
         itemTitle={itemToDelete?.title || ""}
       />
+
+      {viewingItem && (
+        <ProductDetailsModal 
+          item={viewingItem} 
+          seller={user} 
+          isOpen={!!viewingItem} 
+          onClose={() => setViewingItem(null)} 
+        />
+      )}
     </div>
   );
 }

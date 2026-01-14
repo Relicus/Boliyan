@@ -88,6 +88,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Safety check: Don't allow bidding on own item
+    if (item.sellerId === user.id) {
+      console.warn("Attempted to bid on own item");
+      return;
+    }
+
     const newBid: Bid = {
       id: `b${Date.now()}`,
       itemId,
