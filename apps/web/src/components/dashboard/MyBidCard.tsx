@@ -4,7 +4,8 @@ import { Bid, Item, User } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Trophy, AlertTriangle } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 
 interface MyBidCardProps {
   item: Item;
@@ -16,7 +17,9 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   const { user } = useApp();
   
   const isLeading = item.isPublicBid && item.currentHighBidderId === user.id;
+
   const isOutbid = item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getTimeLeft = (expiryAt: string) => {
     const diff = new Date(expiryAt).getTime() - Date.now();
@@ -28,7 +31,12 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   };
 
   return (
-    <div id={`my-bid-card-${item.id}`} className="p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm">
+    <>
+    <div 
+      id={`my-bid-card-${item.id}`} 
+      onClick={() => setIsModalOpen(true)}
+      className="p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm cursor-pointer"
+    >
       <div className="relative shrink-0">
         <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
         <Badge className={`absolute -top-2 -right-2 h-5 flex items-center justify-center px-1.5 text-[10px] font-bold border-2 border-white ${
@@ -79,5 +87,12 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
         </div>
       </div>
     </div>
+      <ProductDetailsModal 
+        item={item} 
+        seller={seller} 
+        isOpen={isModalOpen} 
+        onClose={setIsModalOpen} 
+      />
+    </>
   );
 }

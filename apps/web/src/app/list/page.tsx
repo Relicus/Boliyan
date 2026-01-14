@@ -14,7 +14,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Sparkles, Gavel, EyeOff, Camera, X, Save, Check } from "lucide-react";
+import { Gavel, EyeOff, Camera, X, Save, Check } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -37,7 +37,7 @@ function ListForm() {
   const [duration, setDuration] = useState<"24" | "48" | "72">("24");
   
   const [images, setImages] = useState<string[]>([]);
-  const [recommended, setRecommended] = useState<number | null>(null);
+
   
   const [errors, setErrors] = useState<{
     title?: boolean;
@@ -58,25 +58,7 @@ function ListForm() {
     }
   }, [editingItem]);
 
-  useEffect(() => {
-    if (category) {
-      // Mocked price intelligence
-      const prices: Record<string, number> = {
-        "Mobiles": 45000,
-        "Electronics": 65000,
-        "Furniture": 15000,
-        "Fashion": 5000,
-        "Sports": 8000,
-        "Gaming": 40000,
-        "Watches": 20000,
-        "Audio": 12000,
-        "Cameras": 85000,
-        "Appliances": 25000,
-        "Community": 1000,
-      };
-      setRecommended(prices[category] || 20000);
-    }
-  }, [category]);
+
 
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +115,7 @@ function ListForm() {
         isPublicBid: isPublic,
         sellerId: user.id, // Current user
         images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=1000&auto=format&fit=crop"], // Fallback if no images
-        recommendedPrice: recommended || 0,
+        recommendedPrice: 0,
         createdAt: new Date().toISOString(),
         expiryAt: expiryDate.toISOString(),
         listingDuration: finalDuration,
@@ -275,24 +257,7 @@ function ListForm() {
             </div>
           </div>
 
-          {recommended && (
-            <div id="recommended-price-banner" className="p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3">
-              <Sparkles id="recommended-sparkles-icon" className="h-5 w-5 text-blue-600 animate-pulse" />
-              <div className="flex-1">
-                <p id="recommended-title" className="text-sm font-semibold text-blue-900">Recommended Market Price</p>
-                <p id="recommended-text" className="text-xs text-blue-700">Based on recent sales: <span className="font-bold">Rs. {recommended.toLocaleString()}</span></p>
-              </div>
-              <Button 
-                id="apply-recommended-price-btn"
-                variant="ghost" 
-                size="sm" 
-                className="text-xs text-blue-600 hover:bg-blue-100"
-                onClick={() => setAskPrice(recommended.toString())}
-              >
-                Use This
-              </Button>
-            </div>
-          )}
+
 
           <div className="space-y-2">
             <Label htmlFor="description-textarea">Description</Label>
