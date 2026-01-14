@@ -14,6 +14,8 @@ interface AppContextType {
   updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => void;
   deleteItem: (id: string) => void;
   placeBid: (itemId: string, amount: number, type: 'public' | 'private') => void;
+  toggleWatch: (itemId: string) => void;
+  watchedItemIds: string[];
   sendMessage: (conversationId: string, content: string) => void;
   getUser: (id: string) => User | undefined;
   filters: {
@@ -38,6 +40,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [bids, setBids] = useState<Bid[]>(mockBids);
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
   
   // Current user is hardcoded as 'u1' (Ahmed Ali) for now
   const user = mockUsers[0];
@@ -83,6 +86,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const placeBid = (itemId: string, amount: number, type: 'public' | 'private') => {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+
+    // Safety check: Don't allow bids lower than current high bid for public listings
+    if (type === 'public' && item.currentHighBid && amount < item.currentHighBid) {
+      console.warn("Attempted to place a bid lower than the current high bid");
+      return;
+    }
+
     const newBid: Bid = {
       id: `b${Date.now()}`,
       itemId,
@@ -101,11 +113,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return {
           ...item,
           bidCount: item.bidCount + 1,
-          currentHighBid: item.currentHighBid ? Math.max(item.currentHighBid, amount) : amount
+          currentHighBid: item.currentHighBid ? Math.max(item.currentHighBid, amount) : amount,
+          currentHighBidderId: (!item.currentHighBid || amount > item.currentHighBid) ? user.id : item.currentHighBidderId
         };
       }
       return item;
     }));
+
+    // Auto-watch when bidding
+    setWatchedItemIds(prev => prev.includes(itemId) ? prev : [...prev, itemId]);
+  };
+
+  const toggleWatch = (itemId: string) => {
+    setWatchedItemIds(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId) 
+        : [...prev, itemId]
+    );
   };
 
   const sendMessage = (conversationId: string, content: string) => {
@@ -141,7 +165,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AppContext.Provider value={{ user, items, bids, conversations, messages, addItem, updateItem, deleteItem, placeBid, sendMessage, getUser, filters, setFilter }}>
+    <AppContext.Provider value={{ user, items, bids, conversations, messages, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, sendMessage, getUser, filters, setFilter }}>
       {children}
     </AppContext.Provider>
   );

@@ -52,7 +52,7 @@ export default function Sidebar() {
               "h-4 w-4 transition-transform duration-300",
               filters.listingType === 'sealed' ? "scale-110" : "group-hover:scale-110"
             )} />
-            <span className="text-sm font-bold tracking-wide">Sealed</span>
+            <span className="text-sm font-bold tracking-wide">Secret</span>
           </button>
         </div>
       </div>

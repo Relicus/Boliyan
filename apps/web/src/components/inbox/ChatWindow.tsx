@@ -97,7 +97,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="p-4 border-t shrink-0 bg-background">
         <form onSubmit={handleSend} className="flex gap-2">
           <Input 
             placeholder="Type a message..." 

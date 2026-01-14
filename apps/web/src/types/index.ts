@@ -3,6 +3,7 @@ export interface User {
   name: string;
   avatar: string;
   rating: number; // 0-5
+  reviewCount: number;
   location: {
     lat: number;
     lng: number;
@@ -21,8 +22,11 @@ export interface Item {
   category: string;
   isPublicBid: boolean;
   currentHighBid?: number;
+  currentHighBidderId?: string;
   bidCount: number;
   createdAt: string;
+  expiryAt: string;
+  listingDuration: 24 | 48 | 72;
 }
 
 export interface Bid {

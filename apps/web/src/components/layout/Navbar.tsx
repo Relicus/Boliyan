@@ -8,49 +8,73 @@ import Link from "next/link";
 import { useApp } from "@/lib/store";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 
+import { DihariLogomark, DihariWordmark } from "@/components/branding/DihariLogo";
+
 export default function Navbar() {
   const { filters, setFilter, user } = useApp();
+  
+  // Site detection logic - defaulting to 'boliyan' for this repo
+  const currentSite: 'boliyan' | 'dihari' = 'boliyan';
 
   return (
     <nav id="navbar-01" className="relative md:sticky md:top-0 z-50 w-full border-b bg-white">
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-6">
-        <div id="navbar-left-section-03" className="flex items-center gap-8">
-          <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
-            {/* Geometric 'Ba' (ب) Logomark */}
-            <svg id="navbar-logo-svg-05" viewBox="0 0 40 40" className="h-10 w-10 shrink-0 transition-all duration-300 group-hover:drop-shadow-md">
-              {/* Ba Curve */}
-              <path
-                d="M32,10 C32,20 28,26 16,26 C12,26 8,24 8,24"
-                stroke="currentColor"
-                strokeWidth="7"
-                fill="none"
-                strokeLinecap="round"
-                id="navbar-logo-path-06"
-                className="transition-all duration-300 text-slate-800 group-hover:text-blue-600"
-              />
-              {/* Dot at bottom */}
-              <circle
-                cx="18"
-                cy="36"
-                r="4"
-                id="navbar-logo-dot-07"
-                className="transition-all duration-300 fill-slate-800 group-hover:fill-blue-600"
-              />
-            </svg>
-            
-            <div id="navbar-brand-name-08" className="flex flex-col items-center justify-center gap-0 py-0.5">
-              {/* Urdu: Larger, on top */}
-              <span id="navbar-brand-urdu-09" className="text-2xl font-black mb-[-2px] transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-slate-950 via-slate-800 to-slate-900 group-hover:from-blue-600 group-hover:via-blue-500 group-hover:to-indigo-600">
-                بولیاں
-              </span>
-              {/* English: Much smaller, wide spacing */}
-              <span id="navbar-brand-english-10" className="text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200">
-                Boliyan
-              </span>
-            </div>
-          </Link>
-          
+        <div id="navbar-left-section-03" className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
+            <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
+              {/* Geometric 'Ba' (ب) Logomark */}
+              <svg id="navbar-logo-svg-05" viewBox="0 0 40 40" className="h-10 w-10 shrink-0 transition-all duration-300 group-hover:drop-shadow-md">
+                {/* Ba Curve */}
+                <path
+                  d="M32,10 C32,20 28,26 16,26 C12,26 8,24 8,24"
+                  stroke="currentColor"
+                  strokeWidth="7"
+                  fill="none"
+                  strokeLinecap="round"
+                  id="navbar-logo-path-06"
+                  className={`transition-all duration-300 ${
+                    currentSite === 'boliyan' ? 'text-blue-600' : 'text-slate-800 group-hover:text-blue-600'
+                  }`}
+                />
+                {/* Dot at bottom */}
+                <circle
+                  cx="18"
+                  cy="36"
+                  r="4"
+                  id="navbar-logo-dot-07"
+                  className={`transition-all duration-300 ${
+                    currentSite === 'boliyan' ? 'fill-blue-600' : 'fill-slate-800 group-hover:fill-blue-600'
+                  }`}
+                />
+              </svg>
+              
+              <div id="navbar-brand-name-08" className="flex flex-col items-center justify-center gap-0 py-0.5">
+                {/* Urdu: Larger, on top */}
+                <span id="navbar-brand-urdu-09" className={`text-2xl font-black mb-[-2px] transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br ${
+                  currentSite === 'boliyan' 
+                    ? 'from-blue-600 via-blue-500 to-indigo-600' 
+                    : 'from-slate-950 via-slate-800 to-slate-900 group-hover:from-blue-600 group-hover:via-blue-500 group-hover:to-indigo-600'
+                }`}>
+                  بولیاں
+                </span>
+                {/* English: Much smaller, wide spacing */}
+                <span id="navbar-brand-english-10" className={`text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br ${
+                  currentSite === 'boliyan'
+                    ? 'from-blue-400 to-blue-200'
+                    : 'from-slate-600 to-slate-400 group-hover:from-blue-400 group-hover:to-blue-200'
+                }`}>
+                  Boliyan
+                </span>
+              </div>
+            </Link>
 
+            <div className="h-8 w-px bg-slate-200 hidden sm:block" />
+
+            <Link id="dihari-logo-link" href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
+              <DihariLogomark isActive={currentSite === 'dihari'} />
+              <DihariWordmark isActive={currentSite === 'dihari'} />
+            </Link>
+          </div>
         </div>
 
         <div id="navbar-right-section-11" className="hidden md:flex items-center gap-2">

@@ -1,13 +1,11 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { MapPin, ArrowRight, Lock, Globe, Clock, X } from "lucide-react";
+import { MapPin, Lock, Globe, Clock, X, Ribbon } from "lucide-react";
 import { useApp } from "@/lib/store";
 
 interface ItemCardProps {
@@ -17,7 +15,8 @@ interface ItemCardProps {
 }
 
 export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCardProps) {
-  const { placeBid } = useApp();
+  const { placeBid, user, bids, toggleWatch, watchedItemIds } = useApp();
+  const isWatched = watchedItemIds.includes(item.id);
 
   // Helper for compact price display (e.g. 185.5k)
   // Helper for price display
@@ -43,29 +42,103 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
   const [bidAmount, setBidAmount] = useState<string>(initialBid.toLocaleString());
   const [error, setError] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [now, setNow] = useState(Date.now());
+  const [animTrigger, setAnimTrigger] = useState(0); 
+  const [lastDelta, setLastDelta] = useState<number | null>(null);
+  const [showDelta, setShowDelta] = useState(false);
+
+  // Watch for outbid events (only if user has an existing bid)
+  useEffect(() => {
+    const hasUserBid = bids.some(b => b.itemId === item.id && b.bidderId === user.id);
+    if (hasUserBid && item.currentHighBid && item.currentHighBidderId !== user.id) {
+       setIsOutbidTrigger(true);
+       const timer = setTimeout(() => setIsOutbidTrigger(false), 800);
+       return () => clearTimeout(timer);
+    }
+  }, [item.currentHighBid, item.currentHighBidderId, user.id, bids, item.id]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Stable "random" distance based on item ID to prevent hydration mismatch
-  const distance = useMemo(() => {
+  const { distance, duration, timeLeft, statusColor, isUrgent } = useMemo(() => {
     const hash = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const dist = ((hash % 80) / 10 + 1.2).toFixed(1);
     const dur = Math.round(Number(dist) * 2.5); // Approx 2.5 mins per km
-    return { distance: dist, duration: dur };
-  }, [item.id]);
+    
+    // Time Left calculation
+    const diff = new Date(item.expiryAt).getTime() - now;
+    const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
+    const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
+    const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
+    
+    // Determine listing type (24, 48, 72)
+    const totalDiff = new Date(item.expiryAt).getTime() - new Date(item.createdAt).getTime();
+    const totalHours = Math.round(totalDiff / 3600000);
+    let type = "72h";
+    if (totalHours <= 24) type = "24h";
+    else if (totalHours <= 48) type = "48h";
+
+    const timeStr = hoursLeft >= 24 
+      ? `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`
+      : `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
+
+    // Ending soon logic
+    let statusColor = "bg-black/60";
+    let isUrgent = false;
+    if (hoursLeft < 2) {
+      statusColor = "bg-red-600";
+      isUrgent = true;
+    } else if (hoursLeft < 6) {
+      statusColor = "bg-orange-600";
+    } else if (hoursLeft < 12) {
+      statusColor = "bg-amber-600";
+    }
+
+    return { 
+      distance: dist, 
+      duration: dur, 
+      timeLeft: timeStr,
+      listingType: type,
+      statusColor,
+      isUrgent
+    };
+  }, [item.id, item.expiryAt, item.createdAt, now]);
 
   const handleSmartAdjust = (e: React.MouseEvent, direction: 1 | -1) => {
     e.stopPropagation();
     const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
     const step = getSmartStep(current);
-    const newValue = Math.max(0, current + (step * direction));
+    const delta = step * direction;
+    
+    // We allow the price to drop into the 'error' zone so the user gets visual feedback
+    const newValue = Math.max(0, current + delta);
+    
     setBidAmount(newValue.toLocaleString());
-    setError(false);
+    setLastDelta(delta);
+    setShowDelta(true);
+    setAnimTrigger(prev => prev + 1);
+    
+    // Auto-hide delta after animation
+    setTimeout(() => setShowDelta(false), 800);
   };
 
   const handleBid = (e?: React.MouseEvent) => {
     e?.stopPropagation(); // Prevent dialog from opening when clicking bid button
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
-    const minBid = item.askPrice * 0.7;
+    
+    // Minimum bid is 70% of asking price for sealed bids,
+    // or currentHighBid for public bids (must be higher than current)
+    let minBid = item.askPrice * 0.7;
+    if (item.isPublicBid && item.currentHighBid) {
+      minBid = item.currentHighBid + getSmartStep(item.currentHighBid);
+    }
 
     if (isNaN(amount) || amount < minBid) {
       setError(true);
@@ -76,6 +149,10 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
     // Optimistic UI Success
     placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
     setIsSuccess(true);
+
+    // Automatically increase the bid price in input box by 1 step for the "Next Bid"
+    const nextAmount = amount + getSmartStep(amount);
+    setBidAmount(nextAmount.toLocaleString());
 
     // Confetti Effect
     // If event exists, spawn from click position, otherwise center
@@ -89,7 +166,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
       gravity: 1.2,
       scalar: 1,
       zIndex: 9999, // Ensure it pops over the modal
-      colors: ['#2563eb', '#3b82f6', '#60a5fa', '#ffffff'], // Blue theme
+      colors: ['#fbbf24', '#f59e0b', '#d97706', '#ffffff'], // Gold/Amber celebration theme
     });
 
     // Close after delay
@@ -155,67 +232,137 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
     }
   };
 
+  const getTrophySizeClass = () => {
+    switch (viewMode) {
+      case 'spacious': return 'w-7 h-7 p-1.5';
+      case 'comfortable': return 'w-6 h-6 p-1';
+      default: return 'w-5 h-5 p-1';
+    }
+  };
+
+  const isHighBidder = item.isPublicBid && item.currentHighBidderId === user.id;
+  const showHalo = isHighBidder || isWatched;
+  const haloTheme = isHighBidder ? 'orange' : 'blue';
+
+  // Calculate real-time status for input styling
+  const currentNumericBid = parseFloat(bidAmount.replace(/,/g, '')) || 0;
+  const isWinningAmount = item.isPublicBid 
+    ? (item.currentHighBid 
+        ? currentNumericBid > item.currentHighBid 
+        : currentNumericBid >= item.askPrice)
+    : false;
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Card
+        <motion.div
           id={`item-card-${item.id}`}
-          className="group border-none shadow-sm hover:shadow-md transition-shadow duration-200 bg-white rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer"
-          style={{ backfaceVisibility: 'hidden' }}
+          initial={false}
+          animate={{
+            scale: isSuccess ? 1.05 : 1,
+            x: isOutbidTrigger ? [0, -4, 4, -4, 4, 0] : 0,
+          }}
+          transition={{
+            x: { duration: 0.4 },
+            scale: { type: "spring", stiffness: 300, damping: 20 }
+          }}
+          className={`group relative border-none bg-slate-50 rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500
+            ${showHalo ? 'p-[3.5px]' : 'p-0 shadow-sm hover:shadow-md'}
+            ${isOutbidTrigger ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
+            ${isSuccess ? 'ring-2 ring-green-500 shadow-[0_0_30px_rgba(34,197,94,0.4)]' : ''}
+          `}
+          style={{ backfaceVisibility: 'hidden', transformZ: 0 }}
         >
-            {/* 
-              Image Section:
-              Dynamic height based on viewMode.
-              Changed to motion.div with layout prop to sync with parent grid animation.
-              Removed CSS transition-all to prevent jitter.
-            */}
-            <motion.div
-              layout
+            {/* Victory Halo - State Based Animated Border Background */}
+            {showHalo && (
+              <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg">
+                {/* Base Layer: Solid Vibrant Color */}
+                <div 
+                   className={`absolute inset-0 ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 'bg-[#0ea5e9]'}`}
+                />
+                
+                {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
+                <motion.div 
+                   className={`absolute inset-[-150%] 
+                     ${haloTheme === 'orange' 
+                        ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
+                        : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
+                     }`}
+                   animate={{ rotate: 360 }}
+                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                />
+              </div>
+            )}
+
+            <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(var(--radius)-3px)]">
+            <div
               id={`item-card-${item.id}-image-wrapper`}
               className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0`}
-              style={{ backfaceVisibility: 'hidden' }}
             >
               <img
                 id={`item-card-${item.id}-image`}
                 src={item.images[0]}
                 alt={item.title}
-                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 will-change-transform"
+                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
               />
 
+              {/* Top-Left Location Badge */}
+              <div id={`item-card-${item.id}-location-badge-wrapper`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
+                <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
+                  <MapPin className="h-3 w-3" />
+                  <span className="text-[10px] font-black tracking-tight leading-none truncate max-w-[120px]">
+                    {seller.location.address}
+                  </span>
+                </div>
+              </div>
+
+              {/* Top-Right Timer Badge */}
+              <div className="absolute top-2 right-2 z-20 flex flex-col items-end gap-1">
+                <motion.div
+                  initial={false}
+                  animate={isUrgent ? { scale: [1, 1.05, 1] } : {}}
+                  transition={isUrgent ? { repeat: Infinity, duration: 1.5 } : {}}
+                  className={`${statusColor} backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20`}
+                >
+                  <Clock className={`h-3 w-3 ${isUrgent ? 'animate-pulse' : ''}`} />
+                  <span className="text-[10px] font-black tracking-tight leading-none">{timeLeft}</span>
+                </motion.div>
+              </div>
+
               {/* High Contrast Bottom Bar on Image */}
-              <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-[2px] px-2 py-1.5 flex justify-between items-center z-10 transition-all">
+              <div className="absolute bottom-0 left-0 right-0 bg-black/80 px-2 py-1.5 flex justify-between items-center z-10 transition-all">
                 <div className="flex items-center gap-3 overflow-hidden min-w-0">
                   <div className={`flex items-center gap-2 ${getLabelClass()} text-white font-bold tracking-wide shrink-0`}>
                     <div className="flex items-center gap-0.5">
                       <MapPin className="h-3 w-3 text-red-500" />
-                      {distance.distance}km
+                      {distance}km
                     </div>
                     <div className="flex items-center gap-0.5">
                        <Clock className="h-3 w-3 text-blue-400" />
-                       {distance.duration}min
+                       {duration}min
                     </div>
                   </div>
-                  {viewMode !== 'compact' && (
-                    <div className="flex items-center gap-1 text-[10px] text-slate-300 font-medium truncate border-l border-white/20 pl-2">
-                       <MapPin className="h-3 w-3 text-slate-400" />
-                       <span className="truncate max-w-[100px]">{seller.location.address}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {isWatched && (
+                    <motion.div
+                      id={`item-card-${item.id}-watch-indicator`}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="bg-blue-600/90 text-white p-1 rounded-md border border-blue-400/50"
+                    >
+                      <Ribbon className="h-3 w-3 fill-current" />
+                    </motion.div>
+                  )}
+                  {!item.isPublicBid && (
+                    <div className="bg-amber-600/90 text-white p-1 rounded-md border border-amber-400/50" title="Secret Bidding">
+                       <Lock className="h-3 w-3" />
                     </div>
                   )}
                 </div>
-
-                {item.isPublicBid ? (
-                  <Badge variant="secondary" className="h-6 px-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-100 border border-blue-500/50 backdrop-blur-md shadow-sm text-[10px] font-bold">
-                    <Globe className="h-3.5 w-3.5 mr-1.5" />
-                    Public
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="h-6 px-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 border border-amber-500/50 backdrop-blur-md shadow-sm text-[10px] font-bold">
-                    <Lock className="h-3.5 w-3.5 mr-1.5" />
-                    Secret
-                  </Badge>
-                )}
               </div>
-            </motion.div>
+            </div>
 
             {/* 
               Content Section:
@@ -223,7 +370,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               - Reduced gap-2 to gap-1.5 for tighter fit
               - Removed pt-1
             */}
-            <CardContent className="p-2 flex flex-col gap-1.5 flex-1 z-10 bg-white transition-all">
+            <CardContent className="p-2 flex flex-col gap-1.5 flex-1 z-10 transition-all">
               {/* Title */}
               <h3 id={`item-card-${item.id}-title`} className={`font-bold ${getTitleClass()} text-slate-900 leading-tight ${viewMode === 'compact' ? 'line-clamp-1' : 'line-clamp-2'} transition-all`} title={item.title}>
                 {item.title}
@@ -240,17 +387,48 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
                 <div className="flex flex-col items-end transition-all">
                   <span className={`${getLabelClass()} text-slate-500 font-bold uppercase tracking-wider transition-all`}>
-                    {item.isPublicBid ? "High Bid" : "Sealed Bids"}
+                    {item.isPublicBid ? "High Bid" : "Secret"}
                   </span>
-                  {item.isPublicBid && item.currentHighBid ? (
-                    <span id={`item-card-${item.id}-high-bid`} className={`${getPriceClass()} font-black text-blue-600 leading-none transition-all`}>
-                      {formatDisplayPrice(item.currentHighBid)}
-                    </span>
-                  ) : (
-                    <Badge id={`item-card-${item.id}-bid-count`} variant="outline" className={`px-1.5 py-0 min-h-0 h-auto ${getPriceClass()} leading-none font-black bg-amber-50 text-amber-700 border-amber-200 transition-all`}>
-                      {item.bidCount} Active
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-1.5 transition-all">
+                    {item.isPublicBid && item.currentHighBid ? (
+                      <div className="flex items-center gap-1.5">
+                        <motion.span 
+                          key={item.currentHighBid}
+                          initial={{ scale: 1.4, color: "#3b82f6" }}
+                          animate={{ 
+                            scale: 1, 
+                            color: item.currentHighBidderId === user.id ? "#d97706" : "#2563eb" 
+                          }}
+                          transition={{ 
+                            type: "spring", 
+                            stiffness: 260, 
+                            damping: 20,
+                            duration: 0.6
+                          }}
+                          id={`item-card-${item.id}-high-bid`} 
+                          className={`${getPriceClass()} font-black leading-none inline-block`}
+                        >
+                          {formatDisplayPrice(item.currentHighBid)}
+                        </motion.span>
+                        {item.currentHighBidderId === user.id && (
+                          <motion.div
+                            initial={{ scale: 0, rotate: -20 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            className={`bg-amber-100 text-amber-600 rounded-full flex items-center justify-center ${getTrophySizeClass()}`}
+                            title="You are the high bidder!"
+                          >
+                            <svg className="w-full h-full" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M18 2H6v2H2v7c0 2.21 1.79 4 4 4h1.09c.45 1.76 1.83 3.14 3.58 3.59V20H8v2h8v-2h-2.67v-1.41c1.75-.45 3.13-1.83 3.58-3.59H18c2.21 0 4-1.79 4-4V4h-4V2zM6 13c-1.1 0-2-.9-2-2V6h2v7zm14-2c0 1.1-.9 2-2 2h-2V6h2v5z"/>
+                            </svg>
+                          </motion.div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className={`${getPriceClass()} font-black text-blue-600 leading-none`}>
+                        {item.bidCount} {item.bidCount === 1 ? 'Bid' : 'Bids'}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -275,8 +453,8 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
               {/* Smart Stepper Input Row - Stacked Layout */}
               <div className="flex flex-col gap-2 mt-1">
-                <div className="flex h-9 shadow-sm w-full">
-                  <div className="flex flex-1 border border-slate-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600">
+                <div className="flex h-9 w-full">
+                  <div className="flex flex-1 border border-slate-300 rounded-md shadow-sm overflow-hidden">
                     {/* Decrement Button - Large Touch Target */}
                     <button
                       id={`item-card-${item.id}-decrement-btn`}
@@ -287,23 +465,46 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                     </button>
 
                     {/* Input */}
-                    <input
-                      id={`item-card-${item.id}-bid-input`}
-                      type="text"
-                      value={bidAmount}
-                      onClick={handleInputClick}
-                      onKeyDown={handleKeyDown}
-                      onChange={handleInputChange}
-                      className={`flex-1 w-full text-center text-sm font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
-                              ${error ? 'bg-red-50 text-red-900 text-red-900 placeholder:text-red-400' : 'bg-white'}
-                            `}
-                    />
+                    <div className="relative flex-1">
+                      <AnimatePresence>
+                        {showDelta && lastDelta !== null && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                            animate={{ opacity: 1, y: -40, scale: 1.2 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            className={`absolute left-1/2 -translate-x-1/2 font-black text-sm z-50 pointer-events-none drop-shadow-md
+                              ${lastDelta > 0 ? 'text-amber-600' : 'text-red-600'}`}
+                          >
+                            {lastDelta > 0 ? `+${lastDelta.toLocaleString()}` : lastDelta.toLocaleString()}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      <motion.input
+                        id={`item-card-${item.id}-bid-input`}
+                        type="text"
+                        value={bidAmount}
+                        key={`input-${animTrigger}`}
+                        initial={false}
+                        animate={{ 
+                          scale: [1, 1.05, 1],
+                          x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -2, 2, -2, 2, 0] : 0
+                        }}
+                        transition={{ duration: 0.2 }}
+                        onClick={handleInputClick}
+                        onKeyDown={handleKeyDown}
+                        onChange={handleInputChange}
+                        className={`w-full h-full text-center text-sm font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300
+                                ${(parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? 'bg-red-50 text-red-900' : 'bg-white'}
+                              `}
+                      />
+                    </div>
 
                     {/* Increment Button - Large Touch Target */}
                     <button
                       id={`item-card-${item.id}-increment-btn`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
-                      className="w-10 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-green-600 transition-colors active:bg-slate-200"
+                      className="w-10 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200"
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
                     </button>
@@ -316,7 +517,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                   disabled={isSuccess}
                   className={`w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold text-sm tracking-wide
                     ${isSuccess 
-                      ? 'bg-green-500 text-white scale-105' 
+                      ? 'bg-amber-600 text-white scale-105' 
                       : 'bg-blue-600 hover:bg-blue-700 text-white'
                     }`}
                 >
@@ -330,8 +531,9 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               </div>
             </CardContent>
           </Card>
-        </DialogTrigger>
-      <DialogContent showCloseButton={false} className="sm:max-w-[500px] p-0 overflow-visible bg-transparent border-none shadow-none sm:bg-white sm:border sm:shadow-lg sm:block gap-0">
+        </motion.div>
+      </DialogTrigger>
+      <DialogContent showCloseButton={false} className="sm:max-w-[500px] p-0 overflow-visible !bg-transparent !border-none !shadow-none rounded-none sm:block gap-0">
         <motion.div
           drag="y"
           dragConstraints={{ top: 0, bottom: 0 }}
@@ -345,9 +547,9 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
         >
           {/* Custom Close Button - Premium Sticky Style */}
           <DialogClose asChild>
-            <motion.button
-              id={`close-listing-btn-${item.id}`}
-              className="absolute top-4 right-4 z-[60] p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] text-slate-600 hover:text-red-500 border border-slate-100/50 group"
+              <motion.button
+                id={`close-listing-btn-${item.id}`}
+                className="absolute top-4 right-4 z-[60] p-2.5 bg-white rounded-full shadow-xl text-slate-600 hover:text-red-500 focus:ring-0 focus:outline-none group"
               initial={{ opacity: 0, scale: 0.2, rotate: -45 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: "spring", damping: 15 }}
@@ -375,7 +577,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                   />
                 ))}
                 {/* Visual indicator for horizontal scroll */}
-                <div className="absolute bottom-16 right-4 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-[10px] text-white font-bold pointer-events-none">
+                <div className="absolute bottom-16 right-4 bg-black/80 px-2 py-1 rounded text-[10px] text-white font-bold pointer-events-none">
                   1 / {item.images.length}
                 </div>
               </div>
@@ -390,37 +592,44 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 pt-16">
               <div className="flex justify-between items-end">
                 <DialogTitle className="text-xl font-bold text-white leading-tight">{item.title}</DialogTitle>
-                {item.isPublicBid ? (
-                  <Badge variant="secondary" className="font-bold bg-blue-500 text-white hover:bg-blue-600 border-none shadow-sm">
-                    <Globe className="h-3 w-3 mr-1" />
-                    Public Bid
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="font-bold bg-amber-500 text-white hover:bg-amber-600 border-none shadow-sm">
-                    <Lock className="h-3 w-3 mr-1" />
-                    Sealed Bid
-                  </Badge>
-                )}
+              <div className="flex flex-col gap-2 items-end">
+                <div className="flex gap-2">
+                  {!item.isPublicBid && (
+                    <Badge variant="secondary" className="font-bold bg-amber-500 text-white hover:bg-amber-600 border-none shadow-sm h-7">
+                      <Lock className="h-3.5 w-3.5 mr-1" />
+                      Secret
+                    </Badge>
+                  )}
+                </div>
+              </div>
               </div>
             </div>
           </div>
 
           <div className="p-4 space-y-4 overflow-y-auto max-h-[calc(85vh-200px)] sm:max-h-none overscroll-contain">
-            {/* Price Info Grid */}
-            <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+            {/* Price Info Grid & Timer */}
+            <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100 relative overflow-hidden">
+
               <div>
-                <span className="text-xs font-bold text-slate-500 uppercase">Asking Price</span>
-                <div className="text-2xl font-black text-slate-800">{Math.round(item.askPrice).toLocaleString()} PKR</div>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Price</span>
+                <div className="text-lg font-black text-slate-800 leading-tight">{Math.round(item.askPrice).toLocaleString()}</div>
+              </div>
+              <div className="text-center border-x border-slate-200">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                  {item.isPublicBid ? "High Bid" : "Bids"}
+                </span>
+                <div className={`text-lg font-black leading-tight ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`}>
+                  {item.isPublicBid && item.currentHighBid
+                    ? Math.round(item.currentHighBid).toLocaleString()
+                    : `${item.bidCount} ${item.bidCount === 1 ? 'Bid' : 'Bids'}`
+                  }
+                </div>
               </div>
               <div className="text-right">
-                <span className="text-xs font-bold text-slate-500 uppercase">
-                  {item.isPublicBid ? "Current High" : "Offers Made"}
-                </span>
-                <div className="text-2xl font-black text-blue-600">
-                  {item.isPublicBid && item.currentHighBid
-                    ? `${Math.round(item.currentHighBid).toLocaleString()} PKR`
-                    : `${item.bidCount} Offers`
-                  }
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Ends In</span>
+                <div className={`text-lg font-black leading-tight flex items-center justify-end gap-1 ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}>
+                  <Clock className={`h-3.5 w-3.5 ${isUrgent ? 'animate-pulse' : ''}`} />
+                  {timeLeft}
                 </div>
               </div>
             </div>
@@ -438,21 +647,38 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               <div className="h-10 w-10 rounded-full bg-slate-200 overflow-hidden">
                 <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
               </div>
-              <div>
-                <div className="font-bold text-slate-900 text-sm">{seller.name}</div>
-                <div className="text-xs text-slate-500 flex items-center gap-1">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <div className="font-bold text-slate-900 text-sm truncate">{seller.name}</div>
+                  <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0.5 px-1.5 text-[10px] shrink-0">
+                    ⭐ <span className="ml-0.5">{seller.rating}</span>
+                  </Badge>
+                </div>
+                <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                   <MapPin className="h-3 w-3 text-red-500" />
-                  {seller.location.address}
+                  <span className="truncate">{seller.location.address}</span>
                 </div>
                 <div className="text-xs text-slate-500 font-medium flex items-center gap-1 mt-0.5">
                   <Clock className="h-3 w-3 text-blue-500" />
-                  {distance.duration} min drive ({distance.distance} km)
+                  {duration} min drive ({distance} km)
                 </div>
               </div>
-              <div className="ml-auto flex flex-col items-end">
-                <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200">
-                  ⭐ {seller.rating}
-                </Badge>
+              <div className="ml-auto shrink-0">
+                <button
+                  id={`toggle-watch-btn-${item.id}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleWatch(item.id);
+                  }}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-300 font-bold text-xs
+                    ${isWatched 
+                      ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' 
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
+                    }`}
+                >
+                  <Ribbon className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
+                  {isWatched ? 'Watching' : 'Watch'}
+                </button>
               </div>
             </div>
 
@@ -460,8 +686,8 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
             <div className="space-y-3 pb-4 sm:pb-0">
               <label className="block text-sm font-bold text-slate-900 mb-2">Place Your Bid</label>
 
-              <div className="flex h-12 shadow-sm">
-                <div className="flex flex-1 border border-slate-300 rounded-l-md overflow-hidden focus-within:border-blue-600">
+              <div className="flex h-12">
+                <div className="flex flex-1 border border-slate-300 rounded-l-md shadow-sm overflow-hidden">
                   {/* Decrement Button - Extra Large for Modal */}
                   <button
                     onClick={(e) => handleSmartAdjust(e, -1)}
@@ -471,20 +697,43 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                   </button>
 
                   {/* Input */}
-                  <input
-                    type="text"
-                    value={bidAmount}
-                    onKeyDown={handleKeyDown}
-                    onChange={handleInputChange}
-                    className={`flex-1 w-full text-center text-xl font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
-                          ${error ? 'bg-red-50 text-red-900 placeholder:text-red-400' : 'bg-white'}
-                        `}
-                  />
+                  <div className="relative flex-1">
+                    <AnimatePresence>
+                      {showDelta && lastDelta !== null && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                          animate={{ opacity: 1, y: -50, scale: 1.4 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          className={`absolute left-1/2 -translate-x-1/2 font-black text-lg z-50 pointer-events-none drop-shadow-lg
+                            ${lastDelta > 0 ? 'text-amber-600' : 'text-red-600'}`}
+                        >
+                          {lastDelta > 0 ? `+${lastDelta.toLocaleString()}` : lastDelta.toLocaleString()}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <motion.input
+                      type="text"
+                      value={bidAmount}
+                      key={`modal-input-${animTrigger}`}
+                      initial={false}
+                      animate={{ 
+                        scale: [1, 1.05, 1],
+                        x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -3, 3, -3, 3, 0] : 0
+                      }}
+                      transition={{ duration: 0.2 }}
+                      onKeyDown={handleKeyDown}
+                      onChange={handleInputChange}
+                      className={`w-full h-full text-center text-xl font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300
+                            ${(parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? 'bg-red-50 text-red-900' : 'bg-white'}
+                          `}
+                    />
+                  </div>
 
                   {/* Increment Button - Extra Large for Modal */}
                   <button
                     onClick={(e) => handleSmartAdjust(e, 1)}
-                    className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-green-600 transition-colors active:bg-slate-200"
+                    className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200"
                   >
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
                   </button>
@@ -497,7 +746,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                   disabled={isSuccess}
                   className={`px-6 rounded-r-md font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg min-w-[120px] flex items-center justify-center
                     ${isSuccess 
-                      ? 'bg-green-500 text-white' 
+                      ? 'bg-amber-600 text-white' 
                       : 'bg-blue-600 hover:bg-blue-700 text-white'
                     }`}
                 >
@@ -518,7 +767,10 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
               {error && (
                 <p className="text-xs text-red-500 font-bold">
-                  Bid must be at least {Math.round(item.askPrice * 0.7).toLocaleString()}
+                  {item.isPublicBid && item.currentHighBid 
+                    ? `Bid must be higher than current high bid: ${(item.currentHighBid + getSmartStep(item.currentHighBid)).toLocaleString()}`
+                    : `Bid must be at least ${Math.round(item.askPrice * 0.7).toLocaleString()}`
+                  }
                 </p>
               )}
             </div>

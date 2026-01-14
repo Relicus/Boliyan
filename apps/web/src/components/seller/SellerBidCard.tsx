@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, MessageSquare, Star, Clock } from "lucide-react";
+import { getBidderLocationMock } from "@/lib/utils";
 
 interface SellerBidCardProps {
   bid: Bid;
@@ -15,16 +16,7 @@ interface SellerBidCardProps {
 export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   // Stable "random" derived values based on bidder ID
   const { distance, location, duration } = useMemo(() => {
-    const hash = bidder.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const dist = ((hash % 40) / 10 + 1.1).toFixed(1);
-    
-    const locations = ["Satellite Town, Sargodha", "Model Town, Lahore", "DHA, Karachi", "Blue Area, Islamabad", "Civil Lines, Faisalabad", "Cantt, Rawalpindi"];
-    const loc = locations[hash % locations.length];
-    
-    // Duration approx 2.5 mins per km
-    const dur = Math.round(Number(dist) * 2.5);
-    
-    return { distance: dist, location: loc, duration: dur };
+    return getBidderLocationMock(bidder.id);
   }, [bidder.id]);
 
   return (

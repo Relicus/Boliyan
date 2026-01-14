@@ -14,11 +14,12 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Sparkles, Gavel, EyeOff, Camera, X } from "lucide-react";
+import { Sparkles, Gavel, EyeOff, Camera, X, Save, Check } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useApp } from "@/lib/store";
+import { motion, AnimatePresence } from "framer-motion";
 
 function ListForm() {
   const router = useRouter();
@@ -33,9 +34,17 @@ function ListForm() {
   const [askPrice, setAskPrice] = useState<string>("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(true);
+  const [duration, setDuration] = useState<"24" | "48" | "72">("24");
   
   const [images, setImages] = useState<string[]>([]);
   const [recommended, setRecommended] = useState<number | null>(null);
+  
+  const [errors, setErrors] = useState<{
+    title?: boolean;
+    category?: boolean;
+    askPrice?: boolean;
+  }>({});
+  const [isShaking, setIsShaking] = useState(false);
 
   useEffect(() => {
     if (editingItem) {
@@ -45,6 +54,7 @@ function ListForm() {
       setDescription(editingItem.description || "");
       setIsPublic(editingItem.isPublicBid);
       setImages(editingItem.images);
+      setDuration(editingItem.listingDuration.toString() as "24" | "48" | "72");
     }
   }, [editingItem]);
 
@@ -82,7 +92,23 @@ function ListForm() {
   };
 
   const handleSubmit = () => {
-    if (!title || !category || !askPrice) return;
+    const newErrors = {
+      title: !title.trim(),
+      category: !category,
+      askPrice: !askPrice || isNaN(parseFloat(askPrice)) || parseFloat(askPrice) <= 0
+    };
+
+    setErrors(newErrors);
+
+    if (newErrors.title || newErrors.category || newErrors.askPrice) {
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      return;
+    }
+
+    const finalDuration = parseInt(duration) as 24 | 48 | 72;
+    const expiryDate = new Date();
+    expiryDate.setHours(expiryDate.getHours() + finalDuration);
 
     if (editingItem) {
       updateItem(editingItem.id, {
@@ -92,6 +118,10 @@ function ListForm() {
         description,
         isPublicBid: isPublic,
         images: images.length > 0 ? images : editingItem.images,
+        listingDuration: finalDuration,
+        // For edits, we might not want to reset the expiry if it's already active, 
+        // but typically a re-list or update might extend it. 
+        // Following simplified logic: update duration if changed.
       });
       router.push("/dashboard");
     } else {
@@ -103,7 +133,11 @@ function ListForm() {
         isPublicBid: isPublic,
         sellerId: user.id, // Current user
         images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=1000&auto=format&fit=crop"], // Fallback if no images
-        recommendedPrice: recommended || 0
+        recommendedPrice: recommended || 0,
+        createdAt: new Date().toISOString(),
+        expiryAt: expiryDate.toISOString(),
+        listingDuration: finalDuration,
+        bidCount: 0
       });
       router.push("/");
     }
@@ -121,6 +155,10 @@ function ListForm() {
           </CardDescription>
         </CardHeader>
         <CardContent id="list-item-form" className="space-y-6">
+          <motion.div 
+            animate={isShaking ? { x: [-4, 4, -4, 4, 0], transition: { duration: 0.4 } } : {}}
+            className="space-y-6"
+          >
           <div className="space-y-4">
             <Label id="images-label" className="text-sm font-semibold text-slate-900">Product Images (Max 5)</Label>
             <div id="images-preview-container" className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
@@ -150,21 +188,49 @@ function ListForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="title">Item Title</Label>
+            <Label htmlFor="title" className="flex items-center gap-1">
+              Item Title <span className="text-red-500">*</span>
+            </Label>
             <Input 
               id="title-input" 
               placeholder="e.g. Sony Headphones, Wood Table..." 
-              className="bg-slate-50 border-slate-100" 
+              className={`transition-all ${errors.title ? "border-red-500 bg-red-50/50 ring-red-500/20" : "bg-slate-50 border-slate-100"}`} 
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (errors.title) setErrors(prev => ({ ...prev, title: false }));
+              }}
             />
+            <AnimatePresence>
+              {errors.title && (
+                <motion.p 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-[10px] font-bold text-red-500"
+                >
+                  Please enter a title for your item
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Category</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger id="category-select" className="bg-slate-50 border-slate-100 w-full h-11">
+              <Label className="flex items-center gap-1">
+                Category <span className="text-red-500">*</span>
+              </Label>
+              <Select 
+                value={category} 
+                onValueChange={(val) => {
+                  setCategory(val);
+                  if (errors.category) setErrors(prev => ({ ...prev, category: false }));
+                }}
+              >
+                <SelectTrigger 
+                  id="category-select" 
+                  className={`transition-all w-full h-11 ${errors.category ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-100"}`}
+                >
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
                 <SelectContent id="category-select-content">
@@ -183,20 +249,29 @@ function ListForm() {
                   })}
                 </SelectContent>
               </Select>
-
+              {errors.category && (
+                <p className="text-[10px] font-bold text-red-500">Selection required</p>
+              )}
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="price-input">Ask Price (Rs.)</Label>
+              <Label htmlFor="price-input" className="flex items-center gap-1">
+                Ask Price (Rs.) <span className="text-red-500">*</span>
+              </Label>
               <Input 
                 id="price-input" 
                 type="number" 
                 placeholder="0" 
                 value={askPrice}
-                onChange={(e) => setAskPrice(e.target.value)}
-                className="bg-slate-50 border-slate-100 h-11 w-full" 
+                onChange={(e) => {
+                  setAskPrice(e.target.value);
+                  if (errors.askPrice) setErrors(prev => ({ ...prev, askPrice: false }));
+                }}
+                className={`transition-all h-11 w-full ${errors.askPrice ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-100"}`} 
               />
-
+              {errors.askPrice && (
+                <p className="text-[10px] font-bold text-red-500">Valid price required</p>
+              )}
             </div>
           </div>
 
@@ -262,8 +337,30 @@ function ListForm() {
               </div>
               <div className={`w-4 h-4 rounded-full border ${!isPublic ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`} />
             </div>
+
+            <div className="space-y-3 pt-2">
+              <Label className="text-sm font-semibold text-slate-900">Listing Duration</Label>
+              <div className="grid grid-cols-3 gap-3">
+                {(['24', '48', '72'] as const).map((d) => (
+                  <button
+                    key={d}
+                    id={`duration-btn-${d}`}
+                    onClick={() => setDuration(d)}
+                    className={`py-2 rounded-lg border font-bold text-sm transition-all ${
+                      duration === d 
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-md' 
+                        : 'bg-white border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600'
+                    }`}
+                  >
+                    {d} Hours
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
+          </motion.div>
+          
           <div className="flex flex-col sm:flex-row gap-3">
             <Button 
               id="cancel-listing-btn"
@@ -272,6 +369,7 @@ function ListForm() {
               className="flex-1 h-12 text-lg font-semibold border-slate-200 text-slate-600 hover:bg-slate-50"
               onClick={() => router.back()}
             >
+              <X className="h-5 w-5 mr-2" />
               {editingItem ? "Discard Changes" : "Cancel"}
             </Button>
             <Button 
@@ -279,6 +377,7 @@ function ListForm() {
               className="flex-[2] bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold"
               onClick={handleSubmit}
             >
+              {editingItem ? <Save className="h-5 w-5 mr-2" /> : <Check className="h-5 w-5 mr-2" />}
               {editingItem ? "Save Changes" : "Post Listing"}
             </Button>
           </div>

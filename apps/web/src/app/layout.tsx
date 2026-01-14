@@ -65,6 +65,8 @@ export const metadata: Metadata = {
   description: "Bid smart, sell faster. The no-nonsense marketplace.",
 };
 
+import PageAnimate from "@/components/common/PageAnimate";
+
 export default function RootLayout({
   children,
 }: Readonly<{

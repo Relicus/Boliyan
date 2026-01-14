@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useApp } from "@/lib/store";
 import { mockUsers } from "@/lib/mock-data";
 import ItemCard from "./ItemCard";
@@ -12,7 +12,7 @@ import CategoryBar from "./CategoryBar";
 import { LocationSelector } from "./LocationSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, LayoutGrid, Grid3x3, Grid2x2 } from "lucide-react";
+import { Search, LayoutGrid, Grid3x3, Grid2x2, RefreshCw } from "lucide-react";
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
@@ -44,49 +44,74 @@ export default function MarketplaceGrid() {
      return (hash % 80) / 10 + 1.2;
   };
 
-  // Apply filters and sorting
-  const filteredItems = items.filter(item => {
-    if (filters.category && filters.category !== "All Items" && item.category !== filters.category) {
-      return false;
-    }
-    if (filters.search) {
-      const query = filters.search.toLowerCase();
-      if (!item.title.toLowerCase().includes(query) && !item.description.toLowerCase().includes(query)) {
+  // 1. Get current sorted items from store (LIVE)
+  const currentSortedItems = useMemo(() => {
+    return items.filter(item => {
+      if (filters.category && filters.category !== "All Items" && item.category !== filters.category) {
         return false;
       }
+      if (filters.search) {
+        const query = filters.search.toLowerCase();
+        if (!item.title.toLowerCase().includes(query) && !item.description.toLowerCase().includes(query)) {
+          return false;
+        }
+      }
+      
+      const currentPrice = item.currentHighBid || item.askPrice;
+      if (filters.minPrice !== null && currentPrice < filters.minPrice) return false;
+      if (filters.maxPrice !== null && currentPrice > filters.maxPrice) return false;
+      if (filters.listingType === 'public' && !item.isPublicBid) return false;
+      if (filters.listingType === 'sealed' && item.isPublicBid) return false;
+      
+      return true;
+    }).sort((a, b) => {
+      switch (filters.sortBy) {
+          case 'nearest': return getDistance(a.id) - getDistance(b.id);
+          case 'ending_soon': return new Date(a.expiryAt).getTime() - new Date(b.expiryAt).getTime();
+          case 'luxury': return b.askPrice - a.askPrice;
+          case 'newest': return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          case 'trending':
+          default: return b.bidCount - a.bidCount;
+      }
+    });
+  }, [items, filters]);
+
+  // 2. Stable display state
+  const [displayOrder, setDisplayOrder] = useState<string[]>([]);
+  const [hasNewUpdates, setHasNewUpdates] = useState(false);
+
+  // Update order when filters change (Immediate UX)
+  useEffect(() => {
+    setDisplayOrder(currentSortedItems.map(i => i.id));
+    setHasNewUpdates(false);
+  }, [filters.category, filters.sortBy, filters.search, filters.minPrice, filters.maxPrice, filters.listingType]);
+
+  // Check if live order has changed compared to display order
+  useEffect(() => {
+    if (displayOrder.length === 0 && currentSortedItems.length > 0) {
+      setDisplayOrder(currentSortedItems.map(i => i.id));
+      return;
     }
+
+    const currentIds = currentSortedItems.map(i => i.id);
+    const orderChanged = JSON.stringify(currentIds) !== JSON.stringify(displayOrder);
     
-    // Price Filter
-    const currentPrice = item.currentHighBid || item.askPrice;
-    if (filters.minPrice !== null && currentPrice < filters.minPrice) {
-      return false;
+    if (orderChanged) {
+      setHasNewUpdates(true);
+    } else {
+      setHasNewUpdates(false);
     }
-    if (filters.maxPrice !== null && currentPrice > filters.maxPrice) {
-      return false;
-    }
-    
-    // Listing Type Filter
-    if (filters.listingType === 'public' && !item.isPublicBid) return false;
-    if (filters.listingType === 'sealed' && item.isPublicBid) return false;
-    
-    return true;
-  }).sort((a, b) => {
-    switch (filters.sortBy) {
-        case 'nearest':
-            return getDistance(a.id) - getDistance(b.id);
-        case 'ending_soon':
-            // Mock ending soon: assume items created earlier end sooner? 
-            // Or just random for now since we don't have expiry in mock data clearly
-            return a.id.localeCompare(b.id); 
-        case 'luxury':
-            return b.askPrice - a.askPrice;
-        case 'newest':
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'trending':
-        default:
-            return b.bidCount - a.bidCount;
-    }
-  });
+  }, [currentSortedItems, displayOrder]);
+
+  const handleRefresh = () => {
+    setDisplayOrder(currentSortedItems.map(i => i.id));
+    setHasNewUpdates(false);
+  };
+
+  // Final items to map over (Stable Order, Live Data)
+  const itemsToDisplay = displayOrder
+    .map(id => items.find(item => item.id === id))
+    .filter(Boolean) as typeof items;
 
   // Grid class mapping based on view mode
   const getGridClasses = () => {
@@ -173,6 +198,26 @@ export default function MarketplaceGrid() {
         <div id="category-bar-row" className="hidden md:block px-4 pb-2">
            <CategoryBar />
         </div>
+
+        {/* Floating Refresh Notification */}
+        <AnimatePresence>
+          {hasNewUpdates && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+8px)] z-40"
+            >
+              <Button 
+                onClick={handleRefresh}
+                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full px-5 py-2 h-9 text-xs font-bold gap-2"
+              >
+                <RefreshCw className="h-3 w-3" />
+                New Updates Available
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       
       <motion.div 
@@ -194,7 +239,7 @@ export default function MarketplaceGrid() {
                 </motion.div>
              ))
           ) : (
-            filteredItems.map((item) => {
+            itemsToDisplay.map((item) => {
               const seller = mockUsers.find(u => u.id === item.sellerId) || mockUsers[0];
               return (
                 <motion.div
@@ -213,7 +258,7 @@ export default function MarketplaceGrid() {
         </AnimatePresence>
       </motion.div>
 
-      {!isLoading && filteredItems.length === 0 && (
+      {!isLoading && itemsToDisplay.length === 0 && (
         <EmptyState />
       )}
     </div>

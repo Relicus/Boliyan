@@ -6,6 +6,7 @@ export const mockUsers: User[] = [
     name: "Ahmed Ali",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed",
     rating: 4.8,
+    reviewCount: 124,
     location: { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan" },
   },
   {
@@ -13,6 +14,7 @@ export const mockUsers: User[] = [
     name: "Sara Khan",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sara",
     rating: 4.5,
+    reviewCount: 89,
     location: { lat: 24.8717, lng: 67.0111, address: "Karachi, Pakistan" },
   },
   {
@@ -20,6 +22,7 @@ export const mockUsers: User[] = [
     name: "Zain Malik",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Zain",
     rating: 4.2,
+    reviewCount: 67,
     location: { lat: 24.8807, lng: 67.0211, address: "Karachi, Pakistan" },
   },
 ];
@@ -36,8 +39,11 @@ export const mockItems: Item[] = [
     category: "Electronics",
     isPublicBid: true,
     currentHighBid: 165000,
+    currentHighBidderId: "u2",
     bidCount: 12,
     createdAt: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
+    expiryAt: new Date(Date.now() + 3600000 * 12).toISOString(), // 12h from now
+    listingDuration: 72,
   },
   // Removed Honda Civic Rims
 
@@ -52,8 +58,11 @@ export const mockItems: Item[] = [
     category: "Furniture",
     isPublicBid: true,
     currentHighBid: 48000,
+    currentHighBidderId: "u2",
     bidCount: 8,
     createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 48).toISOString(), // 48h from now
+    listingDuration: 72,
   },
   {
     id: "i4",
@@ -67,6 +76,8 @@ export const mockItems: Item[] = [
     isPublicBid: false,
     bidCount: 3,
     createdAt: new Date(Date.now() - 86400000).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 24).toISOString(), // 24h from now
+    listingDuration: 48,
   },
   {
     id: "i5",
@@ -79,8 +90,11 @@ export const mockItems: Item[] = [
     category: "Cameras",
     isPublicBid: true,
     currentHighBid: 680000,
+    currentHighBidderId: "u3",
     bidCount: 4,
     createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 72).toISOString(), // 72h from now
+    listingDuration: 72,
   },
   {
     id: "i6",
@@ -93,8 +107,11 @@ export const mockItems: Item[] = [
     category: "Electronics",
     isPublicBid: true,
     currentHighBid: 205000,
+    currentHighBidderId: "u1",
     bidCount: 15,
     createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 18).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i7",
@@ -107,8 +124,11 @@ export const mockItems: Item[] = [
     category: "Watches",
     isPublicBid: true,
     currentHighBid: 18000,
+    currentHighBidderId: "u2",
     bidCount: 6,
     createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 5).toISOString(),
+    listingDuration: 24,
   },
   {
     id: "i8",
@@ -122,6 +142,8 @@ export const mockItems: Item[] = [
     isPublicBid: false,
     bidCount: 2,
     createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 36).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i9",
@@ -136,6 +158,8 @@ export const mockItems: Item[] = [
     currentHighBid: 130000,
     bidCount: 20,
     createdAt: new Date(Date.now() - 86400000 * 0.5).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 60).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i10",
@@ -150,6 +174,8 @@ export const mockItems: Item[] = [
     currentHighBid: 28000,
     bidCount: 9,
     createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 4).toISOString(),
+    listingDuration: 24,
   },
   // Removed Yamaha YBR 125 G
   {
@@ -164,6 +190,8 @@ export const mockItems: Item[] = [
     isPublicBid: false,
     bidCount: 1,
     createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 66).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i13",
@@ -178,6 +206,8 @@ export const mockItems: Item[] = [
     currentHighBid: 14000,
     bidCount: 3,
     createdAt: new Date(Date.now() - 86400000 * 6).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 20).toISOString(),
+    listingDuration: 48,
   },
   {
     id: "i14",
@@ -192,6 +222,8 @@ export const mockItems: Item[] = [
     currentHighBid: 145000,
     bidCount: 7,
     createdAt: new Date(Date.now() - 86400000 * 1.5).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 44).toISOString(),
+    listingDuration: 48,
   },
   {
     id: "i15",
@@ -205,6 +237,8 @@ export const mockItems: Item[] = [
     isPublicBid: false,
     bidCount: 0,
     createdAt: new Date(Date.now() - 86400000 * 8).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 30).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i16",
@@ -219,6 +253,8 @@ export const mockItems: Item[] = [
     currentHighBid: 5500,
     bidCount: 4,
     createdAt: new Date(Date.now() - 86400000 * 3.2).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 14).toISOString(),
+    listingDuration: 24,
   },
   {
     id: "i17",
@@ -233,6 +269,8 @@ export const mockItems: Item[] = [
     currentHighBid: 255000,
     bidCount: 8,
     createdAt: new Date(Date.now() - 86400000 * 0.8).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 52).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i18",
@@ -246,6 +284,8 @@ export const mockItems: Item[] = [
     isPublicBid: false,
     bidCount: 2,
     createdAt: new Date(Date.now() - 86400000 * 9).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 10).toISOString(),
+    listingDuration: 24,
   },
   {
     id: "i19",
@@ -260,6 +300,8 @@ export const mockItems: Item[] = [
     currentHighBid: 58000,
     bidCount: 6,
     createdAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 22).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i20",
@@ -274,6 +316,8 @@ export const mockItems: Item[] = [
     currentHighBid: 18500,
     bidCount: 5,
     createdAt: new Date(Date.now() - 86400000 * 4.5).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 58).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i21",
@@ -288,6 +332,8 @@ export const mockItems: Item[] = [
     currentHighBid: 88000,
     bidCount: 6,
     createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 2).toISOString(),
+    listingDuration: 24,
   },
   {
     id: "i22",
@@ -301,6 +347,8 @@ export const mockItems: Item[] = [
     isPublicBid: false,
     bidCount: 2,
     createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 68).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i23",
@@ -315,6 +363,8 @@ export const mockItems: Item[] = [
     currentHighBid: 160000,
     bidCount: 9,
     createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 42).toISOString(),
+    listingDuration: 72,
   },
   {
     id: "i24",
@@ -329,6 +379,8 @@ export const mockItems: Item[] = [
     currentHighBid: 18500,
     bidCount: 4,
     createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 8).toISOString(),
+    listingDuration: 24,
   },
   {
     id: "i25",
@@ -342,6 +394,8 @@ export const mockItems: Item[] = [
     isPublicBid: false,
     bidCount: 7,
     createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+    expiryAt: new Date(Date.now() + 3600000 * 16).toISOString(),
+    listingDuration: 48,
   },
 ];
 
