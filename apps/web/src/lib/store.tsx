@@ -24,7 +24,7 @@ interface AppContextType {
     radius: number;
     locationMode: 'current' | 'city';
     city: string;
-    sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest';
+    sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest' | 'my_bids';
     minPrice: number | null;
     maxPrice: number | null;
     listingType: 'all' | 'public' | 'sealed';
@@ -45,14 +45,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Current user is hardcoded as 'u1' (Ahmed Ali) for now
   const user = mockUsers[0];
 
-  const [filters, setFilters] = useState<{
-    category: string | null;
-    search: string;
-    radius: number;
-    locationMode: 'current' | 'city';
-    city: string;
-    sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest';
-  }>({
+  const [filters, setFilters] = useState<AppContextType['filters']>({
     category: null,
     search: "",
     radius: 15,
