@@ -24,7 +24,7 @@ interface AppContextType {
     radius: number;
     locationMode: 'current' | 'city';
     city: string;
-    sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest' | 'my_bids';
+    sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest' | 'watchlist';
     minPrice: number | null;
     maxPrice: number | null;
     listingType: 'all' | 'public' | 'sealed';

@@ -5,7 +5,7 @@ import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Lock, Globe, Clock, X, Ribbon } from "lucide-react";
+import { MapPin, Lock, Globe, Clock, X, Bookmark } from "lucide-react";
 import { useApp } from "@/lib/store";
 
 interface ItemCardProps {
@@ -352,7 +352,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                       animate={{ scale: 1 }}
                       className="bg-blue-600/90 text-white p-1 rounded-md border border-blue-400/50"
                     >
-                      <Ribbon className="h-3 w-3 fill-current" />
+                      <Bookmark className="h-3 w-3 fill-current" />
                     </motion.div>
                   )}
                   {!item.isPublicBid && (
@@ -676,7 +676,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
                     }`}
                 >
-                  <Ribbon className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
+                  <Bookmark className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
                   {isWatched ? 'Watching' : 'Watch'}
                 </button>
               </div>

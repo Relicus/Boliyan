@@ -17,7 +17,7 @@ import { Search, LayoutGrid, Grid3x3, Grid2x2, RefreshCw } from "lucide-react";
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
 export default function MarketplaceGrid() {
-  const { items, filters, setFilter, bids, user } = useApp();
+  const { items, filters, setFilter, bids, user, watchedItemIds } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>('comfortable');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -47,10 +47,9 @@ export default function MarketplaceGrid() {
   // 1. Get current sorted items from store (LIVE)
   const currentSortedItems = useMemo(() => {
     return items.filter(item => {
-      // My Bids Filter
-      if (filters.sortBy === 'my_bids') {
-        const hasUserBid = bids.some(bid => bid.itemId === item.id && bid.bidderId === user.id);
-        if (!hasUserBid) return false;
+      // Watchlist Filter
+      if (filters.sortBy === 'watchlist') {
+        if (!watchedItemIds.includes(item.id)) return false;
       }
 
       if (filters.category && filters.category !== "All Items" && item.category !== filters.category) {
@@ -76,16 +75,27 @@ export default function MarketplaceGrid() {
           case 'ending_soon': return new Date(a.expiryAt).getTime() - new Date(b.expiryAt).getTime();
           case 'luxury': return b.askPrice - a.askPrice;
           case 'newest': return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-          case 'my_bids': 
-            // Sort by most recent bid first if in My Bits mode
-            const aLastBid = Math.max(...bids.filter(b => b.itemId === a.id && b.bidderId === user.id).map(b => new Date(b.createdAt).getTime()), 0);
-            const bLastBid = Math.max(...bids.filter(b => b.itemId === b.id && b.bidderId === user.id).map(b => new Date(b.createdAt).getTime()), 0);
-            return bLastBid - aLastBid;
+          case 'watchlist': {
+            // Priority 1: High Bidder
+            const aIsHigh = a.currentHighBidderId === user.id;
+            const bIsHigh = b.currentHighBidderId === user.id;
+            if (aIsHigh && !bIsHigh) return -1;
+            if (!aIsHigh && bIsHigh) return 1;
+
+            // Priority 2: Has Bid (but not high)
+            const aHasBid = bids.some(bid => bid.itemId === a.id && bid.bidderId === user.id);
+            const bHasBid = bids.some(bid => bid.itemId === b.id && bid.bidderId === user.id);
+            if (aHasBid && !bHasBid) return -1;
+            if (!aHasBid && bHasBid) return 1;
+
+            // Priority 3: Fallback to bid count / trending
+            return b.bidCount - a.bidCount;
+          }
           case 'trending':
           default: return b.bidCount - a.bidCount;
       }
     });
-  }, [items, filters, bids, user]);
+  }, [items, filters, bids, user, watchedItemIds]);
 
   // 2. Stable display state
   const [displayOrder, setDisplayOrder] = useState<string[]>([]);
