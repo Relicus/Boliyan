@@ -8,27 +8,31 @@ Main marketplace application. Strict TypeScript. See [Manifesto](../../MANIFESTO
 ## STRUCTURE
 ```
 src/
-├── app/               # App Router (Page entries)
+├── app/               # App Router (Pages & Layouts)
 ├── components/
-│   ├── ui/            # Shadcn Primitives (External-like)
-│   └── marketplace/   # Domain Components
-└── lib/               # Stores & Utils
+│   ├── ui/            # Shadcn Primitives (Styling-focused)
+│   └── marketplace/   # Domain Components (ItemCard, ProductDetailsModal, SmartFilterBar)
+└── lib/               # Shared logic
+    ├── store.tsx      # App-wide Zustand-like state (AppContext)
+    └── mock-data.ts   # Local development data
 ```
 
 ## CONVENTIONS
-- **AI Referencing**: Always assign unique, descriptive `id` attributes to main containers, sections, and significant UI elements. This is mandatory for AI agents to accurately target, reference, and modify specific parts of the UI.
-- **Imports**: Use `@/` alias. Manual imports from `packages/shared`.
-- **State**: React Context + Zustand-like stores.
-- **Data**: Fetch in Server Components, pass to Client Components.
+- **AI Referencing**: (STRICT) Assign unique `id` attributes to main containers and actionable elements (buttons, inputs).
+- **State Management**: Use `AppProvider` from `lib/store.tsx` for cross-component flags (Watchlist, User sessions).
+- **UI Patterns**:
+    - **Victory Halo**: Implement using `motion.div` with conic-gradients for status feedback.
+    - **Celebration**: `canvas-confetti` should be triggered for all high-intent successes.
+- **Data Flow**: Server Components fetch; Client Components manage interactive state.
 
 ## ANTI-PATTERNS
-- **DO NOT** modify `components/ui` logic. Style tweaks only.
-- **DO NOT** leak server secrets to client components.
-- **DO NOT** assume `packages/` are symlinked.
+- **DO NOT** manually link packages.
+- **DO NOT** use `window.alert`. 
+- **DO NOT** duplicate bid validation logic outside `placeBid` in `store.tsx`.
 
 ## ROADMAP
-- **UI/UX Enhancements**: See [ui_ux_roadmap.md](file:///C:/Users/ASUS/.gemini/antigravity/brain/bf3cb565-0ea7-4e77-9077-7adcdb4d1347/ui_ux_roadmap.md) for planned platform-level improvements.
-- **Backend Integration**: Planned transition from mock data to Supabase/PostgreSQL.
+- **WebSockets/Real-time**: Adding live bid updates to `MarketplaceGrid`.
+- **User Dashboard**: Expanding "My Bids" and "My Listings" views.
 
 ## COMMANDS
 ```bash

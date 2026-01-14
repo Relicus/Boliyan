@@ -2,15 +2,27 @@
 
 All notable changes to the Boliyan project will be documented in this file.
 
-## [Unreleased]
-### Planned Features
-- **Watchlist**: Ability for users to "heart" items and view them later.
-- **Notification Center**: Alerts for outbid status, accepted offers, and new messages.
-- **Advanced Filters**: Location radius, price range (min/max), and item condition.
-- **Trust Signals**: User verification badges and "Report Item" functionality.
+## [0.2.0] - 2026-01-15
+### Added
+- **Watchlist System**:
+    - "Heart" logic: Toggle items to watch list from cards or details.
+    - **Auto-Watch**: Placing a bid automatically adds the item to the user's watchlist.
+    - **Watchlist Filter**: Dedicated sort/filter mode to view saved items.
+- **Bidding UI 2.0 (Victory Experience)**:
+    - **Smart Stepper**: Context-aware increment/decrement (100, 500, 1000) based on item price.
+    - **Victory Halo**: Dynamic animated border glow (Orange for winning high bidder, Blue for watched/secret items).
+    - **Celebration**: Gold/Amber confetti burst on successful bid placement.
+    - **Feedback Loops**: Outbid shake animation, price deltas (+/- popups), and "You own this" disabled states.
+- **Product Details & Gallery**:
+    - Standalone `ProductDetailsModal` component for deep-dive interactions.
+    - **Multi-image Gallery**: Infinite scroll gallery with fullscreen immersive view.
+    - **Expandable Descriptions**: "More Details" popup for lengthy product copy.
+    - **Proximity Logic**: Travel time and distance estimation from buyer to seller.
 
-### Changed
-- **Messaging Rules**: Chat is now STRICTLY locked until a bid is accepted. No pre-deal messages.
+### Fixed
+- **Accessibility**: Added `DialogTitle` to fullscreen galleries for ARIA compliance.
+- **Validation**: Strict enforcement preventing users from bidding on their own listings.
+- **Consistency**: Unified color palette (Orange for high bidder, Blue for watchlist) across all components.
 
 ## [0.1.0] - 2026-01-12
 ### Added

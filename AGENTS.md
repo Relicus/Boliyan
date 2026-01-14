@@ -4,45 +4,50 @@
 **Context:** Monorepo (Next.js 16 + SQL), manual dependency management.
 
 ## OVERVIEW
-Boliyan: Classifieds marketplace. Next.js 16 frontend (`apps/web`), raw SQL database (`packages/database`). No root workspace config.
+Boliyan: A premium classifieds marketplace. Built with Next.js 16 (React 19), Tailwind v4, and raw SQL (`packages/database`). Focused on high-intent bidding and strictly gated communication.
 
 ## REFERENCES
 - [README.md](./README.md): Entry point & quick start.
 - [MANIFESTO.md](./MANIFESTO.md): Product philosophy ("No chat before deal").
+- [CHANGELOG.md](./CHANGELOG.md): History of implementations.
 
 ## STRUCTURE
 ```
 .
 ├── apps/
-│   └── web/           # Main App (Next.js 16, React 19)
+│   └── web/           # Next.js 16.1 + React 19 Frontend
 ├── packages/
-│   ├── database/      # SQL Schema (Supabase-compatible)
-│   └── shared/        # Shared logic (Bidding validation)
+│   ├── database/      # SQL Schema (PostgreSQL)
+│   └── shared/        # Shared logic & validation
 └── README.md
 ```
 
-## WHERE TO LOOK
-| Task | Location | Notes |
-|------|----------|-------|
-| **Frontend** | `apps/web/src/app` | App Router pages |
-| **UI Lib** | `apps/web/src/components/ui` | Shadcn/Radix (Copy-paste) |
-| **Schema** | `packages/database/schema.sql` | PostgreSQL DDL |
-| **Logic** | `packages/shared` | Bidding rules (Manual import) |
+## FEATURE MAP (WHERE TO LOOK)
+| Feature | Logic | UI Components |
+|---------|-------|---------------|
+| **Core State** | `apps/web/src/lib/store.tsx` | AppContext (Bidding, Watchlist, Filters) |
+| **Bidding Logic** | `placeBid` in `store.tsx` | `SmartStepper` in `ItemCard` & `ProductDetailsModal` |
+| **Watchlist** | `toggleWatch` in `store.tsx` | `Bookmark` indicator & `blue` Halo theme |
+| **Messaging** | `sendMessage` in `store.tsx` | `apps/web/src/app/chat` |
+| **UI Components** | `apps/web/src/components` | Shadcn (ui/), Domain (marketplace/) |
 
 ## CONVENTIONS
-- **AI Referencing**: Always assign unique, descriptive `id` attributes to major UI elements (containers, sections, key classes) to facilitate AI interaction and precise code targeting.
-- **Monorepo**: Manual. No `pnpm-workspace`. Run npm inside dirs.
-- **Styling**: Tailwind v4 + Shadcn.
-- **Database**: Raw SQL. No ORM.
+- **AI Referencing**: (MANDATORY) Always assign unique, descriptive `id` attributes (e.g., `id="item-card-i123"`) to major UI elements for precise targeting by AI agents.
+- **Victory Halo**: Visual feedback system using conic-gradients. 
+    - **Orange**: Current high bidder (Winner state).
+    - **Blue**: Item on watchlist or secret bidding mode.
+- **Smart Stepper**: Manual bid inputs must include increment/decrement buttons with steps scaling by price (100, 500, 1000).
+- **Styling**: Tailwind CSS v4 is used. Use the `motion` (Framer Motion) for all state-based UI transitions.
 
-## ANTI-PATTERNS (THIS PROJECT)
-- **DO NOT** run `npm install` at root.
-- **DO NOT** assume workspace auto-linking.
-- **DO NOT** add ORM (Prisma/Drizzle/TypeORM).
+## ANTI-PATTERNS
+- **DO NOT** assume root workspace linkage (manual installs only).
+- **DO NOT** add an ORM.
+- **DO NOT** use default browser alerts; use the `toast` system or in-card error states (shaking).
 
 ## ROADMAP
-- **UI/UX Enhancements**: See [ui_ux_roadmap.md](file:///C:/Users/ASUS/.gemini/antigravity/brain/bf3cb565-0ea7-4e77-9077-7adcdb4d1347/ui_ux_roadmap.md) for planned platform-level improvements.
-- **Backend Integration**: Planned transition from mock data to Supabase/PostgreSQL.
+- **Notification System**: Real-time alerts for outbid status (using `isOutbidTrigger`).
+- **Payment Integration**: Transitioning from "deal acceptance" to secure escrow.
+- **Backend Sync**: Replacing mock data with live Supabase/PostgreSQL hooks.
 
 ## COMMANDS
 ```bash
