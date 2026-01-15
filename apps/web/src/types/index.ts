@@ -70,6 +70,7 @@ export interface Conversation {
   bidderId: string;
   lastMessage?: string;
   updatedAt: string;
+  expiresAt?: string;
 }
 
 export interface Message {

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, ArrowLeft } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
@@ -20,11 +20,49 @@ interface ChatWindowProps {
 export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const { user, messages, sendMessage, conversations, getUser, items } = useApp();
   const [inputValue, setInputValue] = useState("");
+  const [timeLeft, setTimeLeft] = useState<string>("");
+  const [isLocked, setIsLocked] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Filter messages for this conversation
   const currentMessages = messages.filter(m => m.conversationId === conversationId);
   const conversation = conversations.find(c => c.id === conversationId);
+
+  // Expiration Logic
+  useEffect(() => {
+    if (!conversation?.expiresAt) {
+      setTimeLeft("");
+      setIsLocked(false);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      const expiry = new Date(conversation.expiresAt!).getTime();
+      const now = new Date().getTime();
+      const diff = expiry - now;
+
+      if (diff <= 0) {
+        setTimeLeft("0h 0m 0s");
+        setIsLocked(true);
+        clearInterval(timer);
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const timeStr = days > 0 
+        ? `${days}d ${hours}h ${mins}m` 
+        : `${hours}h ${mins}m ${secs}s`;
+      
+      setTimeLeft(timeStr);
+      setIsLocked(false);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [conversation?.expiresAt]);
 
   // Scroll to bottom on new message
   useEffect(() => {
@@ -42,7 +80,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isLocked) return;
     sendMessage(conversationId, inputValue);
     setInputValue("");
   };
@@ -88,8 +126,23 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
           </div>
         </div>
         
+        {timeLeft && (
+          <div className={cn(
+            "flex flex-col items-end gap-0.5 px-2 py-1 rounded-lg border",
+            isLocked ? "bg-red-50 border-red-100 text-red-600" : "bg-blue-50/50 border-blue-100 text-blue-600"
+          )}>
+            <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
+              <Clock className="h-3 w-3" />
+              {isLocked ? "Expired" : "Time Left"}
+            </div>
+            <div className="text-xs font-bold tabular-nums pr-1">
+              {timeLeft}
+            </div>
+          </div>
+        )}
+
         {item && (
-          <div className="hidden sm:block h-10 w-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm flex-shrink-0">
+          <div className="hidden sm:block h-10 w-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm flex-shrink-0 ml-2">
             <img src={item.images[0]} alt={item.title} className="h-full w-full object-cover" />
           </div>
         )}
@@ -98,8 +151,22 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4 min-h-[calc(100vh-250px)]">
-          <div className="text-center text-xs text-muted-foreground my-4 p-2 bg-secondary/50 rounded-lg">
-             Offer accepted. You can now chat to arrange details.
+          <div className={cn(
+            "text-center text-xs font-bold my-4 p-3 rounded-xl border flex items-center justify-center gap-2",
+            isLocked 
+              ? "bg-red-50 border-red-100 text-red-700" 
+              : "bg-amber-50 border-amber-100 text-amber-700"
+          )}>
+             {isLocked ? (
+               <>
+                <Lock className="h-4 w-4" />
+                Discussion time has expired. This chat is now locked.
+               </>
+             ) : (
+               <>
+                Offer accepted. You have 3 days to arrange details.
+               </>
+             )}
           </div>
         
           {currentMessages.map((msg) => {
@@ -127,15 +194,24 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
       {/* Input Area */}
       <div className="p-4 border-t shrink-0 bg-background">
-        <form onSubmit={handleSend} className="flex gap-2">
+        <form onSubmit={handleSend} className="flex gap-2 relative">
+          {isLocked && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-lg border-2 border-dashed border-red-200">
+               <span className="text-sm font-bold text-red-600 flex items-center gap-2">
+                 <Lock className="h-4 w-4" />
+                 Chat Locked
+               </span>
+            </div>
+          )}
           <Input 
-            placeholder="Type a message..." 
+            placeholder={isLocked ? "Chat locked..." : "Type a message..."} 
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="flex-1"
+            disabled={isLocked}
+            className="flex-1 h-11 bg-slate-50 border-slate-200 focus:bg-white transition-all rounded-xl"
           />
-          <Button type="submit" size="icon" disabled={!inputValue.trim()}>
-            <Send className="h-4 w-4" />
+          <Button type="submit" size="icon" disabled={!inputValue.trim() || isLocked} className="h-11 w-11 rounded-xl shadow-md">
+            <Send className="h-5 w-5" />
             <span className="sr-only">Send</span>
           </Button>
         </form>

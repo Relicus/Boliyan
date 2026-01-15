@@ -18,7 +18,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside id="sidebar-01" className="w-72 border-r border-slate-200/60 bg-white hidden lg:flex flex-col sticky top-16 h-[calc(100vh-64px)] overflow-hidden shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.02)]">
+    <aside id="sidebar-01" className="w-72 border-r border-slate-200/60 bg-white hidden lg:flex flex-col h-fit min-h-[calc(100vh-64px)] overflow-hidden shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.02)]">
       <div className="p-4 pb-0">
         <div className="flex gap-2 mb-2">
           {/* Public Button */}

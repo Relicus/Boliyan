@@ -1,20 +1,38 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { ConversationList } from '@/components/inbox/ConversationList';
 import { ChatWindow } from '@/components/inbox/ChatWindow';
 import { cn } from '@/lib/utils';
 import { useApp } from '@/lib/store';
+import { useSearchParams } from 'next/navigation';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, ShoppingBag, Store } from 'lucide-react';
 
-export default function InboxPage() {
+function InboxContent() {
   const { conversations, user } = useApp();
+  const searchParams = useSearchParams();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'buying' | 'selling'>('buying');
 
   const buyingConversations = conversations.filter(c => c.bidderId === user.id);
   const sellingConversations = conversations.filter(c => c.sellerId === user.id);
+
+  // Handle deep-linking from URL
+  useEffect(() => {
+    const idParam = searchParams.get('id');
+    if (idParam) {
+      setSelectedId(idParam);
+      
+      // Auto-switch tab based on which list contains the ID
+      if (buyingConversations.some(c => c.id === idParam)) {
+        setActiveTab('buying');
+      } else if (sellingConversations.some(c => c.id === idParam)) {
+        setActiveTab('selling');
+      }
+    }
+  }, [searchParams, buyingConversations.length, sellingConversations.length]);
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-muted/20">
@@ -27,7 +45,7 @@ export default function InboxPage() {
       >
         <div className="p-4 border-b">
           <h1 className="font-black text-xl mb-4 text-slate-900">Messages</h1>
-          <Tabs defaultValue="buying" className="w-full">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
             <TabsList className="grid w-full grid-cols-2 h-10 p-1 bg-slate-100 rounded-xl">
               <TabsTrigger 
                 value="buying" 
@@ -105,5 +123,13 @@ export default function InboxPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function InboxPage() {
+  return (
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading inbox...</div>}>
+      <InboxContent />
+    </Suspense>
   );
 }

@@ -17,15 +17,16 @@ import { useApp } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
+import { SearchDropdown } from "./SearchDropdown";
 
 export default function Navbar() {
   const { filters, setFilter, user, isLoggedIn, logout } = useApp();
   const router = useRouter();
 
   return (
-    <nav id="navbar-01" className="relative md:sticky md:top-0 z-50 w-full border-b bg-white">
+    <nav id="navbar-01" className="relative w-full border-b bg-white">
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-6">
-        <div id="navbar-left-section-03" className="flex items-center gap-6">
+        <div id="navbar-left-section-03" className="flex items-center gap-6 shrink-0">
           <div className="flex items-center gap-5">
             <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
               {/* Geometric 'Ba' (ب) Logomark */}
@@ -50,8 +51,7 @@ export default function Navbar() {
                 />
               </svg>
               
-              <div id="navbar-brand-name-08" className="flex flex-col items-center justify-center gap-0 py-0.5">
-                {/* Urdu: Larger, on top */}
+              <div id="navbar-brand-name-08" className="flex flex-col items-center justify-center gap-0 py-0.5 sm:flex hidden">
                 <span id="navbar-brand-urdu-09" className="text-2xl font-black mb-[-2px] transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600">
                   بولیاں
                 </span>
@@ -64,7 +64,17 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div id="navbar-right-section-11" className="hidden md:flex items-center gap-2">
+        {/* Global Search Bar & Location */}
+        <div className="flex-1 max-w-3xl flex items-center gap-4 px-4">
+          <div className="flex-1 hidden md:block">
+            <SearchDropdown />
+          </div>
+          <div id="navbar-location-selector" className="flex items-center">
+            <LocationSelector align="end" />
+          </div>
+        </div>
+
+        <div id="navbar-right-section-11" className="flex items-center gap-2 shrink-0">
           <Button id="navbar-sell-btn-12" asChild variant="outline" className="hidden sm:flex items-center gap-2 border-blue-100 hover:bg-blue-50 text-blue-600">
             <Link href={isLoggedIn ? "/list" : "/signin"}>
               <Plus id="navbar-sell-plus-icon-13" className="h-4 w-4" />
@@ -140,11 +150,6 @@ export default function Navbar() {
               <Link href="/signin">Sign In</Link>
             </Button>
           )}
-        </div>
-
-        {/* Mobile View: Location Selection */}
-        <div id="navbar-mobile-location-21" className="flex md:hidden items-center">
-           <LocationSelector align="end" />
         </div>
       </div>
     </nav>

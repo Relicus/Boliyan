@@ -443,6 +443,7 @@ export const mockConversations: Conversation[] = [
     bidderId: "u2",
     lastMessage: "Is 160k final?",
     updatedAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 86400000 * 3).toISOString(),
   }
 ];
 

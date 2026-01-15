@@ -16,7 +16,7 @@ interface SellerBidCardProps {
 }
 
 export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
-  const { rejectBid, acceptBid } = useApp();
+  const { rejectBid, acceptBid, conversations, user } = useApp();
   const router = useRouter();
   
   // Stable "random" derived values based on bidder ID
@@ -29,8 +29,25 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   };
 
   const handleAccept = () => {
-    acceptBid(bid.id);
-    // Removed auto-redirect to chat as per user request
+    const convId = acceptBid(bid.id);
+    if (convId) {
+      router.push(`/inbox?id=${convId}`);
+    }
+  };
+
+  const handleChat = () => {
+    // Find existing conversation for this bid
+    const conv = conversations.find(c => 
+      c.itemId === bid.itemId && 
+      ((c.sellerId === user.id && c.bidderId === bidder.id) || 
+       (c.bidderId === user.id && c.sellerId === bidder.id))
+    );
+    
+    if (conv) {
+      router.push(`/inbox?id=${conv.id}`);
+    } else {
+      router.push("/inbox");
+    }
   };
 
   // Don't render if bid is rejected (keep accepted to show Chat button)
@@ -94,7 +111,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             </Button>
           )}
           {bid.status === 'accepted' ? (
-            <Button id={`bid-chat-btn-mobile-${bid.id}`} onClick={() => router.push("/inbox")} className="w-full h-10 bg-green-600 hover:bg-green-700 font-bold">
+            <Button id={`bid-chat-btn-mobile-${bid.id}`} onClick={handleChat} className="w-full h-10 bg-green-600 hover:bg-green-700 font-bold">
               <MessageSquare className="h-4 w-4 mr-2" />
               Chat
             </Button>
@@ -155,7 +172,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                   </Button>
                 )}
                 {bid.status === 'accepted' ? (
-                  <Button id={`bid-chat-btn-desktop-${bid.id}`} onClick={() => router.push("/inbox")} size="sm" className="h-9 px-4 bg-green-600 hover:bg-green-700 font-bold">
+                  <Button id={`bid-chat-btn-desktop-${bid.id}`} onClick={handleChat} size="sm" className="h-9 px-4 bg-green-600 hover:bg-green-700 font-bold">
                     <MessageSquare className="h-4 w-4 mr-1" />
                     Chat
                   </Button>

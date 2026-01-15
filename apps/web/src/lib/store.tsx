@@ -22,7 +22,7 @@ interface AppContextType {
   watchedItemIds: string[];
   sendMessage: (conversationId: string, content: string) => void;
   rejectBid: (bidId: string) => void;
-  acceptBid: (bidId: string) => void;
+  acceptBid: (bidId: string) => string | undefined;
   getUser: (id: string) => User | undefined;
   filters: {
     category: string | null;
@@ -101,6 +101,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
 
+    // Safety check: Don't allow bids lower than 70% of ask price
+    const minBidAllowed = item.askPrice * 0.7;
+    if (amount < minBidAllowed) {
+      console.warn(`Attempted to place a bid (${amount}) lower than 70% of ask price (${minBidAllowed})`);
+      return;
+    }
+
     // Safety check: Don't allow bids lower than current high bid for public listings
     if (type === 'public' && item.currentHighBid && amount < item.currentHighBid) {
       console.warn("Attempted to place a bid lower than the current high bid");
@@ -154,8 +161,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // SECURITY/LOGIC CHECK: 
     // In a real app, this function would verify that 'conversationId' refers to a VALID conversation
     // linked to an ACCEPTED bid. The UI enforces this by only showing conversations that exist.
-    // We do NOT allow "creating" a conversation here; it must already exist (created by bid acceptance).
     
+    const conv = conversations.find(c => c.id === conversationId);
+    if (conv?.expiresAt) {
+      if (new Date(conv.expiresAt).getTime() < Date.now()) {
+        console.warn("Attempted to send message to an expired conversation");
+        return;
+      }
+    }
+
     const newMessage: Message = {
       id: `m${Date.now()}`,
       conversationId,
@@ -190,27 +204,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const acceptBid = (bidId: string) => {
     const bid = bids.find(b => b.id === bidId);
-    if (!bid) return;
+    if (!bid) return undefined;
     
     // Update bid status to accepted
     setBids(prev => prev.map(b => 
       b.id === bidId ? { ...b, status: 'accepted' as const } : b
     ));
     
+    // Check if conversation already exists
+    const existingConv = conversations.find(c => 
+      c.itemId === bid.itemId && 
+      ((c.sellerId === user.id && c.bidderId === bid.bidderId) || 
+       (c.bidderId === user.id && c.sellerId === bid.bidderId))
+    );
+
+    if (existingConv) return existingConv.id;
+
     // Get the item to find the seller
     const item = items.find(i => i.id === bid.itemId);
-    if (!item) return;
+    if (!item) return undefined;
     
     // Create conversation (unlocks chat)
+    const newConvId = `conv-${Date.now()}`;
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 3);
+
     const newConversation: Conversation = {
-      id: `conv-${Date.now()}`,
+      id: newConvId,
       itemId: bid.itemId,
       sellerId: item.sellerId,
       bidderId: bid.bidderId,
       lastMessage: '',
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      expiresAt: expiresAt.toISOString()
     };
     setConversations(prev => [newConversation, ...prev]);
+    return newConvId;
   };
 
   const login = () => setIsLoggedIn(true);

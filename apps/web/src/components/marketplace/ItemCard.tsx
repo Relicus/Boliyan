@@ -788,6 +788,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                   <div className={`flex flex-1 border border-slate-300 rounded-l-md shadow-sm overflow-hidden ${user.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Extra Large for Modal */}
                     <button
+                      id={`modal-item-card-${item.id}-decrement-btn`}
                       onClick={(e) => handleSmartAdjust(e, -1)}
                       disabled={user.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
@@ -812,6 +813,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                       </AnimatePresence>
 
                       <motion.input
+                        id={`modal-item-card-${item.id}-bid-input`}
                         type="text"
                         value={bidAmount}
                         key={`modal-input-${animTrigger}`}
@@ -832,6 +834,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
                     {/* Increment Button - Extra Large for Modal */}
                     <button
+                      id={`modal-item-card-${item.id}-increment-btn`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
                       disabled={user.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
@@ -842,6 +845,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
                   {/* Submit Bid Button */}
                   <button
+                    id={`modal-item-card-${item.id}-place-bid-btn`}
                     onClick={(e) => handleBid(e)}
                     disabled={isSuccess || user.id === seller.id}
                     className={`px-6 rounded-r-md font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg min-w-[120px] flex items-center justify-center

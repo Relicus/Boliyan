@@ -15,10 +15,10 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     return 100;
   }, []);
 
-  // Initialize with Ask Price or Current High Bid
+  // Initialize with Ask Price (70% allowed on first bid) or Current High Bid
   const initialBid = item.isPublicBid && item.currentHighBid
     ? item.currentHighBid + getSmartStep(item.currentHighBid)
-    : item.askPrice;
+    : Math.ceil(item.askPrice * 0.7 / 100) * 100; // Round up to nearest 100 for clean bidding
 
   const [bidAmount, setBidAmount] = useState<string>(initialBid.toLocaleString());
   const [error, setError] = useState<boolean>(false);
@@ -27,20 +27,23 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const [lastDelta, setLastDelta] = useState<number | null>(null);
   const [showDelta, setShowDelta] = useState(false);
 
-  // Sync bid amount when item updates (e.g. someone else bids)
+  // Sync bid amount when external minimum bid updates (e.g. someone else bids)
   useEffect(() => {
+    const minBid = item.isPublicBid && item.currentHighBid
+      ? item.currentHighBid + getSmartStep(item.currentHighBid)
+      : item.askPrice * 0.7;
+
     if (!isSuccess) {
       const currentNumericAmount = parseFloat(bidAmount.replace(/,/g, ''));
-      const minBid = item.isPublicBid && item.currentHighBid
-        ? item.currentHighBid + getSmartStep(item.currentHighBid)
-        : item.askPrice;
       
-      // If current bid in input is now too low due to a new high bid, bump it up
-      if (currentNumericAmount < minBid) {
-        setBidAmount(minBid.toLocaleString());
+      // Only force sync if the CURRENT input is below the absolute minimum 
+      // AND we aren't in the middle of a success transition
+      if (currentNumericAmount < minBid && item.currentHighBid) {
+         setBidAmount(minBid.toLocaleString());
       }
     }
-  }, [item.currentHighBid, item.askPrice, item.isPublicBid, getSmartStep, isSuccess, bidAmount]);
+  }, [item.currentHighBid, item.askPrice, item.isPublicBid, getSmartStep, isSuccess]); 
+  // Note: bidAmount removed from dependencies to allow manual adjustment below threshold for error feedback
 
   const handleSmartAdjust = useCallback((e: React.MouseEvent | React.TouchEvent, direction: 1 | -1) => {
     e.stopPropagation();
