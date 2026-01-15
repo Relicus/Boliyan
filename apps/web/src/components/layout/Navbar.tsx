@@ -98,21 +98,21 @@ export default function Navbar() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-slate-100" />
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
-                    <Link href="/inbox" className="flex items-center w-full">
-                      <MessageSquare className="mr-2.5 h-4 w-4 opacity-70" />
-                      Messages
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
-                    <Link href="/profile" className="flex items-center w-full">
-                      <UserCircle className="mr-2.5 h-4 w-4 opacity-70" />
-                      Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
                     <Link href="/dashboard" className="flex items-center w-full">
                       <LayoutDashboard className="mr-2.5 h-4 w-4 opacity-70" />
                       My Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
+                    <Link href="/dashboard?tab=profile" className="flex items-center w-full">
+                      <UserCircle className="mr-2.5 h-4 w-4 opacity-70" />
+                      Profile Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
+                    <Link href="/inbox" className="flex items-center w-full">
+                      <MessageSquare className="mr-2.5 h-4 w-4 opacity-70" />
+                      Messages
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">

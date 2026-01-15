@@ -34,9 +34,9 @@ export default function BottomNav() {
       href: "/inbox",
     },
     {
-      label: "Profile",
+      label: "Dashboard",
       icon: User,
-      href: "/profile",
+      href: "/dashboard",
     },
   ];
 

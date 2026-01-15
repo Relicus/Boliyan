@@ -6,12 +6,14 @@ import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, ShoppingBag, TrendingUp, Package, Trophy } from "lucide-react";
+import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, ShoppingBag, TrendingUp, Package, Trophy, Heart, Settings, UserCircle } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import { AchievementSection } from "@/components/dashboard/AchievementSection";
+import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import DeleteConfirmationDialog from "@/components/seller/DeleteConfirmationDialog";
 import { Item } from "@/types";
 import { getBidderLocationMock } from "@/lib/utils";
@@ -20,10 +22,22 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
   const { items, bids, user, deleteItem, getUser } = useApp();
-  const [activeTab, setActiveTab] = useState("my-bids");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialTab = searchParams.get("tab") || "my-bids";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
   const [viewingItem, setViewingItem] = useState<Item | null>(null);
   const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    router.push(`/dashboard?tab=${value}`, { scroll: false });
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -100,8 +114,16 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <Tabs id="dashboard-tabs" defaultValue="my-bids" onValueChange={setActiveTab} className="space-y-6">
+      <Tabs id="dashboard-tabs" value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList id="dashboard-tabs-list" className="bg-transparent border-b rounded-none h-auto w-full justify-start p-0 gap-6 overflow-x-auto flex-nowrap scrollbar-hide">
+          <TabsTrigger 
+            id="tab-trigger-profile"
+            value="profile" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
+          >
+            <UserCircle className="h-4 w-4 mr-2" />
+            Profile
+          </TabsTrigger>
           <TabsTrigger 
             id="tab-trigger-my-bids"
             value="my-bids" 
@@ -136,6 +158,14 @@ export default function Dashboard() {
             </Badge>
           </TabsTrigger>
           <TabsTrigger 
+            id="tab-trigger-watchlist"
+            value="watchlist" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
+          >
+            <Heart className="h-4 w-4 mr-2" />
+            Watchlist
+          </TabsTrigger>
+          <TabsTrigger 
             id="tab-trigger-achievements"
             value="achievements" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
@@ -157,9 +187,28 @@ export default function Dashboard() {
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="w-full"
           >
+            {activeTab === "profile" && (
+              <div className="space-y-4 m-0">
+                <ProfileSettings />
+              </div>
+            )}
             {activeTab === "achievements" && (
               <div className="space-y-4 m-0">
                 <AchievementSection user={user} />
+              </div>
+            )}
+            {activeTab === "watchlist" && (
+              <div className="space-y-4 m-0">
+                 <div className="p-16 text-center border-2 border-dashed rounded-2xl bg-slate-50/50">
+                    <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Heart className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <h3 className="font-bold text-slate-900 mb-1">Watchlist Empty</h3>
+                    <p className="text-slate-500 text-sm">Items you save will appear here for quick access.</p>
+                    <Button asChild variant="outline" className="mt-6">
+                      <Link href="/">Browse Items</Link>
+                    </Button>
+                 </div>
               </div>
             )}
             {activeTab === "my-bids" && (
