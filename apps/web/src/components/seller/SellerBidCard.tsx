@@ -5,8 +5,10 @@ import { Bid, User } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, MessageSquare, Star, Clock } from "lucide-react";
+import { MapPin, MessageSquare, Star, Clock, Check, X } from "lucide-react";
 import { getBidderLocationMock } from "@/lib/utils";
+import { useApp } from "@/lib/store";
+import { useRouter } from "next/navigation";
 
 interface SellerBidCardProps {
   bid: Bid;
@@ -14,10 +16,27 @@ interface SellerBidCardProps {
 }
 
 export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
+  const { rejectBid, acceptBid } = useApp();
+  const router = useRouter();
+  
   // Stable "random" derived values based on bidder ID
   const { distance, location, duration } = useMemo(() => {
     return getBidderLocationMock(bidder.id);
   }, [bidder.id]);
+
+  const handleReject = () => {
+    rejectBid(bid.id);
+  };
+
+  const handleAccept = () => {
+    acceptBid(bid.id);
+    // Removed auto-redirect to chat as per user request
+  };
+
+  // Don't render if bid is rejected (keep accepted to show Chat button)
+  if (bid.status === 'rejected') {
+    return null;
+  }
 
   return (
     <div id={`bid-card-${bid.id}`} className="bg-slate-50 border border-slate-200 rounded-xl hover:shadow-md transition-all p-3">
@@ -68,13 +87,23 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
 
         {/* Bottom Row: Actions */}
         <div id={`bid-card-mobile-actions-${bid.id}`} className="grid grid-cols-2 gap-3 mt-1">
-          <Button id={`bid-reject-btn-mobile-${bid.id}`} variant="outline" className="w-full h-10 border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold">
-            Reject
-          </Button>
-          <Button id={`bid-unlock-btn-mobile-${bid.id}`} className="w-full h-10 bg-blue-600 hover:bg-blue-700 font-bold">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Unlock Chat
-          </Button>
+          {bid.status !== 'accepted' && (
+            <Button id={`bid-reject-btn-mobile-${bid.id}`} onClick={handleReject} variant="outline" className="w-full h-10 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 font-semibold">
+              <X className="h-4 w-4 mr-2" />
+              Reject
+            </Button>
+          )}
+          {bid.status === 'accepted' ? (
+            <Button id={`bid-chat-btn-mobile-${bid.id}`} onClick={() => router.push("/inbox")} className="w-full h-10 bg-green-600 hover:bg-green-700 font-bold">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Chat
+            </Button>
+          ) : (
+            <Button id={`bid-unlock-btn-mobile-${bid.id}`} onClick={handleAccept} className="w-full h-10 bg-blue-600 hover:bg-blue-700 font-bold">
+              <Check className="h-4 w-4 mr-2" />
+              Accept & Chat
+            </Button>
+          )}
         </div>
       </div>
 
@@ -119,13 +148,23 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
               </div>
 
               <div id={`bid-actions-desktop-${bid.id}`} className="flex gap-2">
-                <Button id={`bid-reject-btn-desktop-${bid.id}`} size="sm" variant="outline" className="h-9 px-4 border-slate-200 hover:bg-slate-50">
-                  Reject
-                </Button>
-                <Button id={`bid-unlock-btn-desktop-${bid.id}`} size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Unlock Chat
-                </Button>
+                {bid.status !== 'accepted' && (
+                  <Button id={`bid-reject-btn-desktop-${bid.id}`} onClick={handleReject} size="sm" variant="outline" className="h-9 px-4 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200">
+                    <X className="h-4 w-4 mr-1" />
+                    Reject
+                  </Button>
+                )}
+                {bid.status === 'accepted' ? (
+                  <Button id={`bid-chat-btn-desktop-${bid.id}`} onClick={() => router.push("/inbox")} size="sm" className="h-9 px-4 bg-green-600 hover:bg-green-700 font-bold">
+                    <MessageSquare className="h-4 w-4 mr-1" />
+                    Chat
+                  </Button>
+                ) : (
+                  <Button id={`bid-unlock-btn-desktop-${bid.id}`} onClick={handleAccept} size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold">
+                    <Check className="h-4 w-4 mr-1" />
+                    Accept
+                  </Button>
+                )}
               </div>
           </div>
       </div>

@@ -36,7 +36,7 @@ export default function BottomNav() {
     {
       label: "Profile",
       icon: User,
-      href: "/dashboard",
+      href: "/profile",
     },
   ];
 

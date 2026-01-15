@@ -6,7 +6,7 @@ import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Clock, Eye } from "lucide-react";
+import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, ShoppingBag, TrendingUp, Package } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -83,12 +83,20 @@ export default function Dashboard() {
           <h1 id="dashboard-title" className="text-4xl font-black text-slate-900 tracking-tight">Dashboard</h1>
           <p id="dashboard-subtitle" className="text-slate-500 font-medium">Manage your marketplace activity.</p>
         </div>
-        <Button id="dashboard-new-listing-btn" asChild className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 h-11 px-6 font-bold shadow-lg shadow-blue-100 transition-all hover:scale-105 active:scale-95">
-          <Link href="/list">
-            <Plus id="dashboard-new-listing-plus" className="h-5 w-5 mr-2" />
-            New Listing
-          </Link>
-        </Button>
+        <div className="flex gap-3 w-full md:w-auto">
+          <Button id="dashboard-messages-btn" variant="outline" asChild className="flex-1 md:flex-none h-11 px-6 font-bold border-slate-200 hover:bg-slate-50 transition-all">
+            <Link href="/inbox" className="flex items-center">
+              <MessageSquare className="h-5 w-5 mr-2 text-slate-400" />
+              Messages
+            </Link>
+          </Button>
+          <Button id="dashboard-new-listing-btn" asChild className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 h-11 px-6 font-bold shadow-lg shadow-blue-100 transition-all hover:scale-105 active:scale-95">
+            <Link href="/list" className="flex items-center">
+              <Plus id="dashboard-new-listing-plus" className="h-5 w-5 mr-2" />
+              Post New
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <Tabs id="dashboard-tabs" defaultValue="my-bids" onValueChange={setActiveTab} className="space-y-6">
@@ -98,7 +106,8 @@ export default function Dashboard() {
             value="my-bids" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
           >
-            My Bids
+            <ShoppingBag className="h-4 w-4 mr-2" />
+            Buying
             <Badge id="tab-badge-my-bids" className="ml-2 bg-blue-50 text-blue-600 hover:bg-blue-50 border-none transition-all duration-300">
               {itemsIMadeBidsOn.length}
             </Badge>
@@ -108,8 +117,9 @@ export default function Dashboard() {
             value="active-bids" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
           >
-            Active Bids
-            <Badge id="tab-badge-active-bids" className="ml-2 bg-slate-100 text-slate-600 hover:bg-slate-100 border-none transition-all duration-300">
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Selling
+            <Badge id="tab-badge-active-bids" className="ml-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-50 border-none transition-all duration-300">
               {bids.filter(b => myItems.some(i => i.id === b.itemId)).length}
             </Badge>
           </TabsTrigger>
@@ -118,6 +128,7 @@ export default function Dashboard() {
             value="my-listings" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
           >
+            <Package className="h-4 w-4 mr-2" />
             My Listings
             <Badge id="tab-badge-my-listings" className="ml-2 bg-slate-100 text-slate-600 hover:bg-slate-100 border-none transition-all duration-300">
               {myItems.length}

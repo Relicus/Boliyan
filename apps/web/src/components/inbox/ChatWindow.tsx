@@ -33,7 +33,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
   if (!conversation) return <div className="p-10 text-center">Conversation not found</div>;
 
-  const otherUserId = conversation.sellerId === user.id ? conversation.bidderId : conversation.sellerId;
+  const isSeller = conversation.sellerId === user.id;
+  const otherUserId = isSeller ? conversation.bidderId : conversation.sellerId;
   const otherUser = getUser(otherUserId);
   const item = items.find(i => i.id === conversation.itemId);
 
@@ -45,25 +46,50 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b shrink-0">
+      <div className="flex items-center gap-3 p-4 border-b shrink-0 bg-white/80 backdrop-blur-md sticky top-0 z-10">
         {onBack && (
-          <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden">
+          <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden -ml-2">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         )}
-        <Avatar className="h-10 w-10 border">
-          <AvatarImage src={otherUser?.avatar} />
-          <AvatarFallback>{otherUser?.name?.[0]}</AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <h3 className="font-semibold text-sm md:text-base">{otherUser?.name}</h3>
-          <p className="text-xs text-muted-foreground truncate max-w-[200px] md:max-w-md">
-             re: {item?.title}
-          </p>
+        <div className="relative">
+          <Avatar className="h-10 w-10 border shadow-sm">
+            <AvatarImage src={otherUser?.avatar} />
+            <AvatarFallback className="bg-blue-50 text-blue-600 font-bold">{otherUser?.name?.[0]}</AvatarFallback>
+          </Avatar>
+          <div className={cn(
+            "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white bg-green-500"
+          )} title="Online" />
         </div>
-        {/* Deal Actions could go here (Accept Offer, etc) */}
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold text-slate-900 truncate tracking-tight">{otherUser?.name}</h3>
+            <Badge variant="outline" className={cn(
+              "text-[8px] h-3.5 px-1 font-black uppercase tracking-tighter border-none",
+              isSeller ? "bg-blue-100 text-blue-700" : "bg-indigo-100 text-indigo-700"
+            )}>
+              {isSeller ? "Buyer" : "Seller"}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-1.5 min-w-0">
+            {item && (
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">RE:</span>
+                <span className="text-xs font-medium text-slate-500 truncate">{item.title}</span>
+                <span className="text-[10px] font-black text-slate-900 bg-slate-100 px-1 py-0.5 rounded">Rs. {item.askPrice.toLocaleString()}</span>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {item && (
+          <div className="hidden sm:block h-10 w-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm flex-shrink-0">
+            <img src={item.images[0]} alt={item.title} className="h-full w-full object-cover" />
+          </div>
+        )}
       </div>
 
       {/* Messages Area */}

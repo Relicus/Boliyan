@@ -6,8 +6,16 @@ import { Separator } from "@/components/ui/separator";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
+import { usePathname } from "next/navigation";
+
 export default function Sidebar() {
   const { filters, setFilter } = useApp();
+  const pathname = usePathname();
+
+  // Only show sidebar on home page
+  if (pathname !== "/") {
+    return null;
+  }
 
   return (
     <aside id="sidebar-01" className="w-72 border-r border-slate-200/60 bg-white hidden lg:flex flex-col sticky top-16 h-[calc(100vh-64px)] overflow-hidden shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.02)]">

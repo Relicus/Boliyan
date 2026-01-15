@@ -11,6 +11,9 @@ interface AppContextType {
   bids: Bid[];
   conversations: Conversation[];
   messages: Message[];
+  isLoggedIn: boolean;
+  login: () => void;
+  logout: () => void;
   addItem: (item: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => void;
   updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => void;
   deleteItem: (id: string) => void;
@@ -18,6 +21,8 @@ interface AppContextType {
   toggleWatch: (itemId: string) => void;
   watchedItemIds: string[];
   sendMessage: (conversationId: string, content: string) => void;
+  rejectBid: (bidId: string) => void;
+  acceptBid: (bidId: string) => void;
   getUser: (id: string) => User | undefined;
   filters: {
     category: string | null;
@@ -42,6 +47,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true); // Logged in by default for now
 
   /* 
     TODO: REAL SUPABASE FETCHING PATTERN
@@ -176,8 +182,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
+  const rejectBid = (bidId: string) => {
+    setBids(prev => prev.map(b => 
+      b.id === bidId ? { ...b, status: 'rejected' as const } : b
+    ));
+  };
+
+  const acceptBid = (bidId: string) => {
+    const bid = bids.find(b => b.id === bidId);
+    if (!bid) return;
+    
+    // Update bid status to accepted
+    setBids(prev => prev.map(b => 
+      b.id === bidId ? { ...b, status: 'accepted' as const } : b
+    ));
+    
+    // Get the item to find the seller
+    const item = items.find(i => i.id === bid.itemId);
+    if (!item) return;
+    
+    // Create conversation (unlocks chat)
+    const newConversation: Conversation = {
+      id: `conv-${Date.now()}`,
+      itemId: bid.itemId,
+      sellerId: item.sellerId,
+      bidderId: bid.bidderId,
+      lastMessage: '',
+      updatedAt: new Date().toISOString()
+    };
+    setConversations(prev => [newConversation, ...prev]);
+  };
+
+  const login = () => setIsLoggedIn(true);
+  const logout = () => setIsLoggedIn(false);
+
   return (
-    <AppContext.Provider value={{ user, items, bids, conversations, messages, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, sendMessage, getUser, filters, setFilter }}>
+    <AppContext.Provider value={{ user, items, bids, conversations, messages, isLoggedIn, login, logout, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, sendMessage, rejectBid, acceptBid, getUser, filters, setFilter }}>
       {children}
     </AppContext.Provider>
   );

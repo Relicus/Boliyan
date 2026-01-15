@@ -8,13 +8,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
+import { Badge } from '@/components/ui/badge';
+
 interface ConversationListProps {
+  conversations: Conversation[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  role: 'buyer' | 'seller';
 }
 
-export function ConversationList({ selectedId, onSelect }: ConversationListProps) {
-  const { conversations, user, getUser, items } = useApp();
+export function ConversationList({ conversations, selectedId, onSelect, role }: ConversationListProps) {
+  const { user, getUser, items } = useApp();
 
   // Helper to find the "other" user in the conversation
   const getOtherUser = (conversation: Conversation) => {
@@ -44,36 +48,65 @@ export function ConversationList({ selectedId, onSelect }: ConversationListProps
           <Card
             key={conv.id}
             className={cn(
-              "p-3 cursor-pointer hover:bg-accent transition-colors flex gap-3 items-center",
-              selectedId === conv.id ? "bg-accent border-primary" : ""
+              "p-4 cursor-pointer hover:bg-slate-50 transition-all flex flex-row gap-4 items-center border-none shadow-none rounded-2xl relative group",
+              selectedId === conv.id ? "bg-white shadow-sm ring-1 ring-slate-100/50" : ""
             )}
             onClick={() => onSelect(conv.id)}
           >
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={otherUser?.avatar} />
-              <AvatarFallback>{otherUser?.name?.[0] || "?"}</AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                <AvatarImage src={otherUser?.avatar} />
+                <AvatarFallback className="bg-slate-100 text-slate-500 font-bold">
+                  {otherUser?.name?.[0] || "?"}
+                </AvatarFallback>
+              </Avatar>
+              {/* Role Badge Positioning */}
+              <div className="absolute -bottom-1 -right-1">
+                <Badge 
+                  variant="outline" 
+                  className={cn(
+                    "text-[8px] px-1 py-0 h-4 border-none shadow-sm font-black uppercase tracking-tighter",
+                    role === 'seller' ? "bg-indigo-600 text-white" : "bg-blue-600 text-white"
+                  )}
+                >
+                  {role === 'seller' ? 'Seller' : 'Buyer'}
+                </Badge>
+              </div>
+            </div>
             
-            <div className="flex-1 overflow-hidden">
-              <div className="flex justify-between items-baseline">
-                <h4 className="font-semibold text-sm truncate">{otherUser?.name || "Unknown User"}</h4>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {conv.updatedAt ? formatDistanceToNow(new Date(conv.updatedAt), { addSuffix: true }) : 'New'}
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-baseline gap-2 mb-0.5">
+                <h4 className="font-bold text-[13px] text-slate-900 truncate leading-none">
+                  {otherUser?.name || "Unknown User"}
+                </h4>
+                <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap">
+                  {conv.updatedAt ? formatDistanceToNow(new Date(conv.updatedAt), { addSuffix: false }) : 'Now'}
                 </span>
               </div>
               
-              <div className="text-xs text-muted-foreground truncate mb-0.5">
-                {item?.title || "Unknown Item"}
+              <div className="flex items-center gap-1.5 mb-1.5 opacity-80">
+                {item && (
+                  <div className="h-3.5 w-3.5 rounded-sm bg-slate-100 overflow-hidden flex-shrink-0">
+                    <img src={item.images[0]} alt="" className="h-full w-full object-cover" />
+                  </div>
+                )}
+                <div className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-tight">
+                  {item?.title || "Unknown Item"}
+                </div>
               </div>
               
               <p className={cn(
-                "text-sm truncate",
-                // Highlight if unread? For now just showing content
-                "text-foreground/80"
+                "text-[11px] truncate font-medium max-w-[90%]",
+                selectedId === conv.id ? "text-slate-700" : "text-slate-400"
               )}>
                 {conv.lastMessage || "Start chatting..."}
               </p>
             </div>
+
+            {/* Selection Indicator */}
+            {selectedId === conv.id && (
+              <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-600 rounded-r-full" />
+            )}
           </Card>
         );
       })}
