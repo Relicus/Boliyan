@@ -18,7 +18,6 @@ export interface Item {
   images: string[];
   sellerId: string;
   askPrice: number;
-  recommendedPrice: number;
   category: string;
   isPublicBid: boolean;
   currentHighBid?: number;

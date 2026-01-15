@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { Item, Bid, User, Conversation, Message } from '@/types';
 import { mockItems, mockBids, mockUsers, mockConversations, mockMessages } from '@/lib/mock-data';
+import { supabase } from '@/lib/supabase';
 
 interface AppContextType {
   user: User; // Current logged in user
@@ -41,6 +42,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
+
+  /* 
+    TODO: REAL SUPABASE FETCHING PATTERN
+    useEffect(() => {
+      const fetchData = async () => {
+        const { data: listings } = await supabase.from('listings').select('*');
+        if (listings) setItems(listings as Item[]);
+        // ... and so on for bids, conversations, etc.
+      };
+      fetchData();
+    }, []);
+  */
   
   // Current user is hardcoded as 'u1' (Ahmed Ali) for now
   const user = mockUsers[0];

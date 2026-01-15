@@ -115,7 +115,6 @@ function ListForm() {
         isPublicBid: isPublic,
         sellerId: user.id, // Current user
         images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=1000&auto=format&fit=crop"], // Fallback if no images
-        recommendedPrice: 0,
         createdAt: new Date().toISOString(),
         expiryAt: expiryDate.toISOString(),
         listingDuration: finalDuration,
