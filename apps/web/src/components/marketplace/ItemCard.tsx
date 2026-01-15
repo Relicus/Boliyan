@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Lock, Globe, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
+import { GamificationBadge } from "@/components/common/GamificationBadge";
+import { VerifiedBadge } from "@/components/common/VerifiedBadge";
+import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
 
 interface ItemCardProps {
   item: Item;
@@ -70,11 +73,10 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
     return () => clearInterval(timer);
   }, []);
 
-  // Stable "random" distance based on item ID to prevent hydration mismatch
+  // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, timeLeft, statusColor, isUrgent } = useMemo(() => {
-    const hash = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const dist = ((hash % 80) / 10 + 1.2).toFixed(1);
-    const dur = Math.round(Number(dist) * 2.5); // Approx 2.5 mins per km
+    // Distance Calculation (Privacy Safe)
+    const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
     
     // Time Left calculation
     const diff = new Date(item.expiryAt).getTime() - now;
@@ -113,7 +115,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
       statusColor,
       isUrgent
     };
-  }, [item.id, item.expiryAt, item.createdAt, now]);
+  }, [item.id, item.expiryAt, item.createdAt, now, user.location, seller.location]);
 
   const handleInputClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent dialog from opening when clicking input
@@ -230,7 +232,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                 <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
                   <MapPin className="h-3 w-3" />
                   <span className="text-[10px] font-black tracking-tight leading-none truncate max-w-[120px]">
-                    {seller.location.address}
+                    {getFuzzyLocationString(seller.location.address)}
                   </span>
                 </div>
               </div>
@@ -293,6 +295,47 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                 {item.title}
               </h3>
 
+              {/* Seller Info - Between Title and Price */}
+              {(viewMode === 'spacious' || viewMode === 'comfortable') && (
+                <div className={`flex items-center gap-2 mb-2 animate-in fade-in duration-300 ${viewMode === 'comfortable' ? 'mt-0.5' : 'mt-1'}`}>
+                  {viewMode === 'spacious' && (
+                    <div className="h-5 w-5 rounded-full bg-slate-200 overflow-hidden shrink-0">
+                      <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
+                    </div>
+                  )}
+                  
+                  <span className={`text-[10px] font-bold text-slate-700 truncate leading-none ${viewMode === 'comfortable' ? 'text-slate-500 max-w-[80px]' : ''}`}>
+                    {seller.name}
+                  </span>
+                  {seller.isVerified && <VerifiedBadge size="sm" />}
+
+                  <div className="flex items-center gap-1">
+                    <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0 px-1 text-[9px] shrink-0 h-3.5 flex items-center leading-none">
+                      ⭐ <span className="ml-0.5 leading-none">{seller.rating}</span>
+                      <span className="ml-0.5 text-yellow-600/80 font-normal leading-none">({seller.reviewCount})</span>
+                    </Badge>
+                    {seller.badges && seller.badges.some(b => b.category === 'seller') && (
+                      <GamificationBadge 
+                        badge={seller.badges.filter(b => b.category === 'seller').sort((a,b) => {
+                          const tiers: Record<string, number> = { diamond: 3, gold: 2, silver: 1, bronze: 0 };
+                          return (tiers[b.tier] || 0) - (tiers[a.tier] || 0);
+                        })[0]} 
+                        size="sm" 
+                        showTooltip={viewMode === 'spacious'}
+                        className="h-3.5 px-1 text-[9px] gap-1 border-none bg-transparent hover:bg-transparent"
+                      />
+                    )}
+                  </div>
+
+                  {viewMode === 'spacious' && (
+                    <div className="flex items-center gap-0.5 ml-auto text-[10px] text-slate-500">
+                      <MapPin className="h-2.5 w-2.5 text-red-500" />
+                      <span className="truncate max-w-[80px] leading-none">{getFuzzyLocationString(seller.location.address)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Price Row */}
               <div className="flex items-end justify-between transition-all">
                 <div className="flex flex-col">
@@ -349,20 +392,10 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                 </div>
               </div>
 
-              {/* Spacious Mode Details */}
+              {/* Spacious Mode Description */}
               {viewMode === 'spacious' && (
                 <div className="mt-2 mb-1 animate-in fade-in duration-300">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div className="h-5 w-5 rounded-full bg-slate-200 overflow-hidden shrink-0">
-                      <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 truncate">{seller.name}</span>
-                    <div className="flex items-center gap-0.5 ml-auto text-[10px] text-slate-500">
-                      <MapPin className="h-2.5 w-2.5 text-red-500" />
-                      <span className="truncate max-w-[80px]">{seller.location.address}</span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -704,13 +737,27 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <div className="font-bold text-slate-900 text-sm truncate">{seller.name}</div>
-                  <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0.5 px-1.5 text-[10px] shrink-0">
-                    ⭐ <span className="ml-0.5">{seller.rating}</span>
-                  </Badge>
+                  {seller.isVerified && <VerifiedBadge size="sm" />}
+                  <div className="flex items-center gap-1.5">
+                    <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0.5 px-1.5 text-[10px] shrink-0">
+                      ⭐ <span className="ml-0.5">{seller.rating}</span>
+                    </Badge>
+                    {seller.badges && seller.badges.some(b => b.category === 'seller') && (
+                      <GamificationBadge 
+                        badge={seller.badges.filter(b => b.category === 'seller').sort((a,b) => {
+                          const tiers: Record<string, number> = { diamond: 3, gold: 2, silver: 1, bronze: 0 };
+                          return (tiers[b.tier] || 0) - (tiers[a.tier] || 0);
+                        })[0]} 
+                        size="sm" 
+                        showTooltip={true}
+                        className="h-5 px-1.5 text-[10px]"
+                      />
+                    )}
+                  </div>
                 </div>
                 <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                   <MapPin className="h-3 w-3 text-red-500" />
-                  <span className="truncate">{seller.location.address}</span>
+                  <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
                 </div>
                 <div className="text-xs text-slate-500 font-medium flex items-center gap-1 mt-0.5 tabular-nums">
                   {duration} min drive ({distance} km)

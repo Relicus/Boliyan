@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
+import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
 
 interface ProductDetailsModalProps {
   item: Item;
@@ -62,11 +63,10 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     return () => clearInterval(timer);
   }, []);
 
-  // Stable "random" distance based on item ID
+  // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, timeLeft, isUrgent } = useMemo(() => {
-    const hash = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const dist = ((hash % 80) / 10 + 1.2).toFixed(1);
-    const dur = Math.round(Number(dist) * 2.5); // Approx 2.5 mins per km
+    // Distance Calculation (Privacy Safe)
+    const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
     
     // Time Left calculation
     const diff = new Date(item.expiryAt).getTime() - now;
@@ -89,7 +89,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
       timeLeft: timeStr,
       isUrgent
     };
-  }, [item.id, item.expiryAt, now]);
+  }, [item.id, item.expiryAt, now, user.location, seller.location]);
 
 
   return (
@@ -324,7 +324,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                 </div>
                 <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                     <MapPin className="h-3 w-3 text-red-500" />
-                    <span className="truncate">{seller.location.address}</span>
+                    <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
                 </div>
                 <div className="text-xs text-slate-500 font-medium flex items-center gap-1 mt-0.5 tabular-nums">
                   {duration} min drive ({distance} km)

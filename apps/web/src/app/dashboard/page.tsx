@@ -6,8 +6,9 @@ import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, ShoppingBag, TrendingUp, Package } from "lucide-react";
+import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, ShoppingBag, TrendingUp, Package, Trophy } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
+import { AchievementSection } from "@/components/dashboard/AchievementSection";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -134,6 +135,17 @@ export default function Dashboard() {
               {myItems.length}
             </Badge>
           </TabsTrigger>
+          <TabsTrigger 
+            id="tab-trigger-achievements"
+            value="achievements" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
+          >
+            <Trophy className="h-4 w-4 mr-2" />
+            Achievements
+            <Badge id="tab-badge-achievements" className="ml-2 bg-amber-50 text-amber-600 hover:bg-amber-50 border-none transition-all duration-300">
+              {user.badges?.length || 0}
+            </Badge>
+          </TabsTrigger>
         </TabsList>
 
         <AnimatePresence mode="wait">
@@ -145,6 +157,11 @@ export default function Dashboard() {
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="w-full"
           >
+            {activeTab === "achievements" && (
+              <div className="space-y-4 m-0">
+                <AchievementSection user={user} />
+              </div>
+            )}
             {activeTab === "my-bids" && (
               <div className="space-y-4 m-0">
                 {itemsIMadeBidsOn.length === 0 && (

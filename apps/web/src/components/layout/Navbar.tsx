@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useApp } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
+import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 
 export default function Navbar() {
   const { filters, setFilter, user, isLoggedIn, logout } = useApp();
@@ -88,7 +89,10 @@ export default function Navbar() {
                 <DropdownMenuContent align="end" className="w-56 mt-1 p-2 rounded-2xl shadow-xl border-slate-100">
                   <DropdownMenuLabel className="font-outfit pb-3">
                     <div className="flex flex-col gap-0.5">
-                      <span className="font-black text-slate-900">{user.name}</span>
+                      <span className="font-black text-slate-900 flex items-center gap-1.5">
+                        {user.name}
+                        {user.isVerified && <VerifiedBadge size="sm" />}
+                      </span>
                       <span className="text-[10px] text-slate-500 font-medium">Verified User</span>
                     </div>
                   </DropdownMenuLabel>

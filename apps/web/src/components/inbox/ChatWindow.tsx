@@ -9,6 +9,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { VerifiedBadge } from '@/components/common/VerifiedBadge';
+import { Badge } from '@/components/ui/badge';
 
 interface ChatWindowProps {
   conversationId: string;
@@ -67,6 +69,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-slate-900 truncate tracking-tight">{otherUser?.name}</h3>
+            {otherUser?.isVerified && <VerifiedBadge size="sm" />}
             <Badge variant="outline" className={cn(
               "text-[8px] h-3.5 px-1 font-black uppercase tracking-tighter border-none",
               isSeller ? "bg-blue-100 text-blue-700" : "bg-indigo-100 text-indigo-700"

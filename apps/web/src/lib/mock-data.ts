@@ -1,4 +1,18 @@
-import { User, Item, Bid, Conversation, Message } from "@/types";
+import { User, Item, Bid, Conversation, Message, Badge } from "@/types";
+
+export const mockBadges: Badge[] = [
+  // Seller Badges
+  { id: 'sb1', name: 'Deal Maker', description: 'Accepted 5+ bids on your listings', tier: 'bronze', icon: 'Handshake', category: 'seller' },
+  { id: 'sb2', name: 'Deal Maker', description: 'Accepted 25+ bids on your listings', tier: 'silver', icon: 'Handshake', category: 'seller' },
+  { id: 'sb3', name: 'Trusted Dealer', description: 'Maintained 4.0+ rating', tier: 'bronze', icon: 'ShieldCheck', category: 'seller' },
+  
+  // Buyer Badges
+  { id: 'bb1', name: 'Serious Buyer', description: 'Had 5+ offers accepted', tier: 'bronze', icon: 'ShoppingBag', category: 'buyer' },
+  { id: 'bb2', name: 'Fast Payer', description: 'Known for quick payments', tier: 'gold', icon: 'Zap', category: 'buyer' },
+  
+  // Special
+  { id: 'sp1', name: 'Verified', description: 'Identity verified', tier: 'diamond', icon: 'BadgeCheck', category: 'special' },
+];
 
 export const mockUsers: User[] = [
   {
@@ -8,6 +22,12 @@ export const mockUsers: User[] = [
     rating: 4.8,
     reviewCount: 124,
     location: { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan" },
+    stats: { bidsAcceptedByMe: 42, myBidsAccepted: 15 },
+    badges: [
+      { id: 'sb2', name: 'Deal Maker', description: 'Accepted 25+ bids on your listings', tier: 'silver', icon: 'Handshake', category: 'seller' },
+      { id: 'sp1', name: 'Verified', description: 'Identity verified', tier: 'diamond', icon: 'BadgeCheck', category: 'special' }
+    ],
+    isVerified: true
   },
   {
     id: "u2",
@@ -16,6 +36,11 @@ export const mockUsers: User[] = [
     rating: 4.5,
     reviewCount: 89,
     location: { lat: 24.8717, lng: 67.0111, address: "Karachi, Pakistan" },
+    stats: { bidsAcceptedByMe: 12, myBidsAccepted: 8 },
+    badges: [
+      { id: 'sb1', name: 'Deal Maker', description: 'Accepted 5+ bids on your listings', tier: 'bronze', icon: 'Handshake', category: 'seller' }
+    ],
+    isVerified: true
   },
   {
     id: "u3",
@@ -24,6 +49,8 @@ export const mockUsers: User[] = [
     rating: 4.2,
     reviewCount: 67,
     location: { lat: 24.8807, lng: 67.0211, address: "Karachi, Pakistan" },
+    stats: { bidsAcceptedByMe: 3, myBidsAccepted: 2 },
+    badges: []
   },
 ];
 

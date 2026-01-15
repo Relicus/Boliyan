@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 import { Badge } from '@/components/ui/badge';
+import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -76,8 +77,9 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
             
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-baseline gap-2 mb-0.5">
-                <h4 className="font-bold text-[13px] text-slate-900 truncate leading-none">
+                <h4 className="font-bold text-[13px] text-slate-900 truncate leading-none flex items-center gap-1">
                   {otherUser?.name || "Unknown User"}
+                  {otherUser?.isVerified && <VerifiedBadge size="sm" />}
                 </h4>
                 <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap">
                   {conv.updatedAt ? formatDistanceToNow(new Date(conv.updatedAt), { addSuffix: false }) : 'Now'}

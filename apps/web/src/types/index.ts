@@ -1,3 +1,19 @@
+export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'diamond';
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  tier: BadgeTier;
+  icon: string; // Lucide icon name or image URL
+  category: 'seller' | 'buyer' | 'special';
+}
+
+export interface UserStats {
+  bidsAcceptedByMe: number; // Seller metric: How many bids I accepted
+  myBidsAccepted: number;   // Buyer metric: How many of my bids were accepted
+}
+
 export interface User {
   id: string;
   name: string;
@@ -10,6 +26,9 @@ export interface User {
     lng: number;
     address: string;
   };
+  badges: Badge[];
+  stats: UserStats;
+  isVerified?: boolean;
 }
 
 export interface Item {
