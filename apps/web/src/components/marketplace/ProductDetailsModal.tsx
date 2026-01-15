@@ -6,10 +6,11 @@ import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
+import Link from "next/link";
 
 interface ProductDetailsModalProps {
   item: Item;
@@ -330,8 +331,17 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                   {duration} min drive ({distance} km)
                 </div>
                 </div>
-                <div className="ml-auto shrink-0">
+                <div className="ml-auto shrink-0 flex flex-col gap-2">
+                <Link
+                    id={`view-details-btn-${item.id}`}
+                    href={`/product/${item.id}`}
+                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 font-bold text-xs"
+                >
+                    <ExternalLink className="h-4 w-4" />
+                    Full Details
+                </Link>
                 <button
+                    id={`toggle-watch-modal-btn-${item.id}`}
                     onClick={(e) => {
                     e.stopPropagation();
                     toggleWatch(item.id);
