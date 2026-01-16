@@ -7,11 +7,17 @@ import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import FilterSheetContent from "@/components/marketplace/FilterSheetContent";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const { messages, items, bids, user } = useApp();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const unreadCount = messages.filter(m => !m.isRead && m.senderId !== user.id).length;
   
   const myItems = items.filter(i => i.sellerId === user.id);

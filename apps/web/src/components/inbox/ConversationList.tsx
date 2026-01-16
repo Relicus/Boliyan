@@ -8,15 +8,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Clock } from 'lucide-react';
-
-import { Badge } from '@/components/ui/badge';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ConversationListProps {
   conversations: Conversation[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  role: 'buyer' | 'seller';
+  role: 'buyer' | 'seller' | 'auto';
 }
 
 export function ConversationList({ conversations, selectedId, onSelect, role }: ConversationListProps) {
@@ -63,103 +62,127 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
 
   if (conversations.length === 0) {
     return (
-      <div className="p-4 text-center text-muted-foreground">
-        No active chats. <br />
-        <span className="text-xs">Chats only open after a bid is accepted.</span>
+      <div className="p-8 text-center flex flex-col items-center justify-center gap-3">
+        <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center mb-1">
+          <Clock className="h-6 w-6 text-slate-200" />
+        </div>
+        <p className="text-sm font-bold text-slate-500">No active conversations</p>
+        <p className="text-[10px] text-slate-400 max-w-[140px] leading-tight">
+          Chats appear here once a bid is accepted and the deal is moving.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2 p-2">
-      {conversations.map((conv) => {
-        const otherUser = getOtherUser(conv);
-        const item = getItem(conv.itemId);
-        const timeLeft = getChatTimeLeft(conv.expiresAt);
-        
-        return (
-          <Card
-            key={conv.id}
-            className={cn(
-              "p-4 cursor-pointer hover:bg-slate-100/50 transition-all flex flex-row gap-4 items-center border-none shadow-none rounded-2xl relative group",
-              selectedId === conv.id ? "bg-white shadow-sm ring-1 ring-slate-100/50" : ""
-            )}
-            onClick={() => onSelect(conv.id)}
-          >
-            <div className="relative">
-              <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
-                <AvatarImage src={otherUser?.avatar} />
-                <AvatarFallback className="bg-slate-100 text-slate-500 font-bold">
-                  {otherUser?.name?.[0] || "?"}
-                </AvatarFallback>
-              </Avatar>
-              {/* Role Badge Positioning */}
-              <div className="absolute -bottom-1 -right-1">
-                <Badge 
-                  variant="outline" 
-                  className={cn(
-                    "text-[8px] px-1 py-0 h-4 border-none shadow-sm font-black uppercase tracking-tighter",
-                    role === 'seller' ? "bg-indigo-600 text-white" : "bg-blue-600 text-white"
-                  )}
-                >
-                  {role === 'seller' ? 'Seller' : 'Buyer'}
-                </Badge>
-              </div>
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start gap-2 mb-1">
-                <h4 className="font-bold text-[13px] text-slate-900 truncate leading-none flex items-center gap-1 pt-0.5">
-                  {otherUser?.name || "Unknown User"}
-                  {otherUser?.isVerified && <VerifiedBadge size="sm" />}
-                </h4>
-                
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap leading-none">
-                    {conv.updatedAt ? formatDistanceToNow(new Date(conv.updatedAt), { addSuffix: false }) + ' ago' : 'Now'}
-                  </span>
-                  {timeLeft && (
-                    <div className={cn(
-                      "flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-black tabular-nums transition-colors shadow-sm border",
-                      timeLeft.done 
-                        ? "bg-red-50 border-red-100 text-red-500" 
-                        : timeLeft.urgent 
-                          ? "bg-red-50 border-red-200 text-red-600 animate-pulse" 
-                          : "bg-blue-50 border-blue-100 text-blue-600"
-                    )}>
-                      <Clock className="h-2.5 w-2.5" />
-                      {timeLeft.text}
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-1.5 mb-1.5 opacity-80 min-w-0">
-                {item && (
-                  <div className="h-3.5 w-3.5 rounded-sm bg-slate-100 overflow-hidden flex-shrink-0">
-                    <img src={item.images[0]} alt="" className="h-full w-full object-cover" />
-                  </div>
+    <div className="flex flex-col gap-1 p-2">
+      <AnimatePresence mode="popLayout">
+        {conversations.map((conv, idx) => {
+          const otherUser = getOtherUser(conv);
+          const item = getItem(conv.itemId);
+          const timeLeft = getChatTimeLeft(conv.expiresAt);
+          const isSelected = selectedId === conv.id;
+          
+          const activeRole = role === 'auto' 
+            ? (conv.sellerId === user.id ? 'seller' : 'buyer')
+            : role;
+          
+          return (
+            <motion.div
+              layout
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ delay: idx * 0.03, duration: 0.2 }}
+              key={conv.id}
+            >
+              <Card
+                className={cn(
+                  "p-4 cursor-pointer transition-all flex flex-row gap-4 items-center border-none shadow-none rounded-[20px] relative group overflow-hidden",
+                  isSelected 
+                    ? "bg-white shadow-[0_8px_30px_rgba(0,0,0,0.04)] ring-1 ring-slate-200/50" 
+                    : "hover:bg-slate-100/40 bg-transparent"
                 )}
-                <div className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-tight">
-                  {item?.title || "Unknown Item"}
+                onClick={() => onSelect(conv.id)}
+              >
+                <div className="relative shrink-0">
+                  <div className={cn(
+                    "absolute -inset-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-md",
+                    activeRole === 'seller' ? "bg-indigo-400/20" : "bg-blue-400/20"
+                  )} />
+                  <Avatar className="h-12 w-12 border-2 border-white shadow-sm relative z-10 transition-transform group-hover:scale-105">
+                    <AvatarImage src={otherUser?.avatar} />
+                    <AvatarFallback className="bg-slate-100 text-slate-400 font-black text-xs">
+                      {otherUser?.name?.[0] || "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="absolute -bottom-1 -right-1 z-20">
+                    <div className={cn(
+                      "text-[9px] px-1.5 py-0.5 rounded-full shadow-sm font-black uppercase tracking-tighter border-2 border-white",
+                      activeRole === 'seller' 
+                        ? "bg-indigo-600 text-white" 
+                        : "bg-blue-600 text-white"
+                    )}>
+                      {activeRole === 'seller' ? 'Offer' : 'Bid'}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <p className={cn(
-                "text-[11px] truncate font-medium max-w-[90%]",
-                selectedId === conv.id ? "text-slate-700" : "text-slate-400"
-              )}>
-                {conv.lastMessage || "Start chatting..."}
-              </p>
-            </div>
+                
+                <div className="flex-1 min-w-0 z-10">
+                  <div className="flex justify-between items-baseline gap-2 mb-0.5">
+                    <h4 className="font-black text-[14px] text-slate-900 truncate leading-none flex items-center gap-1">
+                      {otherUser?.name || "Anonymous"}
+                      {otherUser?.isVerified && <VerifiedBadge size="sm" />}
+                    </h4>
+                    
+                    <span className="text-[9px] font-black text-slate-500 whitespace-nowrap uppercase tracking-widest">
+                      {conv.updatedAt ? formatDistanceToNow(new Date(conv.updatedAt), { addSuffix: false }) : 'now'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5 mb-1.5 min-w-0">
+                    {item && (
+                      <div className="h-4 w-4 rounded-[4px] bg-slate-100 overflow-hidden flex-shrink-0 ring-1 ring-slate-200/50">
+                        <img src={item.images[0]} alt="" className="h-full w-full object-cover" />
+                      </div>
+                    )}
+                    <div className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-tight">
+                      {item?.title || "Product"}
+                    </div>
+                    {timeLeft && (
+                      <div className={cn(
+                        "ml-auto flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-black tabular-nums border shadow-sm",
+                        timeLeft.done 
+                          ? "bg-slate-50 border-slate-100 text-slate-400 line-through" 
+                          : timeLeft.urgent 
+                            ? "bg-red-50 border-red-100 text-red-500 animate-pulse" 
+                            : "bg-emerald-50 border-emerald-100 text-emerald-600"
+                      )}>
+                        {timeLeft.text}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <p className={cn(
+                    "text-[12px] truncate font-medium tracking-tight",
+                    isSelected ? "text-slate-600" : "text-slate-500 group-hover:text-slate-600"
+                  )}>
+                    {conv.lastMessage || "Message the user..."}
+                  </p>
+                </div>
 
-            {/* Selection Indicator */}
-            {selectedId === conv.id && (
-              <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-600 rounded-r-full" />
-            )}
-          </Card>
-        );
-      })}
+                {isSelected && (
+                  <motion.div 
+                    layoutId="active-indicator"
+                    className="absolute left-0 top-4 bottom-4 w-1 bg-blue-600 rounded-r-full shadow-[0_0_15px_rgba(37,99,235,0.4)]" 
+                  />
+                )}
+              </Card>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </div>
   );
 }

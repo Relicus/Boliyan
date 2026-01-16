@@ -14,10 +14,10 @@ function InboxContent() {
   const { conversations, user } = useApp();
   const searchParams = useSearchParams();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'buying' | 'selling'>('buying');
+  const [activeTab, setActiveTab] = useState<'all' | 'offers' | 'bids'>('all');
 
-  const buyingConversations = conversations.filter(c => c.bidderId === user.id);
-  const sellingConversations = conversations.filter(c => c.sellerId === user.id);
+  const offerConversations = conversations.filter(c => c.sellerId === user.id);
+  const bidConversations = conversations.filter(c => c.bidderId === user.id);
 
   // Handle deep-linking from URL
   useEffect(() => {
@@ -26,71 +26,66 @@ function InboxContent() {
       setSelectedId(idParam);
       
       // Auto-switch tab based on which list contains the ID
-      if (buyingConversations.some(c => c.id === idParam)) {
-        setActiveTab('buying');
-      } else if (sellingConversations.some(c => c.id === idParam)) {
-        setActiveTab('selling');
+      if (offerConversations.some(c => c.id === idParam)) {
+        setActiveTab('offers');
+      } else if (bidConversations.some(c => c.id === idParam)) {
+        setActiveTab('bids');
+      } else {
+        setActiveTab('all');
       }
     }
-  }, [searchParams, buyingConversations.length, sellingConversations.length]);
-
-  // Lock Viewport Scroll
-  useEffect(() => {
-    // Save original styles
-    const originalHtmlOverflow = document.documentElement.style.overflow;
-    const originalBodyOverflow = document.body.style.overflow;
-    const originalBodyHeight = document.body.style.height;
-
-    // Lock it down
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.height = '100dvh';
-
-    return () => {
-      // Restore
-      document.documentElement.style.overflow = originalHtmlOverflow;
-      document.body.style.overflow = originalBodyOverflow;
-      document.body.style.height = originalBodyHeight;
-    };
-  }, []);
+  }, [searchParams, offerConversations.length, bidConversations.length]);
 
   return (
-    <div id="inbox-container" className="fixed top-16 left-0 right-0 bottom-16 md:bottom-0 overflow-hidden bg-muted/20 flex">
+    <div id="inbox-container" className="flex flex-1 bg-muted/20 w-full h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)]">
       {/* Sidebar / List - Hidden on mobile if chat is open */}
       <div 
         id="inbox-sidebar"
         className={cn(
-          "w-full md:w-[350px] lg:w-[400px] border-r bg-background flex flex-col shrink-0 overflow-hidden",
+          "w-full md:w-[350px] lg:w-[400px] border-r bg-background flex flex-col shrink-0",
           selectedId ? "hidden md:flex" : "flex"
         )}
       >
         <div className="p-4 border-b shrink-0">
           <h1 className="font-black text-xl mb-4 text-slate-900">Messages</h1>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList id="inbox-tabs-list" className="grid w-full grid-cols-2 h-10 p-1 bg-slate-100 rounded-xl">
+            <TabsList id="inbox-tabs-list" className="grid w-full grid-cols-3 h-10 p-1 bg-slate-100 rounded-xl">
               <TabsTrigger 
-                id="inbox-buying-tab"
-                value="buying" 
-                className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all"
+                id="inbox-all-tab"
+                value="all" 
+                className="rounded-lg text-xs font-bold text-slate-500 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm transition-all"
               >
-                <ShoppingBag className="mr-2 h-3.5 w-3.5" />
-                Buying
-                {buyingConversations.length > 0 && (
-                  <span className="ml-2 bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-md text-[10px]">
-                    {buyingConversations.length}
+                <MessageSquare className="mr-2 h-3.5 w-3.5" />
+                All
+                {conversations.length > 0 && (
+                  <span className="ml-2 bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded-md text-[10px]">
+                    {conversations.length}
                   </span>
                 )}
               </TabsTrigger>
               <TabsTrigger 
-                id="inbox-selling-tab"
-                value="selling" 
-                className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm transition-all"
+                id="inbox-offers-tab"
+                value="offers" 
+                className="rounded-lg text-xs font-bold text-slate-500 data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm transition-all"
               >
                 <Store className="mr-2 h-3.5 w-3.5" />
-                Selling
-                {sellingConversations.length > 0 && (
+                Offers
+                {offerConversations.length > 0 && (
                   <span className="ml-2 bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-md text-[10px]">
-                    {sellingConversations.length}
+                    {offerConversations.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger 
+                id="inbox-bids-tab"
+                value="bids" 
+                className="rounded-lg text-xs font-bold text-slate-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all"
+              >
+                <ShoppingBag className="mr-2 h-3.5 w-3.5" />
+                Bids
+                {bidConversations.length > 0 && (
+                  <span className="ml-2 bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-md text-[10px]">
+                    {bidConversations.length}
                   </span>
                 )}
               </TabsTrigger>
@@ -99,21 +94,30 @@ function InboxContent() {
         </div>
 
         <Tabs value={activeTab} className="flex-1 overflow-hidden">
-          <TabsContent value="buying" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
+          <TabsContent value="all" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
             <ConversationList 
-              conversations={buyingConversations}
+              conversations={conversations}
               selectedId={selectedId} 
               onSelect={setSelectedId} 
-              role="buyer"
+              role="auto"
             />
           </TabsContent>
-          
-          <TabsContent value="selling" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
+
+          <TabsContent value="offers" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
             <ConversationList 
-              conversations={sellingConversations}
+              conversations={offerConversations}
               selectedId={selectedId} 
               onSelect={setSelectedId} 
               role="seller"
+            />
+          </TabsContent>
+          
+          <TabsContent value="bids" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
+            <ConversationList 
+              conversations={bidConversations}
+              selectedId={selectedId} 
+              onSelect={setSelectedId} 
+              role="buyer"
             />
           </TabsContent>
         </Tabs>
@@ -123,7 +127,7 @@ function InboxContent() {
       <div 
         id="chat-window-container"
         className={cn(
-          "flex-1 flex flex-col bg-background md:block min-w-0",
+          "flex-1 flex flex-col bg-background min-w-0",
           !selectedId ? "hidden md:flex" : "flex"
         )}
       >

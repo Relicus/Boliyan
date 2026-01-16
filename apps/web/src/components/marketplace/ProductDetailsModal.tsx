@@ -105,7 +105,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                 onClose(false);
             }
             }}
-            className={`relative rounded-lg overflow-hidden w-full h-full max-h-[85vh] sm:max-h-full sm:h-auto flex flex-col cursor-auto
+            className={`relative rounded-lg overflow-hidden w-full h-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col cursor-auto
             ${showHalo ? 'p-[3.5px] bg-[#0ea5e9]' : 'p-0 bg-white'}
             ${showHalo && haloTheme === 'orange' ? 'bg-[#fbbf24]' : ''}
           `}
@@ -264,7 +264,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             </button>
           </div>
 
-            <div className="p-4 space-y-4 overflow-y-auto max-h-[calc(85vh-200px)] sm:max-h-none overscroll-contain relative z-10 shadow-[0_-8px_20px_-10px_rgba(0,0,0,0.15)] border-t border-slate-100">
+            <div className="flex-1 overflow-y-auto overscroll-contain relative z-10 shadow-[0_-8px_20px_-10px_rgba(0,0,0,0.15)] border-t border-slate-100 p-4 space-y-4">
                 {/* Header Content Area */}
                 <div className="flex justify-between items-start gap-4">
                    <DialogTitle className="text-2xl font-black text-slate-900 leading-tight">{item.title}</DialogTitle>
@@ -277,27 +277,31 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                       )}
                    </div>
                 </div>
-            {/* Price Info Grid & Timer */}
-            <div className="grid grid-cols-3 gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 relative overflow-hidden">
-
-                <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Price</span>
-                <div className="text-xl font-black text-slate-800 leading-tight">{Math.round(item.askPrice).toLocaleString()}</div>
+            {/* Price Info Grid & Timer - Expanded & Reduced Padding */}
+            <div className="grid grid-cols-3 gap-0 bg-slate-50 rounded-xl border border-slate-100 relative overflow-hidden divide-x divide-slate-200">
+                <div className="flex flex-col items-center justify-center py-2 px-1 text-center">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">Price</div>
+                <div className="flex items-baseline gap-0.5 whitespace-nowrap">
+                    <span className="text-xs font-bold text-slate-400">Rs.</span>
+                    <span className="text-xl font-black text-slate-900 leading-none">{Math.round(item.askPrice).toLocaleString()}</span>
                 </div>
-                <div className="flex flex-col justify-center text-center border-x border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                </div>
+
+                <div className="flex flex-col items-center justify-center py-2 px-1 text-center">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">
                     {item.isPublicBid ? "High Bid" : "Bids"}
-                </span>
-                <div className={`text-xl font-black leading-tight ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`}>
+                </div>
+                <div className={`flex items-baseline justify-center gap-0.5 whitespace-nowrap ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`}>
                     {item.isPublicBid && item.currentHighBid
-                    ? Math.round(item.currentHighBid).toLocaleString()
-                    : `${item.bidCount} ${item.bidCount === 1 ? 'Bid' : 'Bids'}`
+                    ? <><span className={`text-xs font-bold ${item.currentHighBidderId === user.id ? 'text-amber-600/70' : 'text-blue-600/70'}`}>Rs.</span><span className="text-xl font-black leading-none">{Math.round(item.currentHighBid).toLocaleString()}</span></>
+                    : <span className="text-xl font-black leading-none">{item.bidCount} <span className="text-sm font-bold opacity-70 hidden sm:inline">{item.bidCount === 1 ? 'Bid' : 'Bids'}</span></span>
                     }
                 </div>
                 </div>
-                <div className="text-right">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Ends In</span>
-                <div className={`text-xl font-black leading-tight text-right tabular-nums ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}>
+                
+                <div className="flex flex-col items-center justify-center py-2 px-1 text-center">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">Ends In</div>
+                <div className={`text-xl font-black leading-none tabular-nums ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}>
                     {timeLeft}
                 </div>
                 </div>
@@ -358,11 +362,13 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                 </div>
             </div>
 
-            {/* Smart Stepper Bidding Section in Modal */}
-            <div className="space-y-3 pb-4 sm:pb-0">
-                <div className="flex h-12">
-                  <div className={`flex flex-1 border border-slate-300 rounded-l-md shadow-sm overflow-hidden ${user.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
-                    {/* Decrement Button */}
+            </div>
+
+            {/* Sticky/Fixed Bidding Footer */}
+            <div className="p-4 bg-white border-t border-slate-100 z-20 shrink-0 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
+                <div className="flex flex-col gap-3">
+                  <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
+                    {/* Decrement Button - Extra Large for Modal */}
                     <button
                       onClick={(e) => handleSmartAdjust(e, -1)}
                       disabled={user.id === seller.id}
@@ -406,7 +412,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                       />
                     </div>
 
-                    {/* Increment Button */}
+                    {/* Increment Button - Extra Large for Modal */}
                     <button
                       onClick={(e) => handleSmartAdjust(e, 1)}
                       disabled={user.id === seller.id}
@@ -420,7 +426,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                   <button
                     onClick={(e) => handleBid(e)}
                     disabled={isSuccess || user.id === seller.id}
-                    className={`px-6 rounded-r-md font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg min-w-[120px] flex items-center justify-center
+                    className={`h-12 w-full rounded-lg font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg flex items-center justify-center
                       ${isSuccess 
                         ? 'bg-amber-600 text-white scale-105' 
                         : user.id === seller.id
@@ -442,12 +448,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                         </motion.svg>
                         <span className="text-base">Placed!</span>
                       </span>
-                    ) : user.id === seller.id ? "Your Listing" : "Bid"}
+                    ) : user.id === seller.id ? "Your Listing" : "Place Bid"}
                   </button>
                 </div>
             </div>
-            </div>
-            </div>
+          </div>
         </motion.div>
       </DialogContent>
 

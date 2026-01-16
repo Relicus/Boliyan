@@ -34,7 +34,7 @@ export default function SmartFilterBar() {
               // Conditional Active States
               isActive 
                 ? "text-blue-600 scale-105 md:scale-100 md:bg-slate-900 md:border-slate-900 md:text-white md:shadow-sm" 
-                : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 md:bg-white md:border-slate-200 md:text-slate-600 md:hover:bg-slate-50 md:hover:border-slate-300"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 md:bg-white md:border-slate-200 md:text-slate-700 md:hover:bg-slate-50 md:hover:border-slate-300"
             )}
           >
             <Icon 

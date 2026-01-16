@@ -99,10 +99,9 @@ export function SearchDropdown() {
           </div>
         </PopoverTrigger>
         <PopoverContent 
-          className="p-0 border-slate-100 shadow-2xl rounded-2xl overflow-hidden bg-white" 
-          align="start"
+          className="p-0 border-slate-100 shadow-2xl rounded-2xl overflow-hidden bg-white w-[90vw] max-w-4xl" 
+          align="center"
           sideOffset={8}
-          style={{ width: containerRef.current?.offsetWidth }}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <Command className="border-none">

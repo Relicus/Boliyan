@@ -325,24 +325,24 @@ function ListForm() {
 
           </motion.div>
           
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-row gap-3">
             <Button 
               id="cancel-listing-btn"
               type="button"
               variant="outline"
-              className="flex-1 h-12 text-lg font-semibold border-slate-200 text-slate-600 hover:bg-slate-50"
+              className="flex-1 h-14 text-lg font-semibold border-slate-200 text-slate-600 hover:bg-slate-50"
               onClick={() => router.back()}
             >
               <X className="h-5 w-5 mr-2" />
-              {editingItem ? "Discard Changes" : "Cancel"}
+              {editingItem ? "Discard" : "Cancel"}
             </Button>
             <Button 
               id="post-listing-btn"
-              className="flex-[2] bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold"
+              className="flex-[2] bg-blue-600 hover:bg-blue-700 h-14 text-lg font-bold"
               onClick={handleSubmit}
             >
               {editingItem ? <Save className="h-5 w-5 mr-2" /> : <Check className="h-5 w-5 mr-2" />}
-              {editingItem ? "Save Changes" : "Post Listing"}
+              {editingItem ? "Save" : "Post Listing"}
             </Button>
           </div>
         </CardContent>

@@ -37,6 +37,7 @@ interface AppContextType {
     listingType: 'all' | 'public' | 'sealed';
   };
   setFilter: (key: keyof AppContextType['filters'], value: any) => void;
+  updateFilters: (updates: Partial<AppContextType['filters']>) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -195,7 +196,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const setFilter = (key: keyof AppContextType['filters'], value: any) => {
+    console.log(`[STORE] setFilter: ${key} =`, value);
     setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const updateFilters = (updates: Partial<AppContextType['filters']>) => {
+    console.log(`[STORE] updateFilters:`, updates);
+    setFilters(prev => ({ ...prev, ...updates }));
   };
 
   const rejectBid = (bidId: string) => {
@@ -248,7 +255,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const logout = () => setIsLoggedIn(false);
 
   return (
-    <AppContext.Provider value={{ user, items, bids, conversations, messages, isLoggedIn, login, logout, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, sendMessage, rejectBid, acceptBid, getUser, filters, setFilter }}>
+    <AppContext.Provider value={{ user, items, bids, conversations, messages, isLoggedIn, login, logout, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, sendMessage, rejectBid, acceptBid, getUser, filters, setFilter, updateFilters }}>
       {children}
     </AppContext.Provider>
   );

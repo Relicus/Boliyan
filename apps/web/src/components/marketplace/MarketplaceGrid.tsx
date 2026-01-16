@@ -329,7 +329,11 @@ export default function MarketplaceGrid() {
               <div className="grid grid-cols-2 gap-2">
                 {/* 5. Location (Span 1) */}
                 <div className="w-full">
-                  <LocationSelector variant="mobile-grid" className="w-full" align="start" />
+                  <LocationSelector 
+                    variant="mobile-grid" 
+                    className="w-full" 
+                    align="start" 
+                  />
                 </div>
 
                 {/* 6. Price (Span 1) */}
@@ -337,7 +341,6 @@ export default function MarketplaceGrid() {
                   <PriceSelector />
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -429,12 +432,13 @@ export default function MarketplaceGrid() {
             )}
           </AnimatePresence>
         </div>
+      </div>
 
         {/* Category Bar Row */}
         <div id="category-bar-row" className="hidden md:block px-4 pb-2">
            <CategoryBar />
         </div>
-      </div>
+      
       
       <motion.div 
         layout

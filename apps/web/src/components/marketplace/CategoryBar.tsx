@@ -121,10 +121,10 @@ export default function CategoryBar() {
                 "flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-fluid-body font-semibold whitespace-nowrap transition-all duration-300 border shrink-0",
                 isSelected
                   ? "bg-slate-900 text-white border-slate-900 shadow-md transform scale-105"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm"
               )}
             >
-              <Icon id={`category-icon-${slug}`} className={cn("h-4 w-4", isSelected ? "text-white" : "text-slate-500")} />
+              <Icon id={`category-icon-${slug}`} className={cn("h-4 w-4", isSelected ? "text-white" : "text-slate-600")} />
               {category.label}
             </button>
           );

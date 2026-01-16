@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
@@ -65,6 +65,13 @@ export const metadata: Metadata = {
   description: "Bid smart, sell faster. The no-nonsense marketplace.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  interactiveWidget: "resizes-content",
+};
+
 import PageAnimate from "@/components/common/PageAnimate";
 
 export default function RootLayout({
@@ -80,9 +87,9 @@ export default function RootLayout({
       >
         <AppProvider>
           <Navbar />
-          <div id="layout-wrapper-02" className="flex pt-16">
+          <div id="layout-wrapper-02" className="flex pt-16 min-h-[100dvh]">
             <Sidebar />
-            <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100vh-4rem)] pb-16 md:pb-0 relative">
+            <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100dvh-4rem)] pb-16 md:pb-0">
               {children}
             </main>
           </div>

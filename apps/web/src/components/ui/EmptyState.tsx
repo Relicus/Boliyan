@@ -15,10 +15,10 @@ export default function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center animate-in fade-in zoom-in duration-300">
       <div className="bg-slate-50 p-4 rounded-full mb-4">
-        <SearchX className="h-16 w-16 text-slate-300" />
+        <SearchX className="h-16 w-16 text-slate-400" />
       </div>
       <h3 className="text-xl font-bold text-slate-900 mb-2">No results found</h3>
-      <p className="text-slate-500 max-w-sm mb-6 text-sm">
+      <p className="text-slate-600 max-w-sm mb-6 text-sm font-medium">
         We couldn't find any items matching your current filters. Try adjusting your search terms or category.
       </p>
       <Button 
