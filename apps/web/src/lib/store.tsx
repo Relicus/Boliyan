@@ -28,8 +28,9 @@ interface AppContextType {
     category: string | null;
     search: string;
     radius: number;
-    locationMode: 'current' | 'city';
+    locationMode: 'current' | 'city' | 'country';
     city: string;
+    currentCoords: { lat: number; lng: number } | null;
     sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest' | 'watchlist';
     minPrice: number | null;
     maxPrice: number | null;
@@ -67,9 +68,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [filters, setFilters] = useState<AppContextType['filters']>({
     category: null,
     search: "",
-    radius: 15,
-    locationMode: 'current',
+    radius: 500, // Default to max radius (whole country)
+    locationMode: 'country', // Default to whole country
     city: 'Karachi',
+    currentCoords: null,
     sortBy: 'trending',
     minPrice: null,
     maxPrice: null,

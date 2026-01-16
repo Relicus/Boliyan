@@ -4,14 +4,14 @@ import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Flame, MapPin, Timer, Gem, Sparkles, Bookmark } from "lucide-react";
 
-const FILTERS = [
+export const FILTERS = [
   { id: 'trending', label: 'Trending', icon: Flame, color: "text-orange-500", fill: "fill-orange-500/10" },
   { id: 'nearest', label: 'Near Me', icon: MapPin, color: "text-blue-500", fill: "fill-blue-500/10" },
   { id: 'ending_soon', label: 'Ending Soon', icon: Timer, color: "text-rose-500", fill: "fill-rose-500/10" },
   { id: 'luxury', label: 'High Value', icon: Gem, color: "text-purple-500", fill: "fill-purple-500/10" },
   { id: 'newest', label: 'Just Listed', icon: Sparkles, color: "text-emerald-500", fill: "fill-emerald-500/10" },
   { id: 'watchlist', label: 'Watchlist', icon: Bookmark, color: "text-amber-500", fill: "fill-amber-500/10" },
-];
+] as const;
 
 export default function SmartFilterBar() {
   const { filters, setFilter } = useApp();

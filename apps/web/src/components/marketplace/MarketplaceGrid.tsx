@@ -7,13 +7,28 @@ import { mockUsers } from "@/lib/mock-data";
 import ItemCard from "./ItemCard";
 import ItemCardSkeleton from "./ItemCardSkeleton";
 import EmptyState from "@/components/ui/EmptyState";
-import SmartFilterBar from "./SmartFilterBar";
+import SmartFilterBar, { FILTERS } from "./SmartFilterBar";
 import CategoryBar from "./CategoryBar";
 import { LocationSelector } from "./LocationSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, LayoutGrid, Grid3x3, Grid2x2, RefreshCw, X } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, LayoutGrid, Grid3x3, Grid2x2, RefreshCw, X, Gavel } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { CATEGORIES } from "@/lib/constants";
+
+// Listing type options for dropdown
+const LISTING_TYPES = [
+  { id: 'all', label: 'All Types' },
+  { id: 'public', label: 'Public Bid' },
+  { id: 'sealed', label: 'Sealed Bid' },
+] as const;
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
@@ -39,40 +54,84 @@ export default function MarketplaceGrid() {
     return () => clearTimeout(timer);
   }, [filters.category, filters.sortBy]); // Run when category or sort changes
 
-  // Calculate Distance (Mock)
-  const getDistance = (itemId: string) => {
-     const hash = itemId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-     return (hash % 80) / 10 + 1.2;
+  // Calculate Distance (Haversine Formula)
+  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Distance in km
+    return d;
+  };
+
+  const deg2rad = (deg: number) => {
+    return deg * (Math.PI / 180);
   };
 
   // 1. Get current sorted items from store (LIVE)
   const currentSortedItems = useMemo(() => {
     return items.filter(item => {
-      // Watchlist Filter
-      if (filters.sortBy === 'watchlist') {
-        if (!watchedItemIds.includes(item.id)) return false;
-      }
-
+      // 1. Category Filter
       if (filters.category && filters.category !== "All Items" && item.category !== filters.category) {
         return false;
       }
+      
+      // 2. Search Filter
       if (filters.search) {
         const query = filters.search.toLowerCase();
         if (!item.title.toLowerCase().includes(query) && !item.description.toLowerCase().includes(query)) {
           return false;
         }
       }
-      
+
+      // 3. Price Filter
       const currentPrice = item.currentHighBid || item.askPrice;
       if (filters.minPrice !== null && currentPrice < filters.minPrice) return false;
       if (filters.maxPrice !== null && currentPrice > filters.maxPrice) return false;
+
+      // 4. Listing Type Filter
       if (filters.listingType === 'public' && !item.isPublicBid) return false;
       if (filters.listingType === 'sealed' && item.isPublicBid) return false;
+
+      // 5. Watchlist Filter
+      if (filters.sortBy === 'watchlist') {
+        if (!watchedItemIds.includes(item.id)) return false;
+      }
+
+      // 6. Location Filter (Actual distance logic)
+      if (filters.locationMode !== 'country' && filters.radius < 500) {
+        const seller = mockUsers.find(u => u.id === item.sellerId);
+        if (seller?.location && filters.currentCoords) {
+          const dist = getDistance(
+            filters.currentCoords.lat,
+            filters.currentCoords.lng,
+            seller.location.lat,
+            seller.location.lng
+          );
+          if (dist > filters.radius) return false;
+        } else if (filters.locationMode === 'city') {
+          // If we have city name but no coordinates yet or seller has no location
+          // In mock data seller always has location, and city selection sets currentCoords
+          // So this is a safety check.
+        }
+      }
       
       return true;
     }).sort((a, b) => {
+      const sellerA = mockUsers.find(u => u.id === a.sellerId);
+      const sellerB = mockUsers.find(u => u.id === b.sellerId);
+
       switch (filters.sortBy) {
-          case 'nearest': return getDistance(a.id) - getDistance(b.id);
+          case 'nearest': {
+            if (!filters.currentCoords || !sellerA?.location || !sellerB?.location) return 0;
+            const distA = getDistance(filters.currentCoords.lat, filters.currentCoords.lng, sellerA.location.lat, sellerA.location.lng);
+            const distB = getDistance(filters.currentCoords.lat, filters.currentCoords.lng, sellerB.location.lat, sellerB.location.lng);
+            return distA - distB;
+          }
           case 'ending_soon': return new Date(a.expiryAt).getTime() - new Date(b.expiryAt).getTime();
           case 'luxury': return b.askPrice - a.askPrice;
           case 'newest': return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -121,10 +180,129 @@ export default function MarketplaceGrid() {
 
   return (
     <div id="marketplace-grid-root" className="px-4 pb-4 pt-2 md:px-4 md:pb-4 md:pt-2">
-      <div className="mb-4 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-0 overflow-hidden">
+      <div className="mb-4 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-0">
         <div className="flex flex-col gap-2 pt-2 pb-2">
-          {/* Filters & View Toggles Row */}
-          <div id="smart-filters-row" className="flex items-center gap-4 px-4">
+          {/* MOBILE: Compact "Dashboard Tab" Style Filter Row */}
+          <div id="smart-filters-row-mobile" className="md:hidden grid grid-cols-4 gap-2 px-4 mb-2">
+            {/* 1. Sort Tab */}
+            <Select 
+              value={filters.sortBy} 
+              onValueChange={(value) => setFilter('sortBy', value as typeof filters.sortBy)}
+            >
+              <SelectTrigger id="mobile-sort-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
+                 {/* Custom Trigger Content */}
+                 {(() => {
+                    const activeFilter = FILTERS.find(f => f.id === filters.sortBy) || FILTERS[0];
+                    const Icon = activeFilter.icon;
+                    return (
+                      <>
+                        <Icon className={`h-5 w-5 ${activeFilter.color}`} />
+                        <span className="text-[10px] font-medium leading-none text-slate-600 truncate w-full text-center">
+                          {activeFilter.label.split(' ')[0]}
+                        </span>
+                      </>
+                    );
+                 })()}
+              </SelectTrigger>
+              <SelectContent className="z-[200]" position="popper" sideOffset={4}>
+                {FILTERS.map((f) => (
+                  <SelectItem key={f.id} value={f.id} className="text-sm">
+                    <span className="flex items-center gap-2">
+                      <f.icon className={`h-4 w-4 ${f.color}`} />
+                      {f.label}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* 2. Category Tab */}
+            <Select 
+              value={filters.category || 'All Items'} 
+              onValueChange={(value) => setFilter('category', value === 'All Items' ? null : value)}
+            >
+              <SelectTrigger id="mobile-category-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
+                 {(() => {
+                    // Find active category icon or default
+                    const activeCat = CATEGORIES.find(c => c.label === filters.category) || CATEGORIES[0];
+                    const Icon = activeCat.icon;
+                    return (
+                      <>
+                        <Icon className="h-5 w-5 text-blue-500" />
+                        <span className="text-[10px] font-medium leading-none text-slate-600 truncate w-full text-center">
+                          {filters.category ? filters.category.split(' ')[0] : 'Categories'}
+                        </span>
+                      </>
+                    );
+                 })()}
+              </SelectTrigger>
+              <SelectContent className="z-[200]" position="popper" sideOffset={4}>
+                {CATEGORIES.map((cat) => (
+                  <SelectItem key={cat.label} value={cat.label} className="text-sm">
+                    <span className="flex items-center gap-2">
+                      <cat.icon className="h-4 w-4 text-slate-500" />
+                      {cat.label}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* 3. Type Tab */}
+            <Select 
+              value={filters.listingType} 
+              onValueChange={(value) => setFilter('listingType', value as typeof filters.listingType)}
+            >
+              <SelectTrigger id="mobile-type-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
+                 {(() => {
+                    // Simple logic for type icon/label
+                    const isPublic = filters.listingType === 'public';
+                    const isSealed = filters.listingType === 'sealed';
+                    // Listing Type Logic
+                    // All -> Gavel (slate)
+                    // Public -> Gavel (green)
+                    // Sealed -> Gavel (purple/rose)? Or Lock? 
+                    // Let's stick to generic Gavel but color it if selected
+                    return (
+                      <>
+                        <Gavel className={`h-5 w-5 ${filters.listingType !== 'all' ? 'text-purple-500' : 'text-slate-500'}`} />
+                        <span className="text-[10px] font-medium leading-none text-slate-600 truncate w-full text-center">
+                          {filters.listingType === 'all' ? 'Type' : filters.listingType === 'public' ? 'Public' : 'Sealed'}
+                        </span>
+                      </>
+                    );
+                 })()}
+              </SelectTrigger>
+              <SelectContent className="z-[200]" position="popper" sideOffset={4}>
+                {LISTING_TYPES.map((type) => (
+                  <SelectItem key={type.id} value={type.id} className="text-sm">
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* 4. View Toggle (Cycle) */}
+            <Button
+              variant="outline"
+              className="h-auto flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out border-0 shadow-sm hover:shadow-md ring-1 ring-slate-200"
+              onClick={() => {
+                // On Phone: Toggle only between compact and spacious (as requested)
+                setViewMode(viewMode === 'compact' ? 'spacious' : 'compact');
+              }}
+            >
+              {viewMode === 'compact' && <Grid3x3 className="h-5 w-5 text-slate-700" />}
+              {viewMode === 'comfortable' && <Grid2x2 className="h-5 w-5 text-slate-700" />}
+              {viewMode === 'spacious' && <LayoutGrid className="h-5 w-5 text-slate-700" />}
+              
+              <span className="text-[10px] font-medium leading-none text-slate-600 truncate w-full text-center">
+                 View
+              </span>
+            </Button>
+          </div>
+
+          {/* DESKTOP: Full Filter Buttons Row */}
+          <div id="smart-filters-row" className="hidden md:flex items-center gap-4 px-4">
             <div className="flex-1 overflow-x-auto scrollbar-hide flex items-center gap-4">
               <SmartFilterBar />
               
@@ -154,7 +332,7 @@ export default function MarketplaceGrid() {
               </AnimatePresence>
             </div>
 
-            {/* View Toggle Controls (Repositioned) */}
+            {/* View Toggle Controls (Desktop) */}
             <div id="view-mode-toggles" className="flex items-center bg-slate-50 p-1 rounded-xl border border-slate-200 shadow-sm shrink-0">
                   <Button
                   id="view-mode-compact-btn"
@@ -188,6 +366,28 @@ export default function MarketplaceGrid() {
                 </Button>
             </div>
           </div>
+          
+          {/* Mobile Active Search Filter Badge (shown below dropdowns when searching) */}
+          <AnimatePresence>
+            {filters.search && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="md:hidden flex items-center px-4"
+              >
+                <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 font-bold py-1.5 px-4 flex items-center gap-2 rounded-full whitespace-nowrap shadow-sm">
+                  Search: {filters.search}
+                  <button 
+                    onClick={() => setFilter('search', '')}
+                    className="bg-white/20 hover:bg-white/30 p-0.5 rounded-full transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Category Bar Row */}
@@ -197,9 +397,11 @@ export default function MarketplaceGrid() {
       </div>
       
       <motion.div 
+        layout
         id="marketplace-grid-container"
         className={`grid gap-3 ${getGridClasses()}`}
         style={getGridStyle()}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
       >
         <AnimatePresence mode="popLayout">
           {isLoading ? (
@@ -224,7 +426,12 @@ export default function MarketplaceGrid() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 350, 
+                    damping: 30,
+                    opacity: { duration: 0.2 }
+                  }}
                 >
                   <ItemCard item={item} seller={seller} viewMode={viewMode} />
                 </motion.div>

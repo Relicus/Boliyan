@@ -2,14 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, LayoutGrid, PlusCircle, MessageSquare, User } from "lucide-react";
+import { Compass, LayoutGrid, PlusCircle, MessageSquare, User, SlidersHorizontal as FilterIcon } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import FilterSheetContent from "@/components/marketplace/FilterSheetContent";
+import { useState } from "react";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const { messages } = useApp();
   const unreadCount = messages.filter(m => !m.isRead).length;
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const navItems = [
     {
@@ -18,11 +22,10 @@ export default function BottomNav() {
       href: "/",
     },
     {
-      label: "Categories",
-      icon: LayoutGrid,
-      href: "/categories",
+      label: "Filters",
+      icon: FilterIcon,
+      isDrawer: true,
     },
-
     {
       label: "Post",
       icon: PlusCircle,
@@ -44,20 +47,19 @@ export default function BottomNav() {
     <div id="bottom-nav-container-01" className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 h-16 safe-area-pb">
       <div id="bottom-nav-wrapper-02" className="flex items-center justify-around h-full px-2">
         {navItems.map((item, index) => {
-          const isActive = pathname === item.href;
+          const isActive = item.href ? pathname === item.href : false;
           const Icon = item.icon;
 
-          return (
-            <Link
+          const content = (
+            <div
               key={item.label}
-              id={`bottom-nav-link-${item.label.toLowerCase()}`}
-              href={item.href}
+              id={`bottom-nav-item-${item.label.toLowerCase()}`}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 min-w-[64px] h-full transition-colors duration-200",
+                "flex flex-col items-center justify-center gap-1 min-w-[64px] h-full transition-colors duration-200 cursor-pointer",
                 isActive ? "text-blue-600" : "text-slate-500 hover:text-slate-900"
               )}
             >
-              <div className="relative">
+              <div className="relative text-center flex flex-col items-center">
                 <Icon 
                   id={`bottom-nav-icon-${item.label.toLowerCase()}`}
                   className={cn(
@@ -67,17 +69,44 @@ export default function BottomNav() {
                   strokeWidth={isActive ? 2.5 : 2}
                 />
                 {item.label === "Inbox" && unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white" />
+                  <span className="absolute -top-1 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white" />
                 )}
+                <span 
+                  id={`bottom-nav-text-${item.label.toLowerCase()}`}
+                  className={cn(
+                  "text-[10px] font-medium tracking-wide mt-1",
+                  isActive ? "font-bold" : "font-medium"
+                )}>
+                  {item.label}
+                </span>
               </div>
-              <span 
-                id={`bottom-nav-text-${item.label.toLowerCase()}`}
-                className={cn(
-                "text-[10px] font-medium tracking-wide",
-                isActive ? "font-bold" : "font-medium"
-              )}>
-                {item.label}
-              </span>
+            </div>
+          );
+
+          if (item.isDrawer) {
+            return (
+              <Sheet key={item.label} open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                <SheetTrigger asChild>
+                  {content}
+                </SheetTrigger>
+                <SheetContent side="bottom" className="p-0 h-[85vh] rounded-t-3xl border-none">
+                  {/* Accessibility: Hidden Title */}
+                  <div className="sr-only">
+                    <h2 id="filters-sheet-title">Marketplace Filters</h2>
+                  </div>
+                  <FilterSheetContent onClose={() => setIsFilterOpen(false)} />
+                </SheetContent>
+              </Sheet>
+            );
+          }
+
+          return (
+            <Link
+              key={item.label}
+              id={`bottom-nav-link-${item.label.toLowerCase()}`}
+              href={item.href || '#'}
+            >
+              {content}
             </Link>
           );
         })}

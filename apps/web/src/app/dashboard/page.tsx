@@ -28,7 +28,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
   const [viewingItem, setViewingItem] = useState<Item | null>(null);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -39,7 +39,9 @@ export default function Dashboard() {
     router.push(`/dashboard?tab=${value}`, { scroll: false });
   };
 
+  // Initialize time only on client to prevent hydration mismatch
   useEffect(() => {
+    setNow(Date.now());
     const timer = setInterval(() => {
       setNow(Date.now());
     }, 1000);
@@ -71,8 +73,17 @@ export default function Dashboard() {
       .sort((a, b) => b.amount - a.amount)[0];
   };
 
-  // Timer Helper
+  // Timer Helper - returns placeholder during SSR to prevent hydration mismatch
   const getTimeLeft = (expiryAt: string) => {
+    // Return placeholder during SSR/initial hydration
+    if (now === null) {
+      return {
+        text: "--:--:--",
+        color: "text-slate-500",
+        isUrgent: false
+      };
+    }
+
     const diff = new Date(expiryAt).getTime() - now;
     const hours = Math.max(0, Math.floor(diff / 3600000));
     const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
@@ -115,7 +126,88 @@ export default function Dashboard() {
       </div>
 
       <Tabs id="dashboard-tabs" value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList id="dashboard-tabs-list" className="bg-transparent border-b rounded-none h-auto w-full justify-start p-0 gap-6 overflow-x-auto flex-nowrap scrollbar-hide">
+        {/* Mobile: App-style icon tabs with text below */}
+        <TabsList id="dashboard-tabs-list" className="md:hidden bg-transparent border-b rounded-none h-auto w-full grid grid-cols-6 p-0 gap-0">
+          <TabsTrigger 
+            id="tab-trigger-profile-mobile"
+            value="profile" 
+            className="flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
+          >
+            <UserCircle className="h-5 w-5" />
+            <span className="text-[10px]">Profile</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            id="tab-trigger-my-bids-mobile"
+            value="my-bids" 
+            className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
+          >
+            <div className="relative">
+              <ShoppingBag className="h-5 w-5" />
+              {itemsIMadeBidsOn.length > 0 && (
+                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-blue-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                  {itemsIMadeBidsOn.length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px]">Buying</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            id="tab-trigger-active-bids-mobile"
+            value="active-bids" 
+            className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
+          >
+            <div className="relative">
+              <TrendingUp className="h-5 w-5" />
+              {bids.filter(b => myItems.some(i => i.id === b.itemId)).length > 0 && (
+                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-indigo-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                  {bids.filter(b => myItems.some(i => i.id === b.itemId)).length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px]">Selling</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            id="tab-trigger-my-listings-mobile"
+            value="my-listings" 
+            className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
+          >
+            <div className="relative">
+              <Package className="h-5 w-5" />
+              {myItems.length > 0 && (
+                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-slate-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                  {myItems.length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px]">Listings</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            id="tab-trigger-watchlist-mobile"
+            value="watchlist" 
+            className="flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
+          >
+            <Heart className="h-5 w-5" />
+            <span className="text-[10px]">Watchlist</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            id="tab-trigger-achievements-mobile"
+            value="achievements" 
+            className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
+          >
+            <div className="relative">
+              <Trophy className="h-5 w-5" />
+              {(user.badges?.length || 0) > 0 && (
+                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-amber-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                  {user.badges?.length || 0}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px]">Awards</span>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Desktop: Original horizontal layout */}
+        <TabsList id="dashboard-tabs-list-desktop" className="hidden md:flex bg-transparent border-b rounded-none h-auto w-full justify-start p-0 gap-6 overflow-x-auto flex-nowrap scrollbar-hide">
           <TabsTrigger 
             id="tab-trigger-profile"
             value="profile" 

@@ -34,7 +34,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState<number | null>(null);
   const [currentImg, setCurrentImg] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
 
@@ -68,6 +68,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
   }, [item.currentHighBid, item.currentHighBidderId, user.id, bids, item.id]);
 
   useEffect(() => {
+    setNow(Date.now());
     const timer = setInterval(() => {
       setNow(Date.now());
     }, 1000);
@@ -79,6 +80,18 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
     // Distance Calculation (Privacy Safe)
     const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
     
+    // Return placeholder during SSR/initial hydration if now is null
+    if (now === null) {
+      return {
+        distance: dist,
+        duration: dur,
+        timeLeft: "--:--:--",
+        listingType: "72h", // Default
+        statusColor: "bg-black/60",
+        isUrgent: false
+      };
+    }
+
     // Time Left calculation
     const diff = new Date(item.expiryAt).getTime() - now;
     const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
