@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useMemo } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useApp } from "@/lib/store";
 import { mockUsers } from "@/lib/mock-data";
 import ItemCard from "./ItemCard";
@@ -12,6 +12,7 @@ import CategoryBar from "./CategoryBar";
 import { LocationSelector } from "./LocationSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { 
   Select,
   SelectContent,
@@ -34,160 +35,41 @@ const LISTING_TYPES = [
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
 export default function MarketplaceGrid() {
-  const { items, filters, setFilter, bids, user, watchedItemIds } = useApp();
+  const { items, filters, setFilter, isLoading, isLoadingMore, hasMore, loadMore } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>('compact');
-  const [isLoading, setIsLoading] = useState(true);
-  const [stableSortedIds, setStableSortedIds] = useState<string[]>([]);
-
-  // Simulate loading on mount
+  
+  // Random cascade direction (changes on every filter/refresh)
+  const [cascadeDirection, setCascadeDirection] = useState(() => Math.floor(Math.random() * 4));
+  
+  // Randomize direction whenever a new load starts
   useEffect(() => {
-    // Set default view mode based on screen size
+    if (isLoading) {
+      setCascadeDirection(Math.floor(Math.random() * 4));
+    }
+  }, [isLoading]);
+  
+  // Infinite Scroll Trigger
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const entry = useIntersectionObserver(loadMoreRef, {
+    threshold: 0,
+    rootMargin: '200px', // Trigger when 80% down (approx 1 card height remaining)
+  });
+
+  useEffect(() => {
+    if (entry?.isIntersecting && hasMore && !isLoadingMore && !isLoading) {
+      loadMore();
+    }
+  }, [entry, hasMore, isLoadingMore, isLoading, loadMore]);
+
+
+  // Set default view mode based on screen size
+  useEffect(() => {
     if (window.innerWidth >= 768) {
       setViewMode('comfortable');
     }
+  }, []);
 
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []); // Run once on mount
 
-  // Reload when sort changes
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [filters.category, filters.sortBy]); // Run when category or sort changes
-
-  // Calculate Distance (Haversine Formula)
-  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Radius of the earth in km
-    const dLat = deg2rad(lat2 - lat1);
-    const dLon = deg2rad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c; // Distance in km
-    return d;
-  };
-
-  const deg2rad = (deg: number) => {
-    return deg * (Math.PI / 180);
-  };
-
-  // 1. Calculate sorting only when filters change or items are added/removed (NOT when deep props change)
-  // This ensures that bidding (which updates an item's bidCount/price) does not cause the card to jump positions.
-  useEffect(() => {
-    const sorted = items.filter(item => {
-      // 1. Category Filter
-      if (filters.category && filters.category !== "All Items" && item.category !== filters.category) {
-        return false;
-      }
-      
-      // 2. Search Filter
-      if (filters.search) {
-        const query = filters.search.toLowerCase();
-        if (!item.title.toLowerCase().includes(query) && !item.description.toLowerCase().includes(query)) {
-          return false;
-        }
-      }
-
-      // 3. Price Filter
-      const currentPrice = item.currentHighBid || item.askPrice;
-      if (filters.minPrice !== null && currentPrice < filters.minPrice) return false;
-      if (filters.maxPrice !== null && currentPrice > filters.maxPrice) return false;
-
-      // 4. Listing Type Filter
-      if (filters.listingType === 'public' && !item.isPublicBid) return false;
-      if (filters.listingType === 'sealed' && item.isPublicBid) return false;
-
-      // 5. Watchlist Filter
-      if (filters.sortBy === 'watchlist') {
-        if (!watchedItemIds.includes(item.id)) return false;
-      }
-
-      // 6. Location Filter (Actual distance logic)
-      if (filters.locationMode !== 'country' && filters.radius < 500) {
-        const seller = mockUsers.find(u => u.id === item.sellerId);
-        if (seller?.location && filters.currentCoords) {
-          const dist = getDistance(
-            filters.currentCoords.lat,
-            filters.currentCoords.lng,
-            seller.location.lat,
-            seller.location.lng
-          );
-          if (dist > filters.radius) return false;
-        } else if (filters.locationMode === 'city') {
-          // If we have city name but no coordinates yet or seller has no location
-          // In mock data seller always has location, and city selection sets currentCoords
-          // So this is a safety check.
-        }
-      }
-      
-      return true;
-    }).sort((a, b) => {
-      const sellerA = mockUsers.find(u => u.id === a.sellerId);
-      const sellerB = mockUsers.find(u => u.id === b.sellerId);
-
-      switch (filters.sortBy) {
-          case 'nearest': {
-            if (!filters.currentCoords || !sellerA?.location || !sellerB?.location) return 0;
-            const distA = getDistance(filters.currentCoords.lat, filters.currentCoords.lng, sellerA.location.lat, sellerA.location.lng);
-            const distB = getDistance(filters.currentCoords.lat, filters.currentCoords.lng, sellerB.location.lat, sellerB.location.lng);
-            return distA - distB;
-          }
-          case 'ending_soon': return new Date(a.expiryAt).getTime() - new Date(b.expiryAt).getTime();
-          case 'luxury': return b.askPrice - a.askPrice;
-          case 'newest': return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-          case 'watchlist': {
-            // Priority 1: High Bidder
-            const aIsHigh = a.currentHighBidderId === user.id;
-            const bIsHigh = b.currentHighBidderId === user.id;
-            if (aIsHigh && !bIsHigh) return -1;
-            if (!aIsHigh && bIsHigh) return 1;
-
-            // Priority 2: Has Bid (but not high)
-            const aHasBid = bids.some(bid => bid.itemId === a.id && bid.bidderId === user.id);
-            const bHasBid = bids.some(bid => bid.itemId === b.id && bid.bidderId === user.id);
-            if (aHasBid && !bHasBid) return -1;
-            if (!aHasBid && bHasBid) return 1;
-
-            // Priority 3: Fallback to bid count / trending
-            return b.bidCount - a.bidCount;
-          }
-          case 'trending':
-          default: return b.bidCount - a.bidCount;
-      }
-    });
-
-    setStableSortedIds(sorted.map(item => item.id));
-    // Important: We dep on items.length so new items trigger re-sort.
-    // We EXPLICITLY do not depend on 'items' content, 'bids', or 'watchedItemIds' to prevent re-sorting on interaction.
-    // We decompose 'filters' to primitives to ensure stability.
-  }, [
-    items.length, 
-    filters.category, 
-    filters.search, 
-    filters.sortBy, 
-    filters.minPrice, 
-    filters.maxPrice, 
-    filters.listingType,
-    filters.locationMode,
-    filters.radius,
-    // Note: We exclude watchedItemIds to prevent jumping when bidding (which auto-watches).
-    // In 'watchlist' sort mode, this means newly watched items won't appear until refresh/filter change, which is consistent with "stable view".
-  ]);
-
-  // 2. Map ids back to latest item data for rendering
-  const itemsToDisplay = useMemo(() => {
-    return stableSortedIds
-      .map(id => items.find(i => i.id === id))
-      .filter((item): item is typeof items[0] => !!item);
-  }, [stableSortedIds, items]); // accessing 'items' here is fine, it just updates the data inside the card, doesn't reorder
 
 
   // Grid class mapping based on view mode
@@ -441,51 +323,82 @@ export default function MarketplaceGrid() {
       
       
       <motion.div 
-        layout
         id="marketplace-grid-container"
         className={`grid gap-3 ${getGridClasses()}`}
         style={getGridStyle()}
-        transition={{ duration: 0.4, ease: "easeInOut" }}
       >
-        <AnimatePresence mode="popLayout">
-          {isLoading ? (
-             // Skeleton Layout
-             Array.from({ length: 12 }).map((_, i) => (
-                <motion.div
-                  key={`skeleton-${i}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <ItemCardSkeleton viewMode={viewMode} />
-                </motion.div>
-             ))
-          ) : (
-            itemsToDisplay.map((item) => {
+        {isLoading ? (
+          // Initial Load Skeletons
+          Array.from({ length: 8 }).map((_, i) => (
+            <motion.div
+              key={`skeleton-initial-${i}`}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.05 }}
+            >
+              <ItemCardSkeleton viewMode={viewMode} />
+            </motion.div>
+          ))
+        ) : (
+          <>
+            {/* Stable Item List */}
+            {items.map((item, index) => {
               const seller = mockUsers.find(u => u.id === item.sellerId) || mockUsers[0];
+              // Stagger: Only animate items in current "page" (8 items at a time)
+              const pagePosition = index % 8;
+              
+              // Directions: left, right, bottom, top
+              const directions = [
+                { x: -30, y: 0 },
+                { x: 30, y: 0 },
+                { x: 0, y: 30 },
+                { x: 0, y: -20 },
+              ];
+              // Use item.id hash for stable randomness per page batch
+              const pageNumber = Math.floor(index / 8);
+              const hashCode = (items[pageNumber * 8]?.id || 'x').split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0);
+              const dirIndex = Math.abs(hashCode) % directions.length;
+              const direction = directions[dirIndex];
+              
               return (
                 <motion.div
-                  layout
                   key={item.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, x: direction.x, y: direction.y }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={{ 
-                    type: "spring", 
-                    stiffness: 350, 
-                    damping: 30,
-                    opacity: { duration: 0.2 }
+                    duration: 0.35,
+                    delay: pagePosition * 0.04,
+                    ease: [0.25, 0.46, 0.45, 0.94]
                   }}
                 >
                   <ItemCard item={item} seller={seller} viewMode={viewMode} />
                 </motion.div>
               );
-            })
-          )}
-        </AnimatePresence>
+            })}
+
+            {/* Infinite Scroll Skeletons */}
+            {isLoadingMore && Array.from({ length: 4 }).map((_, i) => (
+              <motion.div
+                key={`skeleton-more-${i}`}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
+              >
+                <ItemCardSkeleton viewMode={viewMode} />
+              </motion.div>
+            ))}
+          </>
+        )}
       </motion.div>
 
-      {!isLoading && itemsToDisplay.length === 0 && (
+      {/* Sentinel for Infinite Scroll - Always render so Ref attaches, but logic handles trigger */}
+      <div 
+        ref={loadMoreRef} 
+        className="h-4 w-full flex items-center justify-center pointer-events-none opacity-0" 
+      />
+
+
+      {!isLoading && items.length === 0 && (
         <EmptyState />
       )}
     </div>

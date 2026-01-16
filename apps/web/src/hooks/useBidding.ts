@@ -6,7 +6,9 @@ import { useApp } from "@/lib/store";
 import { Item, User } from "@/types";
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
-  const { placeBid } = useApp();
+  const { placeBid, user } = useApp();
+
+  const [warning, setWarning] = useState<{ type: 'double_bid' | 'high_bid', message: string } | null>(null);
 
   // Smart Step Logic
   const getSmartStep = useCallback((price: number) => {
@@ -63,14 +65,17 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     setTimeout(() => setShowDelta(false), 800);
   }, [bidAmount, getSmartStep]);
 
-  const handleBid = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+  const attemptBid = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation();
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
     
     // Minimum bid logic
     let minBid = item.askPrice * 0.7;
+    let referencePrice = item.askPrice;
+
     if (item.isPublicBid && item.currentHighBid) {
       minBid = item.currentHighBid + getSmartStep(item.currentHighBid);
+      referencePrice = item.currentHighBid;
     }
 
     if (isNaN(amount) || amount < minBid) {
@@ -79,6 +84,32 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
 
+    // Safety Check 1: Double Bidding (User is already high bidder)
+    if (item.currentHighBidderId === user.id) {
+      setWarning({
+        type: 'double_bid',
+        message: "You are already the highest bidder. Do you want to increase your bid?"
+      });
+      return;
+    }
+
+    // Safety Check 2: High Bid (20% above reference)
+    // We use a 20% buffer. If they bid 20% MORE than the reference price, we warn.
+    const safetyThreshold = referencePrice * 1.2;
+    if (amount > safetyThreshold) {
+      const percentOver = Math.round(((amount - referencePrice) / referencePrice) * 100);
+      setWarning({
+        type: 'high_bid',
+        message: `Your bid is ${percentOver}% higher than required. Are you sure?`
+      });
+      return;
+    }
+
+    // If no warnings, execute immediately
+    executeBid(amount, e);
+  }, [bidAmount, item, getSmartStep, user.id]);
+
+  const executeBid = useCallback((amount: number, e?: React.MouseEvent | React.TouchEvent | any) => {
     // Place bid logic via store
     placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
     setIsSuccess(true);
@@ -110,14 +141,28 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     } else {
       setTimeout(() => setIsSuccess(false), 1500);
     }
-  }, [bidAmount, item, placeBid, getSmartStep, onBidSuccess]);
+  }, [item, placeBid, getSmartStep, onBidSuccess]);
+
+  const confirmBid = useCallback(() => {
+    if (!warning) return;
+    const amount = parseFloat(bidAmount.replace(/,/g, ''));
+    executeBid(amount); // Pass undefined event, will center confetti
+    setWarning(null);
+  }, [warning, bidAmount, executeBid]);
+
+  const clearWarning = useCallback(() => {
+    setWarning(null);
+  }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     // Prevent 'e', 'E', '+', '-'
     if (['e', 'E', '+', '-'].includes(e.key)) {
       e.preventDefault();
     }
-  }, []);
+    if (e.key === 'Enter') {
+      attemptBid();
+    }
+  }, [attemptBid]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/,/g, '');
@@ -141,7 +186,10 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     lastDelta,
     showDelta,
     handleSmartAdjust,
-    handleBid,
+    handleBid: attemptBid, // Renamed exposed Prop for compat
+    confirmBid,
+    clearWarning,
+    warning,
     handleKeyDown,
     handleInputChange,
     getSmartStep

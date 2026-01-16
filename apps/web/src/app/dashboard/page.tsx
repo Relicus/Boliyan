@@ -12,14 +12,14 @@ import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import DeleteConfirmationDialog from "@/components/seller/DeleteConfirmationDialog";
 import { Item } from "@/types";
 import { getBidderLocationMock } from "@/lib/utils";
-
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function Dashboard() {
+function DashboardContent() {
   const { items, bids, user, deleteItem, getUser, watchedItemIds } = useApp();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -469,5 +469,13 @@ export default function Dashboard() {
         />
       )}
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }

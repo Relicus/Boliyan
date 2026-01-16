@@ -29,7 +29,7 @@ export default function BottomNav() {
   
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const navItems = [
+  const navItems: { label: string; icon: any; href: string; isDrawer?: boolean }[] = [
     {
       label: "Post",
       icon: PlusCircle,

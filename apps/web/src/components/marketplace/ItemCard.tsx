@@ -3,9 +3,9 @@ import confetti from "canvas-confetti";
 import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { MapPin, Lock, Globe, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, Banknote, AlertTriangle, ShieldAlert, TrendingUp } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Lock, Globe, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, Banknote } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
@@ -51,7 +51,10 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
     handleBid,
     handleKeyDown,
     handleInputChange,
-    getSmartStep
+    getSmartStep,
+    warning,
+    confirmBid,
+    clearWarning
   } = useBidding(item, seller, () => setIsDialogOpen(false));
 
   const galleryRef = typeof window !== 'undefined' ? (null as any) : null; 
@@ -206,7 +209,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
             ${isOutbidTrigger ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
 
           `}
-          style={{ backfaceVisibility: 'hidden', transformZ: 0 }}
+          style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
         >
             {/* Victory Halo - State Based Animated Border Background */}
             {showHalo && (
@@ -487,7 +490,9 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                       ? 'bg-amber-600 text-white scale-105' 
                       : user.id === seller.id
                         ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : isHighBidder 
+                          ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                          : 'bg-blue-600 hover:bg-blue-700 text-white'
                     }`}
                 >
                   {isSuccess ? (
@@ -495,7 +500,19 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                       Bid Placed!
                     </span>
-                  ) : user.id === seller.id ? "Your Listing" : "Place Bid"}
+                  ) : user.id === seller.id ? (
+                    "Your Listing"
+                  ) : isHighBidder ? (
+                    <span className="flex items-center gap-1.5">
+                      <TrendingUp className="w-4 h-4" />
+                      Raise Bid
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5">
+                      <Gavel className="w-4 h-4" />
+                      Place Bid
+                    </span>
+                  )}
                 </button>
               </div>
             </CardContent>
@@ -891,7 +908,9 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                         ? 'bg-amber-600 text-white scale-105' 
                         : user.id === seller.id
                           ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          : isHighBidder
+                            ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white'
                       }`}
                   >
                     {isSuccess ? (
@@ -908,7 +927,19 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                         </motion.svg>
                         <span className="text-base">Placed!</span>
                       </span>
-                    ) : user.id === seller.id ? "Your Listing" : "Place Bid"}
+                    ) : user.id === seller.id ? (
+                      "Your Listing"
+                    ) : isHighBidder ? (
+                      <span className="flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5" />
+                        Raise Bid
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Gavel className="w-5 h-5" />
+                        Place Bid
+                      </span>
+                    )}
                   </button>
                 </div>
             </div>
@@ -972,6 +1003,46 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                  </>
                )}
             </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* WARNING/CONFIRMATION DIALOG */}
+      <Dialog open={!!warning} onOpenChange={(open) => !open && clearWarning()}>
+        <DialogContent className="sm:max-w-[400px] bg-white border-none shadow-2xl p-6 rounded-2xl z-[150]">
+           <div className="flex flex-col items-center text-center gap-4">
+              <div className={`p-4 rounded-full ${warning?.type === 'double_bid' ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-600'}`}>
+                 {warning?.type === 'double_bid' ? (
+                   <ShieldAlert className="h-8 w-8" /> 
+                 ) : (
+                   <AlertTriangle className="h-8 w-8" />
+                 )}
+              </div>
+              
+              <div className="space-y-2">
+                 <DialogTitle className="text-xl font-black text-slate-900">
+                    {warning?.type === 'double_bid' ? 'Already Winning' : 'High Bid Warning'}
+                 </DialogTitle>
+                 <DialogDescription className="text-slate-600 font-medium text-base">
+                    {warning?.message}
+                 </DialogDescription>
+              </div>
+
+              <div className="flex gap-3 w-full mt-2">
+                <button
+                  onClick={clearWarning}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmBid}
+                  className={`flex-1 px-4 py-2.5 rounded-xl font-bold text-white shadow-lg shadow-red-200 transition-all active:scale-95
+                    ${warning?.type === 'double_bid' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-red-600 hover:bg-red-700'}`}
+                >
+                  Confirm Bid
+                </button>
+              </div>
+           </div>
         </DialogContent>
       </Dialog>
     </Dialog>

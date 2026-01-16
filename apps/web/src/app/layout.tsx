@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
@@ -72,7 +73,7 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
 };
 
-import PageAnimate from "@/components/common/PageAnimate";
+
 
 export default function RootLayout({
   children,
@@ -86,7 +87,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${notoUrdu.variable} antialiased bg-slate-50`}
       >
         <AppProvider>
-          <Navbar />
+          <Suspense fallback={<div className="h-16 border-b bg-white" />}>
+            <Navbar />
+          </Suspense>
           <div id="layout-wrapper-02" className="flex pt-16 min-h-[100dvh]">
             <Sidebar />
             <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100dvh-4rem)] pb-16 md:pb-0">

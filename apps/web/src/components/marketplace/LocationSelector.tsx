@@ -56,7 +56,7 @@ export function LocationSelector({ className, align = "end", variant = "default"
   );
 }
 
-const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, ButtonProps & { variant: string, isOpen: boolean }>(
+const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonProps, "variant"> & { variant: string, isOpen: boolean }>(
   ({ variant, isOpen, className, ...props }, ref) => {
   const { filters } = useApp();
   
