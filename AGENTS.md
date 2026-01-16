@@ -1,5 +1,8 @@
 # PROJECT KNOWLEDGE BASE
 
+> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)**
+
+
 **Context:** Monorepo (Next.js 16 + SQL), Manual Dependency Management.
 **Last Updated:** 2026-01-16
 
