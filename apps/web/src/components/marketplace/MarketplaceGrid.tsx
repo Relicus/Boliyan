@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { useMarketplace } from "@/context/MarketplaceContext";
-import { mockUsers } from "@/lib/mock-data";
 import ItemCard from "./ItemCard";
 import ItemCardSkeleton from "./ItemCardSkeleton";
 import EmptyState from "@/components/ui/EmptyState";
@@ -343,7 +342,7 @@ export default function MarketplaceGrid() {
           <>
             {/* Stable Item List */}
             {items.map((item, index) => {
-              const seller = mockUsers.find(u => u.id === item.sellerId) || mockUsers[0];
+              const seller = item.seller!; // Items are hydrated with sellers in MarketplaceContext
               // Stagger: Only animate items in current "page" (8 items at a time)
               const pagePosition = index % 8;
               

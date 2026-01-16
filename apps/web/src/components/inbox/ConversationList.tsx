@@ -30,12 +30,12 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
 
   // Helper to find the "other" user in the conversation
   const getOtherUser = (conversation: Conversation) => {
-    const otherUserId = conversation.sellerId === user.id ? conversation.bidderId : conversation.sellerId;
-    return getUser(otherUserId);
+    if (!user) return null;
+    return conversation.sellerId === user.id ? conversation.bidder : conversation.seller;
   };
 
   // Helper to get item details
-  const getItem = (itemId: string) => items.find(i => i.id === itemId);
+  const getItem = (conversation: Conversation) => conversation.item;
 
   // Helper to calculate and format time left
   const getChatTimeLeft = (expiresAt?: string) => {
@@ -79,12 +79,12 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
       <AnimatePresence mode="popLayout">
         {conversations.map((conv, idx) => {
           const otherUser = getOtherUser(conv);
-          const item = getItem(conv.itemId);
+          const item = getItem(conv);
           const timeLeft = getChatTimeLeft(conv.expiresAt);
           const isSelected = selectedId === conv.id;
           
           const activeRole = role === 'auto' 
-            ? (conv.sellerId === user.id ? 'seller' : 'buyer')
+            ? (user && conv.sellerId === user.id ? 'seller' : 'buyer')
             : role;
           
           return (

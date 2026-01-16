@@ -47,7 +47,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const { distance, duration, timeLeft, isUrgent } = useMemo(() => {
     if (!item || !seller) return { distance: 0, duration: 0, timeLeft: "", isUrgent: false };
     
-    const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
+    const { distance: dist, duration: dur } = user ? calculatePrivacySafeDistance(user.location, seller.location) : { distance: 0, duration: 0 };
     const diff = new Date(item.expiryAt).getTime() - now;
     const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
     const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
@@ -63,7 +63,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       timeLeft: timeStr,
       isUrgent: hoursLeft < 2
     };
-  }, [item, seller, now, user.location]);
+  }, [item, seller, now, user?.location]);
 
   if (!item || !seller) {
     return (
@@ -77,7 +77,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     );
   }
 
-  const isHighBidder = item.isPublicBid && item.currentHighBidderId === user.id;
+  const isHighBidder = user && item.isPublicBid && item.currentHighBidderId === user.id;
+  const isSeller = user?.id === seller.id;
 
   return (
     <div id={`product-page-${item.id}`} className="min-h-screen bg-slate-50/50 pb-20">
@@ -250,11 +251,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <div className="space-y-4 pt-4">
                 <div className="flex flex-col gap-4">
                   <div className="flex h-16 w-full">
-                    <div className={`flex flex-1 border-2 border-slate-200 rounded-l-2xl shadow-sm overflow-hidden transition-colors focus-within:border-blue-500 ${user.id === seller.id ? 'opacity-50 grayscale bg-slate-100' : 'bg-slate-50'}`}>
+                    <div className={`flex flex-1 border-2 border-slate-200 rounded-l-2xl shadow-sm overflow-hidden transition-colors focus-within:border-blue-500 ${isSeller ? 'opacity-50 grayscale bg-slate-100' : 'bg-slate-50'}`}>
                       <button
                         id="decrement-bid-btn"
                         onClick={(e) => handleSmartAdjust(e, -1)}
-                        disabled={user.id === seller.id}
+                        disabled={isSeller}
                         className="w-16 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-300"
                       >
                         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M18 12H6" /></svg>
@@ -281,7 +282,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                           value={bidAmount}
                           key={`input-${animTrigger}`}
                           initial={false}
-                          disabled={user.id === seller.id}
+                          disabled={isSeller}
                           animate={{ 
                             scale: [1, 1.02, 1],
                             x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -4, 4, -4, 4, 0] : 0
@@ -296,7 +297,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       <button
                         id="increment-bid-btn"
                         onClick={(e) => handleSmartAdjust(e, 1)}
-                        disabled={user.id === seller.id}
+                        disabled={isSeller}
                         className="w-16 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-300"
                       >
                         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M12 6v12m6-6H6" /></svg>
@@ -306,16 +307,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     <Button
                       id="place-bid-btn"
                       onClick={handleBid}
-                      disabled={isSuccess || user.id === seller.id}
+                      disabled={isSuccess || isSeller}
                       className={`h-16 px-10 rounded-l-none rounded-r-2xl font-black text-xl shadow-lg transition-all active:scale-95 min-w-[160px]
                         ${isSuccess 
                           ? 'bg-amber-600 text-white hover:bg-amber-700' 
-                          : user.id === seller.id
+                          : isSeller
                             ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
                             : 'bg-blue-600 hover:bg-blue-700 text-white'
                         }`}
                     >
-                      {isSuccess ? "Placed!" : user.id === seller.id ? "Your Item" : "Place Bid"}
+                      {isSuccess ? "Placed!" : isSeller ? "Your Item" : "Place Bid"}
                     </Button>
                   </div>
                   {error && <p className="text-red-500 text-sm font-bold text-center">{error}</p>}

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, MessageSquare, Star, Clock, Check, X } from "lucide-react";
-import { getBidderLocationMock } from "@/lib/utils";
+import { calculatePrivacySafeDistance, getFuzzyLocationString } from "@/lib/utils";
 import { useApp } from "@/lib/store";
 import { useRouter } from "next/navigation";
 
@@ -19,25 +19,31 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const { rejectBid, acceptBid, conversations, user } = useApp();
   const router = useRouter();
   
-  // Stable "random" derived values based on bidder ID
-  const { distance, location, duration } = useMemo(() => {
-    return getBidderLocationMock(bidder.id);
-  }, [bidder.id]);
+  // Stable derived values based on bidder profile
+  const { distance, duration } = useMemo(() => {
+    const itemOwnerProfile = user ? { lat: user.location.lat, lng: user.location.lng } : undefined;
+    return calculatePrivacySafeDistance(itemOwnerProfile, bidder.location);
+  }, [user?.location, bidder.location]);
+
+  const location = useMemo(() => getFuzzyLocationString(bidder.location.address), [bidder.location.address]);
 
   const handleReject = () => {
     rejectBid(bid.id);
   };
 
-  const handleAccept = () => {
-    acceptBid(bid.id);
+  const handleAccept = async () => {
+    const convId = await acceptBid(bid.id);
+    if (convId) {
+        router.push(`/inbox?id=${convId}`);
+    }
   };
 
   const handleChat = () => {
     // Find existing conversation for this bid
     const conv = conversations.find(c => 
       c.itemId === bid.itemId && 
-      ((c.sellerId === user.id && c.bidderId === bidder.id) || 
-       (c.bidderId === user.id && c.sellerId === bidder.id))
+      ((c.sellerId === user?.id && c.bidderId === bidder.id) || 
+       (c.bidderId === user?.id && c.sellerId === bidder.id))
     );
     
     if (conv) {

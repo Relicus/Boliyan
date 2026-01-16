@@ -37,6 +37,7 @@ export interface Item {
   description: string;
   images: string[];
   sellerId: string;
+  seller?: User; // Embedded seller profile for UI & Logic
   askPrice: number;
   category: string;
   isPublicBid: boolean;
@@ -46,12 +47,14 @@ export interface Item {
   createdAt: string;
   expiryAt: string;
   listingDuration: 24 | 48 | 72;
+  status: 'active' | 'completed' | 'cancelled' | 'hidden';
 }
 
 export interface Bid {
   id: string;
   itemId: string;
   bidderId: string;
+  bidder?: User; // Hydrated bidder profile
   amount: number;
   status: 'pending' | 'accepted' | 'rejected' | 'shortlisted';
   type: 'public' | 'private';
@@ -66,8 +69,11 @@ export interface LocationInfo {
 export interface Conversation {
   id: string;
   itemId: string;
+  item?: Item;
   sellerId: string;
+  seller?: User;
   bidderId: string;
+  bidder?: User;
   lastMessage?: string;
   updatedAt: string;
   expiresAt?: string;

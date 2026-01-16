@@ -16,8 +16,8 @@ function InboxContent() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'offers' | 'bids'>('all');
 
-  const offerConversations = conversations.filter(c => c.sellerId === user.id);
-  const bidConversations = conversations.filter(c => c.bidderId === user.id);
+  const offerConversations = user ? conversations.filter(c => c.sellerId === user.id) : [];
+  const bidConversations = user ? conversations.filter(c => c.bidderId === user.id) : [];
 
   // Handle deep-linking from URL
   useEffect(() => {

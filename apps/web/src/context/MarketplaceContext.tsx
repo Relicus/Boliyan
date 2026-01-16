@@ -2,11 +2,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Item, Bid } from "@/types";
-import { mockItems, mockBids, mockUsers } from "@/lib/mock-data";
 import { useAuth } from "./AuthContext";
 import { useTime } from "./TimeContext";
 import { supabase } from "@/lib/supabase";
-import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
+import { transformListingToItem, ListingWithSeller, transformBidToHydratedBid, BidWithProfile } from "@/lib/transform";
 
 interface MarketplaceContextType {
   items: Item[];
@@ -22,7 +21,7 @@ interface MarketplaceContextType {
   toggleWatch: (itemId: string) => void;
   watchedItemIds: string[];
   rejectBid: (bidId: string) => void;
-  acceptBid: (bidId: string) => string | undefined;
+  acceptBid: (bidId: string) => Promise<string | undefined>;
   filters: {
     category: string | null;
     search: string;
@@ -43,18 +42,18 @@ const MarketplaceContext = createContext<MarketplaceContextType | undefined>(und
 
 export function MarketplaceProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth(); // Needed for user-specific sort/filter (e.g. watchlist sort)
-  const { now } = useTime(); // Might be needed for sorting by ending soon (dynamic)
+  // const { now } = useTime(); // Unused for now
 
-  // Initialize with empty array, will fetch from Supabase
   const [allItems, setAllItems] = useState<Item[]>([]);
   const [items, setItems] = useState<Item[]>([]);
-  const [bids, setBids] = useState<Bid[]>(mockBids);
+  const [bids, setBids] = useState<Bid[]>([]); // Initialize empty, fetch real bids
   const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const loadingLockRef = React.useRef(false);
   const ITEMS_PER_PAGE = 8;
 
   const [filters, setFilters] = useState<MarketplaceContextType['filters']>({
@@ -70,7 +69,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     listingType: 'all',
   });
 
-  // --- MOCK BACKEND SIMULATION HELPERS ---
+  // --- HELPER FUNCTIONS ---
   const deg2rad = (deg: number) => deg * (Math.PI / 180);
   const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 6371; 
@@ -105,13 +104,14 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       }
 
       if (filters.locationMode !== 'country' && filters.radius < 500) {
-        const seller = mockUsers.find(u => u.id === item.sellerId);
-        if (seller?.location && filters.currentCoords) {
+        // Use embedded seller location if available, fallback to mock if absolutely necessary (or fail safe)
+        const sellerLoc = item.seller?.location;
+        if (sellerLoc && filters.currentCoords) {
           const dist = getDistance(
             filters.currentCoords.lat,
             filters.currentCoords.lng,
-            seller.location.lat,
-            seller.location.lng
+            sellerLoc.lat,
+            sellerLoc.lng
           );
           if (dist > filters.radius) return false;
         }
@@ -120,8 +120,9 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     });
 
     result = result.sort((a, b) => {
-      const sellerA = mockUsers.find(u => u.id === a.sellerId);
-      const sellerB = mockUsers.find(u => u.id === b.sellerId);
+      // Use embedded seller data for sorting
+      const sellerA = a.seller;
+      const sellerB = b.seller;
 
       switch (filters.sortBy) {
           case 'nearest': {
@@ -134,13 +135,17 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           case 'luxury': return b.askPrice - a.askPrice;
           case 'newest': return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
           case 'watchlist': {
-             const aIsHigh = a.currentHighBidderId === user.id;
-             const bIsHigh = b.currentHighBidderId === user.id;
+             // Safe user check
+             const userId = user?.id;
+             if (!userId) return 0; 
+             
+             const aIsHigh = a.currentHighBidderId === userId;
+             const bIsHigh = b.currentHighBidderId === userId;
              if (aIsHigh && !bIsHigh) return -1;
              if (!aIsHigh && bIsHigh) return 1;
 
-             const aHasBid = bids.some(bid => bid.itemId === a.id && bid.bidderId === user.id);
-             const bHasBid = bids.some(bid => bid.itemId === b.id && bid.bidderId === user.id);
+             const aHasBid = bids.some(bid => bid.itemId === a.id && bid.bidderId === userId);
+             const bHasBid = bids.some(bid => bid.itemId === b.id && bid.bidderId === userId);
              if (aHasBid && !bHasBid) return -1;
              if (!aHasBid && bHasBid) return 1;
 
@@ -154,152 +159,215 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     return result;
   };
 
+  // --- DATA FETCHING & REALTIME Subscription ---
   useEffect(() => {
-    const fetchItems = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
-      
-      const { data, error } = await supabase
+
+      // 1. Fetch Listings
+      const { data: listingsData, error: listingsError } = await supabase
         .from('listings')
         .select('*, profiles(*)');
-
-      if (error) {
-        console.error('Error fetching listings:', error);
-        // Fallback to mock data if DB fails (or is empty) so UI doesn't break
-        // This is optional, but good for "Zero to Hero" transition
-        setAllItems(mockItems); 
-      } else if (data) {
-        const transformedItems = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
-        setAllItems(transformedItems);
+      
+      let fetchedItems: Item[] = [];
+      if (listingsData) {
+        fetchedItems = listingsData.map(row => transformListingToItem(row as unknown as ListingWithSeller));
+      } else if (listingsError) {
+        console.error('Error fetching listings:', listingsError);
+        // Ensure UI doesn't break, maybe set empty or keep loading false
       }
 
+      // 2. Fetch Bids with Bidder Profiles
+      const { data: bidsData, error: bidsError } = await supabase
+        .from('bids')
+        .select('*, profiles(*)');
+      
+      if (bidsData) {
+        const transformedBids: Bid[] = (bidsData as unknown as BidWithProfile[]).map(transformBidToHydratedBid);
+        setBids(transformedBids);
+
+        // Hydrate Items with Bid Data (High Bid, Count)
+        fetchedItems = fetchedItems.map(item => {
+           const itemBids = transformedBids.filter(b => b.itemId === item.id);
+           if (itemBids.length === 0) return item;
+
+           const maxBid = Math.max(...itemBids.map(b => b.amount));
+           const highBid = itemBids.find(b => b.amount === maxBid);
+           
+           return {
+             ...item,
+             bidCount: itemBids.length,
+             currentHighBid: maxBid,
+             currentHighBidderId: highBid?.bidderId
+           };
+        });
+      }
+
+      // Deduplicate items by ID (safeguard against DB duplicates)
+      const uniqueItems = Array.from(new Map(fetchedItems.map(item => [item.id, item])).values());
+
+      setAllItems(uniqueItems);
       setIsLoading(false);
     };
 
-    fetchItems();
-  }, []); // Run once on mount
+    fetchData();
 
-  // Local effect to handle Filtering & Pagination based on `allItems` state
+    // 3. Realtime Subscription (Bids)
+    const channel = supabase
+      .channel('public:bids')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bids' }, async (payload) => {
+        const newBidRaw = payload.new as any;
+        
+        // Fetch profile for the new bidder to maintain hydration
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', newBidRaw.bidder_id)
+          .single();
+
+        const newBid: Bid = transformBidToHydratedBid({
+          ...newBidRaw,
+          profiles: profile
+        } as unknown as BidWithProfile);
+
+        setBids(prev => [...prev, newBid]);
+
+        // Update Item State safely
+        setAllItems(prevItems => prevItems.map(item => {
+          if (item.id === newBid.itemId) {
+              const currentMax = item.currentHighBid || 0;
+              const isNewHigh = newBid.amount > currentMax;
+              return {
+                 ...item,
+                 bidCount: item.bidCount + 1,
+                 currentHighBid: isNewHigh ? newBid.amount : currentMax,
+                 currentHighBidderId: isNewHigh ? newBid.bidderId : item.currentHighBidderId
+              };
+          }
+          return item;
+        }));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []); 
+
+  // Local effect for Filters/Pagination
   useEffect(() => {
-    // When `allItems` or `filters` change, reset page to 1 and apply logic
     setPage(1);
     setHasMore(true);
-    
-    // Slight delay to simulate processing/network if needed, or instant
     const filtered = applyFiltersAndSort();
     const firstPage = filtered.slice(0, ITEMS_PER_PAGE);
-    
     setItems(firstPage);
     setHasMore(firstPage.length < filtered.length);
   }, [
-    allItems, // Re-run when DB data arrives
+    allItems, 
     filters.category, filters.search, filters.sortBy, filters.minPrice, filters.maxPrice, 
     filters.listingType, filters.locationMode, filters.radius,
+    user?.id // User change can affect 'watchlist' sort
   ]);
 
   const loadMore = async () => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore || !hasMore || loadingLockRef.current) return;
+    
+    loadingLockRef.current = true;
     setIsLoadingMore(true);
+    
+    try {
+      // Small artificial delay for smooth transition
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-    await new Promise(resolve => setTimeout(resolve, 800));
+      const filtered = applyFiltersAndSort();
+      const start = page * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
+      const nextPage = filtered.slice(start, end);
 
-    const filtered = applyFiltersAndSort();
-    const start = page * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    const nextPage = filtered.slice(start, end);
-
-    if (nextPage.length > 0) {
-      setItems(prev => [...prev, ...nextPage]);
-      setPage(prev => prev + 1);
-      setHasMore(end < filtered.length);
-    } else {
-      setHasMore(false);
+      if (nextPage.length > 0) {
+        setItems(prev => {
+          // One final safety check: don't append if ID already exists in prev
+          const existingIds = new Set(prev.map(i => i.id));
+          const trulyNewItems = nextPage.filter(i => !existingIds.has(i.id));
+          return [...prev, ...trulyNewItems];
+        });
+        setPage(prev => prev + 1);
+        setHasMore(end < filtered.length);
+      } else {
+        setHasMore(false);
+      }
+    } finally {
+      setIsLoadingMore(false);
+      loadingLockRef.current = false;
     }
-
-    setIsLoadingMore(false);
   };
 
+  // Keep simplified local addItem for now (will replace in Selling step)
   const addItem = (newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => {
-    const item: Item = {
-      ...newItem,
-      id: `i${Date.now()}`,
-      bidCount: 0,
-      createdAt: new Date().toISOString(),
-    };
-    setAllItems(prev => [item, ...prev]);
-    setItems(prev => [item, ...prev]);
+    // This will be replaced by direct Supabase INSERT in 'Selling' phase
+    // For now, if called, it might not persist, but 'placeBid' works.
+    console.log("addItem called locally - Logic pending update in Selling phase");
   };
-  const updateItem = (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => {
-    const updater = (prevItems: Item[]) => prevItems.map(item => 
-      item.id === id ? { ...item, ...updates } : item
-    );
-    setAllItems(updater);
-    setItems(updater);
+
+  const updateItem = async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => {
+     // Transform updates to snake_case if necessary (simple for now)
+     const dbUpdates: any = {};
+     if (updates.status) dbUpdates.status = updates.status;
+     if (updates.title) dbUpdates.title = updates.title;
+     // ... add others as needed
+
+     const { error } = await (supabase.from('listings') as any).update(dbUpdates as any).eq('id', id);
+     
+     if (error) {
+         console.error("Failed to update item:", error);
+     } else {
+         setAllItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
+     }
   };
 
   const deleteItem = (id: string) => {
-    const filterer = (prevItems: Item[]) => prevItems.filter(item => item.id !== id);
-    setAllItems(filterer);
-    setItems(filterer);
-    setBids(prev => prev.filter(bid => bid.itemId !== id));
+    setAllItems(prev => prev.filter(i => i.id !== id));
   };
 
-  const placeBid = (itemId: string, amount: number, type: 'public' | 'private') => {
+  const placeBid = async (itemId: string, amount: number, type: 'public' | 'private') => {
+    if (!user) {
+        console.error("Must be logged in to bid");
+        return;
+    }
     const item = items.find(i => i.id === itemId);
     if (!item) return;
 
+    // Client-side Validation Checks
     const minBidAllowed = item.askPrice * 0.7;
     if (amount < minBidAllowed) {
-      console.warn(`Attempted to place a bid (${amount}) lower than 70% of ask price (${minBidAllowed})`);
-      return;
-    }
-    if (type === 'public' && item.currentHighBid && amount < item.currentHighBid) {
-      console.warn("Attempted to place a bid lower than the current high bid");
-      return;
-    }
-    if (item.sellerId === user.id) {
-      console.warn("Attempted to bid on own item");
+      console.warn(`Bid too low`);
       return;
     }
 
-    const newBid: Bid = {
-      id: `b${Date.now()}`,
-      itemId,
-      bidderId: user.id,
-      amount,
-      status: 'pending',
-      type,
-      createdAt: new Date().toISOString(),
-    };
+    // Insert into Supabase
+    const { error } = await (supabase.from('bids') as any).insert({
+        listing_id: itemId,
+        bidder_id: user.id,
+        amount: amount,
+        message: type === 'private' ? 'Private Bid' : 'Public Bid',
+        status: 'pending'
+    } as any);
 
-    setBids(prev => [...prev, newBid]);
-
-    const updateStats = (prevItems: Item[]) => prevItems.map(item => {
-      if (item.id === itemId) {
-        return {
-          ...item,
-          bidCount: item.bidCount + 1,
-          currentHighBid: item.currentHighBid ? Math.max(item.currentHighBid, amount) : amount,
-          currentHighBidderId: (!item.currentHighBid || amount > item.currentHighBid) ? user.id : item.currentHighBidderId
-        };
-      }
-      return item;
-    });
-
-    setAllItems(updateStats);
-    setItems(updateStats);
-
-    setWatchedItemIds(prev => prev.includes(itemId) ? prev : [...prev, itemId]);
+    if (error) {
+        console.error("Failed to place bid:", error);
+    } else {
+        if (!watchedItemIds.includes(itemId)) {
+             setWatchedItemIds(prev => [...prev, itemId]);
+        }
+    }
   };
 
   const toggleWatch = (itemId: string) => {
     setWatchedItemIds(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId) 
-        : [...prev, itemId]
+      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
     );
   };
 
-  // setFilter & updateFilters
   const setFilter = (key: keyof MarketplaceContextType['filters'], value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -307,26 +375,22 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     setFilters(prev => ({ ...prev, ...updates }));
   };
 
-  const rejectBid = (bidId: string) => {
-    setBids(prev => prev.map(b => 
-      b.id === bidId ? { ...b, status: 'rejected' as const } : b
-    ));
+  const rejectBid = async (bidId: string) => {
+      const { error } = await (supabase.from('bids') as any).update({ status: 'rejected' } as any).eq('id', bidId);
+      if (error) console.error("Failed to reject bid", error);
+      else setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: 'rejected' } : b));
   };
 
-  const acceptBid = (bidId: string) => {
-    // This logic relies on starting a conversation, which is in ChatContext
-    // The consumer (component) should call useChat().startConversation() after this succeeds,
-    // OR we can pass a callback. For now, we'll return the conv ID if we had access, but we don't.
-    // In this split architecture, MarketplaceContext handles the BID state update.
-    
-    // We update the bid state here:
-    setBids(prev => prev.map(b => 
-      b.id === bidId ? { ...b, status: 'accepted' as const } : b
-    ));
-    
-    // The component calling this (e.g. valid bid card) will also need to call useChat().startConversation()
-    // We return 'success' or the bid details to help the component know what to do.
-    return undefined; // Deprecated return pattern, component handles orchestration
+  const acceptBid = async (bidId: string) => {
+      // 1. Update Bid Status
+      const { error } = await (supabase.from('bids') as any).update({ status: 'accepted' } as any).eq('id', bidId);
+      if (error) {
+          console.error("Failed to accept bid", error);
+          return undefined;
+      }
+
+      setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: 'accepted' } : b));
+      return bidId;
   };
 
   return (

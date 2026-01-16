@@ -14,11 +14,12 @@ interface WatchedItemCardProps {
 }
 
 export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) {
-  const { toggleWatch } = useApp();
+  const { toggleWatch, now } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getTimeLeft = (expiryAt: string) => {
-    const diff = new Date(expiryAt).getTime() - Date.now();
+    if (now === 0) return "Loading...";
+    const diff = new Date(expiryAt).getTime() - now;
     const hours = Math.max(0, Math.floor(diff / 3600000));
     const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
     

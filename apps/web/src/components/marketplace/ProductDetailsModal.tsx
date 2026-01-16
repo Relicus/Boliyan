@@ -20,7 +20,7 @@ interface ProductDetailsModalProps {
 }
 
 export default function ProductDetailsModal({ item, seller, isOpen, onClose }: ProductDetailsModalProps) {
-  const { placeBid, user, bids, toggleWatch, watchedItemIds } = useApp();
+  const { placeBid, user, bids, toggleWatch, watchedItemIds, now } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
 
   // Hook for encapsulated bidding logic
@@ -39,11 +39,10 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     getSmartStep
   } = useBidding(item, seller, () => onClose(false));
 
-  const [now, setNow] = useState(Date.now());
   const [currentImg, setCurrentImg] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
 
-  const isHighBidder = item.isPublicBid && item.currentHighBidderId === user.id;
+  const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
   const showHalo = isHighBidder || isWatched;
   const haloTheme = isHighBidder ? 'orange' : 'blue';
 
@@ -57,15 +56,10 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     }
   }, [isOpen, item.askPrice, item.isPublicBid, item.currentHighBid, getSmartStep, setBidAmount]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, timeLeft, isUrgent } = useMemo(() => {
+    if (now === 0 || !user) return { distance: 0, duration: 0, timeLeft: "Loading...", isUrgent: false };
+
     // Distance Calculation (Privacy Safe)
     const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
     
@@ -90,7 +84,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
       timeLeft: timeStr,
       isUrgent
     };
-  }, [item.id, item.expiryAt, now, user.location, seller.location]);
+  }, [item.id, item.expiryAt, now, user?.location, seller.location]);
 
 
   return (
@@ -291,9 +285,9 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">
                     {item.isPublicBid ? "High Bid" : "Bids"}
                 </div>
-                <div className={`flex items-baseline justify-center gap-0.5 whitespace-nowrap ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`}>
+                <div className={`flex items-baseline justify-center gap-0.5 whitespace-nowrap ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user?.id ? 'text-amber-600' : 'text-blue-600'}`}>
                     {item.isPublicBid && item.currentHighBid
-                    ? <><span className={`text-xs font-bold ${item.currentHighBidderId === user.id ? 'text-amber-600/70' : 'text-blue-600/70'}`}>Rs.</span><span className="text-xl font-black leading-none">{Math.round(item.currentHighBid).toLocaleString()}</span></>
+                    ? <><span className={`text-xs font-bold ${item.currentHighBidderId === user?.id ? 'text-amber-600/70' : 'text-blue-600/70'}`}>Rs.</span><span className="text-xl font-black leading-none">{Math.round(item.currentHighBid).toLocaleString()}</span></>
                     : <span className="text-xl font-black leading-none">{item.bidCount} <span className="text-sm font-bold opacity-70 hidden sm:inline">{item.bidCount === 1 ? 'Bid' : 'Bids'}</span></span>
                     }
                 </div>
@@ -367,11 +361,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             {/* Sticky/Fixed Bidding Footer */}
             <div className="p-4 bg-white border-t border-slate-100 z-20 shrink-0 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
                 <div className="flex flex-col gap-3">
-                  <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
+                  <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Extra Large for Modal */}
                     <button
                       onClick={(e) => handleSmartAdjust(e, -1)}
-                      disabled={user.id === seller.id}
+                      disabled={user?.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6" /></svg>
@@ -398,7 +392,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                         value={bidAmount}
                         key={`modal-input-${animTrigger}`}
                         initial={false}
-                        disabled={user.id === seller.id}
+                        disabled={user?.id === seller.id}
                         animate={{ 
                           scale: [1, 1.05, 1],
                           x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -3, 3, -3, 3, 0] : 0
@@ -415,7 +409,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     {/* Increment Button - Extra Large for Modal */}
                     <button
                       onClick={(e) => handleSmartAdjust(e, 1)}
-                      disabled={user.id === seller.id}
+                      disabled={user?.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
@@ -425,11 +419,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                   {/* Submit Bid Button */}
                   <button
                     onClick={(e) => handleBid(e)}
-                    disabled={isSuccess || user.id === seller.id}
+                    disabled={isSuccess || user?.id === seller.id}
                     className={`h-12 w-full rounded-lg font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg flex items-center justify-center
                       ${isSuccess 
                         ? 'bg-amber-600 text-white scale-105' 
-                        : user.id === seller.id
+                        : user?.id === seller.id
                           ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
                           : 'bg-blue-600 hover:bg-blue-700 text-white'
                       }`}
@@ -448,7 +442,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                         </motion.svg>
                         <span className="text-base">Placed!</span>
                       </span>
-                    ) : user.id === seller.id ? "Your Listing" : "Place Bid"}
+                    ) : user?.id === seller.id ? "Your Listing" : "Place Bid"}
                   </button>
                 </div>
             </div>

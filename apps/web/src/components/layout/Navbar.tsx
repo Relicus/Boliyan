@@ -23,7 +23,7 @@ import { useState, useEffect, useRef } from "react";
 
 
 export default function Navbar() {
-  const { filters, setFilter, user, isLoggedIn, logout, items, bids, messages } = useApp();
+  const { filters, setFilter, user, isLoggedIn, logout, items, bids, messages, isLoading } = useApp();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -32,13 +32,13 @@ export default function Navbar() {
   const lastScrollY = useRef(0);
 
   // Notifications Calculation
-  const unreadMsgCount = messages.filter(m => !m.isRead && m.senderId !== user.id).length;
+  const unreadMsgCount = messages.filter(m => !m.isRead && m.senderId !== user?.id).length;
   
-  const myItems = items.filter(i => i.sellerId === user.id);
+  const myItems = user ? items.filter(i => i.sellerId === user.id) : [];
   const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length;
   
-  const myBidsItems = items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id));
-  const outbidCount = myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length;
+  const myBidsItems = user ? items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id)) : [];
+  const outbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
 
   useEffect(() => {
     const controlNavbar = () => {
@@ -134,7 +134,9 @@ export default function Navbar() {
             </Link>
           </Button>
 
-          {isLoggedIn ? (
+          {isLoading ? (
+             <div id="navbar-loading-avatar" className="h-10 w-10 rounded-full bg-slate-100 animate-pulse ring-1 ring-slate-200" />
+          ) : isLoggedIn && user ? (
             <>
               {/* Desktop Actions */}
               <div className="hidden md:flex items-center gap-1 mr-2">
@@ -240,7 +242,6 @@ export default function Navbar() {
                   <DropdownMenuItem 
                     onClick={() => {
                       logout();
-                      router.push("/");
                     }}
                     className="rounded-xl py-2.5 cursor-pointer focus:bg-red-50 focus:text-red-600 text-red-500"
                   >

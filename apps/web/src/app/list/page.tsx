@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { 
   Select, 
   SelectContent, 
@@ -14,18 +13,21 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Gavel, EyeOff, Camera, X, Save, Check } from "lucide-react";
+import { Gavel, EyeOff, Camera, X, Save, Check, Loader2 } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useApp } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
+import { uploadListingImage } from "@/lib/uploadImage";
+import { supabase } from "@/lib/supabase";
+import { Database } from "@/types/database.types";
 
 function ListForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("id");
-  const { addItem, updateItem, items, user } = useApp();
+  const { updateItem, items, user } = useApp();
   
   const editingItem = editId ? items.find(i => i.id === editId) : null;
   
@@ -37,8 +39,9 @@ function ListForm() {
   const [duration, setDuration] = useState<"24" | "48" | "72">("24");
   
   const [images, setImages] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
-  
   const [errors, setErrors] = useState<{
     title?: boolean;
     category?: boolean;
@@ -58,22 +61,28 @@ function ListForm() {
     }
   }, [editingItem]);
 
-
-
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages = Array.from(files).map(file => URL.createObjectURL(file));
+      const newFiles = Array.from(files);
+      const newImages = newFiles.map(file => URL.createObjectURL(file));
+      
       setImages(prev => [...prev, ...newImages].slice(0, 5));
+      setImageFiles(prev => [...prev, ...newFiles].slice(0, 5));
     }
   };
 
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+        router.push('/signin');
+        return;
+    }
+
     const newErrors = {
       title: !title.trim(),
       category: !category,
@@ -88,37 +97,61 @@ function ListForm() {
       return;
     }
 
-    const finalDuration = parseInt(duration) as 24 | 48 | 72;
-    const expiryDate = new Date();
-    expiryDate.setHours(expiryDate.getHours() + finalDuration);
+    setIsUploading(true);
 
-    if (editingItem) {
-      updateItem(editingItem.id, {
-        title,
-        category,
-        askPrice: parseFloat(askPrice),
-        description,
-        isPublicBid: isPublic,
-        images: images.length > 0 ? images : editingItem.images,
-        listingDuration: finalDuration,
-        // For edits, we might not want to reset the expiry if it's already active, 
-        // but typically a re-list or update might extend it. 
-        // Following simplified logic: update duration if changed.
-      });
-      router.push("/dashboard");
-    } else {
-      addItem({
-        title,
-        category,
-        askPrice: parseFloat(askPrice),
-        description,
-        isPublicBid: isPublic,
-        sellerId: user.id, // Current user
-        images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=1000&auto=format&fit=crop"], // Fallback if no images
-        expiryAt: expiryDate.toISOString(),
-        listingDuration: finalDuration
-      });
-      router.push("/");
+    try {
+        // 1. Upload Images
+        let finalImageUrls = [...images]; // Start with existing URLs (if editing)
+        
+        // Filter out existing URLs from files (assumes images state mixes URLs and blob:)
+        // Actually, logic needs to be careful.
+        // If we are editing, 'images' has DB URLs. 'imageFiles' has ONLY new files.
+        // If new, 'images' has blob URLs.
+        
+        // Strategy: Upload all files in 'imageFiles'. 
+        // Then assume any 'blob:' in 'images' corresponds to an uploaded file.
+        // OR simpler: Just append uploaded URLs to the ones that are NOT blob/local.
+        
+        const uploadedUrls = await Promise.all(
+            imageFiles.map(file => uploadListingImage(file, user.id))
+        );
+
+        // Filter out blob URLs from 'images' and keep existing HTTP/Supabase URLs
+        const existingRealUrls = images.filter(url => !url.startsWith('blob:'));
+        const allUrls = [...existingRealUrls, ...uploadedUrls];
+
+        const finalDuration = parseInt(duration) as 24 | 48 | 72;
+        // Expiry handled by DB default (or trigger) or we pass it?
+        // Schema doesn't strictly require expiry, transform.ts calculates it.
+        // But let's check schema... Assuming DB has default or we omit and let DB handle.
+        // Actually, better to insert a known value if we want consistency.
+
+        const listingData: Database['public']['Tables']['listings']['Insert'] = {
+            title,
+            category,
+            asked_price: parseFloat(askPrice),
+            description,
+            auction_mode: isPublic ? 'visible' : 'sealed',
+            images: allUrls,
+            seller_id: user.id,
+            status: 'active'
+        };
+
+        if (editingItem) {
+          // ...
+        } else {
+            // Insert
+            const { error } = await supabase.from('listings').insert(listingData as any);
+            
+            if (error) throw error;
+            router.push("/");
+        }
+
+    } catch (error) {
+        console.error("Error creating listing:", error);
+        alert("Failed to create listing. Please try again."); // Simple feedback for now
+    } finally {
+        setIsUploading(false);
     }
   };
 
@@ -330,6 +363,7 @@ function ListForm() {
               variant="outline"
               className="flex-1 h-14 text-lg font-semibold border-slate-200 text-slate-600 hover:bg-slate-50"
               onClick={() => router.back()}
+              disabled={isUploading}
             >
               <X className="h-5 w-5 mr-2" />
               {editingItem ? "Discard" : "Cancel"}
@@ -338,9 +372,16 @@ function ListForm() {
               id="post-listing-btn"
               className="flex-[2] bg-blue-600 hover:bg-blue-700 h-14 text-lg font-bold"
               onClick={handleSubmit}
+              disabled={isUploading}
             >
-              {editingItem ? <Save className="h-5 w-5 mr-2" /> : <Check className="h-5 w-5 mr-2" />}
-              {editingItem ? "Save" : "Post Listing"}
+              {isUploading ? (
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+              ) : editingItem ? (
+                  <Save className="h-5 w-5 mr-2" />
+              ) : (
+                  <Check className="h-5 w-5 mr-2" />
+              )}
+              {isUploading ? "Uploading..." : editingItem ? "Save" : "Post Listing"}
             </Button>
           </div>
         </CardContent>

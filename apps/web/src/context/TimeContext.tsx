@@ -9,7 +9,7 @@ interface TimeContextType {
 const TimeContext = createContext<TimeContextType | undefined>(undefined);
 
 export function TimeProvider({ children }: { children: React.ReactNode }) {
-  const [now, setNow] = useState<number>(Date.now());
+  const [now, setNow] = useState<number>(0);
 
   useEffect(() => {
     // Sync with system time immediately

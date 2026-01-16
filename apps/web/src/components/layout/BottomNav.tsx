@@ -12,19 +12,15 @@ import { useState, useEffect } from "react";
 export default function BottomNav() {
   const pathname = usePathname();
   const { messages, items, bids, user } = useApp();
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
-  const unreadCount = messages.filter(m => !m.isRead && m.senderId !== user.id).length;
+
+  const unreadCount = user ? messages.filter(m => !m.isRead && m.senderId !== user.id).length : 0;
   
-  const myItems = items.filter(i => i.sellerId === user.id);
-  const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length;
+  const myItems = user ? items.filter(i => i.sellerId === user.id) : [];
+  const receivedBidsCount = user ? bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length : 0;
   
-  const myBidsItems = items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id));
-  const outbidCount = myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length;
+  const myBidsItems = user ? items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id)) : [];
+  const outbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
   const totalDashboardCount = receivedBidsCount + outbidCount;
   
   const [isFilterOpen, setIsFilterOpen] = useState(false);

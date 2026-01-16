@@ -5,7 +5,7 @@ import { useApp } from '@/lib/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, Clock, Lock } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock, Phone } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
@@ -93,11 +93,11 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   }, [currentMessages]);
 
   if (!conversation) return <div className="p-10 text-center">Conversation not found</div>;
+  if (!user) return <div className="p-10 text-center">Please sign in to view chats.</div>;
 
   const isSeller = conversation.sellerId === user.id;
-  const otherUserId = isSeller ? conversation.bidderId : conversation.sellerId;
-  const otherUser = getUser(otherUserId);
-  const item = items.find(i => i.id === conversation.itemId);
+  const otherUser = isSeller ? conversation.bidder : conversation.seller;
+  const item = conversation.item;
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,6 +149,21 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
           </div>
         </div>
         
+        {!isLocked && (
+            <Button
+                id="chat-call-btn"
+                size="icon"
+                variant="outline"
+                className="rounded-full h-9 w-9 border-slate-200 text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-colors shadow-sm"
+                onClick={() => {
+                    const phone = otherUser?.phone || "+971500000000"; // Fallback or Mock
+                    window.location.href = `tel:${phone}`;
+                }}
+            >
+                <Phone className="h-4 w-4" />
+            </Button>
+        )}
+
         {timeLeft && (
           <div className={cn(
             "flex flex-col items-end px-3 py-1.5 rounded-xl border transition-colors",
@@ -197,7 +212,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
       
         <AnimatePresence initial={false}>
           {currentMessages.map((msg, idx) => {
-            const isMe = msg.senderId === user.id;
+            const isMe = msg.senderId === user?.id;
             return (
               <motion.div
                 key={msg.id}

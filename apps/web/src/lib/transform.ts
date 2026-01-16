@@ -1,5 +1,5 @@
 import { Database } from '@/types/database.types';
-import { Item, User } from '@/types';
+import { Item, User, Bid, Conversation } from '@/types';
 
 type ListingRow = Database['public']['Tables']['listings']['Row'];
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -13,30 +13,25 @@ export function transformProfileToUser(profile: ProfileRow): User {
   return {
     id: profile.id,
     name: profile.full_name || 'Anonymous',
-    avatar: profile.avatar_url || 'https://github.com/shadcn.png', // Default avatar
+    avatar: profile.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + profile.id,
     rating: profile.rating || 0,
     reviewCount: profile.rating_count || 0,
     location: {
-      lat: 0, // Geo not in schema yet, defaulting
+      lat: 0,
       lng: 0,
-      name: profile.location || 'Unknown'
+      address: profile.location || 'Unknown'
     },
-    verified: false, // Default
-    joinedDate: profile.created_at || new Date().toISOString()
+    isVerified: false,
+    badges: [],
+    stats: {
+      bidsAcceptedByMe: 0,
+      myBidsAccepted: 0
+    }
   };
 }
 
 export function transformListingToItem(listing: ListingWithSeller): Item {
-  const seller = listing.profiles ? transformProfileToUser(listing.profiles) : {
-    id: 'unknown',
-    name: 'Unknown Seller',
-    avatar: '',
-    rating: 0,
-    reviewCount: 0,
-    location: { lat: 0, lng: 0, name: 'Unknown' },
-    verified: false,
-    joinedDate: new Date().toISOString()
-  };
+  const seller = listing.profiles ? transformProfileToUser(listing.profiles) : undefined;
 
   // Calculate expiry (Default to 72 hours after creation)
   const createdAt = listing.created_at ? new Date(listing.created_at).getTime() : Date.now();
@@ -61,17 +56,57 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     id: listing.id,
     title: listing.title,
     description: listing.description || '',
-    askPrice: listing.asked_price,
     images: imageUrls,
-    category: listing.category || 'Other',
-    condition: 'Used', // Default, not in schema
+    sellerId: listing.seller_id || 'unknown',
     seller: seller,
-    likes: 0, // Not in schema
-    postedAt: listing.created_at || new Date().toISOString(),
-    expiryAt: expiryAt,
+    askPrice: listing.asked_price,
+    category: listing.category || 'Other',
     isPublicBid: isPublicBid,
-    currentHighBid: null, // Would need fetching bids to populate
-    currentHighBidderId: null,
-    minBid: listing.asked_price * 0.7 // Business rule applied here too
+    currentHighBid: undefined,
+    currentHighBidderId: undefined,
+    bidCount: 0,
+    createdAt: listing.created_at || new Date().toISOString(),
+    expiryAt: expiryAt,
+    listingDuration: 72,
+    status: (listing as any).status || 'active'
+  };
+}
+export type BidWithProfile = Database['public']['Tables']['bids']['Row'] & {
+  profiles: ProfileRow | null;
+};
+
+export function transformBidToHydratedBid(bid: BidWithProfile): Bid {
+  return {
+    id: bid.id,
+    itemId: bid.listing_id || '',
+    bidderId: bid.bidder_id || '',
+    bidder: bid.profiles ? transformProfileToUser(bid.profiles) : undefined,
+    amount: Number(bid.amount),
+    status: (bid.status as any) || 'pending',
+    type: 'public', // Defaulting since bid_type was removed from schema
+    createdAt: bid.created_at || new Date().toISOString()
+  };
+}
+
+export type ConversationWithHydration = Database['public']['Tables']['conversations']['Row'] & {
+  listings: ListingWithSeller | null;
+  seller_profile: ProfileRow | null;
+  bidder_profile: ProfileRow | null;
+  last_message?: string;
+  updated_at?: string;
+};
+
+export function transformConversationToHydratedConversation(conv: ConversationWithHydration): Conversation {
+  return {
+    id: conv.id,
+    itemId: conv.listing_id || '',
+    item: conv.listings ? transformListingToItem(conv.listings) : undefined,
+    sellerId: conv.seller_id || '',
+    seller: conv.seller_profile ? transformProfileToUser(conv.seller_profile) : undefined,
+    bidderId: conv.bidder_id || '',
+    bidder: conv.bidder_profile ? transformProfileToUser(conv.bidder_profile) : undefined,
+    lastMessage: conv.last_message,
+    updatedAt: conv.updated_at || conv.created_at || new Date().toISOString(),
+    expiresAt: (conv as any).expires_at
   };
 }

@@ -64,30 +64,31 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
   // Watch for outbid events (only if user has an existing bid)
   useEffect(() => {
-    const hasUserBid = bids.some(b => b.itemId === item.id && b.bidderId === user.id);
-    if (hasUserBid && item.currentHighBid && item.currentHighBidderId !== user.id) {
+    if (!user) return;
+    const hasUserBid = user ? bids.some(b => b.itemId === item.id && b.bidderId === user.id) : false;
+    if (hasUserBid && item.currentHighBid && user && item.currentHighBidderId !== user.id) {
        setIsOutbidTrigger(true);
        const timer = setTimeout(() => setIsOutbidTrigger(false), 800);
        return () => clearTimeout(timer);
     }
-  }, [item.currentHighBid, item.currentHighBidderId, user.id, bids, item.id]);
+  }, [item.currentHighBid, item.currentHighBidderId, user?.id, bids, item.id]);
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, timeLeft, statusColor, isUrgent } = useMemo(() => {
-    // Distance Calculation (Privacy Safe)
-    const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
-    
-    // Return placeholder during SSR/initial hydration if now is null
-    if (now === null) {
+    // Return placeholder during SSR/initial hydration if now is null or user is missing
+    if (now === null || !user) {
       return {
-        distance: dist,
-        duration: dur,
+        distance: 0,
+        duration: 0,
         timeLeft: "--:--:--",
         listingType: "72h", // Default
         statusColor: "bg-black/60",
         isUrgent: false
       };
     }
+
+    // Distance Calculation (Privacy Safe)
+    const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
 
     // Time Left calculation
     const diff = new Date(item.expiryAt).getTime() - now;
@@ -126,7 +127,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
       statusColor,
       isUrgent
     };
-  }, [item.id, item.expiryAt, item.createdAt, now, user.location, seller.location]);
+  }, [item.id, item.expiryAt, item.createdAt, now, user?.location, seller.location]);
 
   const handleInputClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent dialog from opening when clicking input
@@ -172,7 +173,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     }
   };
 
-  const isHighBidder = item.isPublicBid && item.currentHighBidderId === user.id;
+  const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
   const showHalo = isHighBidder || isWatched;
   const haloTheme = isHighBidder ? 'orange' : 'blue';
 
@@ -368,7 +369,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                           initial={{ scale: 1.4, color: "#3b82f6" }}
                           animate={{ 
                             scale: 1, 
-                            color: item.currentHighBidderId === user.id ? "#d97706" : "#2563eb" 
+                          color: item.currentHighBidderId === user?.id ? "#d97706" : "#2563eb" 
                           }}
                           transition={{ 
                             type: "spring", 
@@ -381,7 +382,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         >
                           {formatDisplayPrice(item.currentHighBid)}
                         </motion.span>
-                        {item.currentHighBidderId === user.id && (
+                        {item.currentHighBidderId === user?.id && (
                           <motion.div
                             initial={{ scale: 0, rotate: -20 }}
                             animate={{ scale: 1, rotate: 0 }}
@@ -415,12 +416,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {/* Smart Stepper Input Row - Stacked Layout */}
               <div className="flex flex-col gap-2 mt-1">
                 <div className="flex h-9 w-full">
-                  <div className={`flex flex-1 border border-slate-300 rounded-md shadow-sm overflow-hidden ${user.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
+                  <div className={`flex flex-1 border border-slate-300 rounded-md shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Large Touch Target */}
                     <button
                       id={`item-card-${item.id}-decrement-btn`}
                       onClick={(e) => handleSmartAdjust(e, -1)}
-                      disabled={user.id === seller.id}
+                      disabled={user?.id === seller.id}
                       className="w-10 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-600 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6" /></svg>
@@ -448,8 +449,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         value={bidAmount}
                         key={`input-${animTrigger}`}
                         initial={false}
-                        disabled={user.id === seller.id}
-                        animate={{ 
+                        disabled={user?.id === seller.id}
+                        animate={{  
                           scale: [1, 1.05, 1],
                           x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -2, 2, -2, 2, 0] : 0
                         }}
@@ -467,7 +468,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     <button
                       id={`item-card-${item.id}-increment-btn`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
-                      disabled={user.id === seller.id}
+                      disabled={user?.id === seller.id}
                       className="w-10 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-600 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
@@ -478,11 +479,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 <button
                   id={`item-card-${item.id}-place-bid-btn`}
                   onClick={handleBid}
-                  disabled={isSuccess || user.id === seller.id}
+                  disabled={isSuccess || user?.id === seller.id}
                   className={`w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold text-sm tracking-wide
                     ${isSuccess 
                       ? 'bg-amber-600 text-white scale-105' 
-                      : user.id === seller.id
+                      : user?.id === seller.id
                         ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
                         : isHighBidder 
                           ? 'bg-orange-500 hover:bg-orange-600 text-white'
@@ -494,7 +495,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                       Bid Placed!
                     </span>
-                  ) : user.id === seller.id ? (
+                  ) : user?.id === seller.id ? (
                     "Your Listing"
                   ) : isHighBidder ? (
                     <span className="flex items-center gap-1.5">
@@ -711,10 +712,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">
                     {item.isPublicBid ? "High Bid" : "Bids"}
                 </div>
-                <div className={`flex items-baseline justify-center gap-0.5 whitespace-nowrap ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`}>
+                <div className={`flex items-baseline justify-center gap-0.5 whitespace-nowrap ${user && item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`}>
                   {item.isPublicBid && item.currentHighBid ? (
                     <>
-                       <span className={`text-xs font-bold ${item.currentHighBidderId === user.id ? 'text-amber-600/70' : 'text-blue-600/70'}`}>Rs.</span>
+                       <span className={`text-xs font-bold ${item.currentHighBidderId === user?.id ? 'text-amber-600/70' : 'text-blue-600/70'}`}>Rs.</span>
                        <span className="text-xl font-black leading-none">{Math.round(item.currentHighBid).toLocaleString()}</span>
                     </>
                   ) : (
@@ -834,12 +835,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             {/* Sticky/Fixed Bidding Footer */}
             <div className="p-4 bg-white border-t border-slate-100 z-20 shrink-0 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
                 <div className="flex flex-col gap-3">
-                  <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
+                  <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Extra Large for Modal */}
                     <button
                       id={`modal-item-card-${item.id}-decrement-btn`}
                       onClick={(e) => handleSmartAdjust(e, -1)}
-                      disabled={user.id === seller.id}
+                      disabled={user?.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6" /></svg>
@@ -867,7 +868,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         value={bidAmount}
                         key={`modal-input-${animTrigger}`}
                         initial={false}
-                        disabled={user.id === seller.id}
+                        disabled={user?.id === seller.id}
                         animate={{ 
                           scale: [1, 1.05, 1],
                           x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -3, 3, -3, 3, 0] : 0
@@ -885,7 +886,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     <button
                       id={`modal-item-card-${item.id}-increment-btn`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
-                      disabled={user.id === seller.id}
+                      disabled={user?.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
@@ -896,11 +897,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   <button
                     id={`modal-item-card-${item.id}-place-bid-btn`}
                     onClick={(e) => handleBid(e)}
-                    disabled={isSuccess || user.id === seller.id}
+                    disabled={isSuccess || user?.id === seller.id}
                     className={`h-12 w-full rounded-lg font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg flex items-center justify-center
                       ${isSuccess 
                         ? 'bg-amber-600 text-white scale-105' 
-                        : user.id === seller.id
+                        : user?.id === seller.id
                           ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
                           : isHighBidder
                             ? 'bg-orange-500 hover:bg-orange-600 text-white'
@@ -921,7 +922,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         </motion.svg>
                         <span className="text-base">Placed!</span>
                       </span>
-                    ) : user.id === seller.id ? (
+                    ) : user?.id === seller.id ? (
                       "Your Listing"
                     ) : isHighBidder ? (
                       <span className="flex items-center gap-2">

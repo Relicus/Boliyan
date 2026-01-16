@@ -14,15 +14,16 @@ interface MyBidCardProps {
 }
 
 export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
-  const { user } = useApp();
+  const { user, now } = useApp();
   
-  const isLeading = item.isPublicBid && item.currentHighBidderId === user.id;
+  const isLeading = user && item.isPublicBid && item.currentHighBidderId === user.id;
 
-  const isOutbid = item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
+  const isOutbid = user && item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getTimeLeft = (expiryAt: string) => {
-    const diff = new Date(expiryAt).getTime() - Date.now();
+    if (now === 0) return "Loading...";
+    const diff = new Date(expiryAt).getTime() - now;
     const hours = Math.max(0, Math.floor(diff / 3600000));
     const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
     

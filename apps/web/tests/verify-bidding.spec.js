@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
 test('verify initial bid is 70% of ask price for items with 0 bids', async ({ page }) => {
   await page.goto('http://localhost:3000');

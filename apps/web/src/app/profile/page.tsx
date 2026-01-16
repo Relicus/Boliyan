@@ -52,7 +52,7 @@ export default function ProfilePage() {
                 <ProfileSettings />
               </div>
             )}
-            {activeTab === "achievements" && (
+            {activeTab === "achievements" && user && (
               <div className="py-2">
                 <AchievementSection user={user} />
               </div>

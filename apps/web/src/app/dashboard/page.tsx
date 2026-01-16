@@ -1,7 +1,6 @@
 "use client";
 
 import { useApp } from "@/lib/store";
-import { mockUsers } from "@/lib/mock-data";
 import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
@@ -16,7 +15,7 @@ import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import DeleteConfirmationDialog from "@/components/seller/DeleteConfirmationDialog";
 import { Item } from "@/types";
-import { getBidderLocationMock } from "@/lib/utils";
+import { calculatePrivacySafeDistance } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 function DashboardContent() {
@@ -59,11 +58,11 @@ function DashboardContent() {
   };
   
   // SELLER DATA: Items created by current user
-  const myItems = items.filter(item => item.sellerId === user.id);
+  const myItems = user ? items.filter(item => item.sellerId === user.id) : [];
   const itemsWithBids = myItems.filter(item => bids.some(b => b.itemId === item.id));
 
   // BUYER DATA: Bids placed by current user
-  const bidsIMade = bids.filter(b => b.bidderId === user.id);
+  const bidsIMade = user ? bids.filter(b => b.bidderId === user.id) : [];
   const itemsIMadeBidsOn = items.filter(item => bidsIMade.some(b => b.itemId === item.id));
   
   // WATCHLIST DATA
@@ -269,7 +268,7 @@ function DashboardContent() {
                       <WatchedItemCard 
                         key={item.id} 
                         item={item} 
-                        seller={getUser(item.sellerId) || mockUsers[1]} 
+                        seller={item.seller!} 
                       />
                     ))}
                   </div>
@@ -297,7 +296,7 @@ function DashboardContent() {
                       key={item.id} 
                       item={item} 
                       userBid={getUserBidForItem(item.id)} 
-                      seller={getUser(item.sellerId) || mockUsers[1]} 
+                      seller={item.seller!} 
                     />
                   ))}
                 </div>
@@ -344,8 +343,9 @@ function DashboardContent() {
                       {bids
                         .filter(b => b.itemId === item.id)
                         .map(bid => {
-                          const bidder = mockUsers.find(u => u.id === bid.bidderId) || mockUsers[0];
-                          const { distance, duration } = getBidderLocationMock(bidder.id);
+                          const bidder = bid.bidder!; // Bids are hydrated in MarketplaceContext
+                          const itemOwnerProfile = user ? { lat: user.location.lat, lng: user.location.lng } : undefined;
+                          const { distance, duration } = calculatePrivacySafeDistance(itemOwnerProfile, bidder.location);
                           return { ...bid, bidder, distance, duration };
                         })
                         .sort((a, b) => {
@@ -460,7 +460,7 @@ function DashboardContent() {
         itemTitle={itemToDelete?.title || ""}
       />
 
-      {viewingItem && (
+      {viewingItem && user && (
         <ProductDetailsModal 
           item={viewingItem} 
           seller={user} 

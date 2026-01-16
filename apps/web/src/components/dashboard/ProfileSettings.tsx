@@ -16,8 +16,21 @@ import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 export function ProfileSettings() {
   const { user } = useApp();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(user.name);
+  const [name, setName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Keep name in sync with user
+  React.useEffect(() => {
+    if (user) setName(user.name);
+  }, [user]);
+
+  if (!user) {
+    return (
+      <div className="p-8 text-center text-slate-400">
+        Please sign in to view your profile.
+      </div>
+    );
+  }
 
   const handleSave = async () => {
     setIsSaving(true);

@@ -30,15 +30,15 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       : getMinimumAllowedBid(item.askPrice);
 
     if (!isSuccess) {
-      const currentNumericAmount = parseFloat(bidAmount.replace(/,/g, ''));
-      
-      // Only force sync if the CURRENT input is below the absolute minimum 
-      // AND we aren't in the middle of a success transition
-      if (currentNumericAmount < minBid && item.currentHighBid) {
-         setBidAmount(minBid.toLocaleString());
-      }
+      setBidAmount(prev => {
+        const currentNumericAmount = parseFloat(prev.replace(/,/g, ''));
+        if (currentNumericAmount < minBid && item.currentHighBid) {
+          return minBid.toLocaleString();
+        }
+        return prev;
+      });
     }
-  }, [item.currentHighBid, item.askPrice, item.isPublicBid, isSuccess, bidAmount]); 
+  }, [item.currentHighBid, item.askPrice, item.isPublicBid, isSuccess]); 
 
   const handleSmartAdjust = useCallback((e: React.MouseEvent | React.TouchEvent, direction: 1 | -1) => {
     e.stopPropagation();
@@ -57,50 +57,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     // Auto-hide delta after animation
     setTimeout(() => setShowDelta(false), 800);
   }, [bidAmount]);
-
-  const attemptBid = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
-    e?.stopPropagation();
-    const amount = parseFloat(bidAmount.replace(/,/g, ''));
-    
-    // Minimum bid logic
-    let minBid = getMinimumAllowedBid(item.askPrice);
-    let referencePrice = item.askPrice;
-
-    if (item.isPublicBid && item.currentHighBid) {
-      minBid = item.currentHighBid + getSmartStep(item.currentHighBid);
-      referencePrice = item.currentHighBid;
-    }
-
-    if (isNaN(amount) || amount < minBid) {
-      setError(true);
-      setTimeout(() => setError(false), 2000);
-      return;
-    }
-
-    // Safety Check 1: Double Bidding (User is already high bidder)
-    if (item.currentHighBidderId === user.id) {
-      setWarning({
-        type: 'double_bid',
-        message: "You are already the highest bidder. Do you want to increase your bid?"
-      });
-      return;
-    }
-
-    // Safety Check 2: High Bid (20% above reference)
-    // We use a 20% buffer. If they bid 20% MORE than the reference price, we warn.
-    const safetyThreshold = referencePrice * 1.2;
-    if (amount > safetyThreshold) {
-      const percentOver = Math.round(((amount - referencePrice) / referencePrice) * 100);
-      setWarning({
-        type: 'high_bid',
-        message: `Your bid is ${percentOver}% higher than required. Are you sure?`
-      });
-      return;
-    }
-
-    // If no warnings, execute immediately
-    executeBid(amount, e);
-  }, [bidAmount, item, user.id]);
 
   const executeBid = useCallback((amount: number, e?: React.MouseEvent | React.TouchEvent | any) => {
     // Place bid logic via store
@@ -135,6 +91,56 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       setTimeout(() => setIsSuccess(false), 1500);
     }
   }, [item, placeBid, onBidSuccess]);
+
+  const attemptBid = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+    e?.stopPropagation();
+    const amount = parseFloat(bidAmount.replace(/,/g, ''));
+    
+    // Minimum bid logic
+    let minBid = getMinimumAllowedBid(item.askPrice);
+    let referencePrice = item.askPrice;
+
+    if (item.isPublicBid && item.currentHighBid) {
+      minBid = item.currentHighBid + getSmartStep(item.currentHighBid);
+      referencePrice = item.currentHighBid;
+    }
+
+    if (isNaN(amount) || amount < minBid) {
+      setError(true);
+      setTimeout(() => setError(false), 2000);
+      return;
+    }
+
+    if (!user) {
+      // Should ideally redirect to login, but for now just return to prevent crash
+      // The UI should handle showing the sign-in state usually
+      return;
+    }
+
+    // Safety Check 1: Double Bidding (User is already high bidder)
+    if (item.currentHighBidderId === user.id) {
+      setWarning({
+        type: 'double_bid',
+        message: "You are already the highest bidder. Do you want to increase your bid?"
+      });
+      return;
+    }
+
+    // Safety Check 2: High Bid (20% above reference)
+    // We use a 20% buffer. If they bid 20% MORE than the reference price, we warn.
+    const safetyThreshold = referencePrice * 1.2;
+    if (amount > safetyThreshold) {
+      const percentOver = Math.round(((amount - referencePrice) / referencePrice) * 100);
+      setWarning({
+        type: 'high_bid',
+        message: `Your bid is ${percentOver}% higher than required. Are you sure?`
+      });
+      return;
+    }
+
+    // If no warnings, execute immediately
+    executeBid(amount, e);
+  }, [bidAmount, item, user?.id, executeBid]);
 
   const confirmBid = useCallback(() => {
     if (!warning) return;
