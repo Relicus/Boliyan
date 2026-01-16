@@ -5,6 +5,8 @@ import { Item, Bid } from "@/types";
 import { mockItems, mockBids, mockUsers } from "@/lib/mock-data";
 import { useAuth } from "./AuthContext";
 import { useTime } from "./TimeContext";
+import { supabase } from "@/lib/supabase";
+import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 
 interface MarketplaceContextType {
   items: Item[];
@@ -43,8 +45,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const { user } = useAuth(); // Needed for user-specific sort/filter (e.g. watchlist sort)
   const { now } = useTime(); // Might be needed for sorting by ending soon (dynamic)
 
-  // Initialize with mock data
-  const [allItems, setAllItems] = useState<Item[]>(mockItems);
+  // Initialize with empty array, will fetch from Supabase
+  const [allItems, setAllItems] = useState<Item[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [bids, setBids] = useState<Bid[]>(mockBids);
   const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
@@ -153,23 +155,43 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   };
 
   useEffect(() => {
-    const fetchFirstPage = async () => {
+    const fetchItems = async () => {
       setIsLoading(true);
-      setPage(1);
-      setHasMore(true);
-
-      await new Promise(resolve => setTimeout(resolve, 600));
-
-      const filtered = applyFiltersAndSort();
-      const firstPage = filtered.slice(0, ITEMS_PER_PAGE);
       
-      setItems(firstPage);
-      setHasMore(firstPage.length < filtered.length);
+      const { data, error } = await supabase
+        .from('listings')
+        .select('*, profiles(*)');
+
+      if (error) {
+        console.error('Error fetching listings:', error);
+        // Fallback to mock data if DB fails (or is empty) so UI doesn't break
+        // This is optional, but good for "Zero to Hero" transition
+        setAllItems(mockItems); 
+      } else if (data) {
+        const transformedItems = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
+        setAllItems(transformedItems);
+      }
+
       setIsLoading(false);
     };
 
-    fetchFirstPage();
+    fetchItems();
+  }, []); // Run once on mount
+
+  // Local effect to handle Filtering & Pagination based on `allItems` state
+  useEffect(() => {
+    // When `allItems` or `filters` change, reset page to 1 and apply logic
+    setPage(1);
+    setHasMore(true);
+    
+    // Slight delay to simulate processing/network if needed, or instant
+    const filtered = applyFiltersAndSort();
+    const firstPage = filtered.slice(0, ITEMS_PER_PAGE);
+    
+    setItems(firstPage);
+    setHasMore(firstPage.length < filtered.length);
   }, [
+    allItems, // Re-run when DB data arrives
     filters.category, filters.search, filters.sortBy, filters.minPrice, filters.maxPrice, 
     filters.listingType, filters.locationMode, filters.radius,
   ]);
