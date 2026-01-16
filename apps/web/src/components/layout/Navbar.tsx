@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, User, Bell, Plus, LogOut, Activity, Heart, UserCircle, MessageSquare } from "lucide-react";
+import { Search, User, Bell, Plus, LogOut, Activity, Heart, UserCircle, MessageSquare, LayoutGrid, Tag, Gavel } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,7 +21,6 @@ import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { SearchDropdown } from "./SearchDropdown";
 import { useState, useEffect, useRef } from "react";
 
-import { Gavel, Tag, LayoutGrid } from "lucide-react";
 
 export default function Navbar() {
   const { filters, setFilter, user, isLoggedIn, logout, items, bids, messages } = useApp();
@@ -82,6 +81,8 @@ export default function Navbar() {
       }`}
     >
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-6">
+        {/* ... existing navbar content */}
+
         <div id="navbar-left-section-03" className="flex items-center gap-4 shrink-0">
           <div className="flex items-center gap-3">
             <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-2 select-none transition-transform duration-200 active:scale-95">
