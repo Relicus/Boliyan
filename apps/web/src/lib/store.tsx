@@ -13,14 +13,9 @@ import { TimeProvider, useTime } from '@/context/TimeContext';
   so we don't have to refactor every single component file immediately.
 */
 
-import { useOutbidAlerts } from '@/hooks/useOutbidAlerts';
 
-function AlertManager() {
-  const { bids } = useMarketplace();
-  const { user } = useAuth();
-  useOutbidAlerts(bids, user);
-  return null;
-}
+
+
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   // We nest them carefully:
@@ -33,7 +28,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <MarketplaceProvider>
           <ChatProvider>
-            <AlertManager />
             {children}
           </ChatProvider>
         </MarketplaceProvider>

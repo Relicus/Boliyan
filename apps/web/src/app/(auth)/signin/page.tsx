@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, LogIn } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -36,14 +37,34 @@ export default function SignInPage() {
 
     setIsLoading(true);
     
-    // TODO: Replace with Supabase Auth
-    // const { error } = await supabase.auth.signInWithPassword({ email, password });
-    
-    // Simulate login delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    setIsLoading(false);
-    router.push("/");
+    try {
+      // Import dynamically or assume imported at top (I will fix imports in next step if needed, but for now I see no supabase import in original file view)
+      // I need to add import first. Let's do imports in a separate chunk or just use multi_replace.
+      // Wait, earlier view_file showed no supabase import. I should verify.
+      // Yes, line 40 was commented out: // const { error } = await supabase.auth.signInWithPassword({ email, password });
+      // I will replace the whole file content related to imports and submit logic.
+      
+      /* THIS TOOL CALL IS ONLY FOR HANDLESUBMIT, I WILL NEED ANOTHER FOR IMPORTS */
+      
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
+
+      if (error) {
+         console.error("Login error:", error.message);
+         // Ideally show error to user but for now just stop loading
+         // In a real app we'd set an error state here
+         setIsShaking(true);
+      } else {
+         router.push("/");
+         router.refresh(); // Ensure auth state updates
+      }
+    } catch (err) {
+      console.error("Unexpected login error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

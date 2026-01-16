@@ -7,7 +7,7 @@ import { Item, User } from "@/types";
 import { getSmartStep, getMinimumAllowedBid } from "@/lib/bidding";
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
-  const { placeBid, user } = useApp();
+  const { placeBid, user, bids } = useApp();
 
   const [warning, setWarning] = useState<{ type: 'double_bid' | 'high_bid', message: string } | null>(null);
 
@@ -117,13 +117,29 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
 
-    // Safety Check 1: Double Bidding (User is already high bidder)
-    if (item.currentHighBidderId === user.id) {
-      setWarning({
-        type: 'double_bid',
-        message: "You are already the highest bidder. Do you want to increase your bid?"
-      });
-      return;
+    // Safety Check 1: Previous Bid Check
+    if (item.isPublicBid) {
+      // For Public auctions, warn if they are already the high bidder
+      if (item.currentHighBidderId === user.id) {
+        setWarning({
+          type: 'double_bid',
+          message: "You are already the highest bidder. Do you want to increase your bid?"
+        });
+        return;
+      }
+    } else {
+      // For Secret/Sealed auctions, warn if they have bid at all
+      // We rely on MarketplaceContext to have loaded the bids for this item
+      // Note: 'bids' is now destructured at top level to avoid hook rule violation
+      const hasAlreadyBid = bids.some(b => b.itemId === item.id && b.bidderId === user.id);
+      
+      if (hasAlreadyBid) {
+        setWarning({
+          type: 'double_bid',
+          message: "You have already placed a bid for this item. Do you want to update it?"
+        });
+        return;
+      }
     }
 
     // Safety Check 2: High Bid (20% above reference)

@@ -24,17 +24,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   // Fetch full profile data from Supabase 'profiles' table
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (supabaseUser: any) => {
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('id', supabaseUser.id)
         .single();
 
-      if (error) {
+      // Handle 'Row not found' (PGRST116) or null data
+      if (!data && (error?.code === 'PGRST116' || !error)) {
+          console.warn("Profile not found, attempting to create or use fallback...");
+          const metadata = supabaseUser.user_metadata || {};
+          
+          const newProfile = {
+              id: supabaseUser.id,
+              full_name: metadata.full_name || metadata.name || supabaseUser.email?.split('@')[0],
+              email: supabaseUser.email, 
+              avatar_url: metadata.avatar_url,
+              location: metadata.city, // Map city to location
+              phone: metadata.phone
+          };
+
+          // Attempt insertion
+          const { data: inserted, error: insertError } = await supabase
+              .from('profiles')
+              .insert([newProfile])
+              .select()
+              .single();
+
+          if (!insertError && inserted) {
+             data = inserted;
+          } else {
+             // Fallback to ephemeral data so the app still works
+             console.error("Profile creation failed, using temporary data:", insertError);
+             data = newProfile;
+          }
+      } else if (error) {
         console.error('Error fetching profile:', error);
-        return null;
+        return null; // Stop if genuine DB error
       }
 
         if (data) {
@@ -43,14 +71,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const profile = data as any;
           const appUser: User = {
               id: profile.id,
-              name: profile.full_name || profile.email?.split('@')[0] || 'User',
+              name: profile.full_name || profile.name || supabaseUser.email?.split('@')[0] || 'User',
               avatar: profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.id}`,
               isVerified: profile.is_verified || false,
               // Default/Fallback values for fields not yet in DB schema or optional
               phone: profile.phone || undefined,
               rating: profile.rating || 0,
               reviewCount: profile.review_count || 0,
-              location: profile.location ? (typeof profile.location === 'string' ? JSON.parse(profile.location) : profile.location) : { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan" },
+              location: profile.location 
+                ? (typeof profile.location === 'string' && profile.location.trim().startsWith('{')
+                    ? JSON.parse(profile.location) 
+                    : { lat: 0, lng: 0, address: profile.location }) 
+                : { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan" },
               badges: [], // TODO: Fetch badges from a relation if needed
               stats: {
                   bidsAcceptedByMe: 0,
@@ -71,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user);
       } else {
         setUser(null);
         setIsLoading(false);
@@ -87,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
          // Only fetch if we don't have the user or it's a different user
          if (!user || user.id !== session.user.id) {
             setIsLoading(true);
-            fetchProfile(session.user.id);
+            fetchProfile(session.user);
          }
       } else {
         setUser(null);

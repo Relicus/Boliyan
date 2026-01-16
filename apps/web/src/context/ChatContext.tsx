@@ -10,6 +10,7 @@ interface ChatContextType {
   conversations: Conversation[];
   messages: Message[];
   sendMessage: (conversationId: string, content: string) => Promise<void>;
+  markAsRead: (conversationId: string) => Promise<void>;
   startConversation: (bidId: string, itemId: string, bidderId: string, sellerId: string) => Promise<string | undefined>;
   loadMessages: (conversationId: string) => Promise<void>;
 }
@@ -109,25 +110,30 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     const channel = supabase
       .channel('public:messages')
       .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'messages' }, 
+        { event: '*', schema: 'public', table: 'messages' }, 
         (payload) => {
-           const newMsg = payload.new;
+           const newMsg = payload.new as any;
            const relevant = conversations.some(c => c.id === newMsg.conversation_id);
            if (!relevant) return;
 
            const transformed = transformMessage(newMsg);
-           setMessages(prev => { 
-                // Only append if we don't have it (dedup)
-                if (prev.some(m => m.id === transformed.id)) return prev;
-                return [...prev, transformed];
-           });
+           
+           if (payload.eventType === 'INSERT') {
+               setMessages(prev => { 
+                    // Only append if we don't have it (dedup)
+                    if (prev.some(m => m.id === transformed.id)) return prev;
+                    return [...prev, transformed];
+               });
 
-           // Update Conversation Last Message
-           setConversations(prev => prev.map(c => 
-             c.id === newMsg.conversation_id 
-               ? { ...c, lastMessage: newMsg.content, updatedAt: newMsg.created_at }
-               : c
-           ));
+               // Update Conversation Last Message
+               setConversations(prev => prev.map(c => 
+                 c.id === newMsg.conversation_id 
+                   ? { ...c, lastMessage: newMsg.content, updatedAt: newMsg.created_at }
+                   : c
+               ));
+           } else if (payload.eventType === 'UPDATE') {
+               setMessages(prev => prev.map(m => m.id === transformed.id ? transformed : m));
+           }
         }
       )
       .subscribe();
@@ -181,6 +187,30 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const markAsRead = async (conversationId: string) => {
+    if (!user) return;
+
+    // Local Optimistic Update
+    setMessages(prev => prev.map(m => 
+      m.conversationId === conversationId && m.senderId !== user.id && !m.isRead 
+        ? { ...m, isRead: true } 
+        : m
+    ));
+
+    // DB Update
+    const { error } = await (supabase.from('messages') as any)
+      .update({ is_read: true })
+      .eq('conversation_id', conversationId)
+      .neq('sender_id', user.id)
+      .is('is_read', false); // Optimization: only update unread ones
+
+    if (error) {
+      console.error("Failed to mark messages as read", error);
+      // Revert not strictly necessary as eventual consistency handles it, 
+      // but ideally we would refetch or revert if critical.
+    }
+  };
+
   const startConversation = async (bidId: string, itemId: string, bidderId: string, sellerId: string) => {
     // 1. Check local cache
     const existing = conversations.find(c => c.itemId === itemId && c.bidderId === bidderId);
@@ -205,7 +235,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ChatContext.Provider value={{ conversations, messages, sendMessage, startConversation, loadMessages }}>
+    <ChatContext.Provider value={{ conversations, messages, sendMessage, markAsRead, startConversation, loadMessages }}>
       {children}
     </ChatContext.Provider>
   );

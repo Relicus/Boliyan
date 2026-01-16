@@ -40,25 +40,29 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const [currentImg, setCurrentImg] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
 
+
   // Hook for encapsulated bidding logic
   const {
     bidAmount,
     setBidAmount,
     error,
     isSuccess,
-    animTrigger,
-    lastDelta,
-    showDelta,
+    warning, 
+    confirmBid, 
+    clearWarning, 
+    handleKeyDown,
     handleSmartAdjust,
     handleBid,
-    handleKeyDown,
-    handleInputChange,
+    handleInputChange, 
     getSmartStep,
-    warning,
-    confirmBid,
-    clearWarning
+    animTrigger,
+    lastDelta,
+    showDelta
   } = useBidding(item, seller, () => setIsDialogOpen(false));
 
+  // Check if user has bid on this item before
+  const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
+  
   const galleryRef = typeof window !== 'undefined' ? (null as any) : null; 
   // We'll use a local ref for scrolling logic below
 
@@ -174,8 +178,14 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   };
 
   const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
-  const showHalo = isHighBidder || isWatched;
-  const haloTheme = isHighBidder ? 'orange' : 'blue';
+  const showHalo = isHighBidder || hasPriorBid || isWatched;
+  
+  // Halo Theme Priority: Winning > Participating > Watching
+  const haloTheme = isHighBidder 
+    ? 'orange' 
+    : hasPriorBid 
+      ? 'green' 
+      : 'blue';
 
   // Calculate real-time status for input styling
   const currentNumericBid = parseFloat(bidAmount.replace(/,/g, '')) || 0;
@@ -211,7 +221,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg">
                 {/* Base Layer: Solid Vibrant Color */}
                 <div 
-                   className={`absolute inset-0 ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 'bg-[#0ea5e9]'}`}
+                   className={`absolute inset-0 
+                     ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
+                       haloTheme === 'green' ? 'bg-[#16a34a]' : 
+                       'bg-[#0ea5e9]'}`}
                 />
                 
                 {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
@@ -219,7 +232,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                    className={`absolute inset-[-150%] 
                      ${haloTheme === 'orange' 
                         ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
-                        : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
+                        : haloTheme === 'green'
+                          ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
+                          : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
                      }`}
                    animate={{ rotate: 360 }}
                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
@@ -487,7 +502,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
                         : isHighBidder 
                           ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          : hasPriorBid
+                            ? 'bg-green-600 hover:bg-green-700 text-white'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white'
                     }`}
                 >
                   {isSuccess ? (
@@ -501,6 +518,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     <span className="flex items-center gap-1.5">
                       <TrendingUp className="w-4 h-4" />
                       Raise Bid
+                    </span>
+                  ) : hasPriorBid ? (
+                    <span className="flex items-center gap-1.5">
+                      <Gavel className="w-4 h-4" />
+                      Bid Again
                     </span>
                   ) : (
                     <span className="flex items-center gap-1.5">
@@ -527,6 +549,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
           className={`relative rounded-lg overflow-hidden w-full h-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col cursor-auto
             ${showHalo ? 'p-[3.5px] bg-[#0ea5e9]' : 'p-0 bg-white'}
             ${showHalo && haloTheme === 'orange' ? 'bg-[#fbbf24]' : ''}
+            ${showHalo && haloTheme === 'green' ? 'bg-[#16a34a]' : ''}
           `}
         >
             {/* Victory Halo - State Based Animated Border Background */}
@@ -534,7 +557,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg">
                 {/* Base Layer: Solid Vibrant Color */}
                 <div 
-                   className={`absolute inset-0 ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 'bg-[#0ea5e9]'}`}
+                   className={`absolute inset-0 
+                     ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
+                       haloTheme === 'green' ? 'bg-[#16a34a]' : 
+                       'bg-[#0ea5e9]'}`}
                 />
                 
                 {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
@@ -542,7 +568,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                    className={`absolute inset-[-150%] 
                      ${haloTheme === 'orange' 
                         ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
-                        : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
+                        : haloTheme === 'green'
+                          ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
+                          : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
                      }`}
                    animate={{ rotate: 360 }}
                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}

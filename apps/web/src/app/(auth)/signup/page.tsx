@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Mail, Lock, MapPin, UserPlus, Phone } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const CITIES = [
   "Karachi",
@@ -63,18 +64,34 @@ export default function SignUpPage() {
 
     setIsLoading(true);
     
-    // TODO: Replace with Supabase Auth
-    // const { error } = await supabase.auth.signUp({ 
-    //   email, 
-    //   password,
-    //   options: { data: { name, city } }
-    // });
-    
-    // Simulate signup delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsLoading(false);
-    router.push("/");
+    try {
+      // Create user with metadata
+      const { error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: { 
+          data: { 
+            full_name: name, // Standard Supabase field
+            city: city,
+            phone: phone // Store phone in metadata too for easy access
+          } 
+        }
+      });
+
+      if (error) {
+         console.error("Signup error:", error.message);
+         // Ideally show error to user
+         setIsShaking(true);
+      } else {
+         // Success!
+         router.push("/");
+         router.refresh();
+      }
+    } catch (err) {
+      console.error("Unexpected signup error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

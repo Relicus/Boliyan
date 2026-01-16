@@ -22,7 +22,7 @@ function DashboardContent() {
   const { items, bids, user, deleteItem, getUser, watchedItemIds } = useApp();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const initialTab = searchParams.get("tab") || "my-bids";
+  const initialTab = searchParams.get("tab") || "active-bids";
   const [activeTab, setActiveTab] = useState(initialTab);
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
   const [viewingItem, setViewingItem] = useState<Item | null>(null);
@@ -130,21 +130,6 @@ function DashboardContent() {
         {/* Mobile: App-style icon tabs with text below */}
         <TabsList id="dashboard-tabs-list" className="md:hidden bg-transparent border-b rounded-none h-auto w-full grid grid-cols-4 p-0 gap-0">
           <TabsTrigger 
-            id="tab-trigger-my-bids-mobile"
-            value="my-bids" 
-            className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
-          >
-            <div className="relative">
-              <Gavel className="h-5 w-5" />
-              {itemsIMadeBidsOn.length > 0 && (
-                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-blue-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
-                  {itemsIMadeBidsOn.length}
-                </span>
-              )}
-            </div>
-            <span className="text-[10px]">Bids</span>
-          </TabsTrigger>
-          <TabsTrigger 
             id="tab-trigger-active-bids-mobile"
             value="active-bids" 
             className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
@@ -158,6 +143,21 @@ function DashboardContent() {
               )}
             </div>
             <span className="text-[10px]">Offers</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            id="tab-trigger-my-bids-mobile"
+            value="my-bids" 
+            className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
+          >
+            <div className="relative">
+              <Gavel className="h-5 w-5" />
+              {itemsIMadeBidsOn.length > 0 && (
+                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-blue-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                  {itemsIMadeBidsOn.length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px]">Bids</span>
           </TabsTrigger>
           <TabsTrigger 
             id="tab-trigger-my-listings-mobile"
@@ -194,17 +194,6 @@ function DashboardContent() {
         {/* Desktop: Original horizontal layout */}
         <TabsList id="dashboard-tabs-list-desktop" className="hidden md:flex bg-transparent border-b rounded-none h-auto w-full p-0">
           <TabsTrigger 
-            id="tab-trigger-my-bids"
-            value="my-bids" 
-            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
-          >
-            <Gavel className="h-4 w-4 mr-2" />
-            Bids
-            <Badge id="tab-badge-my-bids" className="ml-2 bg-blue-50 text-blue-600 hover:bg-blue-50 border-none transition-all duration-300">
-              {itemsIMadeBidsOn.length}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger 
             id="tab-trigger-active-bids"
             value="active-bids" 
             className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
@@ -213,6 +202,17 @@ function DashboardContent() {
             Offers
             <Badge id="tab-badge-active-bids" className="ml-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-50 border-none transition-all duration-300">
               {bids.filter(b => myItems.some(i => i.id === b.itemId)).length}
+            </Badge>
+          </TabsTrigger>
+          <TabsTrigger 
+            id="tab-trigger-my-bids"
+            value="my-bids" 
+            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
+          >
+            <Gavel className="h-4 w-4 mr-2" />
+            Bids
+            <Badge id="tab-badge-my-bids" className="ml-2 bg-blue-50 text-blue-600 hover:bg-blue-50 border-none transition-all duration-300">
+              {itemsIMadeBidsOn.length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger 

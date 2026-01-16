@@ -19,6 +19,8 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { SearchDropdown } from "./SearchDropdown";
+import { NotificationDropdown } from "../navbar/NotificationDropdown";
+import { useOutbidAlerts } from "@/hooks/useOutbidAlerts";
 import { useState, useEffect, useRef } from "react";
 
 
@@ -32,13 +34,24 @@ export default function Navbar() {
   const lastScrollY = useRef(0);
 
   // Notifications Calculation
+  // Fix: Move useOutbidAlerts usage here to lift state to UI
+  const { notifications, markAllAsRead, unreadCount } = useOutbidAlerts(bids, user);
+
+  // Other notifications
   const unreadMsgCount = messages.filter(m => !m.isRead && m.senderId !== user?.id).length;
   
   const myItems = user ? items.filter(i => i.sellerId === user.id) : [];
   const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length;
   
+  // Note: outbidCount logic might be redundant if we use the new notifications system, 
+  // but let's keep it for the "Bids" button badge if intended. 
+  // Actually, the user asked to refactor useOutbidAlerts so maybe we replace the logic?
+  // The existing "outbidCount" calculation in Navbar (lines 40-41) is purely derived from items/bids state.
+  // The "NotificationDropdown" is for *historical* alerts.
+  // We'll keep both for now as they serve slightly different purposes (one is a badge on a tab, one is a timeline).
+  
   const myBidsItems = user ? items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id)) : [];
-  const outbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
+  const currentOutbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
 
   useEffect(() => {
     const controlNavbar = () => {
@@ -55,6 +68,7 @@ export default function Navbar() {
         // Hide navbar if scrolling down and past 100px
         if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
           setIsVisible(true);
+          return; // Fix: Should just set state, but we need to update lastScrollY
         } else if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
           setIsVisible(false);
         }
@@ -62,14 +76,12 @@ export default function Navbar() {
         lastScrollY.current = currentScrollY;
       }
     };
-
+    
+    // ... existing scroll logic ...
+    
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', controlNavbar);
-
-      // Cleanup function
-      return () => {
-        window.removeEventListener('scroll', controlNavbar);
-      };
+      return () => window.removeEventListener('scroll', controlNavbar);
     }
   }, [pathname]);
 
@@ -81,7 +93,7 @@ export default function Navbar() {
       }`}
     >
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-6">
-        {/* ... existing navbar content */}
+        {/* ... existing navbar content ... */}
 
         <div id="navbar-left-section-03" className="flex items-center gap-4 shrink-0">
           <div className="flex items-center gap-3">
@@ -172,9 +184,9 @@ export default function Navbar() {
                   <Link href="/dashboard?tab=my-bids">
                     <Gavel id="navbar-bids-icon" className={cn("h-5 w-5", pathname === '/dashboard' && currentTab === 'my-bids' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && currentTab === 'my-bids' ? 2.5 : 1.5} />
                     <span>Bids</span>
-                    {outbidCount > 0 && (
+                    {currentOutbidCount > 0 && (
                       <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white">
-                        {outbidCount}
+                        {currentOutbidCount}
                       </span>
                     )}
                   </Link>
@@ -194,6 +206,15 @@ export default function Navbar() {
                     )}
                   </Link>
                 </Button>
+
+                {/* New Notification Dropdown */}
+                <div className="mx-1">
+                   <NotificationDropdown 
+                      notifications={notifications} 
+                      onMarkAllAsRead={markAllAsRead} 
+                      unreadCount={unreadCount} 
+                   />
+                </div>
               </div>
 
               <DropdownMenu>

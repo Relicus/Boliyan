@@ -5,7 +5,7 @@ import { useApp } from '@/lib/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, Clock, Lock, Phone } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
@@ -17,7 +17,7 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
-  const { user, messages, sendMessage, conversations, getUser, items } = useApp();
+  const { user, messages, sendMessage, markAsRead, conversations, getUser, items } = useApp();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
@@ -90,7 +90,13 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [currentMessages]);
+    
+    // Mark as read logic
+    const unreadMessages = currentMessages.filter(m => m.senderId !== user?.id && !m.isRead);
+    if (unreadMessages.length > 0) {
+        markAsRead(conversationId);
+    }
+  }, [currentMessages, conversationId, user?.id]);
 
   if (!conversation) return <div className="p-10 text-center">Conversation not found</div>;
   if (!user) return <div className="p-10 text-center">Please sign in to view chats.</div>;
@@ -240,8 +246,12 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                     {format(new Date(msg.createdAt), 'h:mm a')}
                   </span>
                   {isMe && (
-                    <div className="h-2 w-2 rounded-full bg-blue-100 flex items-center justify-center">
-                      <div className="h-1 w-1 rounded-full bg-blue-400" />
+                    <div className="flex items-center justify-center">
+                      {msg.isRead ? (
+                        <CheckCheck className="h-3 w-3 text-blue-500" />
+                      ) : (
+                         <Check className="h-3 w-3 text-slate-300" />
+                      )}
                     </div>
                   )}
                 </div>
