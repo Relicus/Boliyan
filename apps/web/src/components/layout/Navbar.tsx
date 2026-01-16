@@ -4,6 +4,7 @@ import { Search, User, Bell, Plus, LogOut, Activity, Heart, UserCircle, MessageS
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useApp } from "@/lib/store";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { SearchDropdown } from "./SearchDropdown";
@@ -26,6 +27,8 @@ export default function Navbar() {
   const { filters, setFilter, user, isLoggedIn, logout, items, bids, messages } = useApp();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get('tab');
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -134,17 +137,23 @@ export default function Navbar() {
             <>
               {/* Desktop Actions */}
               <div className="hidden md:flex items-center gap-1 mr-2">
-                <Button id="navbar-market-btn" asChild variant="ghost" className="flex items-center gap-2 text-slate-600 hover:bg-slate-100/80 rounded-full px-4 relative">
+                <Button id="navbar-market-btn" asChild variant="ghost" className={cn(
+                  "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
+                  pathname === '/' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
+                )}>
                   <Link href="/">
-                    <LayoutGrid id="navbar-market-icon" className="h-5 w-5" strokeWidth={1.5} />
-                    <span className="font-medium">Market</span>
+                    <LayoutGrid id="navbar-market-icon" className={cn("h-5 w-5", pathname === '/' && "stroke-[2.5]")} strokeWidth={pathname === '/' ? 2.5 : 1.5} />
+                    <span>Market</span>
                   </Link>
                 </Button>
 
-                <Button id="navbar-offers-btn" asChild variant="ghost" className="flex items-center gap-2 text-slate-600 hover:bg-slate-100/80 rounded-full px-4 relative">
+                <Button id="navbar-offers-btn" asChild variant="ghost" className={cn(
+                  "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
+                  pathname === '/dashboard' && currentTab === 'active-bids' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
+                )}>
                   <Link href="/dashboard?tab=active-bids">
-                    <Tag id="navbar-offers-icon" className="h-5 w-5" strokeWidth={1.5} />
-                    <span className="font-medium">Offers</span>
+                    <Tag id="navbar-offers-icon" className={cn("h-5 w-5", pathname === '/dashboard' && currentTab === 'active-bids' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && currentTab === 'active-bids' ? 2.5 : 1.5} />
+                    <span>Offers</span>
                     {receivedBidsCount > 0 && (
                       <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white">
                         {receivedBidsCount}
@@ -153,10 +162,13 @@ export default function Navbar() {
                   </Link>
                 </Button>
 
-                <Button id="navbar-bids-btn" asChild variant="ghost" className="flex items-center gap-2 text-slate-600 hover:bg-slate-100/80 rounded-full px-4 relative">
+                <Button id="navbar-bids-btn" asChild variant="ghost" className={cn(
+                  "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
+                  pathname === '/dashboard' && currentTab === 'my-bids' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
+                )}>
                   <Link href="/dashboard?tab=my-bids">
-                    <Gavel id="navbar-bids-icon" className="h-5 w-5" strokeWidth={1.5} />
-                    <span className="font-medium">Bids</span>
+                    <Gavel id="navbar-bids-icon" className={cn("h-5 w-5", pathname === '/dashboard' && currentTab === 'my-bids' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && currentTab === 'my-bids' ? 2.5 : 1.5} />
+                    <span>Bids</span>
                     {outbidCount > 0 && (
                       <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white">
                         {outbidCount}
@@ -165,10 +177,13 @@ export default function Navbar() {
                   </Link>
                 </Button>
 
-                <Button id="navbar-chat-btn" asChild variant="ghost" className="flex items-center gap-2 text-slate-600 hover:bg-slate-100/80 rounded-full px-4 relative">
+                <Button id="navbar-chat-btn" asChild variant="ghost" className={cn(
+                  "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
+                  pathname.startsWith('/inbox') ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
+                )}>
                   <Link href="/inbox">
-                    <MessageSquare id="navbar-chat-icon" className="h-5 w-5" strokeWidth={1.5} />
-                    <span className="font-medium">Chat</span>
+                    <MessageSquare id="navbar-chat-icon" className={cn("h-5 w-5", pathname.startsWith('/inbox') && "stroke-[2.5]")} strokeWidth={pathname.startsWith('/inbox') ? 2.5 : 1.5} />
+                    <span>Chat</span>
                     {unreadMsgCount > 0 && (
                       <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
                         {unreadMsgCount}

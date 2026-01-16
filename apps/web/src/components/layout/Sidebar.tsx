@@ -1,9 +1,11 @@
 "use client";
 
-import { MapPin, Tag, CircleDollarSign, Compass, RefreshCcw, Search, Sparkles, Globe, Lock } from "lucide-react";
+import { MapPin, Tag, CircleDollarSign, Compass, RefreshCcw, Search, Sparkles, Globe, Lock, Layers } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useApp } from "@/lib/store";
+import { motion } from "framer-motion";
+import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { cn } from "@/lib/utils";
 
 import { usePathname } from "next/navigation";
@@ -20,47 +22,62 @@ export default function Sidebar() {
   return (
     <aside id="sidebar-01" className="w-72 border-r border-slate-200/60 bg-white hidden lg:flex flex-col h-fit min-h-[calc(100vh-64px)] overflow-hidden shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.02)]">
       <div className="p-4 pb-0">
-        <div className="flex gap-2 mb-2">
-          {/* Public Button */}
+        <div className="flex bg-slate-100/80 p-1.5 rounded-2xl isolate">
+          {/* All Toggle */}
           <button
-            id="sidebar-listing-type-public-btn"
-            onClick={() => {
-              const newValue = filters.listingType === 'public' ? 'all' : 'public';
-              setFilter('listingType', newValue);
-            }}
+            onClick={() => setFilter('listingType', 'all')}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border transition-all duration-200 group relative overflow-hidden",
-              filters.listingType === 'public'
-                ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-200"
-                : "bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:bg-blue-50/50"
+              "flex-1 relative flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-colors duration-200 z-10",
+              filters.listingType === 'all' ? "text-slate-900" : "text-slate-500 hover:text-slate-700"
             )}
           >
-            <Globe className={cn(
-              "h-4 w-4 transition-transform duration-300",
-              filters.listingType === 'public' ? "scale-110" : "group-hover:scale-110"
-            )} />
-            <span className="text-sm font-bold tracking-wide">Public</span>
+            {filters.listingType === 'all' && (
+              <motion.div
+                layoutId="listing-type-pill"
+                className="absolute inset-0 bg-white shadow-sm shadow-slate-200/50 ring-1 ring-black/5 rounded-xl -z-10"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+            <Layers className="h-4 w-4 relative z-20" />
+            <span className="relative z-20">All</span>
           </button>
 
-          {/* Sealed Button */}
+          {/* Public Toggle */}
           <button
-            id="sidebar-listing-type-sealed-btn"
-            onClick={() => {
-              const newValue = filters.listingType === 'sealed' ? 'all' : 'sealed';
-              setFilter('listingType', newValue);
-            }}
+            onClick={() => setFilter('listingType', 'public')}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border transition-all duration-200 group relative overflow-hidden",
-              filters.listingType === 'sealed'
-                ? "bg-amber-500 border-amber-500 text-white shadow-md shadow-amber-200"
-                : "bg-white border-slate-200 text-slate-600 hover:border-amber-300 hover:bg-amber-50/50"
+              "flex-1 relative flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-colors duration-200 z-10",
+              filters.listingType === 'public' ? "text-blue-600" : "text-slate-500 hover:text-blue-600"
             )}
           >
-            <Lock className={cn(
-              "h-4 w-4 transition-transform duration-300",
-              filters.listingType === 'sealed' ? "scale-110" : "group-hover:scale-110"
-            )} />
-            <span className="text-sm font-bold tracking-wide">Secret</span>
+            {filters.listingType === 'public' && (
+              <motion.div
+                layoutId="listing-type-pill"
+                className="absolute inset-0 bg-white shadow-sm shadow-blue-100 ring-1 ring-blue-100 rounded-xl -z-10"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+            <Globe className="h-4 w-4 relative z-20" />
+            <span className="relative z-20">Public</span>
+          </button>
+
+          {/* Secret Toggle */}
+          <button
+            onClick={() => setFilter('listingType', 'sealed')}
+            className={cn(
+              "flex-1 relative flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-colors duration-200 z-10",
+              filters.listingType === 'sealed' ? "text-amber-600" : "text-slate-500 hover:text-amber-600"
+            )}
+          >
+            {filters.listingType === 'sealed' && (
+              <motion.div
+                layoutId="listing-type-pill"
+                className="absolute inset-0 bg-white shadow-sm shadow-amber-100 ring-1 ring-amber-100 rounded-xl -z-10"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+            <Lock className="h-4 w-4 relative z-20" />
+            <span className="relative z-20">Secret</span>
           </button>
         </div>
       </div>
@@ -68,34 +85,9 @@ export default function Sidebar() {
       <ScrollArea id="sidebar-scroll-area-02" className="flex-1 px-4 min-h-0">
         <div className="space-y-7 py-2 pb-8">
           
-          {/* Location Radius */}
-          <div className="bg-white/40 rounded-2xl p-4 border border-slate-200/50 shadow-sm">
-            <h3 className="mb-4 text-sm font-semibold text-slate-900 font-outfit flex items-center gap-2.5">
-              <div className="p-1 rounded-md bg-emerald-100/50 text-emerald-600">
-                <MapPin className="h-3.5 w-3.5" />
-              </div>
-              Search Distance
-            </h3>
-            <div className="space-y-5">
-              <div className="relative pt-2 pb-1">
-                <input 
-                  id="sidebar-radius-slider"
-                  type="range" 
-                  min="1" 
-                  max="100" 
-                  value={filters.radius}
-                  onChange={(e) => setFilter('radius', parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-emerald-500 hover:accent-emerald-400 transition-all" 
-                />
-                <div className="flex justify-between mt-2.5 text-[11px] font-medium text-slate-400">
-                  <span>1 km</span>
-                  <span className="text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100/50">
-                    {filters.radius} km
-                  </span>
-                  <span>100 km</span>
-                </div>
-              </div>
-            </div>
+          {/* Location (Standalone Dropdown) */}
+          <div className="px-1">
+            <LocationSelector variant="sidebar-compact" />
           </div>
 
           {/* Price Range */}

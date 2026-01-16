@@ -209,8 +209,8 @@ export default function MarketplaceGrid() {
 
   return (
     <div id="marketplace-grid-root" className="px-4 pb-4 pt-2 md:px-4 md:pb-4 md:pt-2">
-      <div className="mb-4 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-0">
-        <div className="flex flex-col gap-2 pt-2 pb-2">
+      <div className="mb-4 md:mb-0 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-0 md:bg-transparent md:border-0 md:shadow-none">
+        <div className="flex flex-col gap-2 pt-2 pb-2 md:py-0">
           {/* MOBILE: New Enhanced "Search & Filter" Mobile Header */}
           <div id="mobile-search-filter-container" className="md:hidden flex flex-col gap-2 px-4 mb-2">
             
@@ -345,7 +345,7 @@ export default function MarketplaceGrid() {
           </div>
 
           {/* DESKTOP: Full Filter Buttons Row */}
-          <div id="smart-filters-row" className="hidden md:flex items-center gap-4 px-4">
+          <div id="smart-filters-row" className="hidden md:flex items-center gap-4 md:px-0">
             <div className="flex-1 overflow-x-auto scrollbar-hide flex items-center gap-4">
               <SmartFilterBar />
               
@@ -435,7 +435,7 @@ export default function MarketplaceGrid() {
       </div>
 
         {/* Category Bar Row */}
-        <div id="category-bar-row" className="hidden md:block px-4 pb-2">
+        <div id="category-bar-row" className="hidden md:block pb-2 md:px-0">
            <CategoryBar />
         </div>
       

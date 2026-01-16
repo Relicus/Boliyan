@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useApp } from "@/lib/store";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Slider } from "@/components/ui/slider";
@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 interface LocationSelectorProps {
   className?: string;
   align?: "start" | "center" | "end";
-  variant?: "default" | "mobile-grid" | "sidebar"; 
+  variant?: "default" | "mobile-grid" | "sidebar" | "sidebar-compact"; 
 }
 
 export function LocationSelector({ className, align = "end", variant = "default" }: LocationSelectorProps) {
@@ -23,6 +23,21 @@ export function LocationSelector({ className, align = "end", variant = "default"
     return (
       <div className={cn("w-full bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm", className)}>
         <LocationSelectorContent onSelect={() => {}} />
+      </div>
+    );
+  }
+
+  if (variant === "sidebar-compact") {
+    return (
+      <div id="location-selector-sidebar-compact" className={cn("w-full", className)}>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <LocationSelectorTrigger variant={variant} isOpen={isOpen} />
+          </PopoverTrigger>
+          <PopoverContent className="w-[280px] p-0 shadow-lg border-slate-200 rounded-xl overflow-hidden" align="start" sideOffset={8}>
+            <LocationSelectorContent onSelect={() => setIsOpen(false)} />
+          </PopoverContent>
+        </Popover>
       </div>
     );
   }
@@ -41,7 +56,8 @@ export function LocationSelector({ className, align = "end", variant = "default"
   );
 }
 
-function LocationSelectorTrigger({ variant, isOpen }: { variant: string, isOpen: boolean }) {
+const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, ButtonProps & { variant: string, isOpen: boolean }>(
+  ({ variant, isOpen, className, ...props }, ref) => {
   const { filters } = useApp();
   
   const getDisplayLabel = () => {
@@ -52,12 +68,15 @@ function LocationSelectorTrigger({ variant, isOpen }: { variant: string, isOpen:
   if (variant === "mobile-grid") {
     return (
       <Button
+        ref={ref}
         id="location-popover-trigger-mobile"
         variant="outline"
         className={cn(
           "h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md",
-          filters.locationMode !== "country" && "bg-blue-50 border-blue-200 ring-1 ring-blue-100"
+          filters.locationMode !== "country" && "bg-blue-50 border-blue-200 ring-1 ring-blue-100",
+          className
         )}
+        {...props}
       >
         <div className="relative">
           {filters.locationMode === "country" ? (
@@ -78,33 +97,43 @@ function LocationSelectorTrigger({ variant, isOpen }: { variant: string, isOpen:
     );
   }
 
+  if (variant === "sidebar-compact") {
+    return (
+      <Button
+        ref={ref}
+        id="location-sidebar-trigger"
+        variant="outline"
+        className={cn(
+          "w-full justify-between px-3 py-5 bg-white border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 text-slate-700 font-medium shadow-sm transition-all group",
+          isOpen && "border-blue-500 ring-2 ring-blue-500/10",
+          className
+        )}
+        {...props}
+      >
+        <span className="flex items-center gap-2 truncate">
+           <MapPin className={cn("h-4 w-4 text-slate-400 group-hover:text-blue-500 transition-colors", filters.locationMode === 'current' && 'text-blue-500')} />
+           <span className="truncate">{getDisplayLabel()}</span>
+        </span>
+        <div className="flex items-center gap-1 text-xs text-slate-400 font-normal">
+          {filters.radius >= 500 ? "All" : `${filters.radius}km`}
+        </div>
+      </Button>
+    );
+  }
+
   return (
     <Button
+      ref={ref}
       id="location-popover-trigger"
-      variant="outline"
-      role="combobox"
-      aria-expanded={isOpen}
-      className="h-11 px-4 bg-slate-50 border-slate-200 shadow-sm min-w-[160px] max-w-[220px] justify-between hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl group"
+      variant="ghost"
+      className={cn("h-8 w-8 p-0 rounded-full", className)}
+      {...props}
     >
-      <div className="flex items-center gap-2.5 truncate">
-        {filters.locationMode === "country" ? (
-          <Globe className="h-4 w-4 text-slate-400 shrink-0 group-hover:text-blue-500 transition-colors" />
-        ) : filters.locationMode === "current" ? (
-          <Navigation className="h-4 w-4 text-blue-500 fill-blue-500/10 shrink-0" />
-        ) : (
-          <MapPin className="h-4 w-4 text-blue-500 fill-blue-500/10 shrink-0" />
-        )}
-        <div className="flex flex-col items-start overflow-hidden">
-          <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 group-hover:text-slate-500 transition-colors">Area</span>
-          <span className="truncate text-sm font-semibold text-slate-700">
-            {getDisplayLabel()}
-          </span>
-        </div>
-      </div>
-      <Search className="ml-2 h-3.5 w-3.5 shrink-0 opacity-40 group-hover:opacity-70 transition-opacity" />
+      <MapPin className="h-4 w-4 text-slate-700" />
     </Button>
   );
-}
+});
+LocationSelectorTrigger.displayName = "LocationSelectorTrigger";
 
 function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
   const { filters, setFilter, updateFilters } = useApp();
