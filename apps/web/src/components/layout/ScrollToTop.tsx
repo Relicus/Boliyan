@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 export default function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const pathname = usePathname();
 
   // Show button when page is scrolled up to given distance
   const toggleVisibility = () => {
@@ -28,6 +30,11 @@ export default function ScrollToTop() {
     window.addEventListener("scroll", toggleVisibility);
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
+
+  // Only show on marketplace/home page
+  if (pathname !== "/") {
+    return null;
+  }
 
   return (
     <AnimatePresence>

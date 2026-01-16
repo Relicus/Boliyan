@@ -19,6 +19,7 @@ interface ChatWindowProps {
 
 export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const { user, messages, sendMessage, conversations, getUser, items } = useApp();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState("");
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isLocked, setIsLocked] = useState(false);
@@ -83,14 +84,19 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     if (!inputValue.trim() || isLocked) return;
     sendMessage(conversationId, inputValue);
     setInputValue("");
+    
+    // Maintain focus on mobile so keyboard stays open
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
   };
 
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b shrink-0 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+      {/* Header - Fixed height, no sticky needed because parent is flex h-full */}
+      <div id="chat-header" className="flex items-center gap-3 p-4 border-b shrink-0 bg-white">
         {onBack && (
-          <Button variant="ghost" size="icon" onClick={onBack} className="md:hidden -ml-2">
+          <Button id="chat-back-btn" variant="ghost" size="icon" onClick={onBack} className="md:hidden -ml-2">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         )}
@@ -149,8 +155,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
       </div>
 
       {/* Messages Area */}
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4 min-h-[calc(100vh-250px)]">
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-4">
           <div className={cn(
             "text-center text-xs font-bold my-4 p-3 rounded-xl border flex items-center justify-center gap-2",
             isLocked 
@@ -204,13 +210,29 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
             </div>
           )}
           <Input 
+            ref={inputRef}
+            id="chat-input-field"
             placeholder={isLocked ? "Chat locked..." : "Type a message..."} 
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend(e);
+              }
+            }}
+            enterKeyHint="send"
             disabled={isLocked}
             className="flex-1 h-11 bg-slate-50 border-slate-200 focus:bg-white transition-all rounded-xl"
+            autoFocus
           />
-          <Button type="submit" size="icon" disabled={!inputValue.trim() || isLocked} className="h-11 w-11 rounded-xl shadow-md">
+          <Button 
+            id="chat-send-btn"
+            type="submit" 
+            size="icon" 
+            disabled={!inputValue.trim() || isLocked} 
+            className="h-11 w-11 rounded-xl shadow-md"
+          >
             <Send className="h-5 w-5" />
             <span className="sr-only">Send</span>
           </Button>

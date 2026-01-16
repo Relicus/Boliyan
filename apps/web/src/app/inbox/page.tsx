@@ -34,20 +34,42 @@ function InboxContent() {
     }
   }, [searchParams, buyingConversations.length, sellingConversations.length]);
 
+  // Lock Viewport Scroll
+  useEffect(() => {
+    // Save original styles
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyHeight = document.body.style.height;
+
+    // Lock it down
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100dvh';
+
+    return () => {
+      // Restore
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.overflow = originalBodyOverflow;
+      document.body.style.height = originalBodyHeight;
+    };
+  }, []);
+
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-muted/20">
+    <div id="inbox-container" className="fixed top-16 left-0 right-0 bottom-16 md:bottom-0 overflow-hidden bg-muted/20 flex">
       {/* Sidebar / List - Hidden on mobile if chat is open */}
       <div 
+        id="inbox-sidebar"
         className={cn(
-          "w-full md:w-[350px] lg:w-[400px] border-r bg-background flex flex-col",
+          "w-full md:w-[350px] lg:w-[400px] border-r bg-background flex flex-col shrink-0 overflow-hidden",
           selectedId ? "hidden md:flex" : "flex"
         )}
       >
-        <div className="p-4 border-b">
+        <div className="p-4 border-b shrink-0">
           <h1 className="font-black text-xl mb-4 text-slate-900">Messages</h1>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 h-10 p-1 bg-slate-100 rounded-xl">
+            <TabsList id="inbox-tabs-list" className="grid w-full grid-cols-2 h-10 p-1 bg-slate-100 rounded-xl">
               <TabsTrigger 
+                id="inbox-buying-tab"
                 value="buying" 
                 className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all"
               >
@@ -60,6 +82,7 @@ function InboxContent() {
                 )}
               </TabsTrigger>
               <TabsTrigger 
+                id="inbox-selling-tab"
                 value="selling" 
                 className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm transition-all"
               >
@@ -72,36 +95,35 @@ function InboxContent() {
                 )}
               </TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="buying" className="mt-2 focus-visible:outline-none">
-              <div className="flex-1 overflow-y-auto">
-                <ConversationList 
-                  conversations={buyingConversations}
-                  selectedId={selectedId} 
-                  onSelect={setSelectedId} 
-                  role="buyer"
-                />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="selling" className="mt-2 focus-visible:outline-none">
-              <div className="flex-1 overflow-y-auto">
-                <ConversationList 
-                  conversations={sellingConversations}
-                  selectedId={selectedId} 
-                  onSelect={setSelectedId} 
-                  role="seller"
-                />
-              </div>
-            </TabsContent>
           </Tabs>
         </div>
+
+        <Tabs value={activeTab} className="flex-1 overflow-hidden">
+          <TabsContent value="buying" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
+            <ConversationList 
+              conversations={buyingConversations}
+              selectedId={selectedId} 
+              onSelect={setSelectedId} 
+              role="buyer"
+            />
+          </TabsContent>
+          
+          <TabsContent value="selling" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
+            <ConversationList 
+              conversations={sellingConversations}
+              selectedId={selectedId} 
+              onSelect={setSelectedId} 
+              role="seller"
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Chat Window - Full width on mobile when selected */}
       <div 
+        id="chat-window-container"
         className={cn(
-          "flex-1 flex flex-col bg-background md:block",
+          "flex-1 flex flex-col bg-background md:block min-w-0",
           !selectedId ? "hidden md:flex" : "flex"
         )}
       >

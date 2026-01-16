@@ -4,12 +4,11 @@ import { useApp } from "@/lib/store";
 import { mockUsers } from "@/lib/mock-data";
 import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
+import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, ShoppingBag, TrendingUp, Package, Trophy, Heart, Settings, UserCircle } from "lucide-react";
+import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, ShoppingBag, TrendingUp, Package, Trophy, Heart, Settings, UserCircle, Gavel, Tag } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
-import { AchievementSection } from "@/components/dashboard/AchievementSection";
-import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -21,7 +20,7 @@ import { getBidderLocationMock } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
-  const { items, bids, user, deleteItem, getUser } = useApp();
+  const { items, bids, user, deleteItem, getUser, watchedItemIds } = useApp();
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialTab = searchParams.get("tab") || "my-bids";
@@ -66,6 +65,9 @@ export default function Dashboard() {
   // BUYER DATA: Bids placed by current user
   const bidsIMade = bids.filter(b => b.bidderId === user.id);
   const itemsIMadeBidsOn = items.filter(item => bidsIMade.some(b => b.itemId === item.id));
+  
+  // WATCHLIST DATA
+  const watchedItems = items.filter(item => watchedItemIds.includes(item.id));
 
   const getUserBidForItem = (itemId: string) => {
     return bidsIMade
@@ -106,10 +108,10 @@ export default function Dashboard() {
     <div id="dashboard-root" className="p-4 md:p-8 max-w-5xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 id="dashboard-title" className="text-4xl font-black text-slate-900 tracking-tight">Dashboard</h1>
-          <p id="dashboard-subtitle" className="text-slate-500 font-medium">Manage your marketplace activity.</p>
+          <h1 id="dashboard-title" className="text-fluid-h1 font-black text-slate-900 tracking-tight">Dashboard</h1>
+          <p id="dashboard-subtitle" className="text-fluid-body text-slate-500 font-medium">Manage your marketplace activity.</p>
         </div>
-        <div className="flex gap-3 w-full md:w-auto">
+        <div className="hidden md:flex gap-3 w-full md:w-auto">
           <Button id="dashboard-messages-btn" variant="outline" asChild className="flex-1 md:flex-none h-11 px-6 font-bold border-slate-200 hover:bg-slate-50 transition-all">
             <Link href="/inbox" className="flex items-center">
               <MessageSquare className="h-5 w-5 mr-2 text-slate-400" />
@@ -127,29 +129,21 @@ export default function Dashboard() {
 
       <Tabs id="dashboard-tabs" value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         {/* Mobile: App-style icon tabs with text below */}
-        <TabsList id="dashboard-tabs-list" className="md:hidden bg-transparent border-b rounded-none h-auto w-full grid grid-cols-6 p-0 gap-0">
-          <TabsTrigger 
-            id="tab-trigger-profile-mobile"
-            value="profile" 
-            className="flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
-          >
-            <UserCircle className="h-5 w-5" />
-            <span className="text-[10px]">Profile</span>
-          </TabsTrigger>
+        <TabsList id="dashboard-tabs-list" className="md:hidden bg-transparent border-b rounded-none h-auto w-full grid grid-cols-4 p-0 gap-0">
           <TabsTrigger 
             id="tab-trigger-my-bids-mobile"
             value="my-bids" 
             className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
           >
             <div className="relative">
-              <ShoppingBag className="h-5 w-5" />
+              <Gavel className="h-5 w-5" />
               {itemsIMadeBidsOn.length > 0 && (
                 <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-blue-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                   {itemsIMadeBidsOn.length}
                 </span>
               )}
             </div>
-            <span className="text-[10px]">Buying</span>
+            <span className="text-[10px]">Bids</span>
           </TabsTrigger>
           <TabsTrigger 
             id="tab-trigger-active-bids-mobile"
@@ -157,14 +151,14 @@ export default function Dashboard() {
             className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
           >
             <div className="relative">
-              <TrendingUp className="h-5 w-5" />
+              <Tag className="h-5 w-5" />
               {bids.filter(b => myItems.some(i => i.id === b.itemId)).length > 0 && (
                 <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-indigo-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                   {bids.filter(b => myItems.some(i => i.id === b.itemId)).length}
                 </span>
               )}
             </div>
-            <span className="text-[10px]">Selling</span>
+            <span className="text-[10px]">Offers</span>
           </TabsTrigger>
           <TabsTrigger 
             id="tab-trigger-my-listings-mobile"
@@ -186,43 +180,27 @@ export default function Dashboard() {
             value="watchlist" 
             className="flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
           >
-            <Heart className="h-5 w-5" />
-            <span className="text-[10px]">Watchlist</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            id="tab-trigger-achievements-mobile"
-            value="achievements" 
-            className="relative flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
-          >
             <div className="relative">
-              <Trophy className="h-5 w-5" />
-              {(user.badges?.length || 0) > 0 && (
-                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-amber-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
-                  {user.badges?.length || 0}
+              <Heart className="h-5 w-5" />
+              {watchedItems.length > 0 && (
+                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-pink-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                  {watchedItems.length}
                 </span>
               )}
             </div>
-            <span className="text-[10px]">Awards</span>
+            <span className="text-[10px]">Watchlist</span>
           </TabsTrigger>
         </TabsList>
 
         {/* Desktop: Original horizontal layout */}
-        <TabsList id="dashboard-tabs-list-desktop" className="hidden md:flex bg-transparent border-b rounded-none h-auto w-full justify-start p-0 gap-6 overflow-x-auto flex-nowrap scrollbar-hide">
-          <TabsTrigger 
-            id="tab-trigger-profile"
-            value="profile" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
-          >
-            <UserCircle className="h-4 w-4 mr-2" />
-            Profile
-          </TabsTrigger>
+        <TabsList id="dashboard-tabs-list-desktop" className="hidden md:flex bg-transparent border-b rounded-none h-auto w-full p-0">
           <TabsTrigger 
             id="tab-trigger-my-bids"
             value="my-bids" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
+            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
           >
-            <ShoppingBag className="h-4 w-4 mr-2" />
-            Buying
+            <Gavel className="h-4 w-4 mr-2" />
+            Bids
             <Badge id="tab-badge-my-bids" className="ml-2 bg-blue-50 text-blue-600 hover:bg-blue-50 border-none transition-all duration-300">
               {itemsIMadeBidsOn.length}
             </Badge>
@@ -230,10 +208,10 @@ export default function Dashboard() {
           <TabsTrigger 
             id="tab-trigger-active-bids"
             value="active-bids" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
+            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
           >
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Selling
+            <Tag className="h-4 w-4 mr-2" />
+            Offers
             <Badge id="tab-badge-active-bids" className="ml-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-50 border-none transition-all duration-300">
               {bids.filter(b => myItems.some(i => i.id === b.itemId)).length}
             </Badge>
@@ -241,7 +219,7 @@ export default function Dashboard() {
           <TabsTrigger 
             id="tab-trigger-my-listings"
             value="my-listings" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
+            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
           >
             <Package className="h-4 w-4 mr-2" />
             My Listings
@@ -252,20 +230,12 @@ export default function Dashboard() {
           <TabsTrigger 
             id="tab-trigger-watchlist"
             value="watchlist" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
+            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
           >
             <Heart className="h-4 w-4 mr-2" />
             Watchlist
-          </TabsTrigger>
-          <TabsTrigger 
-            id="tab-trigger-achievements"
-            value="achievements" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
-          >
-            <Trophy className="h-4 w-4 mr-2" />
-            Achievements
-            <Badge id="tab-badge-achievements" className="ml-2 bg-amber-50 text-amber-600 hover:bg-amber-50 border-none transition-all duration-300">
-              {user.badges?.length || 0}
+            <Badge id="tab-badge-watchlist" className="ml-2 bg-pink-50 text-pink-600 hover:bg-pink-50 border-none transition-all duration-300">
+              {watchedItems.length}
             </Badge>
           </TabsTrigger>
         </TabsList>
@@ -279,19 +249,11 @@ export default function Dashboard() {
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="w-full"
           >
-            {activeTab === "profile" && (
-              <div className="space-y-4 m-0">
-                <ProfileSettings />
-              </div>
-            )}
-            {activeTab === "achievements" && (
-              <div className="space-y-4 m-0">
-                <AchievementSection user={user} />
-              </div>
-            )}
+
             {activeTab === "watchlist" && (
               <div className="space-y-4 m-0">
-                 <div className="p-16 text-center border-2 border-dashed rounded-2xl bg-slate-50/50">
+                {watchedItems.length === 0 ? (
+                  <div className="p-16 text-center border-2 border-dashed rounded-2xl bg-slate-50/50">
                     <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Heart className="h-8 w-8 text-slate-400" />
                     </div>
@@ -300,7 +262,18 @@ export default function Dashboard() {
                     <Button asChild variant="outline" className="mt-6">
                       <Link href="/">Browse Items</Link>
                     </Button>
-                 </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {watchedItems.map(item => (
+                      <WatchedItemCard 
+                        key={item.id} 
+                        item={item} 
+                        seller={getUser(item.sellerId) || mockUsers[1]} 
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             {activeTab === "my-bids" && (
@@ -345,22 +318,22 @@ export default function Dashboard() {
 
                 {itemsWithBids.map(item => (
                   <div key={item.id} className="border border-slate-200 rounded-xl overflow-hidden mb-6 bg-white shadow-sm transition-shadow hover:shadow-md">
-                    <div className="flex items-center justify-between p-4 bg-slate-50 border-b border-slate-200 w-full">
-                      <div className="flex items-center gap-3">
-                        <img src={item.images[0]} alt="" className="h-10 w-10 rounded-md object-cover border border-slate-200" />
-                        <div>
-                          <h3 className="font-bold text-slate-900">{item.title}</h3>
-                          <p className="text-xs text-muted-foreground">Asking: Rs. {item.askPrice.toLocaleString()}</p>
+                    <div className="flex items-start justify-between p-3 bg-slate-50 border-b border-slate-200 w-full gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img src={item.images[0]} alt="" className="h-10 w-10 rounded-md object-cover border border-slate-200 shrink-0" />
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-slate-900 text-sm truncate">{item.title}</h3>
+                          <p className="text-[10px] text-muted-foreground truncate">Asking: Rs. {item.askPrice.toLocaleString()}</p>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-1.5">
-                        <Badge variant="secondary" className="bg-white text-slate-600 border border-slate-200 shadow-sm font-bold">
-                          {item.bidCount} Bids Total
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <Badge variant="secondary" className="bg-white text-slate-600 border border-slate-200 shadow-sm font-bold text-[10px] h-5 px-1.5">
+                          {item.bidCount} Bids
                         </Badge>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.listingDuration}h</span>
-                          <div className={`text-xs font-black flex items-center gap-1 ${getTimeLeft(item.expiryAt).color}`}>
-                            <Clock className={`h-3 w-3 ${getTimeLeft(item.expiryAt).isUrgent ? 'animate-pulse' : ''}`} />
+                        <div className="flex items-center gap-1.5 justify-end w-full">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{item.listingDuration}h</span>
+                          <div className={`text-[10px] font-black flex items-center gap-0.5 ${getTimeLeft(item.expiryAt).color}`}>
+                            <Clock className={`h-2.5 w-2.5 ${getTimeLeft(item.expiryAt).isUrgent ? 'animate-pulse' : ''}`} />
                             {getTimeLeft(item.expiryAt).text}
                           </div>
                         </div>
@@ -406,9 +379,9 @@ export default function Dashboard() {
               <div className="m-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {myItems.map(item => (
-                    <div key={item.id} id={`listing-card-${item.id}`} className="p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-md">
+                    <div key={item.id} id={`listing-card-${item.id}`} className="p-3 bg-white border rounded-xl flex gap-3 transition-all hover:shadow-md">
                       <div className="relative shrink-0">
-                        <img id={`listing-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
+                        <img id={`listing-img-${item.id}`} src={item.images[0]} alt="" className="h-16 w-16 md:h-20 md:w-20 rounded-lg object-cover bg-slate-100" />
                         {item.images.length > 1 && (
                           <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-blue-600 text-[10px] font-bold border-2 border-white">
                             {item.images.length}
@@ -417,8 +390,8 @@ export default function Dashboard() {
                       </div>
                       <div id={`listing-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
                         <div>
-                          <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-1">{item.title}</h3>
-                          <p id={`listing-price-${item.id}`} className="text-sm text-blue-600 font-bold mb-2">Rs. {item.askPrice.toLocaleString()}</p>
+                          <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-0.5 text-sm md:text-base">{item.title}</h3>
+                          <p id={`listing-price-${item.id}`} className="text-xs md:text-sm text-blue-600 font-bold mb-1.5">Rs. {item.askPrice.toLocaleString()}</p>
                           <div className="flex items-center gap-2 mb-2">
                              <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
                                {item.listingDuration}h
@@ -429,12 +402,12 @@ export default function Dashboard() {
                              </div>
                           </div>
                         </div>
-                        <div id={`listing-actions-${item.id}`} className="flex gap-2">
+                        <div id={`listing-actions-${item.id}`} className="flex gap-1.5 md:gap-2">
                           <Button 
                             id={`listing-view-btn-${item.id}`} 
                             variant="outline" 
                             size="sm" 
-                            className="h-8 text-[11px] px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
+                            className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
                             onClick={() => setViewingItem(item)}
                           >
                             <Eye className="h-3 w-3 mr-1" />
@@ -444,7 +417,7 @@ export default function Dashboard() {
                             id={`listing-edit-btn-${item.id}`} 
                             variant="outline" 
                             size="sm" 
-                            className="h-8 text-[11px] px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
+                            className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
                             asChild
                           >
                             <Link href={`/list?id=${item.id}`}>
@@ -456,7 +429,7 @@ export default function Dashboard() {
                             id={`listing-delete-btn-${item.id}`} 
                             variant="outline" 
                             size="sm" 
-                            className="h-8 text-[11px] px-3 font-bold text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all"
+                            className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all"
                             onClick={() => handleDeleteClick(item)}
                           >
                             <Trash2 className="h-3 w-3 mr-1" />

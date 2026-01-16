@@ -216,7 +216,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     </Badge>
                   )}
                 </div>
-                <h1 className="text-4xl font-black text-slate-900 leading-tight">
+                <h1 className="text-fluid-h1 font-black text-slate-900 leading-tight">
                   {item.title}
                 </h1>
               </div>
@@ -225,7 +225,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <div className="grid grid-cols-3 gap-6 py-6 border-y border-slate-50">
                 <div className="space-y-1">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Ask Price</span>
-                  <div className="text-2xl font-black text-slate-800">Rs. {Math.round(item.askPrice).toLocaleString()}</div>
+                  <div className="text-fluid-h2 font-black text-slate-800">Rs. {Math.round(item.askPrice).toLocaleString()}</div>
                 </div>
                 <div className="space-y-1 text-center border-x border-slate-100">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">

@@ -46,6 +46,14 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Fluid Typography Utilities */
+  --font-size-fluid-h1: var(--font-fluid-h1);
+  --font-size-fluid-h2: var(--font-fluid-h2);
+  --font-size-fluid-h3: var(--font-fluid-h3);
+  --font-size-fluid-price-lg: var(--font-fluid-price-lg);
+  --font-size-fluid-price-sm: var(--font-fluid-price-sm);
+  --font-size-fluid-body: var(--font-fluid-body);
 }
 
 :root {
@@ -81,6 +89,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* Fluid Typography */
+  --font-fluid-h1: clamp(1.75rem, 5vw + 1rem, 3.5rem);
+  --font-fluid-h2: clamp(1.25rem, 4vw + 0.5rem, 2.25rem);
+  --font-fluid-h3: clamp(1.1rem, 3vw + 0.5rem, 1.75rem);
+  --font-fluid-price-lg: clamp(1.1rem, 5vw + 0.2rem, 2.5rem);
+  --font-fluid-price-sm: clamp(0.9rem, 3.5vw + 0.1rem, 1.75rem);
+  --font-fluid-body: clamp(0.875rem, 2vw + 0.1rem, 1rem);
 }
 
 .dark {

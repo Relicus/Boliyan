@@ -50,7 +50,7 @@ export default function SmartFilterBar() {
             <span 
               id={`smart-filter-label-${f.id}`}
               className={cn(
-              "text-[10px] leading-none tracking-wide whitespace-nowrap md:text-sm md:font-bold",
+              "text-[10px] leading-none tracking-wide whitespace-nowrap md:text-fluid-body md:font-bold",
               isActive ? "font-bold" : "font-medium"
             )}>
               {f.label}

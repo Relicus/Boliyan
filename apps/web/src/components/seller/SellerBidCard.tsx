@@ -29,10 +29,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   };
 
   const handleAccept = () => {
-    const convId = acceptBid(bid.id);
-    if (convId) {
-      router.push(`/inbox?id=${convId}`);
-    }
+    acceptBid(bid.id);
   };
 
   const handleChat = () => {
@@ -60,44 +57,41 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
       {/* MOBILE Layout (md:hidden) */}
       <div id={`bid-card-mobile-${bid.id}`} className="flex flex-col gap-2 md:hidden">
         {/* Top Row: User (65%) | Price (35%) */}
-        <div id={`bid-card-mobile-top-row-${bid.id}`} className="flex items-start">
-          <div id={`bid-card-mobile-user-info-${bid.id}`} className="flex items-center gap-2 w-[65%]">
+        <div id={`bid-card-mobile-top-row-${bid.id}`} className="flex items-start justify-between gap-3">
+          <div id={`bid-card-mobile-user-info-${bid.id}`} className="flex items-center gap-2 min-w-0 flex-1">
             <Avatar className="h-9 w-9 border-2 border-slate-50 shrink-0">
               <AvatarImage id={`bidder-avatar-img-mobile-${bid.id}`} src={bidder.avatar} />
               <AvatarFallback id={`bidder-avatar-fallback-mobile-${bid.id}`}>{bidder.name[0]}</AvatarFallback>
             </Avatar>
             
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h4 id={`bidder-name-mobile-${bid.id}`} className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
-                <div id={`bidder-rating-mobile-${bid.id}`} className="flex items-center gap-1.5 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-100 shrink-0">
-                  <div className="flex items-center gap-0.5 text-xs text-amber-600 font-black">
-                      <Star className="h-3 w-3 fill-amber-500" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h4 id={`bidder-name-mobile-${bid.id}`} className="font-bold text-sm text-slate-900 truncate max-w-[100px]">{bidder.name}</h4>
+                <div id={`bidder-rating-mobile-${bid.id}`} className="flex items-center gap-1 bg-amber-50 px-1 py-0.5 rounded-md border border-amber-100 shrink-0">
+                  <div className="flex items-center gap-0.5 text-[10px] text-amber-600 font-black">
+                      <Star className="h-2.5 w-2.5 fill-amber-500" />
                       {bidder.rating}
                   </div>
-                  <span className="text-xs text-amber-600/70 font-semibold">(24)</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
-                  <div id={`bidder-location-mobile-${bid.id}`} className="flex items-center gap-0.5 min-w-0">
-                    <MapPin className="h-3 w-3 text-red-400 shrink-0" />
-                    <span className="truncate">{location}</span>
+              <div className="flex items-center gap-2 mt-0.5 text-[10px] text-muted-foreground w-full">
+                  <div id={`bidder-location-mobile-${bid.id}`} className="flex items-center gap-0.5 min-w-0 overflow-hidden">
+                    <MapPin className="h-2.5 w-2.5 text-red-400 shrink-0" />
+                    <span className="truncate max-w-[120px]">{location}</span>
                   </div>
               </div>
             </div>
           </div>
 
-          <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right w-[35%]">
-            <p id={`bid-amount-mobile-${bid.id}`} className="text-xl font-black text-blue-600 leading-none truncate">Rs. {bid.amount.toLocaleString()}</p>
-            <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-0.5 text-xs text-muted-foreground font-medium whitespace-nowrap">
-               <div className="flex items-center gap-0.5">
-                 <MapPin className="h-3 w-3 text-red-400" />
-                 <span>{distance} km</span>
-               </div>
-               <div className="flex items-center gap-0.5">
-                 <Clock className="h-3 w-3 text-blue-400" />
-                 <span>{duration} min</span>
-               </div>
+          <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right shrink-0 flex flex-col items-end">
+            <p id={`bid-amount-mobile-${bid.id}`} className="font-black text-blue-600 leading-none truncate text-[clamp(1rem,5vw,1.25rem)]">Rs. {bid.amount.toLocaleString()}</p>
+            <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-1 text-[10px] text-muted-foreground font-medium whitespace-nowrap">
+               <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
+                  {distance} km
+               </span>
+               <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
+                 {duration} min
+               </span>
             </div>
           </div>
         </div>

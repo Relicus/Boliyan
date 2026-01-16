@@ -5,7 +5,7 @@ import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Lock, Globe, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink } from "lucide-react";
+import { MapPin, Lock, Globe, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, Banknote } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
@@ -145,17 +145,17 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
   const getTitleClass = () => {
     switch (viewMode) {
-      case 'spacious': return 'text-lg';
-      case 'comfortable': return 'text-base';
+      case 'spacious': return 'text-fluid-h3';
+      case 'comfortable': return 'text-fluid-body';
       default: return 'text-sm';
     }
   };
 
   const getPriceClass = () => {
     switch (viewMode) {
-      case 'spacious': return 'text-xl';
-      case 'comfortable': return 'text-lg';
-      default: return 'text-base';
+      case 'spacious': return 'text-fluid-price-lg';
+      case 'comfortable': return 'text-fluid-h3';
+      default: return 'text-fluid-price-sm';
     }
   };
 
@@ -686,25 +686,44 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
             </div>
             {/* Price Info Grid & Timer */}
             <div className="grid grid-cols-3 gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 relative overflow-hidden">
-
-              <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Price</span>
-                <div className="text-xl font-black text-slate-800 leading-tight">{Math.round(item.askPrice).toLocaleString()}</div>
-              </div>
-              <div className="flex flex-col justify-center text-center border-x border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-                  {item.isPublicBid ? "High Bid" : "Bids"}
-                </span>
-                <div className={`text-xl font-black leading-tight ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`}>
-                  {item.isPublicBid && item.currentHighBid
-                    ? Math.round(item.currentHighBid).toLocaleString()
-                    : `${item.bidCount} ${item.bidCount === 1 ? 'Bid' : 'Bids'}`
-                  }
+              <div className="flex flex-col items-center gap-0.5 text-center">
+                <div className="flex items-center gap-1">
+                  <Banknote className="h-3 w-3 text-emerald-600" />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight hidden sm:inline">Price</span>
+                </div>
+                <div className="flex items-baseline gap-0.5 whitespace-nowrap">
+                  <span className="text-xs font-bold text-slate-500">Rs.</span>
+                  <span className="text-fluid-price-sm font-black text-slate-800 leading-tight">{Math.round(item.askPrice).toLocaleString()}</span>
                 </div>
               </div>
-              <div className="text-right">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Ends In</span>
-                <div className={`text-xl font-black leading-tight text-right tabular-nums ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}>
+
+              <div className="flex flex-col items-center justify-center gap-0.5 text-center border-x border-slate-200">
+                <div className="flex items-center justify-center gap-1">
+                  <Gavel className={`h-3 w-3 ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`} />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight hidden sm:inline">
+                    {item.isPublicBid ? "High Bid" : "Bids"}
+                  </span>
+                </div>
+                <div className={`flex items-baseline justify-center gap-0.5 whitespace-nowrap ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user.id ? 'text-amber-600' : 'text-blue-600'}`}>
+                  {item.isPublicBid && item.currentHighBid ? (
+                    <>
+                       <span className={`text-xs font-bold ${item.currentHighBidderId === user.id ? 'text-amber-600/70' : 'text-blue-600/70'}`}>Rs.</span>
+                       <span className="text-fluid-price-sm font-black leading-tight">{Math.round(item.currentHighBid).toLocaleString()}</span>
+                    </>
+                  ) : (
+                     <span className="text-fluid-price-sm font-black leading-tight">
+                        {item.bidCount} <span className="text-sm font-bold opacity-70 hidden sm:inline">{item.bidCount === 1 ? 'Bid' : 'Bids'}</span>
+                     </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-0.5 text-center">
+                <div className="flex items-center gap-1">
+                  <Clock className={`h-3 w-3 ${isUrgent ? 'text-red-600' : 'text-slate-500'}`} />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight hidden sm:inline">Ends In</span>
+                </div>
+                <div className={`text-fluid-price-sm font-black leading-tight text-center tabular-nums whitespace-nowrap ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}>
                   {timeLeft}
                 </div>
               </div>
@@ -806,8 +825,8 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
 
             {/* Smart Stepper Bidding Section in Modal */}
             <div className="space-y-3 pb-4 sm:pb-0">
-                <div className="flex h-12">
-                  <div className={`flex flex-1 border border-slate-300 rounded-l-md shadow-sm overflow-hidden ${user.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
+                <div className="flex flex-col gap-3">
+                  <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Extra Large for Modal */}
                     <button
                       id={`modal-item-card-${item.id}-decrement-btn`}
@@ -870,7 +889,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                     id={`modal-item-card-${item.id}-place-bid-btn`}
                     onClick={(e) => handleBid(e)}
                     disabled={isSuccess || user.id === seller.id}
-                    className={`px-6 rounded-r-md font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg min-w-[120px] flex items-center justify-center
+                    className={`h-12 w-full rounded-lg font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg flex items-center justify-center
                       ${isSuccess 
                         ? 'bg-amber-600 text-white scale-105' 
                         : user.id === seller.id
@@ -892,7 +911,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
                         </motion.svg>
                         <span className="text-base">Placed!</span>
                       </span>
-                    ) : user.id === seller.id ? "Your Listing" : "Bid"}
+                    ) : user.id === seller.id ? "Your Listing" : "Place Bid"}
                   </button>
                 </div>
 

@@ -25,14 +25,18 @@ export function getBidderLocationMock(bidderId: string) {
 export function getFuzzyLocationString(address: string): string {
   if (!address) return "Unknown Location";
   
-  const parts = address.split(',').map(p => p.trim());
+  // Filter out "Pakistan" from the address parts to keep it local
+  const parts = address.split(',')
+    .map(p => p.trim())
+    .filter(p => !p.toLowerCase().includes('pakistan'));
   
-  // If we have enough parts (e.g. "House 5, Street 10, DHA, Lahore") -> "DHA, Lahore"
-  if (parts.length > 2) {
+  if (parts.length > 0) {
+    // If we have multiple parts (e.g. "DHA, Lahore"), take last 2. 
+    // If just "Karachi", take it.
     return parts.slice(-2).join(', ');
   }
   
-  // Already fairly short/fuzzy (e.g. "Karachi, Pakistan")
+  // Fallback if address was just "Pakistan"
   return address;
 }
 

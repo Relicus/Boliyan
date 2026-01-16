@@ -53,7 +53,7 @@ export function ProfileSettings() {
             <div className="flex-1 space-y-6 w-full">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+                  <h2 className="text-fluid-h2 font-black text-slate-900 flex items-center gap-2">
                     {user.name}
                     {user.isVerified && <VerifiedBadge size="sm" />}
                   </h2>

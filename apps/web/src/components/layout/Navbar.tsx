@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, User, Bell, Plus, LogOut, LayoutDashboard, Heart, UserCircle, MessageSquare } from "lucide-react";
+import { Search, User, Bell, Plus, LogOut, Activity, Heart, UserCircle, MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,23 +14,76 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useApp } from "@/lib/store";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { SearchDropdown } from "./SearchDropdown";
+import { useState, useEffect, useRef } from "react";
+
+import { Gavel, Tag, LayoutGrid } from "lucide-react";
 
 export default function Navbar() {
-  const { filters, setFilter, user, isLoggedIn, logout } = useApp();
+  const { filters, setFilter, user, isLoggedIn, logout, items, bids, messages } = useApp();
   const router = useRouter();
+  const pathname = usePathname();
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  // Notifications Calculation
+  const unreadMsgCount = messages.filter(m => !m.isRead && m.senderId !== user.id).length;
+  
+  const myItems = items.filter(i => i.sellerId === user.id);
+  const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length;
+  
+  const myBidsItems = items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id));
+  const outbidCount = myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length;
+
+  useEffect(() => {
+    const controlNavbar = () => {
+      if (typeof window !== 'undefined') {
+        const currentScrollY = window.scrollY;
+        
+        // Disable hide effect for Inbox and restricted views
+        if (pathname === '/inbox' || pathname === '/signin' || pathname === '/signup') {
+          setIsVisible(true);
+          return;
+        }
+
+        // Show navbar if scrolling up or at the very top
+        // Hide navbar if scrolling down and past 100px
+        if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
+          setIsVisible(true);
+        } else if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+          setIsVisible(false);
+        }
+
+        lastScrollY.current = currentScrollY;
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', controlNavbar);
+
+      // Cleanup function
+      return () => {
+        window.removeEventListener('scroll', controlNavbar);
+      };
+    }
+  }, [pathname]);
 
   return (
-    <nav id="navbar-01" className="relative w-full border-b bg-white">
+    <nav 
+      id="navbar-01" 
+      className={`fixed top-0 left-0 right-0 z-50 w-full border-b bg-white transition-transform duration-300 ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-6">
-        <div id="navbar-left-section-03" className="flex items-center gap-6 shrink-0">
-          <div className="flex items-center gap-5">
-            <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-1.5 select-none transition-transform duration-200 active:scale-95">
+        <div id="navbar-left-section-03" className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-3">
+            <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-2 select-none transition-transform duration-200 active:scale-95">
               {/* Geometric 'Ba' (ب) Logomark */}
-              <svg id="navbar-logo-svg-05" viewBox="0 0 40 40" className="h-10 w-10 shrink-0 transition-all duration-300 group-hover:drop-shadow-md">
+              <svg id="navbar-logo-svg-05" viewBox="0 0 40 40" className="h-[clamp(32px,4vw,40px)] w-[clamp(32px,4vw,40px)] shrink-0 transition-all duration-300 group-hover:drop-shadow-md">
                 {/* Ba Curve */}
                 <path
                   d="M32,10 C32,20 28,26 16,26 C12,26 8,24 8,24"
@@ -51,12 +104,12 @@ export default function Navbar() {
                 />
               </svg>
               
-              <div id="navbar-brand-name-08" className="flex flex-col items-center justify-center gap-0 py-0.5 sm:flex hidden">
-                <span id="navbar-brand-urdu-09" className="text-2xl font-black mb-[-2px] transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600">
+              <div id="navbar-brand-name-08" className="flex flex-col items-center justify-center gap-0 py-0.5">
+                <span id="navbar-brand-urdu-09" className="text-[clamp(1.25rem,3vw,1.75rem)] font-black mb-[-2px] transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600">
                   بولیاں
                 </span>
                 {/* English: Much smaller, wide spacing */}
-                <span id="navbar-brand-english-10" className="text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-blue-400 to-blue-200">
+                <span id="navbar-brand-english-10" className="text-[clamp(7px,1.2vw,9px)] font-bold tracking-[0.4em] uppercase transition-all duration-300 font-[family-name:var(--font-outfit)] bg-clip-text text-transparent bg-gradient-to-br from-blue-400 to-blue-200 leading-none">
                   Boliyan
                 </span>
               </div>
@@ -64,14 +117,9 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Global Search Bar & Location */}
-        <div className="flex-1 max-w-3xl flex items-center gap-4 px-4">
-          <div className="flex-1 hidden md:block">
-            <SearchDropdown />
-          </div>
-          <div id="navbar-location-selector" className="flex items-center">
-            <LocationSelector align="end" />
-          </div>
+        {/* Global Search Bar (Full Width on Mobile) */}
+        <div className="flex-1 px-3 md:px-6 max-w-4xl">
+          <SearchDropdown />
         </div>
 
         <div id="navbar-right-section-11" className="flex items-center gap-2 shrink-0">
@@ -84,10 +132,51 @@ export default function Navbar() {
 
           {isLoggedIn ? (
             <>
-              <Button id="navbar-bell-btn-14" variant="ghost" size="icon" className="relative size-12 rounded-full hover:bg-slate-100/80 transition-colors">
-                <Bell id="navbar-bell-icon-15" className="size-8 text-slate-900 drop-shadow-sm" strokeWidth={1.5} />
-                <span id="navbar-bell-badge-16" className="absolute top-2.5 right-2.5 h-3 w-3 rounded-full bg-red-500 border-2 border-white shadow-sm" />
-              </Button>
+              {/* Desktop Actions */}
+              <div className="hidden md:flex items-center gap-1 mr-2">
+                <Button id="navbar-market-btn" asChild variant="ghost" className="flex items-center gap-2 text-slate-600 hover:bg-slate-100/80 rounded-full px-4 relative">
+                  <Link href="/">
+                    <LayoutGrid id="navbar-market-icon" className="h-5 w-5" strokeWidth={1.5} />
+                    <span className="font-medium">Market</span>
+                  </Link>
+                </Button>
+
+                <Button id="navbar-offers-btn" asChild variant="ghost" className="flex items-center gap-2 text-slate-600 hover:bg-slate-100/80 rounded-full px-4 relative">
+                  <Link href="/dashboard?tab=active-bids">
+                    <Tag id="navbar-offers-icon" className="h-5 w-5" strokeWidth={1.5} />
+                    <span className="font-medium">Offers</span>
+                    {receivedBidsCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white">
+                        {receivedBidsCount}
+                      </span>
+                    )}
+                  </Link>
+                </Button>
+
+                <Button id="navbar-bids-btn" asChild variant="ghost" className="flex items-center gap-2 text-slate-600 hover:bg-slate-100/80 rounded-full px-4 relative">
+                  <Link href="/dashboard?tab=my-bids">
+                    <Gavel id="navbar-bids-icon" className="h-5 w-5" strokeWidth={1.5} />
+                    <span className="font-medium">Bids</span>
+                    {outbidCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white">
+                        {outbidCount}
+                      </span>
+                    )}
+                  </Link>
+                </Button>
+
+                <Button id="navbar-chat-btn" asChild variant="ghost" className="flex items-center gap-2 text-slate-600 hover:bg-slate-100/80 rounded-full px-4 relative">
+                  <Link href="/inbox">
+                    <MessageSquare id="navbar-chat-icon" className="h-5 w-5" strokeWidth={1.5} />
+                    <span className="font-medium">Chat</span>
+                    {unreadMsgCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+                        {unreadMsgCount}
+                      </span>
+                    )}
+                  </Link>
+                </Button>
+              </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -109,12 +198,12 @@ export default function Navbar() {
                   <DropdownMenuSeparator className="bg-slate-100" />
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
                     <Link href="/dashboard" className="flex items-center w-full">
-                      <LayoutDashboard className="mr-2.5 h-4 w-4 opacity-70" />
-                      My Dashboard
+                      <Activity className="mr-2.5 h-4 w-4 opacity-70" />
+                      Dashboard
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
-                    <Link href="/dashboard?tab=profile" className="flex items-center w-full">
+                    <Link href="/profile" className="flex items-center w-full">
                       <UserCircle className="mr-2.5 h-4 w-4 opacity-70" />
                       Profile Settings
                     </Link>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, LayoutGrid, PlusCircle, MessageSquare, User, SlidersHorizontal as FilterIcon } from "lucide-react";
+import { LayoutGrid, PlusCircle, MessageSquare, Activity, SlidersHorizontal as FilterIcon } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -11,25 +11,28 @@ import { useState } from "react";
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { messages } = useApp();
-  const unreadCount = messages.filter(m => !m.isRead).length;
+  const { messages, items, bids, user } = useApp();
+  const unreadCount = messages.filter(m => !m.isRead && m.senderId !== user.id).length;
+  
+  const myItems = items.filter(i => i.sellerId === user.id);
+  const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length;
+  
+  const myBidsItems = items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id));
+  const outbidCount = myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length;
+  const totalDashboardCount = receivedBidsCount + outbidCount;
+  
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const navItems = [
     {
-      label: "Home",
-      icon: Compass,
-      href: "/",
-    },
-    {
-      label: "Filters",
-      icon: FilterIcon,
-      isDrawer: true,
-    },
-    {
       label: "Post",
       icon: PlusCircle,
       href: "/list",
+    },
+    {
+      label: "Market",
+      icon: LayoutGrid,
+      href: "/",
     },
     {
       label: "Inbox",
@@ -38,7 +41,7 @@ export default function BottomNav() {
     },
     {
       label: "Dashboard",
-      icon: User,
+      icon: Activity,
       href: "/dashboard",
     },
   ];
@@ -69,7 +72,14 @@ export default function BottomNav() {
                   strokeWidth={isActive ? 2.5 : 2}
                 />
                 {item.label === "Inbox" && unreadCount > 0 && (
-                  <span className="absolute -top-1 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white" />
+                  <span className="absolute -top-1 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+                    {unreadCount}
+                  </span>
+                )}
+                {item.label === "Dashboard" && totalDashboardCount > 0 && (
+                  <span className="absolute -top-1 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white">
+                    {totalDashboardCount}
+                  </span>
                 )}
                 <span 
                   id={`bottom-nav-text-${item.label.toLowerCase()}`}

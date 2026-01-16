@@ -118,7 +118,7 @@ export default function CategoryBar() {
                 }
               }}
               className={cn(
-                "flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-300 border shrink-0",
+                "flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-fluid-body font-semibold whitespace-nowrap transition-all duration-300 border shrink-0",
                 isSelected
                   ? "bg-slate-900 text-white border-slate-900 shadow-md transform scale-105"
                   : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm"

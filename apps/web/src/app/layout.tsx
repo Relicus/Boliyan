@@ -80,9 +80,9 @@ export default function RootLayout({
       >
         <AppProvider>
           <Navbar />
-          <div id="layout-wrapper-02" className="flex">
+          <div id="layout-wrapper-02" className="flex pt-16">
             <Sidebar />
-            <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-screen md:min-h-[calc(100vh-64px)] pb-16 md:pb-0">
+            <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100vh-4rem)] pb-16 md:pb-0 relative">
               {children}
             </main>
           </div>
