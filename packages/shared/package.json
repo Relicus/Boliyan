@@ -1,0 +1,7 @@
+{
+  "name": "@boliyan/shared",
+  "version": "0.0.0",
+  "private": true,
+  "main": "bidding.ts",
+  "types": "bidding.ts"
+}

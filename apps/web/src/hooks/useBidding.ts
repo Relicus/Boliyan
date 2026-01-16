@@ -4,23 +4,17 @@ import { useState, useCallback, useEffect } from "react";
 import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
 import { Item, User } from "@/types";
+import { getSmartStep, getMinimumAllowedBid } from "@/lib/bidding";
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
   const { placeBid, user } = useApp();
 
   const [warning, setWarning] = useState<{ type: 'double_bid' | 'high_bid', message: string } | null>(null);
 
-  // Smart Step Logic
-  const getSmartStep = useCallback((price: number) => {
-    if (price >= 100000) return 1000;
-    if (price >= 10000) return 500;
-    return 100;
-  }, []);
-
   // Initialize with Ask Price (70% allowed on first bid) or Current High Bid
   const initialBid = item.isPublicBid && item.currentHighBid
     ? item.currentHighBid + getSmartStep(item.currentHighBid)
-    : Math.ceil(item.askPrice * 0.7 / 100) * 100; // Round up to nearest 100 for clean bidding
+    : Math.ceil(getMinimumAllowedBid(item.askPrice) / 100) * 100; // Round up to nearest 100
 
   const [bidAmount, setBidAmount] = useState<string>(initialBid.toLocaleString());
   const [error, setError] = useState<boolean>(false);
@@ -33,7 +27,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   useEffect(() => {
     const minBid = item.isPublicBid && item.currentHighBid
       ? item.currentHighBid + getSmartStep(item.currentHighBid)
-      : item.askPrice * 0.7;
+      : getMinimumAllowedBid(item.askPrice);
 
     if (!isSuccess) {
       const currentNumericAmount = parseFloat(bidAmount.replace(/,/g, ''));
@@ -44,8 +38,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
          setBidAmount(minBid.toLocaleString());
       }
     }
-  }, [item.currentHighBid, item.askPrice, item.isPublicBid, getSmartStep, isSuccess]); 
-  // Note: bidAmount removed from dependencies to allow manual adjustment below threshold for error feedback
+  }, [item.currentHighBid, item.askPrice, item.isPublicBid, isSuccess, bidAmount]); 
 
   const handleSmartAdjust = useCallback((e: React.MouseEvent | React.TouchEvent, direction: 1 | -1) => {
     e.stopPropagation();
@@ -63,14 +56,14 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     
     // Auto-hide delta after animation
     setTimeout(() => setShowDelta(false), 800);
-  }, [bidAmount, getSmartStep]);
+  }, [bidAmount]);
 
   const attemptBid = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation();
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
     
     // Minimum bid logic
-    let minBid = item.askPrice * 0.7;
+    let minBid = getMinimumAllowedBid(item.askPrice);
     let referencePrice = item.askPrice;
 
     if (item.isPublicBid && item.currentHighBid) {
@@ -107,7 +100,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     // If no warnings, execute immediately
     executeBid(amount, e);
-  }, [bidAmount, item, getSmartStep, user.id]);
+  }, [bidAmount, item, user.id]);
 
   const executeBid = useCallback((amount: number, e?: React.MouseEvent | React.TouchEvent | any) => {
     // Place bid logic via store
@@ -141,7 +134,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     } else {
       setTimeout(() => setIsSuccess(false), 1500);
     }
-  }, [item, placeBid, getSmartStep, onBidSuccess]);
+  }, [item, placeBid, onBidSuccess]);
 
   const confirmBid = useCallback(() => {
     if (!warning) return;

@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { useApp } from "@/lib/store";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { mockUsers } from "@/lib/mock-data";
 import ItemCard from "./ItemCard";
 import ItemCardSkeleton from "./ItemCardSkeleton";
@@ -35,7 +35,7 @@ const LISTING_TYPES = [
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
 export default function MarketplaceGrid() {
-  const { items, filters, setFilter, isLoading, isLoadingMore, hasMore, loadMore } = useApp();
+  const { items, filters, setFilter, isLoading, isLoadingMore, hasMore, loadMore } = useMarketplace();
   const [viewMode, setViewMode] = useState<ViewMode>('compact');
   
   // Random cascade direction (changes on every filter/refresh)

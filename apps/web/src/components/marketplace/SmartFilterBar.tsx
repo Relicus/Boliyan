@@ -1,6 +1,6 @@
 "use client";
 
-import { useApp } from "@/lib/store";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { cn } from "@/lib/utils";
 import { Flame, MapPin, Timer, Gem, Sparkles, Bookmark } from "lucide-react";
 
@@ -14,7 +14,7 @@ export const FILTERS = [
 ] as const;
 
 export default function SmartFilterBar() {
-  const { filters, setFilter } = useApp();
+  const { filters, setFilter } = useMarketplace();
 
   return (
     <div id="smart-filter-bar-root" className="w-full flex items-center justify-between md:justify-start gap-4 overflow-x-auto scrollbar-hide px-4 py-1">

@@ -1,12 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, memo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Lock, Globe, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, Banknote, AlertTriangle, ShieldAlert, TrendingUp } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/lib/store";
+import { useTime } from "@/context/TimeContext";
 import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
@@ -19,8 +20,9 @@ interface ItemCardProps {
   viewMode?: 'compact' | 'comfortable' | 'spacious';
 }
 
-export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCardProps) {
+const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) => {
   const { placeBid, user, bids, toggleWatch, watchedItemIds } = useApp();
+  const { now } = useTime(); // Use global heartbeat
   const isWatched = watchedItemIds.includes(item.id);
 
   // Helper for compact price display (e.g. 185.5k)
@@ -34,7 +36,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [now, setNow] = useState<number | null>(null);
+  // Removed local 'now' state and useEffect timer
   const [currentImg, setCurrentImg] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
 
@@ -69,14 +71,6 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
        return () => clearTimeout(timer);
     }
   }, [item.currentHighBid, item.currentHighBidderId, user.id, bids, item.id]);
-
-  useEffect(() => {
-    setNow(Date.now());
-    const timer = setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, timeLeft, statusColor, isUrgent } = useMemo(() => {
@@ -1047,4 +1041,7 @@ export default function ItemCard({ item, seller, viewMode = 'compact' }: ItemCar
       </Dialog>
     </Dialog>
   );
-}
+});
+
+ItemCard.displayName = "ItemCard";
+export default ItemCard;
