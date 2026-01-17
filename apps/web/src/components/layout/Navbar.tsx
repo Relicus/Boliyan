@@ -22,6 +22,7 @@ import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import SearchBar from "@/components/search/SearchBar";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
 
 export default function Navbar() {
@@ -82,6 +83,7 @@ export default function Navbar() {
       }`}
     >
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-6">
+        <LayoutGroup>
         {/* ... existing navbar content ... */}
 
         <div id="navbar-left-section-03" className="flex items-center gap-4 shrink-0">
@@ -123,11 +125,20 @@ export default function Navbar() {
         </div>
 
         {/* Global Search Bar (Full Width on Mobile) */}
-        <div className="flex-1 px-3 md:px-6 max-w-4xl">
+        <motion.div 
+          layout
+          transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+          className="flex-1 px-3 md:px-6 max-w-4xl flex justify-center"
+        >
           <SearchBar />
-        </div>
+        </motion.div>
 
-        <div id="navbar-right-section-11" className="flex items-center gap-2 shrink-0">
+        <motion.div 
+          layout
+          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+          id="navbar-right-section-11" 
+          className="flex items-center gap-2 shrink-0"
+        >
           <Button id="navbar-sell-btn-12" asChild variant="outline" className="hidden sm:flex items-center gap-2 border-blue-100 hover:bg-blue-50 text-blue-600">
             <Link href={isLoggedIn ? "/list" : "/signin"}>
               <Plus id="navbar-sell-plus-icon-13" className="h-4 w-4" />
@@ -135,10 +146,28 @@ export default function Navbar() {
             </Link>
           </Button>
 
-          {isLoading ? (
-             <div id="navbar-loading-avatar" className="h-10 w-10 rounded-full bg-slate-100 animate-pulse ring-1 ring-slate-200" />
-          ) : isLoggedIn && user ? (
-            <>
+          <AnimatePresence mode="wait">
+            {isLoading ? (
+              <motion.div
+                key="loading"
+                layout="position"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+                id="navbar-loading-avatar"
+                className="h-10 w-10 rounded-full bg-slate-100 animate-pulse ring-1 ring-slate-200"
+              />
+            ) : isLoggedIn && user ? (
+              <motion.div
+                key="logged-in"
+                layout="position"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="flex items-center"
+              >
               {/* Desktop Actions */}
               <div className="hidden md:flex items-center gap-1 mr-2">
                 <Button id="navbar-market-btn" asChild variant="ghost" className={cn(
@@ -233,6 +262,12 @@ export default function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
+                    <Link href="/dashboard/seller" className="flex items-center w-full">
+                      <LayoutGrid className="mr-2.5 h-4 w-4 opacity-70" />
+                      Seller Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
                     <Link href="/inbox" className="flex items-center w-full">
                       <MessageSquare className="mr-2.5 h-4 w-4 opacity-70" />
                       Messages
@@ -256,13 +291,24 @@ export default function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>
-          ) : (
-            <Button id="navbar-signin-btn" asChild className="h-11 px-6 bg-blue-600 hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-200">
-              <Link href="/signin">Sign In</Link>
-            </Button>
-          )}
-        </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="signed-out"
+                layout="position"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button id="navbar-signin-btn" asChild className="h-11 px-6 bg-blue-600 hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-200">
+                  <Link href="/signin">Sign In</Link>
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+        </LayoutGroup>
       </div>
     </nav>
   );

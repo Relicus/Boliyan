@@ -58,7 +58,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     animTrigger,
     lastDelta,
     showDelta
-  } = useBidding(item, seller, () => setIsDialogOpen(false));
+  } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
 
   // Check if user has bid on this item before
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
@@ -92,7 +92,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     }
 
     // Distance Calculation (Privacy Safe)
-    const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
+    const { distance: dist, duration: dur } = seller?.location ? calculatePrivacySafeDistance(user.location, seller.location) : { distance: 0, duration: 0 };
 
     // Time Left calculation
     const diff = new Date(item.expiryAt).getTime() - now;
@@ -131,7 +131,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
       statusColor,
       isUrgent
     };
-  }, [item.id, item.expiryAt, item.createdAt, now, user?.location, seller.location]);
+  }, [item.id, item.expiryAt, item.createdAt, now, user?.location, seller?.location]); // Added safe navigation for seller
 
   const handleInputClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent dialog from opening when clicking input
@@ -259,7 +259,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
                   <MapPin className="h-3 w-3" />
                   <span className="text-[10px] font-black tracking-tight leading-none truncate max-w-[120px]">
-                    {getFuzzyLocationString(seller.location.address)}
+                    {seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown Location'}
                   </span>
                 </div>
               </div>
@@ -325,23 +325,23 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {/* Seller Info - Between Title and Price */}
               {(viewMode === 'spacious' || viewMode === 'comfortable') && (
                 <div className={`flex items-center gap-2 mb-2 animate-in fade-in duration-300 ${viewMode === 'comfortable' ? 'mt-0.5' : 'mt-1'}`}>
-                  {viewMode === 'spacious' && (
+                  {viewMode === 'spacious' && seller?.avatar && (
                     <div className="h-5 w-5 rounded-full bg-slate-200 overflow-hidden shrink-0">
                       <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
                     </div>
                   )}
                   
                   <span className={`text-[10px] font-bold text-slate-700 truncate leading-none ${viewMode === 'comfortable' ? 'text-slate-500 max-w-[80px]' : ''}`}>
-                    {seller.name}
+                    {seller?.name || 'Unknown Seller'}
                   </span>
-                  {seller.isVerified && <VerifiedBadge size="sm" />}
+                  {seller?.isVerified && <VerifiedBadge size="sm" />}
 
                   <div className="flex items-center gap-1">
                     <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0 px-1 text-[9px] shrink-0 h-3.5 flex items-center leading-none">
-                      ⭐ <span className="ml-0.5 leading-none">{seller.rating}</span>
-                      <span className="ml-0.5 text-yellow-600/80 font-normal leading-none">({seller.reviewCount})</span>
+                      ⭐ <span className="ml-0.5 leading-none">{seller?.rating || 0}</span>
+                      <span className="ml-0.5 text-yellow-600/80 font-normal leading-none">({seller?.reviewCount || 0})</span>
                     </Badge>
-                    {seller.badges && seller.badges.some(b => b.category === 'seller') && (
+                    {seller?.badges && seller.badges.some(b => b.category === 'seller') && (
                       <GamificationBadge 
                         badge={seller.badges.filter(b => b.category === 'seller').sort((a,b) => {
                           const tiers: Record<string, number> = { diamond: 3, gold: 2, silver: 1, bronze: 0 };
@@ -357,7 +357,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   {viewMode === 'spacious' && (
                     <div className="flex items-center gap-0.5 ml-auto text-[10px] text-slate-500">
                       <MapPin className="h-2.5 w-2.5 text-red-500" />
-                      <span className="truncate max-w-[80px] leading-none">{getFuzzyLocationString(seller.location.address)}</span>
+                      <span className="truncate max-w-[80px] leading-none">{seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown'}</span>
                     </div>
                   )}
                 </div>
@@ -431,12 +431,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {/* Smart Stepper Input Row - Stacked Layout */}
               <div className="flex flex-col gap-2 mt-1">
                 <div className="flex h-9 w-full">
-                  <div className={`flex flex-1 border border-slate-300 rounded-md shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
+                  <div className={`flex flex-1 border border-slate-300 rounded-md shadow-sm overflow-hidden ${user?.id === seller?.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Large Touch Target */}
                     <button
                       id={`item-card-${item.id}-decrement-btn`}
                       onClick={(e) => handleSmartAdjust(e, -1)}
-                      disabled={user?.id === seller.id}
+                      disabled={user?.id === seller?.id}
                       className="w-10 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-600 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6" /></svg>
@@ -464,7 +464,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         value={bidAmount}
                         key={`input-${animTrigger}`}
                         initial={false}
-                        disabled={user?.id === seller.id}
+                        disabled={user?.id === seller?.id}
                         animate={{  
                           scale: [1, 1.05, 1],
                           x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -2, 2, -2, 2, 0] : 0
@@ -483,7 +483,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     <button
                       id={`item-card-${item.id}-increment-btn`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
-                      disabled={user?.id === seller.id}
+                      disabled={user?.id === seller?.id}
                       className="w-10 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-600 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
@@ -494,11 +494,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 <button
                   id={`item-card-${item.id}-place-bid-btn`}
                   onClick={handleBid}
-                  disabled={isSuccess || user?.id === seller.id}
+                  disabled={isSuccess || user?.id === seller?.id}
                   className={`w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold text-sm tracking-wide
                     ${isSuccess 
                       ? 'bg-amber-600 text-white scale-105' 
-                      : user?.id === seller.id
+                      : user?.id === seller?.id
                         ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
                         : isHighBidder 
                           ? 'bg-orange-500 hover:bg-orange-600 text-white'
@@ -512,7 +512,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                       Bid Placed!
                     </span>
-                  ) : user?.id === seller.id ? (
+                  ) : user?.id === seller?.id ? (
                     "Your Listing"
                   ) : isHighBidder ? (
                     <span className="flex items-center gap-1.5">
@@ -798,17 +798,17 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             {/* Seller Info */}
             <div className="flex items-center gap-3 py-3 border-t border-b border-slate-100">
               <div className="h-10 w-10 rounded-full bg-slate-200 overflow-hidden">
-                <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
+                {seller?.avatar && <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <div className="font-bold text-slate-900 text-sm truncate">{seller.name}</div>
-                  {seller.isVerified && <VerifiedBadge size="sm" />}
+                  <div className="font-bold text-slate-900 text-sm truncate">{seller?.name || 'Unknown Seller'}</div>
+                  {seller?.isVerified && <VerifiedBadge size="sm" />}
                   <div className="flex items-center gap-1.5">
                     <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0.5 px-1.5 text-[10px] shrink-0">
-                      ⭐ <span className="ml-0.5">{seller.rating}</span>
+                      ⭐ <span className="ml-0.5">{seller?.rating || 0}</span>
                     </Badge>
-                    {seller.badges && seller.badges.some(b => b.category === 'seller') && (
+                    {seller?.badges && seller.badges.some(b => b.category === 'seller') && (
                       <GamificationBadge 
                         badge={seller.badges.filter(b => b.category === 'seller').sort((a,b) => {
                           const tiers: Record<string, number> = { diamond: 3, gold: 2, silver: 1, bronze: 0 };
@@ -823,7 +823,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 </div>
                 <div className="text-xs text-slate-600 flex items-center gap-1 mt-0.5 font-medium">
                   <MapPin className="h-3 w-3 text-red-500" />
-                  <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
+                  <span className="truncate">{seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown'}</span>
                 </div>
                 <div className="text-xs text-slate-600 font-black flex items-center gap-1 mt-0.5 tabular-nums uppercase tracking-tighter">
                   {duration} min drive ({distance} km)
@@ -863,12 +863,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             {/* Sticky/Fixed Bidding Footer */}
             <div className="p-4 bg-white border-t border-slate-100 z-20 shrink-0 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
                 <div className="flex flex-col gap-3">
-                  <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
+                  <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user?.id === seller?.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Extra Large for Modal */}
                     <button
                       id={`modal-item-card-${item.id}-decrement-btn`}
                       onClick={(e) => handleSmartAdjust(e, -1)}
-                      disabled={user?.id === seller.id}
+                      disabled={user?.id === seller?.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6" /></svg>
@@ -896,7 +896,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         value={bidAmount}
                         key={`modal-input-${animTrigger}`}
                         initial={false}
-                        disabled={user?.id === seller.id}
+                        disabled={user?.id === seller?.id}
                         animate={{ 
                           scale: [1, 1.05, 1],
                           x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -3, 3, -3, 3, 0] : 0
@@ -914,7 +914,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     <button
                       id={`modal-item-card-${item.id}-increment-btn`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
-                      disabled={user?.id === seller.id}
+                      disabled={user?.id === seller?.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
@@ -925,11 +925,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   <button
                     id={`modal-item-card-${item.id}-place-bid-btn`}
                     onClick={(e) => handleBid(e)}
-                    disabled={isSuccess || user?.id === seller.id}
+                    disabled={isSuccess || user?.id === seller?.id}
                     className={`h-12 w-full rounded-lg font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg flex items-center justify-center
                       ${isSuccess 
                         ? 'bg-amber-600 text-white scale-105' 
-                        : user?.id === seller.id
+                        : user?.id === seller?.id
                           ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
                           : isHighBidder
                             ? 'bg-orange-500 hover:bg-orange-600 text-white'
@@ -950,7 +950,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         </motion.svg>
                         <span className="text-base">Placed!</span>
                       </span>
-                    ) : user?.id === seller.id ? (
+                    ) : user?.id === seller?.id ? (
                       "Your Listing"
                     ) : isHighBidder ? (
                       <span className="flex items-center gap-2">

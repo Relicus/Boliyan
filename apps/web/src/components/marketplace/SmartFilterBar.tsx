@@ -19,8 +19,9 @@ export default function SmartFilterBar() {
   const { filters: searchFilters, updateFilter: updateSearchFilter, isSearching: isGlobalSearchActive } = useSearch();
 
   // Determine effective context
-  // If search query is present, we are in "Search Mode"
-  const isSearchMode = !!searchFilters.query || !!searchFilters.category;
+  // Only switch to search mode when there's an actual search QUERY (not category)
+  // Category from FilterSheet should use MarketplaceContext
+  const isSearchMode = !!searchFilters.query;
 
   const handleFilterClick = (id: string) => {
     if (isSearchMode) {

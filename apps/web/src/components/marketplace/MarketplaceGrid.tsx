@@ -361,37 +361,15 @@ export default function MarketplaceGrid() {
         ) : (
           <>
             {/* Stable Item List */}
-            {displayItems.map((item, index) => {
+            {displayItems.map((item) => {
               const seller = item.seller!; // Items are hydrated with sellers in MarketplaceContext
-              // Stagger: Only animate items in current "page" (8 items at a time)
-              const pagePosition = index % 8;
-              
-              // Directions: left, right, bottom, top
-              const directions = [
-                { x: -30, y: 0 },
-                { x: 30, y: 0 },
-                { x: 0, y: 30 },
-                { x: 0, y: -20 },
-              ];
-              // Use item.id hash for stable randomness per page batch
-              const pageNumber = Math.floor(index / 8);
-              const hashCode = (displayItems[pageNumber * 8]?.id || 'x').split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0);
-              const dirIndex = Math.abs(hashCode) % directions.length;
-              const direction = directions[dirIndex];
               
               return (
-                <motion.div
+                <div
                   key={item.id}
-                  initial={{ opacity: 0, x: direction.x, y: direction.y }}
-                  animate={{ opacity: 1, x: 0, y: 0 }}
-                  transition={{ 
-                    duration: 0.35,
-                    delay: pagePosition * 0.04,
-                    ease: [0.25, 0.46, 0.45, 0.94]
-                  }}
                 >
                   <ItemCard item={item} seller={seller} viewMode={viewMode} />
-                </motion.div>
+                </div>
               );
             })}
 

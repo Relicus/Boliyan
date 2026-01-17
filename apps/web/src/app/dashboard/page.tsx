@@ -58,7 +58,7 @@ function DashboardContent() {
   };
   
   // SELLER DATA: Items created by current user
-  const myItems = user ? items.filter(item => item.sellerId === user.id) : [];
+  const myItems = user ? items.filter((item: Item) => item.sellerId === user.id) : [];
   const itemsWithBids = myItems.filter(item => bids.some(b => b.itemId === item.id));
 
   // BUYER DATA: Bids placed by current user

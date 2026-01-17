@@ -20,7 +20,7 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
-  const { user, messages, sendMessage, markAsRead, conversations } = useApp();
+  const { user, messages, sendMessage, markAsRead, conversations, subscribeToConversation, unsubscribeFromConversation } = useApp();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
@@ -29,6 +29,18 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const { canReview } = useReviews();
   const [showReviewBtn, setShowReviewBtn] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+
+  // Lazy Subscription Lifecycle
+  useEffect(() => {
+    if (conversationId) {
+        subscribeToConversation(conversationId);
+    }
+    return () => {
+        if (conversationId) {
+            unsubscribeFromConversation(conversationId);
+        }
+    };
+  }, [conversationId, subscribeToConversation, unsubscribeFromConversation]);
 
   const currentMessages = messages.filter(m => m.conversationId === conversationId);
   const conversation = conversations.find(c => c.id === conversationId);

@@ -25,7 +25,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   // Fetch notifications
   const refreshNotifications = useCallback(async () => {
-    if (!user) {
+    if (!user?.id) {
       setNotifications([]);
       setIsLoading(false);
       return;
@@ -42,11 +42,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setNotifications(data.map(transformNotification));
     }
     setIsLoading(false);
-  }, [user, supabase]);
+  }, [user?.id, supabase]);
 
   // Real-time subscription
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
 
     refreshNotifications();
 
@@ -79,7 +79,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, supabase, refreshNotifications]);
+  }, [user?.id, supabase, refreshNotifications]);
 
   const markAsRead = async (id: string) => {
     await (supabase.from('notifications') as any).update({ is_read: true }).eq('id', id);

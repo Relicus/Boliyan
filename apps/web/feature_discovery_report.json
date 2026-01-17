@@ -1,0 +1,1687 @@
+{
+  "timestamp": "2026-01-17T13:43:45.110Z",
+  "routes": [
+    "/",
+    "/signin",
+    "/list",
+    "/inbox",
+    "/dashboard"
+  ],
+  "elements": [
+    {
+      "route": "/",
+      "title": "Boliyan - Speak Your Price",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nSell Item\nAll\nPublic\nSecret\nKarachi"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "All\nPublic\nSecret\nKarachi\nAll\nPrice Range\nPKR\nPKR\n"
+        },
+        {
+          "id": "sidebar-01",
+          "tagName": "ASIDE",
+          "text": "All\nPublic\nSecret\nKarachi\nAll\nPrice Range\nPKR\nPKR\n"
+        },
+        {
+          "id": "sidebar-scroll-area-02",
+          "tagName": "DIV",
+          "text": "Karachi\nAll\nPrice Range\nPKR\nPKR\nCondition\nBrand Ne"
+        },
+        {
+          "id": "location-selector-sidebar-compact",
+          "tagName": "DIV",
+          "text": "Karachi\nAll"
+        },
+        {
+          "id": "location-sidebar-trigger",
+          "tagName": "BUTTON",
+          "text": "Karachi\nAll",
+          "type": "button"
+        },
+        {
+          "id": "sidebar-min-price-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "number",
+          "placeholder": "Min"
+        },
+        {
+          "id": "sidebar-max-price-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "number",
+          "placeholder": "Max"
+        },
+        {
+          "id": "sidebar-condition-label-brand-new",
+          "tagName": "LABEL",
+          "text": "Brand New"
+        },
+        {
+          "id": "sidebar-condition-checkbox-brand-new",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "checkbox"
+        },
+        {
+          "id": "sidebar-condition-label-like-new",
+          "tagName": "LABEL",
+          "text": "Like New"
+        },
+        {
+          "id": "sidebar-condition-checkbox-like-new",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "checkbox"
+        },
+        {
+          "id": "sidebar-condition-label-excellent",
+          "tagName": "LABEL",
+          "text": "Excellent"
+        },
+        {
+          "id": "sidebar-condition-checkbox-excellent",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "checkbox"
+        },
+        {
+          "id": "sidebar-condition-label-good",
+          "tagName": "LABEL",
+          "text": "Good"
+        },
+        {
+          "id": "sidebar-condition-checkbox-good",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "checkbox"
+        },
+        {
+          "id": "sidebar-condition-label-fair",
+          "tagName": "LABEL",
+          "text": "Fair"
+        },
+        {
+          "id": "sidebar-condition-checkbox-fair",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "checkbox"
+        },
+        {
+          "id": "sidebar-saved-search-iphone-15-pro",
+          "tagName": "BUTTON",
+          "text": "iPhone 15 Pro",
+          "type": "submit"
+        },
+        {
+          "id": "sidebar-saved-search-gaming-laptop",
+          "tagName": "BUTTON",
+          "text": "Gaming Laptop",
+          "type": "submit"
+        },
+        {
+          "id": "sidebar-saved-search-vintage-watch",
+          "tagName": "BUTTON",
+          "text": "Vintage Watch",
+          "type": "submit"
+        },
+        {
+          "id": "sidebar-reset-filters-btn",
+          "tagName": "BUTTON",
+          "text": "Reset All Filters",
+          "type": "submit"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+        },
+        {
+          "id": "marketplace-grid-root",
+          "tagName": "DIV",
+          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+        },
+        {
+          "id": "mobile-search-filter-container",
+          "tagName": "DIV",
+          "text": "JustCategoriesTypeViewKarachiPrice"
+        },
+        {
+          "id": "mobile-sort-select",
+          "tagName": "BUTTON",
+          "text": "Just",
+          "type": "button"
+        },
+        {
+          "id": "mobile-category-select",
+          "tagName": "BUTTON",
+          "text": "Categories",
+          "type": "button"
+        },
+        {
+          "id": "mobile-type-select",
+          "tagName": "BUTTON",
+          "text": "Type",
+          "type": "button"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Karachi"
+        },
+        {
+          "id": "location-popover-trigger-mobile",
+          "tagName": "BUTTON",
+          "text": "Karachi",
+          "type": "button"
+        },
+        {
+          "id": "price-selector-trigger",
+          "tagName": "BUTTON",
+          "text": "Price",
+          "type": "button"
+        },
+        {
+          "id": "smart-filters-row",
+          "tagName": "DIV",
+          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+        },
+        {
+          "id": "smart-filter-bar-root",
+          "tagName": "DIV",
+          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+        },
+        {
+          "id": "smart-filter-btn-trending",
+          "tagName": "BUTTON",
+          "text": "Trending",
+          "type": "submit"
+        },
+        {
+          "id": "smart-filter-icon-trending",
+          "tagName": "svg"
+        },
+        {
+          "id": "smart-filter-label-trending",
+          "tagName": "SPAN",
+          "text": "Trending"
+        },
+        {
+          "id": "smart-filter-btn-nearest",
+          "tagName": "BUTTON",
+          "text": "Near Me",
+          "type": "submit"
+        },
+        {
+          "id": "smart-filter-icon-nearest",
+          "tagName": "svg"
+        },
+        {
+          "id": "smart-filter-label-nearest",
+          "tagName": "SPAN",
+          "text": "Near Me"
+        },
+        {
+          "id": "smart-filter-btn-ending_soon",
+          "tagName": "BUTTON",
+          "text": "Ending Soon",
+          "type": "submit"
+        },
+        {
+          "id": "smart-filter-icon-ending_soon",
+          "tagName": "svg"
+        },
+        {
+          "id": "smart-filter-label-ending_soon",
+          "tagName": "SPAN",
+          "text": "Ending Soon"
+        },
+        {
+          "id": "smart-filter-btn-luxury",
+          "tagName": "BUTTON",
+          "text": "High Value",
+          "type": "submit"
+        },
+        {
+          "id": "smart-filter-icon-luxury",
+          "tagName": "svg"
+        },
+        {
+          "id": "smart-filter-label-luxury",
+          "tagName": "SPAN",
+          "text": "High Value"
+        },
+        {
+          "id": "smart-filter-btn-newest",
+          "tagName": "BUTTON",
+          "text": "Just Listed",
+          "type": "submit"
+        },
+        {
+          "id": "smart-filter-icon-newest",
+          "tagName": "svg"
+        },
+        {
+          "id": "smart-filter-label-newest",
+          "tagName": "SPAN",
+          "text": "Just Listed"
+        },
+        {
+          "id": "smart-filter-btn-watchlist",
+          "tagName": "BUTTON",
+          "text": "Watchlist",
+          "type": "submit"
+        },
+        {
+          "id": "smart-filter-icon-watchlist",
+          "tagName": "svg"
+        },
+        {
+          "id": "smart-filter-label-watchlist",
+          "tagName": "SPAN",
+          "text": "Watchlist"
+        },
+        {
+          "id": "view-mode-toggles",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "view-mode-compact-btn",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "view-mode-comfortable-btn",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "view-mode-spacious-btn",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "category-bar-row",
+          "tagName": "DIV",
+          "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
+        },
+        {
+          "id": "marketplace-grid-container",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-dashboard",
+          "tagName": "A",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-item-dashboard",
+          "tagName": "DIV",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-icon-dashboard",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dashboard",
+          "tagName": "SPAN",
+          "text": "Dashboard"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"farpXWA7I2j0ZTlZFZooL\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        }
+      ]
+    },
+    {
+      "route": "/signin",
+      "title": "Boliyan - Speak Your Price",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nSell Item\nWelcome Back\nSign in to c"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "Welcome Back\nSign in to continue to Boliyan\nEmail\n"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "Welcome Back\nSign in to continue to Boliyan\nEmail\n"
+        },
+        {
+          "id": "auth-layout-root",
+          "tagName": "DIV",
+          "text": "Welcome Back\nSign in to continue to Boliyan\nEmail\n"
+        },
+        {
+          "id": "signin-card",
+          "tagName": "DIV",
+          "text": "Welcome Back\nSign in to continue to Boliyan\nEmail\n"
+        },
+        {
+          "id": "signin-header",
+          "tagName": "DIV",
+          "text": "Welcome Back\nSign in to continue to Boliyan"
+        },
+        {
+          "id": "signin-title",
+          "tagName": "DIV",
+          "text": "Welcome Back"
+        },
+        {
+          "id": "signin-description",
+          "tagName": "DIV",
+          "text": "Sign in to continue to Boliyan"
+        },
+        {
+          "id": "signin-form-container",
+          "tagName": "DIV",
+          "text": "Email\nPassword\nSign In\nDon't have an account? Sign"
+        },
+        {
+          "id": "signin-form",
+          "tagName": "FORM",
+          "text": "Email\nPassword\nSign In"
+        },
+        {
+          "id": "email-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "email",
+          "placeholder": "you@example.com"
+        },
+        {
+          "id": "password-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "password",
+          "placeholder": "••••••••"
+        },
+        {
+          "id": "signin-submit-btn",
+          "tagName": "BUTTON",
+          "text": "Sign In",
+          "type": "submit"
+        },
+        {
+          "id": "signup-link",
+          "tagName": "A",
+          "text": "Sign Up"
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-dashboard",
+          "tagName": "A",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-item-dashboard",
+          "tagName": "DIV",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-icon-dashboard",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dashboard",
+          "tagName": "SPAN",
+          "text": "Dashboard"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"ucv6eCdrv2OFG0QuwBelK\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "route": "/list",
+      "title": "Boliyan - Speak Your Price",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nSell Item\nList an Item\nMinimalist l"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "List an Item\nMinimalist listing. Set your price an"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "List an Item\nMinimalist listing. Set your price an"
+        },
+        {
+          "id": "list-page-container",
+          "tagName": "DIV",
+          "text": "List an Item\nMinimalist listing. Set your price an"
+        },
+        {
+          "id": "list-item-card",
+          "tagName": "DIV",
+          "text": "List an Item\nMinimalist listing. Set your price an"
+        },
+        {
+          "id": "list-item-header",
+          "tagName": "DIV",
+          "text": "List an Item\nMinimalist listing. Set your price an"
+        },
+        {
+          "id": "list-item-title-heading",
+          "tagName": "DIV",
+          "text": "List an Item"
+        },
+        {
+          "id": "list-item-description-text",
+          "tagName": "DIV",
+          "text": "Minimalist listing. Set your price and choose your"
+        },
+        {
+          "id": "list-item-form",
+          "tagName": "DIV",
+          "text": "Product Images (Max 5)\nAdd Photo\nItem Title\n*\nCate"
+        },
+        {
+          "id": "images-label",
+          "tagName": "LABEL",
+          "text": "Product Images (Max 5)"
+        },
+        {
+          "id": "images-preview-container",
+          "tagName": "DIV",
+          "text": "Add Photo"
+        },
+        {
+          "id": "add-image-label",
+          "tagName": "LABEL",
+          "text": "Add Photo"
+        },
+        {
+          "id": "camera-icon",
+          "tagName": "svg"
+        },
+        {
+          "id": "add-photo-text",
+          "tagName": "SPAN",
+          "text": "Add Photo"
+        },
+        {
+          "id": "image-upload-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "file"
+        },
+        {
+          "id": "title-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "text",
+          "placeholder": "e.g. Sony Headphones, Wood Table..."
+        },
+        {
+          "id": "category-select",
+          "tagName": "BUTTON",
+          "text": "Select Category",
+          "type": "button"
+        },
+        {
+          "id": "price-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "number",
+          "placeholder": "0"
+        },
+        {
+          "id": "description-textarea",
+          "tagName": "TEXTAREA",
+          "text": "",
+          "type": "textarea",
+          "placeholder": "Tell buyers about condition, usage, and any defects..."
+        },
+        {
+          "id": "bidding-style-heading",
+          "tagName": "H3",
+          "text": "Bidding Style"
+        },
+        {
+          "id": "public-auction-option",
+          "tagName": "DIV",
+          "text": "Public Auction\n\nEveryone can see the highest bid"
+        },
+        {
+          "id": "sealed-bids-option",
+          "tagName": "DIV",
+          "text": "Secret Bids Only\n\nOnly you see the bid amounts"
+        },
+        {
+          "id": "duration-btn-24",
+          "tagName": "BUTTON",
+          "text": "24 Hours",
+          "type": "submit"
+        },
+        {
+          "id": "duration-btn-48",
+          "tagName": "BUTTON",
+          "text": "48 Hours",
+          "type": "submit"
+        },
+        {
+          "id": "duration-btn-72",
+          "tagName": "BUTTON",
+          "text": "72 Hours",
+          "type": "submit"
+        },
+        {
+          "id": "cancel-listing-btn",
+          "tagName": "BUTTON",
+          "text": "Cancel",
+          "type": "button"
+        },
+        {
+          "id": "post-listing-btn",
+          "tagName": "BUTTON",
+          "text": "Post Listing",
+          "type": "submit"
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-dashboard",
+          "tagName": "A",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-item-dashboard",
+          "tagName": "DIV",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-icon-dashboard",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dashboard",
+          "tagName": "SPAN",
+          "text": "Dashboard"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"-LZWBoXnfJzY-nXs8JxJn\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": "0\n1\nIssue"
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "route": "/inbox",
+      "title": "Boliyan - Speak Your Price",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nSell Item\nMessages\nAll\nOffers\nBids\n"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "Messages\nAll\nOffers\nBids\n\nNo active conversations\n"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "Messages\nAll\nOffers\nBids\n\nNo active conversations\n"
+        },
+        {
+          "id": "inbox-container",
+          "tagName": "DIV",
+          "text": "Messages\nAll\nOffers\nBids\n\nNo active conversations\n"
+        },
+        {
+          "id": "inbox-sidebar",
+          "tagName": "DIV",
+          "text": "Messages\nAll\nOffers\nBids\n\nNo active conversations\n"
+        },
+        {
+          "id": "inbox-tabs-list",
+          "tagName": "DIV",
+          "text": "All\nOffers\nBids"
+        },
+        {
+          "id": "inbox-all-tab",
+          "tagName": "BUTTON",
+          "text": "All",
+          "type": "button"
+        },
+        {
+          "id": "inbox-offers-tab",
+          "tagName": "BUTTON",
+          "text": "Offers",
+          "type": "button"
+        },
+        {
+          "id": "inbox-bids-tab",
+          "tagName": "BUTTON",
+          "text": "Bids",
+          "type": "button"
+        },
+        {
+          "id": "radix-_R_9inebbe9lb_-content-all",
+          "tagName": "DIV",
+          "text": "No active conversations\n\nChats appear here once a "
+        },
+        {
+          "id": "radix-_R_9inebbe9lb_-content-offers",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "radix-_R_9inebbe9lb_-content-bids",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "chat-window-container",
+          "tagName": "DIV",
+          "text": "Speak Your Price\n\nChoose a chat from the left to a"
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-dashboard",
+          "tagName": "A",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-item-dashboard",
+          "tagName": "DIV",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-icon-dashboard",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dashboard",
+          "tagName": "SPAN",
+          "text": "Dashboard"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"iYaJeqfxIB3LNbjWlJfmF\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "title": "Boliyan - Speak Your Price",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nSell Item\nDashboard\n\nManage your ma"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN\nSell Item"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+        },
+        {
+          "id": "dashboard-root",
+          "tagName": "DIV",
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+        },
+        {
+          "id": "dashboard-title",
+          "tagName": "H1",
+          "text": "Dashboard"
+        },
+        {
+          "id": "dashboard-subtitle",
+          "tagName": "P",
+          "text": "Manage your marketplace activity."
+        },
+        {
+          "id": "dashboard-messages-btn",
+          "tagName": "A",
+          "text": "Messages"
+        },
+        {
+          "id": "dashboard-new-listing-btn",
+          "tagName": "A",
+          "text": "Post New"
+        },
+        {
+          "id": "dashboard-new-listing-plus",
+          "tagName": "svg"
+        },
+        {
+          "id": "dashboard-tabs",
+          "tagName": "DIV",
+          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0\nNo activ"
+        },
+        {
+          "id": "dashboard-tabs-list",
+          "tagName": "DIV",
+          "text": "OffersBidsListingsWatchlist"
+        },
+        {
+          "id": "tab-trigger-active-bids-mobile",
+          "tagName": "BUTTON",
+          "text": "Offers",
+          "type": "button"
+        },
+        {
+          "id": "tab-trigger-my-bids-mobile",
+          "tagName": "BUTTON",
+          "text": "Bids",
+          "type": "button"
+        },
+        {
+          "id": "tab-trigger-my-listings-mobile",
+          "tagName": "BUTTON",
+          "text": "Listings",
+          "type": "button"
+        },
+        {
+          "id": "tab-trigger-watchlist-mobile",
+          "tagName": "BUTTON",
+          "text": "Watchlist",
+          "type": "button"
+        },
+        {
+          "id": "dashboard-tabs-list-desktop",
+          "tagName": "DIV",
+          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0"
+        },
+        {
+          "id": "tab-trigger-active-bids",
+          "tagName": "BUTTON",
+          "text": "Offers\n0",
+          "type": "button"
+        },
+        {
+          "id": "tab-badge-active-bids",
+          "tagName": "SPAN",
+          "text": "0"
+        },
+        {
+          "id": "tab-trigger-my-bids",
+          "tagName": "BUTTON",
+          "text": "Bids\n0",
+          "type": "button"
+        },
+        {
+          "id": "tab-badge-my-bids",
+          "tagName": "SPAN",
+          "text": "0"
+        },
+        {
+          "id": "tab-trigger-my-listings",
+          "tagName": "BUTTON",
+          "text": "My Listings\n0",
+          "type": "button"
+        },
+        {
+          "id": "tab-badge-my-listings",
+          "tagName": "SPAN",
+          "text": "0"
+        },
+        {
+          "id": "tab-trigger-watchlist",
+          "tagName": "BUTTON",
+          "text": "Watchlist\n0",
+          "type": "button"
+        },
+        {
+          "id": "tab-badge-watchlist",
+          "tagName": "SPAN",
+          "text": "0"
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "PostMarketInboxDashboard"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-dashboard",
+          "tagName": "A",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-item-dashboard",
+          "tagName": "DIV",
+          "text": "Dashboard"
+        },
+        {
+          "id": "bottom-nav-icon-dashboard",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dashboard",
+          "tagName": "SPAN",
+          "text": "Dashboard"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"2jVKRf7G7fRwmMj3Pfj-n\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

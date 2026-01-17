@@ -79,17 +79,13 @@ export function SearchProvider({ children }: { children: ReactNode }) {
           // If user selects 'all', we skip this. If 'active', we filter 'active'.
       }
 
-      // Full-text search
+      // Hybrid ranked search: exact matches first, fuzzy matches second
       if (filters.query) {
-        // Using Supabase textSearch if migration applied
-        // If not, this might fail or we should use ILIKE as fallback if column missing
-        // For robustness given the plan, we assume migration is run or will be run.
-        // Falls back to ILIKE if search_vector column not indexed properly or accessible? 
-        // No, TSVector usage is explicit.
-        query = query.textSearch('search_vector', filters.query, {
-          type: 'websearch',
-          config: 'english',
-        });
+        const searchTerm = filters.query.trim();
+        
+        // Use ILIKE to get ALL potential matches (including typos and partial words)
+        // This ensures we never miss a result
+        query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
         
         // Save to search history
         if (user) {
@@ -141,7 +137,38 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       if (data) {
         // Transform
         // Need to cast to unknown first to match ListingWithSeller interface structure expectations
+        // Transform database rows to items
         let items = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
+        
+        // Rank results: exact matches first, then partial matches
+        if (filters.query) {
+          const searchLower = filters.query.toLowerCase().trim();
+          items = items.sort((a, b) => {
+            const aTitleLower = a.title.toLowerCase();
+            const bTitleLower = b.title.toLowerCase();
+            
+            // Exact title match gets highest priority
+            const aExactTitle = aTitleLower === searchLower;
+            const bExactTitle = bTitleLower === searchLower;
+            if (aExactTitle && !bExactTitle) return -1;
+            if (!aExactTitle && bExactTitle) return 1;
+            
+            // Title starts with query gets second priority
+            const aStartsWith = aTitleLower.startsWith(searchLower);
+            const bStartsWith = bTitleLower.startsWith(searchLower);
+            if (aStartsWith && !bStartsWith) return -1;
+            if (!aStartsWith && bStartsWith) return 1;
+            
+            // Title contains whole word gets third priority
+            const aWholeWord = new RegExp(`\\b${searchLower}\\b`, 'i').test(aTitleLower);
+            const bWholeWord = new RegExp(`\\b${searchLower}\\b`, 'i').test(bTitleLower);
+            if (aWholeWord && !bWholeWord) return -1;
+            if (!aWholeWord && bWholeWord) return 1;
+            
+            // Otherwise maintain original order (newest first)
+            return 0;
+          });
+        }
         
         // Client-side sort for 'nearest'
         if (filters.sortBy === 'nearest' && filters.location) {

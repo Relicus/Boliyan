@@ -4,12 +4,16 @@ import { Item, User, Bid, Conversation } from '@/types';
 type ListingRow = Database['public']['Tables']['listings']['Row'];
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 
+import { CITY_COORDINATES } from './locations';
+
 // We need a joined type because we will fetch listings with their sellers
 export type ListingWithSeller = ListingRow & {
   profiles: ProfileRow | null;
 };
 
 export function transformProfileToUser(profile: ProfileRow): User {
+  const cityCoords = profile.location ? CITY_COORDINATES[profile.location] : null;
+  
   return {
     id: profile.id,
     name: profile.full_name || 'Anonymous',
@@ -17,9 +21,9 @@ export function transformProfileToUser(profile: ProfileRow): User {
     rating: profile.rating || 0,
     reviewCount: profile.rating_count || 0,
     location: {
-      lat: 0,
-      lng: 0,
-      address: profile.location || 'Unknown'
+      lat: cityCoords?.lat || 24.8607, // Default to Karachi if unknown
+      lng: cityCoords?.lng || 67.0011,
+      address: profile.location || 'Karachi' // Default to Karachi instead of 'Unknown' for better UI
     },
     isVerified: false,
     badges: [],

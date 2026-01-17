@@ -1,6 +1,6 @@
 "use client";
 
-import { useApp } from "@/lib/store";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { CATEGORIES } from "@/lib/constants";
 import { FILTERS } from "./SmartFilterBar";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Check } from "lucide-react";
 
 export default function FilterSheetContent({ onClose }: { onClose?: () => void }) {
-  const { filters, setFilter } = useApp();
+  const { filters, setFilter } = useMarketplace();
 
   const resetFilters = () => {
     setFilter('category', null);

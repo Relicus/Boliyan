@@ -1,0 +1,986 @@
+{
+  "timestamp": "2026-01-17T13:46:44.993Z",
+  "summary": {
+    "totalComponents": 55,
+    "totalContexts": 8,
+    "totalHooks": 2,
+    "totalLibs": 9
+  },
+  "routes": [
+    "/",
+    "/signin",
+    "/signup",
+    "/admin",
+    "/admin/seed",
+    "/auth",
+    "/auth/callback",
+    "/categories",
+    "/dashboard",
+    "/dashboard/seller",
+    "/inbox",
+    "/list",
+    "/product",
+    "/product/:id",
+    "/profile",
+    "/samples",
+    "/samples/seller-card"
+  ],
+  "contexts": [
+    {
+      "name": "AuthContext",
+      "path": "\\src\\context\\AuthContext.tsx",
+      "type": "context",
+      "exports": [
+        "AuthProvider",
+        "useAuth"
+      ],
+      "dependencies": [
+        "@/types",
+        "@/lib/supabase"
+      ]
+    },
+    {
+      "name": "ChatContext",
+      "path": "\\src\\context\\ChatContext.tsx",
+      "type": "context",
+      "exports": [
+        "ChatProvider",
+        "useChat"
+      ],
+      "dependencies": [
+        "@/types",
+        "@/lib/supabase",
+        "@/lib/transform"
+      ]
+    },
+    {
+      "name": "DashboardContext",
+      "path": "\\src\\context\\DashboardContext.tsx",
+      "type": "context",
+      "exports": [
+        "DashboardProvider",
+        "useDashboard"
+      ],
+      "dependencies": [
+        "@/lib/supabase/client",
+        "@/lib/store",
+        "@/types/dashboard",
+        "@/types"
+      ]
+    },
+    {
+      "name": "MarketplaceContext",
+      "path": "\\src\\context\\MarketplaceContext.tsx",
+      "type": "context",
+      "exports": [
+        "MarketplaceProvider",
+        "useMarketplace"
+      ],
+      "dependencies": [
+        "@/types",
+        "@/lib/supabase",
+        "@/lib/transform"
+      ]
+    },
+    {
+      "name": "NotificationContext",
+      "path": "\\src\\context\\NotificationContext.tsx",
+      "type": "context",
+      "exports": [
+        "NotificationProvider",
+        "useNotifications"
+      ],
+      "dependencies": [
+        "@/lib/supabase",
+        "@/context/AuthContext",
+        "@/types/notification"
+      ]
+    },
+    {
+      "name": "ReviewContext",
+      "path": "\\src\\context\\ReviewContext.tsx",
+      "type": "context",
+      "exports": [
+        "ReviewProvider",
+        "useReviews"
+      ],
+      "dependencies": [
+        "@/lib/supabase",
+        "@/context/AuthContext",
+        "@/types/review"
+      ]
+    },
+    {
+      "name": "SearchContext",
+      "path": "\\src\\context\\SearchContext.tsx",
+      "type": "context",
+      "exports": [
+        "SearchProvider",
+        "useSearch"
+      ],
+      "dependencies": [
+        "@/lib/supabase",
+        "@/types",
+        "@/lib/searchUtils",
+        "@/lib/transform"
+      ]
+    },
+    {
+      "name": "TimeContext",
+      "path": "\\src\\context\\TimeContext.tsx",
+      "type": "context",
+      "exports": [
+        "TimeProvider",
+        "useTime"
+      ],
+      "dependencies": []
+    }
+  ],
+  "hooks": [
+    {
+      "name": "useBidding",
+      "path": "\\src\\hooks\\useBidding.ts",
+      "type": "hook",
+      "exports": [
+        "useBidding"
+      ],
+      "dependencies": [
+        "@/lib/store",
+        "@/types",
+        "@/lib/bidding"
+      ]
+    },
+    {
+      "name": "useIntersectionObserver",
+      "path": "\\src\\hooks\\useIntersectionObserver.ts",
+      "type": "hook",
+      "exports": [
+        "useIntersectionObserver"
+      ],
+      "dependencies": []
+    }
+  ],
+  "libs": [
+    {
+      "name": "bidding",
+      "path": "\\src\\lib\\bidding.ts",
+      "type": "lib",
+      "exports": [
+        "MIN_BID_PERCENTAGE",
+        "isValidBid",
+        "getMinimumAllowedBid",
+        "getSmartStep"
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "constants",
+      "path": "\\src\\lib\\constants.ts",
+      "type": "lib",
+      "exports": [
+        "CATEGORIES"
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "profileScore",
+      "path": "\\src\\lib\\profileScore.ts",
+      "type": "lib",
+      "exports": [
+        "calculateProfileCompleteness"
+      ],
+      "dependencies": [
+        "@/types"
+      ]
+    },
+    {
+      "name": "searchUtils",
+      "path": "\\src\\lib\\searchUtils.ts",
+      "type": "lib",
+      "exports": [
+        "calculateDistance",
+        "sortByDistance"
+      ],
+      "dependencies": [
+        "@/types"
+      ]
+    },
+    {
+      "name": "store",
+      "path": "\\src\\lib\\store.tsx",
+      "type": "lib",
+      "exports": [
+        "AppProvider",
+        "useApp"
+      ],
+      "dependencies": [
+        "@/context/AuthContext",
+        "@/context/MarketplaceContext",
+        "@/context/ChatContext",
+        "@/context/TimeContext",
+        "@/context/SearchContext",
+        "@/context/ReviewContext"
+      ]
+    },
+    {
+      "name": "supabase",
+      "path": "\\src\\lib\\supabase.ts",
+      "type": "lib",
+      "exports": [
+        "supabase"
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "transform",
+      "path": "\\src\\lib\\transform.ts",
+      "type": "lib",
+      "exports": [
+        "transformProfileToUser",
+        "transformListingToItem",
+        "transformBidToHydratedBid",
+        "transformConversationToHydratedConversation"
+      ],
+      "dependencies": [
+        "@/types"
+      ]
+    },
+    {
+      "name": "uploadImage",
+      "path": "\\src\\lib\\uploadImage.ts",
+      "type": "lib",
+      "exports": [
+        "uploadListingImage"
+      ],
+      "dependencies": [
+        "@/lib/supabase"
+      ]
+    },
+    {
+      "name": "utils",
+      "path": "\\src\\lib\\utils.ts",
+      "type": "lib",
+      "exports": [
+        "cn",
+        "getFuzzyLocationString",
+        "calculatePrivacySafeDistance"
+      ],
+      "dependencies": []
+    }
+  ],
+  "components": {
+    "marketplace": [
+      {
+        "name": "CategoryBar",
+        "path": "\\src\\components\\marketplace\\CategoryBar.tsx",
+        "type": "component",
+        "exports": [
+          "default:CategoryBar"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/lib/utils",
+          "@/lib/constants"
+        ]
+      },
+      {
+        "name": "FilterSheetContent",
+        "path": "\\src\\components\\marketplace\\FilterSheetContent.tsx",
+        "type": "component",
+        "exports": [
+          "default:FilterSheetContent"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/lib/constants",
+          "@/lib/utils",
+          "@/components/ui/button",
+          "@/components/ui/input",
+          "@/components/ui/label",
+          "@/components/ui/separator",
+          "@/components/ui/badge"
+        ]
+      },
+      {
+        "name": "ItemCard",
+        "path": "\\src\\components\\marketplace\\ItemCard.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/types",
+          "@/components/ui/card",
+          "@/components/ui/dialog",
+          "@/components/ui/badge",
+          "@/lib/store",
+          "@/context/TimeContext",
+          "@/hooks/useBidding",
+          "@/components/common/GamificationBadge",
+          "@/components/common/VerifiedBadge",
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "ItemCardSkeleton",
+        "path": "\\src\\components\\marketplace\\ItemCardSkeleton.tsx",
+        "type": "component",
+        "exports": [
+          "default:ItemCardSkeleton"
+        ],
+        "dependencies": [
+          "@/components/ui/card"
+        ]
+      },
+      {
+        "name": "LocationSelector",
+        "path": "\\src\\components\\marketplace\\LocationSelector.tsx",
+        "type": "component",
+        "exports": [
+          "LocationSelector"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/components/ui/button",
+          "@/components/ui/popover",
+          "@/components/ui/command",
+          "@/components/ui/slider",
+          "@/lib/constants/locations",
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "MarketplaceGrid",
+        "path": "\\src\\components\\marketplace\\MarketplaceGrid.tsx",
+        "type": "component",
+        "exports": [
+          "default:MarketplaceGrid"
+        ],
+        "dependencies": [
+          "@/context/MarketplaceContext",
+          "@/context/SearchContext",
+          "@/components/ui/EmptyState",
+          "@/components/search/CategoryNav",
+          "@/components/ui/button",
+          "@/hooks/useIntersectionObserver",
+          "@/components/ui/select",
+          "@/components/ui/badge",
+          "@/lib/constants"
+        ]
+      },
+      {
+        "name": "PriceSelector",
+        "path": "\\src\\components\\marketplace\\PriceSelector.tsx",
+        "type": "component",
+        "exports": [
+          "default:PriceSelector"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/components/ui/popover",
+          "@/components/ui/button",
+          "@/components/ui/input",
+          "@/components/ui/label",
+          "@/components/ui/badge",
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "ProductDetailsModal",
+        "path": "\\src\\components\\marketplace\\ProductDetailsModal.tsx",
+        "type": "component",
+        "exports": [
+          "default:ProductDetailsModal"
+        ],
+        "dependencies": [
+          "@/types",
+          "@/components/ui/dialog",
+          "@/components/ui/badge",
+          "@/lib/store",
+          "@/hooks/useBidding",
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "SmartFilterBar",
+        "path": "\\src\\components\\marketplace\\SmartFilterBar.tsx",
+        "type": "component",
+        "exports": [
+          "FILTERS",
+          "default:SmartFilterBar"
+        ],
+        "dependencies": [
+          "@/context/MarketplaceContext",
+          "@/context/SearchContext",
+          "@/lib/utils"
+        ]
+      }
+    ],
+    "dashboard": [
+      {
+        "name": "AchievementSection",
+        "path": "\\src\\components\\dashboard\\AchievementSection.tsx",
+        "type": "component",
+        "exports": [
+          "AchievementSection"
+        ],
+        "dependencies": [
+          "@/types",
+          "@/components/common/GamificationBadge",
+          "@/components/ui/card"
+        ]
+      },
+      {
+        "name": "ListingActionMenu",
+        "path": "\\src\\components\\dashboard\\ListingActionMenu.tsx",
+        "type": "component",
+        "exports": [
+          "ListingActionMenu"
+        ],
+        "dependencies": [
+          "@/components/ui/button",
+          "@/context/DashboardContext"
+        ]
+      },
+      {
+        "name": "MyBidCard",
+        "path": "\\src\\components\\dashboard\\MyBidCard.tsx",
+        "type": "component",
+        "exports": [
+          "default:MyBidCard"
+        ],
+        "dependencies": [
+          "@/types",
+          "@/components/ui/badge",
+          "@/lib/store",
+          "@/components/marketplace/ProductDetailsModal"
+        ]
+      },
+      {
+        "name": "MyListingsTable",
+        "path": "\\src\\components\\dashboard\\MyListingsTable.tsx",
+        "type": "component",
+        "exports": [
+          "MyListingsTable"
+        ],
+        "dependencies": [
+          "@/context/DashboardContext",
+          "@/components/ui/badge"
+        ]
+      },
+      {
+        "name": "ProfileSettings",
+        "path": "\\src\\components\\dashboard\\ProfileSettings.tsx",
+        "type": "component",
+        "exports": [
+          "ProfileSettings"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/components/ui/card",
+          "@/components/ui/avatar",
+          "@/components/ui/input",
+          "@/components/ui/label",
+          "@/components/ui/button",
+          "@/components/ui/separator",
+          "@/components/ui/badge",
+          "@/components/common/VerifiedBadge"
+        ]
+      },
+      {
+        "name": "SellerStats",
+        "path": "\\src\\components\\dashboard\\SellerStats.tsx",
+        "type": "component",
+        "exports": [
+          "SellerStats"
+        ],
+        "dependencies": [
+          "@/components/ui/card",
+          "@/context/DashboardContext"
+        ]
+      },
+      {
+        "name": "WatchedItemCard",
+        "path": "\\src\\components\\dashboard\\WatchedItemCard.tsx",
+        "type": "component",
+        "exports": [
+          "default:WatchedItemCard"
+        ],
+        "dependencies": [
+          "@/types",
+          "@/components/ui/badge",
+          "@/lib/store",
+          "@/components/marketplace/ProductDetailsModal",
+          "@/components/ui/button"
+        ]
+      }
+    ],
+    "inbox": [
+      {
+        "name": "ChatWindow",
+        "path": "\\src\\components\\inbox\\ChatWindow.tsx",
+        "type": "component",
+        "exports": [
+          "ChatWindow"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/components/ui/avatar",
+          "@/components/ui/button",
+          "@/components/ui/input",
+          "@/lib/utils",
+          "@/components/common/VerifiedBadge",
+          "@/components/profile/ReviewForm",
+          "@/context/ReviewContext"
+        ]
+      },
+      {
+        "name": "ConversationList",
+        "path": "\\src\\components\\inbox\\ConversationList.tsx",
+        "type": "component",
+        "exports": [
+          "ConversationList"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/types",
+          "@/components/ui/card",
+          "@/components/ui/avatar",
+          "@/lib/utils",
+          "@/components/common/VerifiedBadge"
+        ]
+      }
+    ],
+    "profile": [
+      {
+        "name": "ProfileCompleteness",
+        "path": "\\src\\components\\profile\\ProfileCompleteness.tsx",
+        "type": "component",
+        "exports": [
+          "default:ProfileCompleteness"
+        ],
+        "dependencies": [
+          "@/types",
+          "@/lib/profileScore",
+          "@/lib/utils",
+          "@/components/ui/button"
+        ]
+      },
+      {
+        "name": "ReviewForm",
+        "path": "\\src\\components\\profile\\ReviewForm.tsx",
+        "type": "component",
+        "exports": [
+          "default:ReviewForm"
+        ],
+        "dependencies": [
+          "@/context/ReviewContext",
+          "@/components/ui/dialog",
+          "@/components/ui/button",
+          "@/components/ui/textarea",
+          "@/components/ui/label"
+        ]
+      },
+      {
+        "name": "ReviewList",
+        "path": "\\src\\components\\profile\\ReviewList.tsx",
+        "type": "component",
+        "exports": [
+          "default:ReviewList"
+        ],
+        "dependencies": [
+          "@/context/ReviewContext",
+          "@/types/review",
+          "@/components/ui/avatar",
+          "@/lib/utils",
+          "@/components/ui/badge"
+        ]
+      },
+      {
+        "name": "StarRating",
+        "path": "\\src\\components\\profile\\StarRating.tsx",
+        "type": "component",
+        "exports": [
+          "default:StarRating"
+        ],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      }
+    ],
+    "layout": [
+      {
+        "name": "BottomNav",
+        "path": "\\src\\components\\layout\\BottomNav.tsx",
+        "type": "component",
+        "exports": [
+          "default:BottomNav"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/lib/utils",
+          "@/components/ui/sheet",
+          "@/components/marketplace/FilterSheetContent"
+        ]
+      },
+      {
+        "name": "Navbar",
+        "path": "\\src\\components\\layout\\Navbar.tsx",
+        "type": "component",
+        "exports": [
+          "default:Navbar"
+        ],
+        "dependencies": [
+          "@/components/ui/input",
+          "@/components/ui/button",
+          "@/components/ui/avatar",
+          "@/lib/utils",
+          "@/lib/store",
+          "@/components/marketplace/LocationSelector",
+          "@/components/common/VerifiedBadge",
+          "@/components/search/SearchBar",
+          "@/components/notifications/NotificationDropdown"
+        ]
+      },
+      {
+        "name": "ScrollToTop",
+        "path": "\\src\\components\\layout\\ScrollToTop.tsx",
+        "type": "component",
+        "exports": [
+          "default:ScrollToTop"
+        ],
+        "dependencies": []
+      },
+      {
+        "name": "SearchDropdown",
+        "path": "\\src\\components\\layout\\SearchDropdown.tsx",
+        "type": "component",
+        "exports": [
+          "SearchDropdown"
+        ],
+        "dependencies": [
+          "@/components/ui/command",
+          "@/components/ui/popover",
+          "@/components/ui/input",
+          "@/lib/store",
+          "@/types",
+          "@/components/ui/badge",
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "Sidebar",
+        "path": "\\src\\components\\layout\\Sidebar.tsx",
+        "type": "component",
+        "exports": [
+          "default:Sidebar"
+        ],
+        "dependencies": [
+          "@/components/ui/separator",
+          "@/lib/store",
+          "@/components/marketplace/LocationSelector",
+          "@/lib/utils"
+        ]
+      }
+    ],
+    "search": [
+      {
+        "name": "CategoryNav",
+        "path": "\\src\\components\\search\\CategoryNav.tsx",
+        "type": "component",
+        "exports": [
+          "default:CategoryNav"
+        ],
+        "dependencies": [
+          "@/context/SearchContext",
+          "@/components/ui/button",
+          "@/lib/utils",
+          "@/lib/constants"
+        ]
+      },
+      {
+        "name": "SearchBar",
+        "path": "\\src\\components\\search\\SearchBar.tsx",
+        "type": "component",
+        "exports": [
+          "default:SearchBar"
+        ],
+        "dependencies": [
+          "@/context/SearchContext",
+          "@/components/ui/input",
+          "@/components/ui/button"
+        ]
+      },
+      {
+        "name": "SearchFilters",
+        "path": "\\src\\components\\search\\SearchFilters.tsx",
+        "type": "component",
+        "exports": [
+          "default:SearchFilters"
+        ],
+        "dependencies": [
+          "@/context/SearchContext",
+          "@/components/ui/button",
+          "@/components/ui/slider",
+          "@/components/ui/label",
+          "@/components/ui/select"
+        ]
+      },
+      {
+        "name": "SimilarItems",
+        "path": "\\src\\components\\search\\SimilarItems.tsx",
+        "type": "component",
+        "exports": [
+          "default:SimilarItems"
+        ],
+        "dependencies": [
+          "@/context/SearchContext",
+          "@/types",
+          "@/components/marketplace/ItemCard"
+        ]
+      }
+    ],
+    "seller": [
+      {
+        "name": "DeleteConfirmationDialog",
+        "path": "\\src\\components\\seller\\DeleteConfirmationDialog.tsx",
+        "type": "component",
+        "exports": [
+          "default:DeleteConfirmationDialog"
+        ],
+        "dependencies": [
+          "@/components/ui/dialog",
+          "@/components/ui/button",
+          "@/components/ui/input"
+        ]
+      },
+      {
+        "name": "SellerBidCard",
+        "path": "\\src\\components\\seller\\SellerBidCard.tsx",
+        "type": "component",
+        "exports": [
+          "default:SellerBidCard"
+        ],
+        "dependencies": [
+          "@/types",
+          "@/components/ui/avatar",
+          "@/components/ui/button",
+          "@/components/ui/badge",
+          "@/lib/utils",
+          "@/lib/store"
+        ]
+      }
+    ],
+    "notifications": [
+      {
+        "name": "NotificationDropdown",
+        "path": "\\src\\components\\notifications\\NotificationDropdown.tsx",
+        "type": "component",
+        "exports": [
+          "NotificationDropdown"
+        ],
+        "dependencies": [
+          "@/components/ui/button",
+          "@/context/NotificationContext",
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "NotificationItem",
+        "path": "\\src\\components\\notifications\\NotificationItem.tsx",
+        "type": "component",
+        "exports": [
+          "NotificationItem"
+        ],
+        "dependencies": [
+          "@/types/notification",
+          "@/lib/utils"
+        ]
+      }
+    ],
+    "ui": [
+      {
+        "name": "avatar",
+        "path": "\\src\\components\\ui\\avatar.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "badge",
+        "path": "\\src\\components\\ui\\badge.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "button",
+        "path": "\\src\\components\\ui\\button.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "card",
+        "path": "\\src\\components\\ui\\card.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "command",
+        "path": "\\src\\components\\ui\\command.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils",
+          "@/components/ui/dialog"
+        ]
+      },
+      {
+        "name": "dialog",
+        "path": "\\src\\components\\ui\\dialog.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "dropdown-menu",
+        "path": "\\src\\components\\ui\\dropdown-menu.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "EmptyState",
+        "path": "\\src\\components\\ui\\EmptyState.tsx",
+        "type": "component",
+        "exports": [
+          "default:EmptyState"
+        ],
+        "dependencies": [
+          "@/lib/store",
+          "@/components/ui/button"
+        ]
+      },
+      {
+        "name": "input",
+        "path": "\\src\\components\\ui\\input.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "label",
+        "path": "\\src\\components\\ui\\label.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "popover",
+        "path": "\\src\\components\\ui\\popover.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "scroll-area",
+        "path": "\\src\\components\\ui\\scroll-area.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "select",
+        "path": "\\src\\components\\ui\\select.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "separator",
+        "path": "\\src\\components\\ui\\separator.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "sheet",
+        "path": "\\src\\components\\ui\\sheet.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "slider",
+        "path": "\\src\\components\\ui\\slider.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "switch",
+        "path": "\\src\\components\\ui\\switch.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "tabs",
+        "path": "\\src\\components\\ui\\tabs.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "textarea",
+        "path": "\\src\\components\\ui\\textarea.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      },
+      {
+        "name": "tooltip",
+        "path": "\\src\\components\\ui\\tooltip.tsx",
+        "type": "component",
+        "exports": [],
+        "dependencies": [
+          "@/lib/utils"
+        ]
+      }
+    ]
+  }
+}

@@ -7,8 +7,10 @@ import { cn } from '@/lib/utils';
 import * as Icons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
+import { CATEGORIES } from '@/lib/constants';
+
 export default function CategoryNav() {
-  const { categories, filters, setFilters } = useSearch();
+  const { filters, setFilters } = useSearch();
 
   const handleSelect = (categoryId: string | undefined) => {
     setFilters({ ...filters, category: categoryId });
@@ -30,17 +32,18 @@ export default function CategoryNav() {
         >
           All
         </Button>
-        {categories.map((category) => {
-          // Dynamic Icon Rendering
-             const IconComponent = (Icons as unknown as Record<string, LucideIcon>)[category.icon] || Icons.HelpCircle;
-            const isActive = filters.category === category.id;
+        {CATEGORIES.map((category) => {
+          const isActive = filters.category === category.label;
+          // Skip "All Items" as we have a dedicated All button, or use it? 
+          // The constant has All Items as first entry.
+          if (category.label === 'All Items') return null;
 
           return (
             <Button
-              key={category.id}
+              key={category.label}
               variant={isActive ? "default" : "outline"}
               size="sm"
-              onClick={() => handleSelect(category.id)}
+              onClick={() => handleSelect(category.label)}
               className={cn(
                 "rounded-full h-8 px-3 text-xs font-medium gap-2 transition-all",
                 isActive
@@ -48,16 +51,8 @@ export default function CategoryNav() {
                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               )}
             >
-              <IconComponent className={cn("h-3.5 w-3.5", isActive ? "text-white" : "text-slate-400")} />
-              {category.name}
-              {category.count !== undefined && category.count > 0 && (
-                <span className={cn(
-                    "ml-1 px-1.5 py-0.5 rounded-full text-[10px]",
-                    isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                )}>
-                  {category.count}
-                </span>
-              )}
+              <category.icon className={cn("h-3.5 w-3.5", isActive ? "text-white" : "text-slate-400")} />
+              {category.label}
             </Button>
           );
         })}
