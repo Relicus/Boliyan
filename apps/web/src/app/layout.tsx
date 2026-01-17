@@ -76,6 +76,11 @@ export const viewport: Viewport = {
 
 
 
+import { NotificationProvider } from "@/context/NotificationContext";
+// ... imports
+
+// ...
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -88,17 +93,19 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${notoUrdu.variable} antialiased bg-slate-50`}
       >
         <AppProvider>
-          <Suspense fallback={<div className="h-16 border-b bg-white" />}>
-            <Navbar />
-          </Suspense>
-          <div id="layout-wrapper-02" className="flex pt-16 min-h-[100dvh]">
-            <Sidebar />
-            <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100dvh-4rem)] pb-16 md:pb-0">
-              {children}
-            </main>
-          </div>
-          <BottomNav />
-          <ScrollToTop />
+          <NotificationProvider>
+            <Suspense fallback={<div className="h-16 border-b bg-white" />}>
+              <Navbar />
+            </Suspense>
+            <div id="layout-wrapper-02" className="flex pt-16 min-h-[100dvh]">
+              <Sidebar />
+              <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100dvh-4rem)] pb-16 md:pb-0">
+                {children}
+              </main>
+            </div>
+            <BottomNav />
+            <ScrollToTop />
+          </NotificationProvider>
         </AppProvider>
         <Toaster />
       </body>

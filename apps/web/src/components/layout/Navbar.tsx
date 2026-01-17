@@ -18,9 +18,9 @@ import { useApp } from "@/lib/store";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
-import { SearchDropdown } from "./SearchDropdown";
-import { NotificationDropdown } from "../navbar/NotificationDropdown";
-import { useOutbidAlerts } from "@/hooks/useOutbidAlerts";
+// import { SearchDropdown } from "./SearchDropdown";
+import SearchBar from "@/components/search/SearchBar";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useState, useEffect, useRef } from "react";
 
 
@@ -33,22 +33,11 @@ export default function Navbar() {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
 
-  // Notifications Calculation
-  // Fix: Move useOutbidAlerts usage here to lift state to UI
-  const { notifications, markAllAsRead, unreadCount } = useOutbidAlerts(bids, user);
-
   // Other notifications
-  const unreadMsgCount = messages.filter(m => !m.isRead && m.senderId !== user?.id).length;
+  const unreadMsgCount = (messages || []).filter(m => !m.isRead && m.senderId !== user?.id).length;
   
   const myItems = user ? items.filter(i => i.sellerId === user.id) : [];
   const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length;
-  
-  // Note: outbidCount logic might be redundant if we use the new notifications system, 
-  // but let's keep it for the "Bids" button badge if intended. 
-  // Actually, the user asked to refactor useOutbidAlerts so maybe we replace the logic?
-  // The existing "outbidCount" calculation in Navbar (lines 40-41) is purely derived from items/bids state.
-  // The "NotificationDropdown" is for *historical* alerts.
-  // We'll keep both for now as they serve slightly different purposes (one is a badge on a tab, one is a timeline).
   
   const myBidsItems = user ? items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id)) : [];
   const currentOutbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
@@ -135,7 +124,7 @@ export default function Navbar() {
 
         {/* Global Search Bar (Full Width on Mobile) */}
         <div className="flex-1 px-3 md:px-6 max-w-4xl">
-          <SearchDropdown />
+          <SearchBar />
         </div>
 
         <div id="navbar-right-section-11" className="flex items-center gap-2 shrink-0">
@@ -209,11 +198,7 @@ export default function Navbar() {
 
                 {/* New Notification Dropdown */}
                 <div className="mx-1">
-                   <NotificationDropdown 
-                      notifications={notifications} 
-                      onMarkAllAsRead={markAllAsRead} 
-                      unreadCount={unreadCount} 
-                   />
+                   <NotificationDropdown />
                 </div>
               </div>
 

@@ -43,3 +43,49 @@ To build the most **efficient, transparent, and safe** peer-to-peer marketplace 
 
 ## 🎯 Our Goal
 To become the **Default Operating System** for the secondary economy. Whether you're a student selling books or a family moving house, Boliyan is the only tool you need to get the job done.
+
+---
+
+## 📦 Current Development Status
+
+**Last Updated:** 2026-01-17
+
+### Completed Phases
+
+| Phase | Focus | Status |
+|-------|-------|--------|
+| **Phase 1-3** | Foundation — Schema, UI Components, Core Bidding Logic | ✅ Complete |
+| **Phase 4** | Real-Time Auth & Bidding — Supabase Auth, Live Bids, Image Storage | ✅ Complete |
+| **Phase 5** | Messaging & Engagement — Chat, Conversations, Read Receipts, Watchlist | ✅ Complete |
+| **Phase 6** | De-Mocking & Production Hardening — Full Supabase Integration, Build Validation | ✅ Complete |
+
+### Core Features Live
+- ✅ Real-time bidding with 70% minimum bid validation
+- ✅ "No Chat Before Deal" — Messaging unlocks only after bid acceptance
+- ✅ Watchlist with visual "Blue Halo" indicator
+- ✅ "Victory Halo" for winning the highest bid
+- ✅ Outbid notifications
+- ✅ Verified seller badges (`is_verified` flag)
+- ✅ Image gallery with full-screen immersive view
+- ✅ Apple-style minimalist UI with Framer Motion animations
+
+### Upcoming Priorities (Phase 7+)
+
+> **Note:** Boliyan is a **pure classifieds marketplace**. All transactions happen directly between buyers and sellers. We connect — we don't process payments.
+
+| Priority | Feature | Description |
+|----------|---------|-------------|
+| **High** | Notification System | Persistent DB-backed alerts (Outbid, Deal Accepted, New Message) with optional email/push |
+| **High** | Trust & Verification | User ratings/reviews after completed deals, profile completeness scores |
+| **High** | Search & Discovery | Full-text search, category filters, location-based sorting, "Similar Items" |
+| **Medium** | Seller Dashboard | "My Listings" analytics (views, bids), listing management (edit/relist/close) |
+| **Medium** | Production Polish | Performance optimization, image CDN, SEO improvements, rate limiting |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 16.1 (React 19)
+- **Styling:** Tailwind CSS v4 + Framer Motion
+- **Database:** Supabase (PostgreSQL + Real-time + Auth + Storage)
+- **Design Philosophy:** Apple-Style Minimalism — "Subtract before you add"

@@ -111,3 +111,6 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 3.  **Verify Animations**: Ensure Framer Motion transitions are smooth and don't cause layout shifts.
 4.  **Respect The Halo**: The "Victory Halo" is a core mechanic. Do not remove or alter its logic without specific instruction.
 5.  **Mock Data First**: Implement features using `mock-data.ts` first, then plan for SQL migration.
+
+## PROJECT MANIFESTO
+D:\VSCode\Boliyan\MANIFESTO.md

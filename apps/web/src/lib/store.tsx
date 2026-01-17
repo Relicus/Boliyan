@@ -5,6 +5,8 @@ import { useAuth, AuthProvider } from '@/context/AuthContext';
 import { useMarketplace, MarketplaceProvider } from '@/context/MarketplaceContext';
 import { useChat, ChatProvider } from '@/context/ChatContext';
 import { TimeProvider, useTime } from '@/context/TimeContext';
+import { useSearch, SearchProvider } from '@/context/SearchContext';
+import { useReviews, ReviewProvider } from '@/context/ReviewContext';
 
 /* 
   LEGACY COMPATIBILITY LAYER
@@ -21,16 +23,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // We nest them carefully:
   // 1. Time (Global lowest level)
   // 2. Auth (User session needed for data)
-  // 3. Marketplace & Chat (Depend on Auth)
+  // 3. Marketplace & Chat & Search (Depend on Auth)
   
   return (
     <TimeProvider>
       <AuthProvider>
-        <MarketplaceProvider>
-          <ChatProvider>
-            {children}
-          </ChatProvider>
-        </MarketplaceProvider>
+        <SearchProvider>
+          <MarketplaceProvider>
+            <ChatProvider>
+              <ReviewProvider>
+                {children}
+              </ReviewProvider>
+            </ChatProvider>
+          </MarketplaceProvider>
+        </SearchProvider>
       </AuthProvider>
     </TimeProvider>
   );
@@ -40,8 +46,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 export function useApp() {
   const auth = useAuth();
   const marketplace = useMarketplace();
+  const search = useSearch();
+
   const chat = useChat();
   const time = useTime();
+  const reviews = useReviews();
 
   // Combine relevant methods to match the old interface
   // Note: 'acceptBid' in the old store did two things (update bid + start conv).
@@ -83,6 +92,15 @@ export function useApp() {
     ...auth,
     ...marketplace,
     ...chat,
+    ...reviews,
+    searchState: search, // Avoid name collision if any, or just spread?
+    // Spreading might conflict with 'filters' in marketplace.
+    // Let's namespace search or check if conflicts exist.
+    // marketplace has 'filters' property. search has 'filters' property. CONFLICT.
+    // We should probably NOT spread 'search' blindly if it conflicts.
+    // Providing 'search' as a sub-object is safer.
+    search: search,
+    
     now: time.now,
     acceptBid: acceptBidCompat, // Override with composite function
     isLoading: marketplace.isLoading // Explicitly map common conflicts if any

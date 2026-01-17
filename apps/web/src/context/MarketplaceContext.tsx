@@ -325,7 +325,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         message: type === 'private' ? 'Private Bid' : 'Public Bid',
         createdAt: new Date().toISOString(),
         bidder: user // We have the full user object locally
-    };
+    } as unknown as Bid;
 
     // 2. Update local Bids state
     setBids(prev => [...prev, optimisticBid]);
@@ -421,8 +421,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         }
     } else {
         // Add
-        const { error } = await supabase
-            .from('watchlist')
+        const { error } = await (supabase
+            .from('watchlist') as any)
             .insert({ user_id: user.id, listing_id: itemId });
             
         if (error) {

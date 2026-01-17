@@ -10,6 +10,9 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReviewForm from '@/components/profile/ReviewForm';
+import { useReviews } from '@/context/ReviewContext';
+import { Star } from 'lucide-react';
 
 interface ChatWindowProps {
   conversationId: string;
@@ -17,15 +20,21 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
-  const { user, messages, sendMessage, markAsRead, conversations, getUser, items } = useApp();
+  const { user, messages, sendMessage, markAsRead, conversations } = useApp();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isLocked, setIsLocked] = useState(false);
+  const { canReview } = useReviews();
+  const [showReviewBtn, setShowReviewBtn] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
 
   const currentMessages = messages.filter(m => m.conversationId === conversationId);
   const conversation = conversations.find(c => c.id === conversationId);
+  const isSeller = user && conversation ? conversation.sellerId === user.id : false;
+  const otherUser = conversation ? (isSeller ? conversation.bidder : conversation.seller) : undefined;
+  const item = conversation?.item;
 
   // Lock body scroll to prevent Safari from scrolling page when input focused
   useEffect(() => {
@@ -52,8 +61,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   // Expiration Logic
   useEffect(() => {
     if (!conversation?.expiresAt) {
-      setTimeLeft("");
-      setIsLocked(false);
+      setTimeLeft((prev) => prev !== "" ? "" : prev); // eslint-disable-line react-hooks/set-state-in-effect
+      setIsLocked((prev) => prev ? false : prev); // eslint-disable-line react-hooks/set-state-in-effect
       return;
     }
 
@@ -85,6 +94,16 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     return () => clearInterval(timer);
   }, [conversation?.expiresAt]);
 
+  useEffect(() => {
+      if (item?.status === 'completed' && otherUser) {
+          canReview(item.id, isSeller ? 'seller' : 'buyer')
+              .then(setShowReviewBtn);
+      } else {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setShowReviewBtn((prev) => prev ? false : prev);
+      }
+  }, [item?.status, otherUser, canReview, isSeller, conversation?.itemId]);
+
   // Scroll to bottom on new message
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -96,14 +115,10 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     if (unreadMessages.length > 0) {
         markAsRead(conversationId);
     }
-  }, [currentMessages, conversationId, user?.id]);
+  }, [currentMessages, conversationId, user?.id, markAsRead]);
 
   if (!conversation) return <div className="p-10 text-center">Conversation not found</div>;
   if (!user) return <div className="p-10 text-center">Please sign in to view chats.</div>;
-
-  const isSeller = conversation.sellerId === user.id;
-  const otherUser = isSeller ? conversation.bidder : conversation.seller;
-  const item = conversation.item;
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,6 +170,17 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
           </div>
         </div>
         
+        {showReviewBtn && (
+            <Button 
+                size="sm" 
+                onClick={() => setIsReviewOpen(true)}
+                className="mr-2 bg-amber-500 hover:bg-amber-600 text-white gap-1.5 font-bold shadow-amber-200 shadow-md"
+            >
+                <Star className="h-4 w-4 fill-white/20" />
+                Review
+            </Button>
+        )}
+
         {!isLocked && (
             <Button
                 id="chat-call-btn"
@@ -217,7 +243,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
         </motion.div>
       
         <AnimatePresence initial={false}>
-          {currentMessages.map((msg, idx) => {
+          {currentMessages.map((msg) => {
             const isMe = msg.senderId === user?.id;
             return (
               <motion.div
@@ -310,6 +336,22 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
         </form>
         <div className="h-[env(safe-area-inset-bottom)]" />
       </div>
+
+      {otherUser && item && (
+        <ReviewForm
+            isOpen={isReviewOpen}
+            onClose={() => {
+                setIsReviewOpen(false);
+                // Re-check if review is possible (it won't be after submission)
+                canReview(item.id, isSeller ? 'seller' : 'buyer').then(setShowReviewBtn);
+            }}
+            reviewedId={otherUser.id}
+            listingId={item.id}
+            conversationId={conversationId}
+            role={isSeller ? 'seller' : 'buyer'}
+            reviewedName={otherUser.name}
+        />
+      )}
     </div>
   );
 }

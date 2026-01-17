@@ -87,3 +87,31 @@ export interface Message {
   isRead: boolean;
   createdAt: string;
 }
+
+export interface SearchFilters {
+  query?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  location?: {
+    lat: number;
+    lng: number;
+    radiusKm: number;
+  };
+  sortBy?: 'newest' | 'price_low' | 'price_high' | 'nearest' | 'ending_soon';
+  status?: 'active' | 'all';
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  parentId?: string;
+  count?: number; // Number of active listings
+}
+
+export interface SearchSuggestion {
+  type: 'recent' | 'popular' | 'category' | 'item';
+  text: string;
+  category?: string;
+}

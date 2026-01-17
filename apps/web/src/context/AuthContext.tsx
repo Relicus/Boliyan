@@ -47,8 +47,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
 
           // Attempt insertion
-          const { data: inserted, error: insertError } = await supabase
-              .from('profiles')
+          const { data: inserted, error: insertError } = await (supabase
+              .from('profiles') as any)
               .insert([newProfile])
               .select()
               .single();
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else {
              // Fallback to ephemeral data so the app still works
              console.error("Profile creation failed, using temporary data:", insertError);
-             data = newProfile;
+             data = newProfile as any;
           }
       } else if (error) {
         console.error('Error fetching profile:', error);

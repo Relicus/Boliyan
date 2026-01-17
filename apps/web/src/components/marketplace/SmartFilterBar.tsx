@@ -1,6 +1,7 @@
 "use client";
 
 import { useMarketplace } from "@/context/MarketplaceContext";
+import { useSearch } from "@/context/SearchContext";
 import { cn } from "@/lib/utils";
 import { Flame, MapPin, Timer, Gem, Sparkles, Bookmark } from "lucide-react";
 
@@ -14,19 +15,47 @@ export const FILTERS = [
 ] as const;
 
 export default function SmartFilterBar() {
-  const { filters, setFilter } = useMarketplace();
+  const { filters: mpFilters, setFilter: setMpFilter } = useMarketplace();
+  const { filters: searchFilters, updateFilter: updateSearchFilter, isSearching: isGlobalSearchActive } = useSearch();
+
+  // Determine effective context
+  // If search query is present, we are in "Search Mode"
+  const isSearchMode = !!searchFilters.query || !!searchFilters.category;
+
+  const handleFilterClick = (id: string) => {
+    if (isSearchMode) {
+       // Map to SearchContext supported sorts
+       // 'trending' -> default/newest?
+       // 'luxury' -> price_high?
+       // 'watchlist' -> ignored or implemented?
+       let sortVal: any = id; // Try direct map
+       
+       if (id === 'luxury') sortVal = 'price_high';
+       if (id === 'trending') sortVal = 'newest'; // Fallback
+       if (id === 'watchlist') return; // Not supported in search yet
+       
+       updateSearchFilter('sortBy', sortVal);
+    } else {
+       setMpFilter('sortBy', id as any);
+    }
+  };
 
   return (
     <div id="smart-filter-bar-root" className="w-full flex items-center justify-between md:justify-start gap-4 overflow-x-auto scrollbar-hide px-4 py-1">
       {FILTERS.map((f) => {
         const Icon = f.icon;
-        const isActive = filters.sortBy === f.id;
+        const currentSort = isSearchMode ? searchFilters.sortBy : mpFilters.sortBy;
         
+        // Map active state logic
+        let isActive = currentSort === f.id;
+        if (isSearchMode && f.id === 'luxury' && currentSort === 'price_high') isActive = true;
+        // ... other maps
+
         return (
           <button
             key={f.id}
             id={`smart-filter-btn-${f.id}`}
-            onClick={() => setFilter('sortBy', f.id)}
+            onClick={() => handleFilterClick(f.id)}
             className={cn(
               // Base / Mobile Styles (Vertical, Borderless)
               "flex flex-col md:flex-row items-center justify-center md:gap-1.5 min-w-[60px] md:min-w-0 px-2 py-1 md:py-1.5 md:px-3 rounded-md md:rounded-full transition-all duration-200 md:border",

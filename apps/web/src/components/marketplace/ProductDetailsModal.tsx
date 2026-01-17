@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink } from "lucide-react";
+import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, TrendingUp } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
@@ -43,8 +43,13 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   const [showFullscreen, setShowFullscreen] = useState(false);
 
   const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
-  const showHalo = isHighBidder || isWatched;
-  const haloTheme = isHighBidder ? 'orange' : 'blue';
+  const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
+  const showHalo = isHighBidder || hasPriorBid || isWatched;
+  const haloTheme = isHighBidder 
+    ? 'orange' 
+    : hasPriorBid 
+      ? 'green' 
+      : 'blue';
 
   useEffect(() => {
     if (isOpen) {
@@ -102,6 +107,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             className={`relative rounded-lg overflow-hidden w-full h-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col cursor-auto
             ${showHalo ? 'p-[3.5px] bg-[#0ea5e9]' : 'p-0 bg-white'}
             ${showHalo && haloTheme === 'orange' ? 'bg-[#fbbf24]' : ''}
+            ${showHalo && haloTheme === 'green' ? 'bg-[#16a34a]' : ''}
           `}
         >
             {/* Victory Halo - State Based Animated Border Background */}
@@ -109,7 +115,10 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
               <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg">
                 {/* Base Layer: Solid Vibrant Color */}
                 <div 
-                   className={`absolute inset-0 ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 'bg-[#0ea5e9]'}`}
+                   className={`absolute inset-0 
+                     ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
+                       haloTheme === 'green' ? 'bg-[#16a34a]' : 
+                       'bg-[#0ea5e9]'}`}
                 />
                 
                 {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
@@ -117,7 +126,9 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                    className={`absolute inset-[-150%] 
                      ${haloTheme === 'orange' 
                         ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
-                        : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
+                        : haloTheme === 'green'
+                          ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
+                          : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
                      }`}
                    animate={{ rotate: 360 }}
                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
@@ -425,7 +436,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                         ? 'bg-amber-600 text-white scale-105' 
                         : user?.id === seller.id
                           ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          : isHighBidder 
+                            ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                            : hasPriorBid
+                              ? 'bg-green-600 hover:bg-green-700 text-white'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white'
                       }`}
                   >
                     {isSuccess ? (
@@ -440,9 +455,26 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </motion.svg>
-                        <span className="text-base">Placed!</span>
+                        <span className="text-base">Bid Placed!</span>
                       </span>
-                    ) : user?.id === seller.id ? "Your Listing" : "Place Bid"}
+                    ) : user?.id === seller.id ? (
+                      "Your Listing"
+                    ) : isHighBidder ? (
+                      <span className="flex items-center gap-1.5">
+                        <TrendingUp className="w-5 h-5" />
+                        Raise Bid
+                      </span>
+                    ) : hasPriorBid ? (
+                      <span className="flex items-center gap-1.5">
+                        <Gavel className="w-5 h-5" />
+                        Bid Again
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5">
+                        <Gavel className="w-5 h-5" />
+                        Place Bid
+                      </span>
+                    )}
                   </button>
                 </div>
             </div>
