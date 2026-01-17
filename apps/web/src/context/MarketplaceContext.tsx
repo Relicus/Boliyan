@@ -104,7 +104,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           if (filters.listingType === 'public') {
               query = query.eq('auction_mode', 'visible');
           } else if (filters.listingType === 'sealed') {
-               query = query.eq('auction_mode', 'sealed'); // Assuming 'sealed' exists or mapped logic
+               // Match both 'sealed' and 'hidden' for secret/sealed bids
+               query = query.in('auction_mode', ['sealed', 'hidden']);
           } // 'all' does nothing
 
            // --- APPLY SORT ---
@@ -307,13 +308,13 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         console.error("Must be logged in to bid");
         return;
     }
+    
+    // Note: Validation (70% minimum, etc.) is already done in useBidding hook
+    // We just need to insert into database and update local state
+    
+    // Find item if available (may not be in current filtered view)
     const item = items.find(i => i.id === itemId);
-    if (!item) return;
-
-    // Validation
-    const minBidAllowed = item.askPrice * 0.7;
-    if (amount < minBidAllowed) return;
-
+    
     // --- OPTIMISTIC UPDATE START ---
     // 1. Create a temporary bid object
     const optimisticBid: Bid = {
@@ -324,45 +325,76 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         status: 'pending',
         message: type === 'private' ? 'Private Bid' : 'Public Bid',
         createdAt: new Date().toISOString(),
-        bidder: user // We have the full user object locally
+        bidder: user
     } as unknown as Bid;
 
     // 2. Update local Bids state
     setBids(prev => [...prev, optimisticBid]);
 
-    // 3. Update local Items state (High Bidder logic)
-    setItems(prevItems => prevItems.map(i => {
-       if (i.id === itemId) {
-           const currentMax = i.currentHighBid || 0;
-           const isNewHigh = amount > currentMax;
-           return {
-               ...i,
-               bidCount: i.bidCount + 1,
-               currentHighBid: isNewHigh ? amount : currentMax,
-               currentHighBidderId: isNewHigh ? user.id : i.currentHighBidderId
-           };
-       }
-       return i;
-    }));
+    // 3. Update local Items state (only if item is in current view)
+    if (item) {
+        setItems(prevItems => prevItems.map(i => {
+           if (i.id === itemId) {
+               const currentMax = i.currentHighBid || 0;
+               const isNewHigh = amount > currentMax;
+               return {
+                   ...i,
+                   bidCount: i.bidCount + 1,
+                   currentHighBid: isNewHigh ? amount : currentMax,
+                   currentHighBidderId: isNewHigh ? user.id : i.currentHighBidderId
+               };
+           }
+           return i;
+        }));
+    }
     // --- OPTIMISTIC UPDATE END ---
 
-    const { error } = await (supabase.from('bids') as any).insert({
+    // Debug logging
+    console.log("[placeBid] Attempting upsert with:", {
+        listing_id: itemId,
+        bidder_id: user.id,
+        amount: amount,
+        type: type
+    });
+
+    // Use UPSERT to handle the unique constraint on (listing_id, bidder_id)
+    // This allows users to update their existing bid instead of creating duplicates
+    const { data, error } = await (supabase.from('bids') as any).upsert({
         listing_id: itemId,
         bidder_id: user.id,
         amount: amount,
         message: type === 'private' ? 'Private Bid' : 'Public Bid',
         status: 'pending'
-    } as any);
+    } as any, { 
+        onConflict: 'listing_id,bidder_id'
+    }).select();
 
-    if (error) {
-        console.error("Failed to place bid:", error);
-        // Rollback state if desired, or let Realtime/refresh handle consistency
-        // For simplicity, we keep it as is; a refresh cleans it up if needed.
-        // In a strictly robust app, we'd revert the optimistic change here.
-    } else {
-        if (!watchedItemIds.includes(itemId)) {
-             setWatchedItemIds(prev => [...prev, itemId]);
+    console.log("[placeBid] Supabase response - data:", data, "error:", error);
+
+    // Check for error (Supabase returns null for no error, not empty object)
+    if (error || !data || data.length === 0) {
+        console.error("Failed to place bid:", { error, data, userId: user.id, itemId });
+        // Rollback optimistic bids update
+        setBids(prev => prev.filter(b => b.id !== optimisticBid.id));
+        // Rollback items update if we modified it
+        if (item) {
+            setItems(prevItems => prevItems.map(i => {
+                if (i.id === itemId) {
+                    return {
+                        ...i,
+                        bidCount: Math.max(0, i.bidCount - 1),
+                        // Note: We can't perfectly rollback high bid, but this is better than nothing
+                    };
+                }
+                return i;
+            }));
         }
+        return;
+    }
+    
+    // Add to watchlist on success
+    if (!watchedItemIds.includes(itemId)) {
+         setWatchedItemIds(prev => [...prev, itemId]);
     }
   };
 

@@ -69,7 +69,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     try {
       let query = supabase
         .from('listings')
-        .select('*, seller:profiles!seller_id(*)', { count: 'exact' });
+        .select('*, profiles(*)', { count: 'exact' });
         
       if (filters.status !== 'all') {
           query = query.eq('status', 'active'); // defaulting to active if not all? or use filters.status? 

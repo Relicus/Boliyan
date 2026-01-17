@@ -1,0 +1,137 @@
+/**
+ * Bidding Configuration Types
+ * 
+ * OOP-style type system for bidding behavior.
+ * Shared base properties + variant-specific overrides.
+ */
+
+import { Item, User, Bid } from './index';
+
+// ============================================
+// VARIANT TYPES
+// ============================================
+
+export type BiddingVariant = 'public' | 'secret';
+
+// ============================================
+// BASE CONFIG (Shared by all variants)
+// ============================================
+
+interface BiddingConfigBase {
+  // Identity
+  itemId: string;
+  variant: BiddingVariant;
+  
+  // Pricing
+  askPrice: number;
+  minBid: number;
+  smartStep: number;
+  
+  // User state
+  isUserHighBidder: boolean;
+  hasUserBid: boolean;
+}
+
+// ============================================
+// VARIANT CONFIGS
+// ============================================
+
+export interface PublicBiddingConfig extends BiddingConfigBase {
+  variant: 'public';
+  
+  // Public-specific: we CAN see the competition
+  showHighBid: true;
+  showHighBidder: true;
+  currentHighBid: number | undefined;
+  currentHighBidderId: string | undefined;
+  
+  // Visual states
+  showVictoryHalo: boolean;  // True when user is high bidder
+  showOutbidWarning: boolean; // True when user was outbid
+}
+
+export interface SecretBiddingConfig extends BiddingConfigBase {
+  variant: 'secret';
+  
+  // Secret-specific: we CANNOT see the competition
+  showHighBid: false;
+  showHighBidder: false;
+  currentHighBid: undefined;
+  currentHighBidderId: undefined;
+  
+  // Visual states
+  showSecretBadge: true;
+  showDuplicateBidWarning: boolean; // True when user already bid
+}
+
+// ============================================
+// UNION TYPE
+// ============================================
+
+export type BiddingConfig = PublicBiddingConfig | SecretBiddingConfig;
+
+// ============================================
+// FACTORY FUNCTION
+// ============================================
+
+import { getSmartStep, getMinimumAllowedBid } from '@/lib/bidding';
+
+export function createBiddingConfig(
+  item: Item,
+  user: User | null,
+  bids: Bid[]
+): BiddingConfig {
+  const isPublic = item.isPublicBid;
+  const hasUserBid = user ? bids.some(b => b.itemId === item.id && b.bidderId === user.id) : false;
+  const isUserHighBidder = user ? item.currentHighBidderId === user.id : false;
+  
+  // Base values
+  const baseMinBid = getMinimumAllowedBid(item.askPrice);
+  const publicMinBid = item.currentHighBid 
+    ? item.currentHighBid + getSmartStep(item.currentHighBid)
+    : baseMinBid;
+  
+  if (isPublic) {
+    return {
+      variant: 'public',
+      itemId: item.id,
+      askPrice: item.askPrice,
+      minBid: publicMinBid,
+      smartStep: getSmartStep(item.currentHighBid || item.askPrice),
+      isUserHighBidder,
+      hasUserBid,
+      
+      // Public-specific
+      showHighBid: true,
+      showHighBidder: true,
+      currentHighBid: item.currentHighBid,
+      currentHighBidderId: item.currentHighBidderId,
+      showVictoryHalo: isUserHighBidder,
+      showOutbidWarning: hasUserBid && !isUserHighBidder,
+    };
+  } else {
+    return {
+      variant: 'secret',
+      itemId: item.id,
+      askPrice: item.askPrice,
+      minBid: baseMinBid,
+      smartStep: getSmartStep(item.askPrice),
+      isUserHighBidder: false, // Can never know in secret
+      hasUserBid,
+      
+      // Secret-specific
+      showHighBid: false,
+      showHighBidder: false,
+      currentHighBid: undefined,
+      currentHighBidderId: undefined,
+      showSecretBadge: true,
+      showDuplicateBidWarning: hasUserBid,
+    };
+  }
+}
+
+// ============================================
+// VIEW MODE (for UI sizing)
+// ============================================
+
+export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
