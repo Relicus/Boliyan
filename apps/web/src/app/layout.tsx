@@ -7,7 +7,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import ScrollToTop from "@/components/layout/ScrollToTop";
 import { AppProvider } from "@/lib/store";
-import { Toaster } from 'sonner';
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = localFont({
   src: "../../public/fonts/geist-sans.woff2",

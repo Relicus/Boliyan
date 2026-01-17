@@ -7,6 +7,7 @@ import { Item, User } from "@/types";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
@@ -60,6 +61,15 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
         setBidAmount(initialBidValue.toLocaleString());
     }
   }, [isOpen, item.askPrice, item.isPublicBid, item.currentHighBid, getSmartStep, setBidAmount]);
+
+  // Toast Notification on Success
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Bid placed successfully!", {
+        description: `You placed a bid of Rs. ${bidAmount} on ${item.title}`
+      });
+    }
+  }, [isSuccess, bidAmount, item.title]);
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, timeLeft, isUrgent } = useMemo(() => {
@@ -375,6 +385,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                   <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Extra Large for Modal */}
                     <button
+                      id={`modal-decrement-btn-${item.id}`}
                       onClick={(e) => handleSmartAdjust(e, -1)}
                       disabled={user?.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
@@ -399,6 +410,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                       </AnimatePresence>
 
                       <motion.input
+                        id={`modal-bid-input-${item.id}`}
                         type="text"
                         value={bidAmount}
                         key={`modal-input-${animTrigger}`}
@@ -419,6 +431,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
                     {/* Increment Button - Extra Large for Modal */}
                     <button
+                      id={`modal-increment-btn-${item.id}`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
                       disabled={user?.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"

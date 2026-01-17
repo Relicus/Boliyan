@@ -3,27 +3,25 @@ import { test, expect } from '@playwright/test';
 
 test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   // 1. Navigate to Home
-  await page.goto('http://localhost:3000/');
+  await page.goto('/');
   
   // Wait for items to load
   await page.waitForSelector('img[alt]');
 
   // Locate the first Item Card that actually has a bidding input
   // (Avoids selecting other 'group' elements like categories or banners)
-  const firstCard = page.locator('.group', { has: page.locator('input[type="number"]') }).first();
+  const firstCard = page.locator('.group', { has: page.locator('input[id*="bid-input"]') }).first();
   
   // Ensure it's visible
   await expect(firstCard).toBeVisible();
 
   // Get the Asking Price or High Bid text to calculate expectations
-  // We look for the "Asking" price since that's the base for calculating steps usually
-  // But the logic uses High Bid if exists.
-  // For simplicity, we will read the INITIAL value of the input.
-  const input = firstCard.locator('input[type="number"]');
+  const input = firstCard.locator('input[id*="bid-input"]');
   await expect(input).toBeVisible();
   
   const initialValueStr = await input.inputValue();
-  const initialValue = parseFloat(initialValueStr);
+  // Handle comma-separated values (e.g. "1,200")
+  const initialValue = parseFloat(initialValueStr.replace(/,/g, ''));
   console.log(`Initial Bid Value: ${initialValue}`);
 
   // Calculate Expected Step
@@ -32,34 +30,23 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   else if (initialValue >= 10000) step = 500;
 
   // 2. Test Card Stepper (+)
-  // New Structure: 
-  // Container (flex-col) 
-  //   > Div (Stepper Row) > [Minus] [Input] [Plus]
-  //   > Button (Place Bid)
-  
-  // 2. Test Card Stepper (+)
-  // New Structure: 
-  // Container (flex-col) 
-  //   > Div (Stepper Row) > [Minus] [Input] [Plus]
-  //   > Button (Place Bid)
-  
-  // Input is already defined above: const input = firstCard.locator('input[type="number"]');
   await expect(input).toBeVisible({ timeout: 10000 }); // Increase timeout for hydration
   
   // Find the stepper row container (parent of input)
-  const stepperRow = firstCard.locator('.shadow-sm', { has: input });
-  
-  const minusBtn = stepperRow.locator('button').first();
-  const plusBtn = stepperRow.locator('button').last();
-
-  // Use force: true because the card itself is a DialogTrigger and sometimes overlay hit-testing can be flaky
+  // Test Card Stepper (+)
+  const plusBtn = firstCard.locator('button[id*="increment-btn"]');
+  // Use force: true to avoid overlay issues
   await plusBtn.click({ force: true });
-  const incrementedValue = parseFloat(await input.inputValue());
+  
+  const incrementedValueStr = await input.inputValue();
+  const incrementedValue = parseFloat(incrementedValueStr.replace(/,/g, ''));
   expect(incrementedValue).toBe(initialValue + step);
 
   // 3. Test Card Stepper (-)
+  const minusBtn = firstCard.locator('button[id*="decrement-btn"]');
   await minusBtn.click({ force: true });
-  const decrementedValue = parseFloat(await input.inputValue());
+  const decrementedValueStr = await input.inputValue();
+  const decrementedValue = parseFloat(decrementedValueStr.replace(/,/g, ''));
   expect(decrementedValue).toBe(initialValue);
 
   // 4. Test Click Input
@@ -73,16 +60,16 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   await expect(dialog).toBeVisible();
 
   // 6. Test Modal Stepper
-  const modalInput = dialog.locator('input[type="number"]');
-  const modalInitialValue = parseFloat(await modalInput.inputValue());
+  const modalInput = dialog.locator('input[type="text"]');
+  const modalInitialValueStr = await modalInput.inputValue();
+  const modalInitialValue = parseFloat(modalInitialValueStr.replace(/,/g, ''));
   
-  const modalInputGroup = dialog.locator('.shadow-sm', { has: modalInput });
-  const modalMinusBtn = modalInputGroup.locator('button').nth(0);
-  const modalPlusBtn = modalInputGroup.locator('button').nth(1);
+  const modalMinusBtn = dialog.locator('button[id*="modal-decrement-btn"]');
+  const modalPlusBtn = dialog.locator('button[id*="modal-increment-btn"]');
 
   await modalPlusBtn.click();
   const modalIncrementedStr = await modalInput.inputValue();
-  expect(parseFloat(modalIncrementedStr)).toBe(modalInitialValue + step);
+  expect(parseFloat(modalIncrementedStr.replace(/,/g, ''))).toBe(modalInitialValue + step);
 
   // 7. Test Bid Submission
   // Button text is now "Bid" or "Place Bid" depending on context. 

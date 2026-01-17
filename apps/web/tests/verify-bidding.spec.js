@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('verify initial bid is 70% of ask price for items with 0 bids', async ({ page }) => {
-  await page.goto('http://localhost:3000');
+  await page.goto('/');
   
   // Wait for the grid to load
   await page.waitForSelector('[id^="item-card-"]');
@@ -12,7 +12,11 @@ test('verify initial bid is 70% of ask price for items with 0 bids', async ({ pa
   await itemCard.scrollIntoViewIfNeeded();
   
   const askPriceText = await page.locator('#item-card-i15-ask-price').innerText();
-  const askPrice = parseFloat(askPriceText.replace(/[^0-9.]/g, '')) * 1000; // k format
+  // Handle both "25k" and "Rs 25,000" formats
+  let askPrice = parseFloat(askPriceText.replace(/[^0-9.]/g, ''));
+  if (askPriceText.toLowerCase().includes('k')) {
+      askPrice *= 1000;
+  }
   
   const bidInput = page.locator('#item-card-i15-bid-input');
   const bidValueText = await bidInput.inputValue();

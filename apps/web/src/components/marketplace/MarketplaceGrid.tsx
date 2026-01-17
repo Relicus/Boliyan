@@ -21,6 +21,7 @@ import {
 import { LayoutGrid, Grid3x3, Grid2x2, X, Gavel } from "lucide-react";
 import PriceSelector from "./PriceSelector";
 import { Badge } from "@/components/ui/badge";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CATEGORIES } from "@/lib/constants";
 
 // Listing type options for dropdown
@@ -277,38 +278,36 @@ export default function MarketplaceGrid() {
             </div>
 
             {/* View Toggle Controls (Desktop) */}
-            <div id="view-mode-toggles" className="flex items-center bg-slate-50 p-1 rounded-xl border border-slate-200 shadow-sm shrink-0">
-                  <Button
-                  id="view-mode-compact-btn"
-                  variant={viewMode === 'compact' ? 'default' : 'ghost'}
-                  size="icon"
-                  className={`h-8 w-8 rounded-lg ${viewMode === 'compact' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
-                  onClick={() => setViewMode('compact')}
-                  title="Compact View"
-                  >
-                  <Grid3x3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  id="view-mode-comfortable-btn"
-                  variant={viewMode === 'comfortable' ? 'default' : 'ghost'}
-                  size="icon"
-                  className={`h-8 w-8 rounded-lg ${viewMode === 'comfortable' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
-                  onClick={() => setViewMode('comfortable')}
-                  title="Comfortable View"
-                  >
-                  <Grid2x2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  id="view-mode-spacious-btn"
-                  variant={viewMode === 'spacious' ? 'default' : 'ghost'}
-                  size="icon"
-                  className={`h-8 w-8 rounded-lg ${viewMode === 'spacious' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
-                  onClick={() => setViewMode('spacious')}
-                  title="Spacious View"
-                  >
-                  <LayoutGrid className="h-4 w-4" />
-                </Button>
-            </div>
+            {/* View Toggle Controls (Desktop) */}
+            <ToggleGroup 
+              id="view-mode-toggles"
+              type="single" 
+              value={viewMode} 
+              onValueChange={(val) => val && setViewMode(val as ViewMode)}
+              className="bg-slate-50 p-1 rounded-xl border border-slate-200 shadow-sm shrink-0"
+            >
+              <ToggleGroupItem 
+                value="compact" 
+                aria-label="Compact View" 
+                className="h-8 w-8 rounded-lg data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
+              >
+                <Grid3x3 className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="comfortable" 
+                aria-label="Comfortable View"
+                className="h-8 w-8 rounded-lg data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
+              >
+                <Grid2x2 className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="spacious" 
+                aria-label="Spacious View"
+                className="h-8 w-8 rounded-lg data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
           
           {/* Mobile Active Search Filter Badge (shown below dropdowns when searching) */}

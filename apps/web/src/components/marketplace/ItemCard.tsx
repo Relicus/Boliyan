@@ -13,6 +13,20 @@ import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
 import Link from "next/link";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi
+} from "@/components/ui/carousel";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ItemCardProps {
   item: Item;
@@ -38,7 +52,16 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const [showFullDescription, setShowFullDescription] = useState(false);
   // Removed local 'now' state and useEffect timer
   const [currentImg, setCurrentImg] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [showFullscreen, setShowFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (!carouselApi) return
+
+    carouselApi.on("select", () => {
+      setCurrentImg(carouselApi.selectedScrollSnap())
+    })
+  }, [carouselApi])
 
 
   // Hook for encapsulated bidding logic
@@ -63,9 +86,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   // Check if user has bid on this item before
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
   
-  const galleryRef = typeof window !== 'undefined' ? (null as any) : null; 
-  // We'll use a local ref for scrolling logic below
-
   // Watch for outbid events (only if user has an existing bid)
   useEffect(() => {
     if (!user) return;
@@ -245,14 +265,49 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(var(--radius)-3px)]">
             <div
               id={`item-card-${item.id}-image-wrapper`}
-              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0`}
+              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 group/gallery`}
             >
-              <img
-                id={`item-card-${item.id}-image`}
-                src={item.images[0]}
-                alt={item.title}
-                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-              />
+              <Carousel
+                setApi={setCarouselApi}
+                className="w-full h-full"
+              >
+                <CarouselContent className="-ml-0 h-full">
+                  {item.images.map((src, i) => (
+                    <CarouselItem key={i} className="pl-0 h-full">
+                      <div className="relative w-full h-full">
+                        <img
+                          id={`item-card-${item.id}-image-${i}`}
+                          src={src}
+                          alt={`${item.title} - ${i + 1}`}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {item.images.length > 1 && (
+                  <>
+                    <div className="absolute inset-0 flex items-center justify-between p-2 opacity-0 group-hover/gallery:opacity-100 transition-opacity pointer-events-none">
+                      <CarouselPrevious 
+                        className="pointer-events-auto h-8 w-8 bg-black/50 text-white border-none hover:bg-black/70 translate-y-0 static" 
+                        variant="ghost"
+                      />
+                      <CarouselNext 
+                        className="pointer-events-auto h-8 w-8 bg-black/50 text-white border-none hover:bg-black/70 translate-y-0 static" 
+                        variant="ghost"
+                      />
+                    </div>
+                    <div className="absolute bottom-16 left-0 right-0 flex justify-center gap-1.5 z-30 pointer-events-none">
+                      {item.images.map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-1.5 rounded-full transition-all duration-300 ${i === currentImg ? 'w-6 bg-white shadow-sm' : 'w-1.5 bg-white/40'}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </Carousel>
 
               {/* Top-Left Location Badge */}
               <div id={`item-card-${item.id}-location-badge-wrapper`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
@@ -292,19 +347,37 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
                 <div className="flex items-center gap-2">
                   {isWatched && (
-                    <motion.div
-                      id={`item-card-${item.id}-watch-indicator`}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="bg-blue-600/90 text-white p-1 rounded-md border border-blue-400/50"
-                    >
-                      <Bookmark className="h-3 w-3 fill-current" />
-                    </motion.div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <motion.div
+                            id={`item-card-${item.id}-watch-indicator`}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="bg-blue-600/90 text-white p-1 rounded-md border border-blue-400/50"
+                          >
+                            <Bookmark className="h-3 w-3 fill-current" />
+                          </motion.div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>You are watching this item</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                   {!item.isPublicBid && (
-                    <div className="bg-amber-600/90 text-white p-1 rounded-md border border-amber-400/50" title="Secret Bidding">
-                       <Lock className="h-3 w-3" />
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="bg-amber-600/90 text-white p-1 rounded-md border border-amber-400/50">
+                             <Lock className="h-3 w-3" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Secret Bidding</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                 </div>
               </div>
@@ -604,87 +677,41 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
           >
             {item.images.length > 1 ? (
               <div className="relative h-60 sm:h-72 w-full group/gallery">
-                <div 
-                  id={`item-card-${item.id}-gallery`} 
-                  className="flex h-full w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth"
-                  onScroll={(e) => {
-                    const el = e.currentTarget;
-                    const index = Math.round(el.scrollLeft / el.clientWidth);
-                    if (index !== currentImg) setCurrentImg(index);
-                  }}
-                >
-                  {item.images.map((src, i) => (
-                    <div 
-                      key={i} 
-                      className="relative h-full w-full shrink-0 snap-center flex items-center justify-center overflow-hidden"
-                    >
-                      <img
-                        id={`item-card-${item.id}-image-${i}`}
-                        src={src}
-                        alt={`${item.title} - ${i + 1}`}
-                        className="object-cover w-full h-full"
+                 <Carousel
+                    setApi={setCarouselApi}
+                    className="w-full h-full"
+                  >
+                  <CarouselContent className="-ml-0 h-full">
+                    {item.images.map((src, i) => (
+                      <CarouselItem key={i} className="pl-0 h-full">
+                        <div className="relative w-full h-full flex items-center justify-center">
+                          <img
+                            id={`item-card-${item.id}-image-${i}`}
+                            src={src}
+                            alt={`${item.title} - ${i + 1}`}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                   <div className="absolute inset-0 flex items-center justify-between p-2 pointer-events-none opacity-0 group-hover/gallery:opacity-100 transition-opacity">
+                      <CarouselPrevious 
+                        className="pointer-events-auto h-8 w-8 bg-black/50 text-white border-none hover:bg-black/70 translate-y-0 static" 
+                        variant="ghost"
                       />
-                      {/* Clickable regions for shifting - Desktop Only */}
-                      <div className="absolute inset-0 hidden sm:flex">
-                        <div 
-                          className="w-1/2 h-full cursor-[w-resize]" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const el = document.getElementById(`item-card-${item.id}-gallery`);
-                            if (el) el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
-                          }}
-                        />
-                        <div 
-                          className="w-1/2 h-full cursor-[e-resize]" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const el = document.getElementById(`item-card-${item.id}-gallery`);
-                            if (el) el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
-                          }}
-                        />
-                      </div>
+                      <CarouselNext 
+                        className="pointer-events-auto h-8 w-8 bg-black/50 text-white border-none hover:bg-black/70 translate-y-0 static" 
+                        variant="ghost"
+                      />
                     </div>
-                  ))}
-                </div>
+                </Carousel>
 
-                {/* Left/Right Overlays (Chevrons) - Desktop Hover Only */}
-                {currentImg > 0 && (
-                  <button
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-30 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full backdrop-blur-xl border border-white/10 shadow-lg transition-all active:scale-95"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const el = document.getElementById(`item-card-${item.id}-gallery`);
-                      if (el) el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                )}
-                {currentImg < item.images.length - 1 && (
-                  <button
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-30 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full backdrop-blur-xl border border-white/10 shadow-lg transition-all active:scale-95"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const el = document.getElementById(`item-card-${item.id}-gallery`);
-                      if (el) el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                )}
-
-
-
-                  <div className="absolute bottom-16 left-0 right-0 flex justify-center gap-1.5 z-30">
+                  <div className="absolute bottom-16 left-0 right-0 flex justify-center gap-1.5 z-30 pointer-events-none">
                     {item.images.map((_, i) => (
-                      <button 
+                      <div 
                         key={i} 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const el = document.getElementById(`item-card-${item.id}-gallery`);
-                          if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' });
-                        }}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${i === currentImg ? 'w-6 bg-white shadow-sm' : 'w-1.5 bg-white/40 hover:bg-white/60'}`}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${i === currentImg ? 'w-6 bg-white shadow-sm' : 'w-1.5 bg-white/40'}`}
                       />
                     ))}
                   </div>

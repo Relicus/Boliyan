@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-17T13:43:45.110Z",
+  "timestamp": "2026-01-17T19:25:36.518Z",
   "routes": [
     "/",
     "/signin",
@@ -63,6 +63,17 @@
           "id": "navbar-brand-english-10",
           "tagName": "SPAN",
           "text": "BOLIYAN"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "button"
         },
         {
           "id": "navbar-right-section-11",
@@ -358,24 +369,6 @@
           "text": ""
         },
         {
-          "id": "view-mode-compact-btn",
-          "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
-        },
-        {
-          "id": "view-mode-comfortable-btn",
-          "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
-        },
-        {
-          "id": "view-mode-spacious-btn",
-          "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
-        },
-        {
           "id": "category-bar-row",
           "tagName": "DIV",
           "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
@@ -474,7 +467,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"farpXWA7I2j0ZTlZFZooL\""
+          "text": "self.__next_r=\"rHuBw_FIgg43VtfCaJTH1\""
         },
         {
           "id": "devtools-indicator",
@@ -498,6 +491,11 @@
         {
           "id": "next_logo_mask0",
           "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
         }
       ]
     },
@@ -556,6 +554,17 @@
           "id": "navbar-brand-english-10",
           "tagName": "SPAN",
           "text": "BOLIYAN"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "button"
         },
         {
           "id": "navbar-right-section-11",
@@ -735,7 +744,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"ucv6eCdrv2OFG0QuwBelK\""
+          "text": "self.__next_r=\"q6CFBEOEXrnqImY-_7bn5\""
         },
         {
           "id": "devtools-indicator",
@@ -822,6 +831,17 @@
           "id": "navbar-brand-english-10",
           "tagName": "SPAN",
           "text": "BOLIYAN"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "button"
         },
         {
           "id": "navbar-right-section-11",
@@ -1073,12 +1093,12 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"-LZWBoXnfJzY-nXs8JxJn\""
+          "text": "self.__next_r=\"1LTCUPjKKpq6-wNUnNaJi\""
         },
         {
           "id": "devtools-indicator",
           "tagName": "DIV",
-          "text": "0\n1\nIssue"
+          "text": ""
         },
         {
           "id": "next-logo",
@@ -1160,6 +1180,17 @@
           "id": "navbar-brand-english-10",
           "tagName": "SPAN",
           "text": "BOLIYAN"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "button"
         },
         {
           "id": "navbar-right-section-11",
@@ -1332,12 +1363,12 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"iYaJeqfxIB3LNbjWlJfmF\""
+          "text": "self.__next_r=\"vaHv03qNRnelo08NyUtP2\""
         },
         {
           "id": "devtools-indicator",
           "tagName": "DIV",
-          "text": ""
+          "text": "1\n2\nIssues"
         },
         {
           "id": "next-logo",
@@ -1419,6 +1450,17 @@
           "id": "navbar-brand-english-10",
           "tagName": "SPAN",
           "text": "BOLIYAN"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "button"
         },
         {
           "id": "navbar-right-section-11",
@@ -1650,7 +1692,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"2jVKRf7G7fRwmMj3Pfj-n\""
+          "text": "self.__next_r=\"aV0f1pB-ejLXnXyzaaHkt\""
         },
         {
           "id": "devtools-indicator",

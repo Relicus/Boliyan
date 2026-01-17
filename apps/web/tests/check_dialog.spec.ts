@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('check dialog close button', async ({ page }) => {
-  await page.goto('http://localhost:3000');
+  await page.goto('/');
   
   // Wait for item cards to load
   await page.waitForSelector('[id^="item-card-"]');

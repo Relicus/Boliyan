@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('Verify Dihari is not visible in Navbar', async ({ page }) => {
   // Navigate to Home
-  await page.goto('http://localhost:3000/');
+  await page.goto('/');
   
   // Wait for navbar to load
   await page.waitForSelector('#navbar-01');

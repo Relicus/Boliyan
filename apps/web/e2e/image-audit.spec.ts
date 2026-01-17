@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('check all listing images', async ({ page }) => {
-  await page.goto('http://localhost:3000');
+  await page.goto('/');
   
   // Wait for the marketplace grid to be visible
   await page.waitForSelector('img');

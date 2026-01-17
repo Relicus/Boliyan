@@ -9,8 +9,8 @@ test('Notification System Verification', async ({ browser }) => {
   const pageB = await contextB.newPage();
 
   // Load pages
-  await pageA.goto('http://localhost:3000/signin');
-  await pageB.goto('http://localhost:3000/signin');
+  await pageA.goto('/signin');
+  await pageB.goto('/signin');
 
   // Note: Full E2E verification requires authenticated sessions.
   // In a local environment, you would need to log in as User A and User B.
