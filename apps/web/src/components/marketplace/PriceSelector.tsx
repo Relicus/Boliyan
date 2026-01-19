@@ -78,25 +78,25 @@ export default function PriceSelector() {
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="space-y-1">
+            <div className="space-y-1 flex-1">
               <Label className="text-[10px] font-bold text-slate-400 uppercase">Min</Label>
               <Input 
                 type="number" 
                 placeholder="0" 
                 value={localMin}
                 onChange={(e) => setLocalMin(e.target.value)}
-                className="h-9 text-sm"
+                className="h-9 text-sm rounded-lg"
               />
             </div>
-            <div className="h-px w-4 bg-slate-300 mt-5" />
-            <div className="space-y-1">
+            <div className="h-px w-4 bg-slate-300 mt-5 shrink-0" />
+            <div className="space-y-1 flex-1">
               <Label className="text-[10px] font-bold text-slate-400 uppercase">Max</Label>
               <Input 
                 type="number" 
                 placeholder="Any" 
                 value={localMax}
                 onChange={(e) => setLocalMax(e.target.value)}
-                className="h-9 text-sm"
+                className="h-9 text-sm rounded-lg"
               />
             </div>
           </div>

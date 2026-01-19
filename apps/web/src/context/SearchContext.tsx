@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext';
 import type { Item } from '@/types';
 import type { SearchFilters, Category, SearchSuggestion } from '@/types';
 import { sortByDistance } from '@/lib/searchUtils';
-import { transformListingToItem, ListingWithSeller } from '@/lib/transform';
+import { transformListingToItem, ListingWithSeller, transformBidToHydratedBid } from '@/lib/transform';
 
 interface SearchContextType {
   filters: SearchFilters;
@@ -139,6 +139,34 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Need to cast to unknown first to match ListingWithSeller interface structure expectations
         // Transform database rows to items
         let items = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
+
+        // --- FETCH ASSOCIATED BIDS ---
+        if (items.length > 0) {
+          const itemIds = items.map(i => i.id);
+          const { data: bidsData } = await supabase
+            .from('bids')
+            .select('*, profiles(*)')
+            .in('listing_id', itemIds);
+          
+          if (bidsData) {
+            const transformedBids = (bidsData as any[]).map(transformBidToHydratedBid);
+            
+            items = items.map(item => {
+              const itemBids = transformedBids.filter(b => b.itemId === item.id);
+              if (itemBids.length === 0) return item;
+
+              const maxBid = Math.max(...itemBids.map(b => b.amount));
+              const highBid = itemBids.find(b => b.amount === maxBid);
+
+              return {
+                ...item,
+                bidCount: itemBids.length,
+                currentHighBid: maxBid,
+                currentHighBidderId: highBid?.bidderId
+              };
+            });
+          }
+        }
         
         // Rank results: exact matches first, then partial matches
         if (filters.query) {
@@ -292,6 +320,36 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       .limit(6);
 
     return data?.map(row => transformListingToItem(row as unknown as ListingWithSeller)) || [];
+  }, []);
+
+  // --- Realtime Subscription (Bids) ---
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:search_bids')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bids' }, async (payload) => {
+        const newBidRaw = payload.new as any;
+        
+        // Find if this bid belongs to any of our search results
+        setSearchResults(prevItems => prevItems.map(item => {
+          if (item.id === newBidRaw.listing_id) {
+              const amount = Number(newBidRaw.amount);
+              const currentMax = item.currentHighBid || 0;
+              const isNewHigh = amount > currentMax;
+              return {
+                 ...item,
+                 bidCount: item.bidCount + 1,
+                 currentHighBid: isNewHigh ? amount : currentMax,
+                 currentHighBidderId: isNewHigh ? newBidRaw.bidder_id : item.currentHighBidderId
+              };
+          }
+          return item;
+        }));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
   
   // Initial category fetch

@@ -72,13 +72,14 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   }, [isSuccess, bidAmount, item.title]);
 
   // Safe Privacy-Preserving Distance Calculation
-  const { distance, duration, timeLeft, isUrgent } = useMemo(() => {
-    if (now === 0 || !user) return { distance: 0, duration: 0, timeLeft: "Loading...", isUrgent: false };
+  const { distance, duration, isOutside, timeLeft, isUrgent } = useMemo(() => {
+    if (now === 0 || !user) return { distance: 0, duration: 0, isOutside: false, timeLeft: "Loading...", isUrgent: false };
 
     // Distance Calculation (Privacy Safe)
-    const { distance: dist, duration: dur } = calculatePrivacySafeDistance(user.location, seller.location);
+    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(user.location, seller.location);
     
     // Time Left calculation
+
     const diff = new Date(item.expiryAt).getTime() - now;
     const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
     const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
@@ -96,9 +97,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     return { 
       distance: dist, 
       duration: dur, 
+      isOutside: outside,
       timeLeft: timeStr,
       isUrgent
     };
+
   }, [item.id, item.expiryAt, now, user?.location, seller.location]);
 
 
@@ -343,13 +346,16 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     </Badge>
                 </div>
                 <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                    <MapPin className="h-3 w-3 text-red-500" />
-                    <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
+                  <MapPin className="h-3 w-3 text-red-500" />
+                  <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
                 </div>
-                <div className="text-xs text-slate-500 font-medium flex items-center gap-1 mt-0.5 tabular-nums">
-                  {duration} min drive ({distance} km)
-                </div>
-                </div>
+                {!isOutside && (
+                  <div className="text-xs text-slate-500 font-medium flex items-center gap-1 mt-0.5 tabular-nums">
+                    {duration} min drive ({distance} km)
+                  </div>
+                )}
+              </div>
+
                 <div className="ml-auto shrink-0 flex flex-col gap-2">
                 <Link
                     id={`view-details-btn-${item.id}`}

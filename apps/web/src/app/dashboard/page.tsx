@@ -344,20 +344,23 @@ function DashboardContent() {
                         .filter(b => b.itemId === item.id)
                         .map(bid => {
                           const bidder = bid.bidder!; // Bids are hydrated in MarketplaceContext
-                          const itemOwnerProfile = user ? { lat: user.location.lat, lng: user.location.lng } : undefined;
-                          const { distance, duration } = calculatePrivacySafeDistance(itemOwnerProfile, bidder.location);
-                          return { ...bid, bidder, distance, duration };
+                          const { distance, duration, isOutside } = calculatePrivacySafeDistance(user?.location, bidder.location);
+                          return { ...bid, bidder, distance, duration, isOutside };
                         })
                         .sort((a, b) => {
                           // 1. Price first (highest at the top)
                           if (b.amount !== a.amount) {
                             return b.amount - a.amount;
                           }
-                          // 2. Driving distance second (shortest first)
+                          // 2. Location availability (Inside country first)
+                          if (a.isOutside !== b.isOutside) {
+                            return a.isOutside ? 1 : -1;
+                          }
+                          // 3. Driving distance second (shortest first)
                           if (a.duration !== b.duration) {
                             return a.duration - b.duration;
                           }
-                          // 3. Kilometers third (shortest first)
+                          // 4. Kilometers third (shortest first)
                           return a.distance - b.distance;
                         })
                         .map(bidData => (

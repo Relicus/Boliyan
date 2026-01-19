@@ -67,7 +67,7 @@ export default function SearchBar() {
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Search items, categories..."
+          placeholder="Search..."
           className="pl-9 pr-9 h-10 w-full bg-slate-50 border-slate-200 focus:bg-white transition-colors rounded-xl"
         />
         {inputValue && (

@@ -8,7 +8,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Slider } from "@/components/ui/slider";
 import { PAKISTAN_CITIES, CITY_COORDINATES } from "@/lib/constants/locations";
 import { Check, MapPin, Globe, Navigation, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, isLocationInCountry } from "@/lib/utils";
+
 
 interface LocationSelectorProps {
   className?: string;
@@ -126,11 +127,12 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
       ref={ref}
       id="location-popover-trigger"
       variant="ghost"
-      className={cn("h-8 flex items-center gap-1.5 px-3 rounded-full bg-slate-50 hover:bg-slate-100", className)}
+      className={cn("h-8 flex items-center gap-1.5 px-2 rounded-full bg-slate-50 hover:bg-slate-100", className)}
       {...props}
+      title={getDisplayLabel()}
     >
       <MapPin className="h-4 w-4 text-slate-700" />
-      <span className="text-xs font-semibold text-slate-700 max-w-[100px] truncate">
+      <span className="text-[10px] font-bold text-slate-700 max-w-[80px] truncate hidden xl:inline">
         {getDisplayLabel().split(' ')[0]}
       </span>
     </Button>
@@ -139,11 +141,14 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
 LocationSelectorTrigger.displayName = "LocationSelectorTrigger";
 
 function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
-  const { filters, setFilter, updateFilters } = useApp();
+  const { filters, setFilter, updateFilters, user } = useApp();
   const [isLocating, setIsLocating] = useState(false);
   const [locError, setLocError] = useState<string | null>(null);
 
+  const isOutside = !isLocationInCountry(user?.location.address);
+
   const handleCurrentLocation = async (e?: React.MouseEvent | React.PointerEvent) => {
+
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -195,37 +200,40 @@ function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
   return (
     <div className="flex flex-col w-full">
       {/* Search Radius Section - Ultra Compact */}
-      <div className="p-3 pb-4 border-b bg-slate-50/30">
-        <div className="flex items-center justify-between mb-2 px-0.5">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Range</span>
-          <span className="text-[10px] font-black text-blue-600 bg-blue-50/50 px-1.5 py-0.5 rounded">
-            {filters.radius >= 500 ? "Everywhere" : `${filters.radius}km`}
-          </span>
+      {!isOutside && (
+        <div className="p-3 pb-4 border-b bg-slate-50/30">
+          <div className="flex items-center justify-between mb-2 px-0.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Range</span>
+            <span className="text-[10px] font-black text-blue-600 bg-blue-50/50 px-1.5 py-0.5 rounded">
+              {filters.radius >= 500 ? "Everywhere" : `${filters.radius}km`}
+            </span>
+          </div>
+          <Slider
+            value={[displayRadius]}
+            max={200}
+            min={5}
+            step={5}
+            className="py-1"
+            onValueChange={handleRadiusChange}
+          />
+          <div className="flex justify-between mt-1 px-0.5 text-[8px] font-black text-slate-300 uppercase tracking-tighter invisible">
+            <span>5km</span>
+            <span 
+              id="loc-option-whole-country"
+              onClick={() => {
+                handleRadiusChange([500]);
+                setSelectedCity(null);
+              }}
+              className={cn(isWholeCountry && "text-slate-900", "cursor-pointer")}
+            >
+              All
+            </span>
+          </div>
         </div>
-        <Slider
-          value={[displayRadius]}
-          max={200}
-          min={5}
-          step={5}
-          className="py-1"
-          onValueChange={handleRadiusChange}
-        />
-        <div className="flex justify-between mt-1 px-0.5 text-[8px] font-black text-slate-300 uppercase tracking-tighter">
-          <span>5km</span>
-          <span 
-            id="loc-option-whole-country"
-            onClick={() => {
-              handleRadiusChange([500]);
-              setSelectedCity(null);
-            }}
-            className={cn(isWholeCountry && "text-slate-900", "cursor-pointer")}
-          >
-            All
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* Current Location Button */}
+
       <div className="p-1.5 border-b bg-white">
          <div
             onPointerDown={handleCurrentLocation}

@@ -103,6 +103,34 @@ export function useApp() {
     
     now: time.now,
     acceptBid: acceptBidCompat, // Override with composite function
-    isLoading: marketplace.isLoading // Explicitly map common conflicts if any
+    isLoading: marketplace.isLoading, // Explicitly map common conflicts if any
+    
+    // Override setFilter to sync both contexts for shared filters
+    setFilter: (key: string, value: any) => {
+      // Update Marketplace Context
+      if (key === 'category' || key === 'search' || key === 'minPrice' || key === 'maxPrice' || key === 'sortBy' || key === 'listingType') {
+        marketplace.setFilter(key as any, value);
+      }
+      
+      // Update Search Context if it's a shared filter
+      const searchKeyMap: Record<string, string> = {
+        'search': 'query',
+        'category': 'category',
+        'minPrice': 'minPrice',
+        'maxPrice': 'maxPrice',
+        'sortBy': 'sortBy'
+      };
+      
+      if (key in searchKeyMap) {
+        let searchValue = value;
+        if (key === 'sortBy') {
+          // Map Marketplace Sorts to Search Sorts
+          if (value === 'luxury') searchValue = 'price_high';
+          if (value === 'trending') searchValue = 'newest';
+          if (value === 'watchlist') return; // Not supported in search
+        }
+        search.updateFilter(searchKeyMap[key] as any, searchValue);
+      }
+    }
   };
 }

@@ -98,12 +98,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   }, [item.currentHighBid, item.currentHighBidderId, user?.id, bids, item.id]);
 
   // Safe Privacy-Preserving Distance Calculation
-  const { distance, duration, timeLeft, statusColor, isUrgent } = useMemo(() => {
+  const { distance, duration, isOutside, timeLeft, statusColor, isUrgent } = useMemo(() => {
     // Return placeholder during SSR/initial hydration if now is null or user is missing
     if (now === null || !user) {
       return {
         distance: 0,
         duration: 0,
+        isOutside: false,
         timeLeft: "--:--:--",
         listingType: "72h", // Default
         statusColor: "bg-black/60",
@@ -112,7 +113,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     }
 
     // Distance Calculation (Privacy Safe)
-    const { distance: dist, duration: dur } = seller?.location ? calculatePrivacySafeDistance(user.location, seller.location) : { distance: 0, duration: 0 };
+    const { distance: dist, duration: dur, isOutside: outside } = seller?.location 
+      ? calculatePrivacySafeDistance(user.location, seller.location) 
+      : { distance: 0, duration: 0, isOutside: false };
 
     // Time Left calculation
     const diff = new Date(item.expiryAt).getTime() - now;
@@ -146,6 +149,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     return { 
       distance: dist, 
       duration: dur, 
+      isOutside: outside,
       timeLeft: timeStr,
       listingType: type,
       statusColor,
@@ -331,21 +335,23 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 </motion.div>
               </div>
 
-              {/* High Contrast Bottom Bar on Image */}
-              <div className="absolute bottom-0 left-0 right-0 bg-black/80 px-2 py-1.5 flex justify-between items-center z-10 transition-all">
-                <div className="flex items-center gap-3 overflow-hidden min-w-0">
-                  <div className={`flex items-center gap-2 ${getLabelClass()} text-white font-bold tracking-wide shrink-0`}>
-                    <div className="flex items-center gap-0.5">
-                      <MapPin className="h-3 w-3 text-red-500" />
-                      {distance}km
-                    </div>
-                    <div className="flex items-center gap-0.5 tabular-nums">
-                       {duration}min
-                    </div>
+              {/* Bottom Floating Badges - Replaces old full-width bar */}
+              
+              {/* Bottom Left: Distance/Duration */}
+              {!isOutside && (
+                <div className="absolute bottom-2 left-2 z-20 flex items-center gap-1">
+                  <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
+                    <MapPin className="h-3 w-3 text-red-500" />
+                    <span className="text-[10px] font-bold tracking-wide tabular-nums leading-none">
+                      {distance}km • {duration}min
+                    </span>
                   </div>
                 </div>
+              )}
 
-                <div className="flex items-center gap-2">
+              {/* Bottom Right: Watchlist & Secret Indicators */}
+              {(isWatched || !item.isPublicBid) && (
+                <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1.5">
                   {isWatched && (
                     <TooltipProvider>
                       <Tooltip>
@@ -354,12 +360,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                             id={`item-card-${item.id}-watch-indicator`}
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="bg-blue-600/90 text-white p-1 rounded-md border border-blue-400/50"
+                            whileHover={{ scale: 1.1 }}
+                            className="bg-blue-600/90 backdrop-blur-md text-white p-1.5 rounded-md border border-blue-400/50 shadow-lg cursor-help"
                           >
                             <Bookmark className="h-3 w-3 fill-current" />
                           </motion.div>
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent side="left">
                           <p>You are watching this item</p>
                         </TooltipContent>
                       </Tooltip>
@@ -369,18 +376,18 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="bg-amber-600/90 text-white p-1 rounded-md border border-amber-400/50">
+                          <div className="bg-amber-600/90 backdrop-blur-md text-white p-1.5 rounded-md border border-amber-400/50 shadow-lg cursor-help">
                              <Lock className="h-3 w-3" />
                           </div>
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent side="left">
                           <p>Secret Bidding</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   )}
                 </div>
-              </div>
+              )}
             </div>
 
             {/* 
@@ -484,7 +491,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         )}
                       </div>
                     ) : (
-                      <span className={`${getPriceClass()} font-black text-blue-600 leading-none`}>
+                      <span id={`item-card-${item.id}-bid-count`} className={`${getPriceClass()} font-black text-blue-600 leading-none`}>
                         {item.bidCount} {item.bidCount === 1 ? 'Bid' : 'Bids'}
                       </span>
                     )}
@@ -852,9 +859,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   <MapPin className="h-3 w-3 text-red-500" />
                   <span className="truncate">{seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown'}</span>
                 </div>
-                <div className="text-xs text-slate-600 font-black flex items-center gap-1 mt-0.5 tabular-nums uppercase tracking-tighter">
-                  {duration} min drive ({distance} km)
-                </div>
+                {!isOutside && (
+                  <div className="text-xs text-slate-600 font-black flex items-center gap-1 mt-0.5 tabular-nums uppercase tracking-tighter">
+                    {duration} min drive ({distance} km)
+                  </div>
+                )}
               </div>
               <div className="ml-auto shrink-0 flex flex-col gap-2">
                 <Link

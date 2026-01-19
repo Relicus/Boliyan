@@ -100,24 +100,24 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
           {/* Price Range Section */}
           <section id="filter-section-price">
             <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Price Range</Label>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="flex-1">
                 <Input
                   type="number"
                   placeholder="Min"
                   value={filters.minPrice || ''}
                   onChange={(e) => setFilter('minPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="rounded-xl border-slate-200 focus:ring-blue-100"
+                  className="rounded-xl border-slate-200 focus:ring-blue-100 h-10"
                 />
               </div>
-              <div className="w-4 h-px bg-slate-200" />
+              <div className="w-4 h-px bg-slate-200 shrink-0" />
               <div className="flex-1">
                 <Input
                   type="number"
                   placeholder="Max"
                   value={filters.maxPrice || ''}
                   onChange={(e) => setFilter('maxPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="rounded-xl border-slate-200 focus:ring-blue-100"
+                  className="rounded-xl border-slate-200 focus:ring-blue-100 h-10"
                 />
               </div>
             </div>

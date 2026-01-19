@@ -81,10 +81,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           setIsLoadingMore(true);
       }
 
-      try {
-          let query = supabase.from('listings').select('*, profiles(*)', { count: 'exact' });
+        try {
+            let query = supabase.from('listings').select('*, profiles(*)', { count: 'exact' }).eq('status', 'active');
 
-          // --- APPLY FILTERS ---
+            // --- APPLY FILTERS ---
           if (filters.category && filters.category !== "All Items") {
               query = query.eq('category', filters.category);
           }
@@ -473,9 +473,9 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   };
 
   const rejectBid = async (bidId: string) => {
-      const { error } = await (supabase.from('bids') as any).update({ status: 'rejected' } as any).eq('id', bidId);
+      const { error } = await (supabase.from('bids') as any).update({ status: 'ignored' } as any).eq('id', bidId);
       if (error) console.error("Failed to reject bid", error);
-      else setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: 'rejected' } : b));
+      else setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: 'ignored' } : b));
   };
 
   const acceptBid = async (bidId: string) => {

@@ -32,6 +32,24 @@ export function getFuzzyLocationString(address: string): string {
 }
 
 /**
+ * Checks if a given address is within the primary operating country (Pakistan).
+ * This is used to hide distance metrics for users outside the country.
+ * 
+ * Falls back to distance threshold if address check is ambiguous.
+ */
+export function isLocationInCountry(address: string | undefined): boolean {
+  if (!address) return true; // Default to true for mock safety
+  const addr = address.toLowerCase();
+  
+  // Explicit country mention
+  if (addr.includes('pakistan')) return true;
+  
+  // Common Pakistani cities/provinces as indicators if country is missing
+  const indicators = ['karachi', 'lahore', 'islamabad', 'rawalpindi', 'faisalabad', 'multan', 'peshawar', 'quetta', 'sialkot', 'sindh', 'punjab', 'balochistan', 'kpk', 'khyber'];
+  return indicators.some(ind => addr.includes(ind));
+}
+
+/**
  * Calculates a privacy-safe estimated distance between two coordinates.
  * 
  * Privacy Measures:
@@ -39,14 +57,14 @@ export function getFuzzyLocationString(address: string): string {
  * 2. Rounds the result to the nearest 2km to prevent triangulation.
  * 3. Adds a small stable jitter based on IDs if needed (omitted for now for purity).
  * 
- * @param from - Origin { lat, lng }
- * @param to - Destination { lat, lng }
- * @returns { distance: number (km), duration: number (mins) }
+ * @param from - Origin { lat, lng, address? }
+ * @param to - Destination { lat, lng, address? }
+ * @returns { distance: number (km), duration: number (mins), isOutside: boolean }
  */
 export function calculatePrivacySafeDistance(
-  from: { lat: number; lng: number } | undefined, 
-  to: { lat: number; lng: number }
-): { distance: number; duration: number } {
+  from: { lat: number; lng: number; address?: string } | undefined, 
+  to: { lat: number; lng: number; address?: string }
+): { distance: number; duration: number; isOutside: boolean } {
   // If no user location, default to a generic "Far" distance or specific center
   // For this mock, we'll assume a fixed user location if undefined
   const userLat = from?.lat ?? 24.8607; // Default to Karachi center
@@ -77,5 +95,10 @@ export function calculatePrivacySafeDistance(
   // Estimate duration (Urban driving: ~25km/h avg => ~2.4 mins per km)
   const duration = Math.max(1, Math.round(safeDist * 2.5));
 
-  return { distance: safeDist, duration };
+  // Logic: Mark as outside if addresses don't match country OR distance is extreme (> 1500km)
+  const fromInCountry = isLocationInCountry(from?.address);
+  const toInCountry = isLocationInCountry(to.address);
+  const isOutside = (!fromInCountry || !toInCountry) || safeDist > 1500;
+
+  return { distance: safeDist, duration, isOutside };
 }

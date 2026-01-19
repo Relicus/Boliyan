@@ -20,9 +20,8 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const router = useRouter();
   
   // Stable derived values based on bidder profile
-  const { distance, duration } = useMemo(() => {
-    const itemOwnerProfile = user ? { lat: user.location.lat, lng: user.location.lng } : undefined;
-    return calculatePrivacySafeDistance(itemOwnerProfile, bidder.location);
+  const { distance, duration, isOutside } = useMemo(() => {
+    return calculatePrivacySafeDistance(user?.location, bidder.location);
   }, [user?.location, bidder.location]);
 
   const location = useMemo(() => getFuzzyLocationString(bidder.location.address), [bidder.location.address]);
@@ -91,14 +90,16 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
 
           <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right shrink-0 flex flex-col items-end">
             <p id={`bid-amount-mobile-${bid.id}`} className="font-black text-blue-600 leading-none truncate text-[clamp(1rem,5vw,1.25rem)]">Rs. {bid.amount.toLocaleString()}</p>
-            <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-1 text-[10px] text-muted-foreground font-medium whitespace-nowrap">
-               <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
-                  {distance} km
-               </span>
-               <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
-                 {duration} min
-               </span>
-            </div>
+            {!isOutside && (
+              <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-1 text-[10px] text-muted-foreground font-medium whitespace-nowrap">
+                <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
+                    {distance} km
+                </span>
+                <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
+                  {duration} min
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -142,20 +143,25 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                   <span className="text-xs text-amber-600/70 font-semibold">(24)</span>
                 </div>
                 
-                <div id={`bidder-stats-desktop-${bid.id}`} className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                 <div id={`bidder-stats-desktop-${bid.id}`} className="flex items-center gap-3 text-[11px] text-muted-foreground">
                    <div className="flex items-center gap-1">
                     <MapPin className="h-3 w-3 text-red-400" />
                     {location}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-red-400" />
-                    {distance} km away
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-blue-400" />
-                    {duration} mins drive
-                  </div>
+                  {!isOutside && (
+                    <>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3 text-red-400" />
+                        {distance} km away
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3 text-blue-400" />
+                        {duration} mins drive
+                      </div>
+                    </>
+                  )}
                 </div>
+
             </div>
           </div>
 

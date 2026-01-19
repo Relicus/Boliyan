@@ -83,7 +83,7 @@ export default function Sidebar() {
       </div>
 
       <ScrollArea id="sidebar-scroll-area-02" className="flex-1 px-4 min-h-0">
-        <div className="space-y-7 py-2 pb-8">
+        <div className="space-y-6 py-4 pb-8">
           
           {/* Location (Standalone Dropdown) */}
           <div className="px-1">
@@ -100,25 +100,23 @@ export default function Sidebar() {
             </h3>
             <div className="grid grid-cols-2 gap-3">
               <div className="relative group">
-                <span className="absolute left-3 top-2.5 text-xs font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors">PKR</span>
                 <input 
                   id="sidebar-min-price-input"
                   type="number" 
                   placeholder="Min" 
                   value={filters.minPrice || ''}
                   onChange={(e) => setFilter('minPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="w-full pl-10 pr-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none placeholder:text-slate-300 font-medium text-slate-700 hover:border-slate-300"
+                  className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none placeholder:text-slate-300 font-medium text-slate-700 hover:border-slate-300"
                 />
               </div>
               <div className="relative group">
-                <span className="absolute left-3 top-2.5 text-xs font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors">PKR</span>
                 <input 
                   id="sidebar-max-price-input"
                   type="number" 
                   placeholder="Max" 
                   value={filters.maxPrice || ''}
                   onChange={(e) => setFilter('maxPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="w-full pl-10 pr-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none placeholder:text-slate-300 font-medium text-slate-700 hover:border-slate-300"
+                  className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none placeholder:text-slate-300 font-medium text-slate-700 hover:border-slate-300"
                 />
               </div>
             </div>
@@ -174,26 +172,29 @@ export default function Sidebar() {
                 ))}
              </div>
           </div>
+
+          <Separator className="bg-slate-100" />
+
+          {/* Reset Filters - Integrated */}
+          <div className="px-1 pt-2">
+            <button 
+              id="sidebar-reset-filters-btn"
+              onClick={() => {
+                setFilter('category', null);
+                setFilter('search', "");
+                setFilter('radius', 15);
+                setFilter('minPrice', null);
+                setFilter('maxPrice', null);
+                setFilter('listingType', 'all');
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all group border border-dashed border-slate-200 hover:border-rose-200"
+            >
+              <RefreshCcw className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform duration-500" />
+              Reset All Filters
+            </button>
+          </div>
         </div>
       </ScrollArea>
-
-      <div className="p-4 border-t border-slate-100 bg-white">
-        <button 
-          id="sidebar-reset-filters-btn"
-          onClick={() => {
-            setFilter('category', null);
-            setFilter('search', "");
-            setFilter('radius', 15);
-            setFilter('minPrice', null);
-            setFilter('maxPrice', null);
-            setFilter('listingType', 'all');
-          }}
-          className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all group"
-        >
-          <RefreshCcw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
-          Reset All Filters
-        </button>
-      </div>
     </aside>
   );
 }

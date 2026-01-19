@@ -142,10 +142,10 @@ export default function Navbar() {
           id="navbar-right-section-11" 
           className="flex items-center gap-2 shrink-0"
         >
-          <Button id="navbar-sell-btn-12" asChild variant="outline" className="hidden sm:flex items-center gap-2 border-blue-100 hover:bg-blue-50 text-blue-600">
+          <Button id="navbar-sell-btn-12" asChild variant="outline" className="hidden sm:flex items-center gap-2 border-blue-100 hover:bg-blue-50 text-blue-600 px-3 sm:px-4">
             <Link href={isLoggedIn ? "/list" : "/signin"}>
               <Plus id="navbar-sell-plus-icon-13" className="h-4 w-4" />
-              Sell Item
+              <span className="hidden lg:inline">Sell Item</span>
             </Link>
           </Button>
 
