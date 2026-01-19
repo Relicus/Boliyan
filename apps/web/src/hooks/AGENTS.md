@@ -1,6 +1,9 @@
 # HOOKS KNOWLEDGE BASE
 
+> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)** | **[📖 THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
+
 **Context:** Custom React Hooks.
+
 
 ## DIRECTORY MAP
 - **`useBidding.ts`**: Encapsulates bidding logic.

@@ -88,7 +88,7 @@ export default function MarketplaceGrid() {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const entry = useIntersectionObserver(loadMoreRef, {
     threshold: 0,
-    rootMargin: '200px', // Trigger when 80% down (approx 1 card height remaining)
+    rootMargin: '800px', // Aggressive prefetch: Trigger when 800px from bottom (approx 3 screen heights)
   });
 
   useEffect(() => {

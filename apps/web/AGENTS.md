@@ -1,5 +1,7 @@
 # FRONTEND KNOWLEDGE BASE
 
+> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)** | **[📖 THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
+
 **Context:** Next.js 16.1.1 (App Router), Tailwind v4, Shadcn UI.
 
 ## OVERVIEW
@@ -12,18 +14,18 @@ src/
 ├── components/
 │   ├── ui/            # Shadcn Primitives (Styling-focused)
 │   └── marketplace/   # Domain Components (ItemCard, ProductDetailsModal, SmartFilterBar)
-└── lib/               # Shared logic
-    ├── store.tsx      # App-wide Zustand-like state (AppContext)
-    └── mock-data.ts   # Local development data
+└── lib/               # Core logic & Supabase client
+    ├── store.tsx      # Compatibility Layer for state
+    └── transform.ts   # DB -> UI transformations
 ```
 
 ## CONVENTIONS
 - **AI Referencing**: (STRICT) Assign unique `id` attributes to main containers and actionable elements (buttons, inputs).
-- **State Management**: Use `AppProvider` from `lib/store.tsx` for cross-component flags (Watchlist, User sessions).
+- **State Management**: Use specific context hooks (`useMarketplace`, `useAuth`, etc.) or the legacy `useApp()` wrapper.
 - **UI Patterns**:
     - **Victory Halo**: Implement using `motion.div` with conic-gradients for status feedback.
     - **Celebration**: `canvas-confetti` should be triggered for all high-intent successes.
-- **Data Flow**: Server Components fetch; Client Components manage interactive state.
+- **Data Flow**: Use Supabase real-time subscriptions for dynamic updates.
 
 ## ANTI-PATTERNS
 - **DO NOT** manually link packages.

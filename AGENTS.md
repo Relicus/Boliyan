@@ -1,10 +1,10 @@
 # PROJECT KNOWLEDGE BASE
 
-> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)**
+> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)** | **[📖 THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
 
 
 **Context:** Monorepo (Next.js 16 + SQL), Manual Dependency Management.
-**Last Updated:** 2026-01-16
+**Last Updated:** 2026-01-19
 
 ## OVERVIEW
 Boliyan is a premium classifieds marketplace focused on high-intent bidding and strictly gated communication ("No chat before deal").
@@ -103,14 +103,14 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 ## ROADMAP & CURRENT TASKS
 - **Notification System**: Real-time alerts for `isOutbidTrigger`.
 - **Payment Integration**: Transition from "deal acceptance" to secure escrow.
-- **Backend Sync**: Replace `mock-data.ts` with real Supabase hooks.
+- **Trust & Verification**: User ratings and reviews implementation.
 
 ## RULES FOR AI AGENTS
 1.  **Minimalist Check**: Before implementing, ask "Can this be done with FEWER elements?"
 2.  **Always Check IDs**: Before interacting with elements, verify the `id` exists or add it.
 3.  **Verify Animations**: Ensure Framer Motion transitions are smooth and don't cause layout shifts.
 4.  **Respect The Halo**: The "Victory Halo" is a core mechanic. Do not remove or alter its logic without specific instruction.
-5.  **Mock Data First**: Implement features using `mock-data.ts` first, then plan for SQL migration.
+5.  **SQL First**: DDL changes must be reflected in `packages/database/schema.sql`.
 
 ## PROJECT MANIFESTO
 D:\VSCode\Boliyan\MANIFESTO.md

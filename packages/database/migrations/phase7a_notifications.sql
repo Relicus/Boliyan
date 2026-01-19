@@ -21,12 +21,12 @@ ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 -- Users can only see their own notifications
 CREATE POLICY "Users can view own notifications"
 ON notifications FOR SELECT
-USING (auth.uid() = user_id);
+USING ((SELECT auth.uid()) = user_id);
 
 -- Users can mark their own notifications as read
 CREATE POLICY "Users can update own notifications"
 ON notifications FOR UPDATE
-USING (auth.uid() = user_id);
+USING ((SELECT auth.uid()) = user_id);
 
 -- System/triggers can insert (service role)
 CREATE POLICY "Service can insert notifications"

@@ -10,7 +10,7 @@ import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2,
 import { toast } from "sonner";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
-import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
+import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
 import Link from "next/link";
 
 interface ProductDetailsModalProps {
@@ -58,7 +58,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
         const initialBidValue = item.isPublicBid && item.currentHighBid
           ? item.currentHighBid + getSmartStep(item.currentHighBid)
           : item.askPrice;
-        setBidAmount(initialBidValue.toLocaleString());
+        setBidAmount(Math.round(initialBidValue).toLocaleString());
     }
   }, [isOpen, item.askPrice, item.isPublicBid, item.currentHighBid, getSmartStep, setBidAmount]);
 
@@ -101,219 +101,141 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
       timeLeft: timeStr,
       isUrgent
     };
-
-  }, [item.id, item.expiryAt, now, user?.location, seller.location]);
-
+  }, [item.expiryAt, now, user, seller.location]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[500px] p-0 overflow-visible !bg-transparent !border-none !shadow-none rounded-none sm:block gap-0">
-        <motion.div
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.8 }}
-            onDragEnd={(_, info) => {
-            if (info.offset.y > 150) {
-                onClose(false);
-            }
-            }}
-            className={`relative rounded-lg overflow-hidden w-full h-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col cursor-auto
-            ${showHalo ? 'p-[3.5px] bg-[#0ea5e9]' : 'p-0 bg-white'}
-            ${showHalo && haloTheme === 'orange' ? 'bg-[#fbbf24]' : ''}
-            ${showHalo && haloTheme === 'green' ? 'bg-[#16a34a]' : ''}
-          `}
+      <DialogContent showCloseButton={false} className="sm:max-w-[800px] p-0 overflow-hidden bg-white border-none shadow-2xl rounded-2xl">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row h-full max-h-[90vh]"
         >
-            {/* Victory Halo - State Based Animated Border Background */}
-            {showHalo && (
-              <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg">
-                {/* Base Layer: Solid Vibrant Color */}
-                <div 
-                   className={`absolute inset-0 
-                     ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
-                       haloTheme === 'green' ? 'bg-[#16a34a]' : 
-                       'bg-[#0ea5e9]'}`}
-                />
-                
-                {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
-                <motion.div 
-                   className={`absolute inset-[-150%] 
-                     ${haloTheme === 'orange' 
-                        ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
-                        : haloTheme === 'green'
-                          ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
-                          : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
-                     }`}
-                   animate={{ rotate: 360 }}
-                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                />
-              </div>
-            )}
-
-            <div className="relative bg-white w-full h-full rounded-[calc(0.5rem-2px)] overflow-hidden flex flex-col z-10">
-            {/* Custom Close Button */}
-            <DialogClose asChild>
-                <motion.button
-                id={`close-listing-btn-${item.id}`}
-                className="absolute top-4 right-4 z-[60] p-2.5 bg-white rounded-full shadow-xl text-slate-600 hover:text-red-500 focus:ring-0 focus:outline-none group"
-                initial={{ opacity: 0, scale: 0.2, rotate: -45 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ delay: 0.1, type: "spring", damping: 15 }}
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => onClose(false)}
-            >
-                <X className="h-4.5 w-4.5" />
-                <span className="sr-only">Close</span>
-            </motion.button>
-            </DialogClose>
-
-            {/* Mobile Drag Handle */}
-            <div className="h-1.5 w-12 bg-slate-300 rounded-full mx-auto my-2 absolute top-1 left-1/2 -translate-x-1/2 z-20 sm:hidden" />
-            
-          <div 
-            className="relative h-60 sm:h-72 w-full bg-slate-100 shrink-0 cursor-pointer"
-            onClick={() => setShowFullscreen(true)}
-          >
-            {item.images.length > 1 ? (
-              <div className="relative h-60 sm:h-72 w-full group/gallery">
-                <div 
-                  id={`modal-gallery-${item.id}`} 
-                  className="flex h-full w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth"
-                  onScroll={(e) => {
-                    const el = e.currentTarget;
-                    const index = Math.round(el.scrollLeft / el.clientWidth);
-                    if (index !== currentImg) setCurrentImg(index);
-                  }}
-                >
-                  {item.images.map((src, i) => (
-                    <div 
-                      key={i} 
-                      className="relative h-full w-full shrink-0 snap-center flex items-center justify-center overflow-hidden"
-                    >
-                      <img
-                        src={src}
-                        alt={`${item.title} - ${i + 1}`}
-                        className="object-cover w-full h-full"
-                      />
-                      {/* Clickable regions for shifting - Desktop Only */}
-                      <div className="absolute inset-0 hidden sm:flex">
-                        <div 
-                          className="w-1/2 h-full cursor-[w-resize]" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const el = document.getElementById(`modal-gallery-${item.id}`);
-                            if (el) el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
-                          }}
-                        />
-                        <div 
-                          className="w-1/2 h-full cursor-[e-resize]" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const el = document.getElementById(`modal-gallery-${item.id}`);
-                            if (el) el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Left/Right Overlays (Chevrons) - Desktop Hover Only */}
-                {currentImg > 0 && (
-                  <button
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-30 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full backdrop-blur-xl border border-white/10 shadow-lg transition-all active:scale-95"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const el = document.getElementById(`modal-gallery-${item.id}`);
-                      if (el) el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                )}
-                {currentImg < item.images.length - 1 && (
-                  <button
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-30 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full backdrop-blur-xl border border-white/10 shadow-lg transition-all active:scale-95"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const el = document.getElementById(`modal-gallery-${item.id}`);
-                      if (el) el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
-                    }}
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                )}
-
-
-
-                {/* Dots Indicator */}
-                <div className="absolute bottom-16 left-0 right-0 flex justify-center gap-1.5 z-30">
-                  {item.images.map((_, i) => (
-                    <button 
-                      key={i} 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const el = document.getElementById(`modal-gallery-${item.id}`);
-                        if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' });
-                      }}
-                      className={`h-1.5 rounded-full transition-all duration-300 ${i === currentImg ? 'w-6 bg-white shadow-sm' : 'w-1.5 bg-white/40 hover:bg-white/60'}`}
+          {/* Left Side: Dynamic Gallery */}
+          <div className="relative w-full md:w-1/2 bg-slate-100 group">
+             {/* Victory Halo - State Based Animated Border Background */}
+              {showHalo && (
+                <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+                  {/* Base Layer: Solid Vibrant Color */}
+                  <div 
+                     className={`absolute inset-0 opacity-20
+                       ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
+                         haloTheme === 'green' ? 'bg-[#16a34a]' : 
+                         'bg-[#0ea5e9]'}`}
+                  />
+                  
+                  {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
+                  {item.isPublicBid && (
+                    <motion.div 
+                      className={`absolute inset-[-150%] opacity-30
+                        ${haloTheme === 'orange' 
+                            ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
+                            : haloTheme === 'green'
+                              ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
+                              : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
+                        }`}
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                     />
-                  ))}
+                  )}
                 </div>
-              </div>
-            ) : (
-                <img
-                src={item.images[0]}
-                alt={item.title}
-                className="object-cover w-full h-full"
-                />
-            )}
-            
-            {/* Expand Button - Always Visible, Repositioned to Bottom-Right */}
-            <button
-               className="absolute bottom-4 right-4 z-40 p-2.5 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-200 backdrop-blur-sm"
-               title="Expand to Fullscreen"
-               onClick={(e) => {
-                 e.stopPropagation();
-                 setShowFullscreen(true);
-               }}
-            >
-               <Maximize2 className="h-4.5 w-4.5" />
-            </button>
+              )}
+             <div 
+                className="relative h-[300px] md:h-full w-full overflow-hidden cursor-pointer z-10"
+                onClick={() => setShowFullscreen(true)}
+              >
+               <AnimatePresence mode="wait">
+                 <motion.img 
+                    key={currentImg}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    src={item.images[currentImg]} 
+                    className="h-full w-full object-cover"
+                 />
+               </AnimatePresence>
+                
+               <div className="absolute top-4 right-4 z-20">
+                 <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowFullscreen(true);
+                    }}
+                    className="p-2 bg-white/80 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90"
+                 >
+                    <Maximize2 className="h-5 w-5" />
+                 </button>
+               </div>
+
+               {item.images.length > 1 && (
+                 <>
+                   <button 
+                     className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setCurrentImg(prev => (prev > 0 ? prev - 1 : item.images.length - 1));
+                     }}
+                   >
+                     <ChevronLeft className="h-6 w-6" />
+                   </button>
+                   <button 
+                     className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setCurrentImg(prev => (prev < item.images.length - 1 ? prev + 1 : 0));
+                     }}
+                   >
+                     <ChevronRight className="h-6 w-6" />
+                   </button>
+                 </>
+               )}
+             </div>
+             
+             {/* Thumbs Overlay */}
+             {item.images.length > 1 && (
+               <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4">
+                 {item.images.map((img, i) => (
+                   <button
+                     key={i}
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setCurrentImg(i);
+                     }}
+                     className={`h-12 w-12 rounded-lg border-2 overflow-hidden transition-all ${i === currentImg ? 'border-blue-500 scale-110 shadow-lg' : 'border-white/50 grayscale-[50%] hover:grayscale-0'}`}
+                   >
+                     <img src={img} className="h-full w-full object-cover" alt="" />
+                   </button>
+                 ))}
+               </div>
+             )}
           </div>
 
-            <div className="flex-1 overflow-y-auto overscroll-contain relative z-10 shadow-[0_-8px_20px_-10px_rgba(0,0,0,0.15)] border-t border-slate-100 p-4 space-y-4">
-                {/* Header Content Area */}
-                <div className="flex justify-between items-start gap-4">
-                   <DialogTitle className="text-2xl font-black text-slate-900 leading-tight">{item.title}</DialogTitle>
-                   <div className="flex gap-2 shrink-0">
-                      {!item.isPublicBid && (
-                        <Badge variant="secondary" className="font-bold bg-amber-500 text-white hover:bg-amber-600 border-none shadow-sm h-7">
-                          <Lock className="h-3.5 w-3.5 mr-1" />
-                          Secret
-                        </Badge>
-                      )}
-                   </div>
-                </div>
-            {/* Price Info Grid & Timer - Expanded & Reduced Padding */}
-            <div className="grid grid-cols-3 gap-0 bg-slate-50 rounded-xl border border-slate-100 relative overflow-hidden divide-x divide-slate-200">
-                <div className="flex flex-col items-center justify-center py-2 px-1 text-center">
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">Price</div>
-                <div className="flex items-baseline gap-0.5 whitespace-nowrap">
-                    <span className="text-xs font-bold text-slate-400">Rs.</span>
-                    <span className="text-xl font-black text-slate-900 leading-none">{Math.round(item.askPrice).toLocaleString()}</span>
-                </div>
-                </div>
+          {/* Right Side: Product Details & Bidding */}
+          <div className="flex-1 flex flex-col p-6 overflow-y-auto">
+            <div className="flex justify-between items-start mb-4">
+               <div>
+                  <DialogTitle className="text-2xl font-black text-slate-900 leading-tight mb-2">{item.title}</DialogTitle>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="font-bold bg-blue-50 text-blue-700 border-blue-100">Verified Listing</Badge>
+                    {!item.isPublicBid && (
+                      <Badge variant="secondary" className="font-bold bg-amber-500 text-white border-none shadow-sm">
+                        <Lock className="h-3.5 w-3.5 mr-1" />
+                        Secret Bidding
+                      </Badge>
+                    )}
+                  </div>
+               </div>
+               <DialogClose className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                 <X className="h-6 w-6" />
+               </DialogClose>
+            </div>
 
-                <div className="flex flex-col items-center justify-center py-2 px-1 text-center">
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">
-                    {item.isPublicBid ? "High Bid" : "Bids"}
-                </div>
-                <div className={`flex items-baseline justify-center gap-0.5 whitespace-nowrap ${item.isPublicBid && item.currentHighBid && item.currentHighBidderId === user?.id ? 'text-amber-600' : 'text-blue-600'}`}>
-                    {item.isPublicBid && item.currentHighBid
-                    ? <><span className={`text-xs font-bold ${item.currentHighBidderId === user?.id ? 'text-amber-600/70' : 'text-blue-600/70'}`}>Rs.</span><span className="text-xl font-black leading-none">{Math.round(item.currentHighBid).toLocaleString()}</span></>
-                    : <span className="text-xl font-black leading-none">{item.bidCount} <span className="text-sm font-bold opacity-70 hidden sm:inline">{item.bidCount === 1 ? 'Bid' : 'Bids'}</span></span>
-                    }
+            <div className="grid grid-cols-2 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="flex flex-col">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">Ask Price</div>
+                <div className="text-xl font-black text-slate-900 leading-none">
+                    {formatPrice(item.askPrice)}
                 </div>
                 </div>
                 
@@ -326,7 +248,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             </div>
 
             {/* Description */}
-            <div className="space-y-1">
+            <div className="space-y-1 mb-6">
                 <h4 className="text-sm font-bold text-slate-900">Description</h4>
                 <p className="text-sm text-slate-600 leading-relaxed">
                 {item.description}
@@ -334,7 +256,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             </div>
 
             {/* Seller Info */}
-            <div className="flex items-center gap-3 py-3 border-t border-b border-slate-100">
+            <div className="flex items-center gap-3 py-3 border-t border-b border-slate-100 mb-6">
                 <div className="h-10 w-10 rounded-full bg-slate-200 overflow-hidden">
                 <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
                 </div>
@@ -383,10 +305,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                 </div>
             </div>
 
-            </div>
-
             {/* Sticky/Fixed Bidding Footer */}
-            <div className="p-4 bg-white border-t border-slate-100 z-20 shrink-0 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
+            <div className="mt-auto pt-4 bg-white z-20 shrink-0">
                 <div className="flex flex-col gap-3">
                   <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Extra Large for Modal */}
@@ -423,10 +343,13 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                         initial={false}
                         disabled={user?.id === seller.id}
                         animate={{ 
-                          scale: [1, 1.05, 1],
-                          x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -3, 3, -3, 3, 0] : 0
+                          scale: [1, 1.05],
+                          x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -5, 5, -5, 5, 0] : 0
                         }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ 
+                          scale: { duration: 0.2, repeat: 1, repeatType: "reverse" },
+                          x: { duration: 0.2, type: "spring", stiffness: 500, damping: 20 }
+                        }}
                         onKeyDown={handleKeyDown}
                         onChange={handleInputChange}
                         className={`w-full h-full text-center text-xl font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300 disabled:bg-transparent disabled:text-slate-500 disabled:cursor-not-allowed

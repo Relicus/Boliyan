@@ -2,26 +2,40 @@
 
 **Boliyan** — Speak your price. Seal the deal. No nonsense.
 
-## Overview
-A next-generation peer-to-peer marketplace for Pakistan that eliminates the friction of buying and selling used goods.
+> **[📖 THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)** | **[🗺️ PROJECT INDEX](file:///d:/VSCode/Boliyan/INDEX.md)**
 
-## Project Structure
+## 🚀 Our Mission
+To build the most **efficient, transparent, and safe** peer-to-peer marketplace for Pakistan. We are killing the friction of buying and selling used goods. We believe that selling your old phone or buying a dining table shouldn't feel like a battle.
+
+## 🛑 The Pain Points We Solve
+- **The "Is this available?" Epidemic**: No chat before deal. Messaging unlocks ONLY after a bid is accepted.
+- **The Lowball Nightmare**: Automated Price Intelligence and mandatory 70% minimum bids.
+- **The Trust Deficit**: Verified profiles and community-policed safety.
+
+## 🏗️ Project Structure
 ```
 .
 ├── apps/
-│   └── web/           # Main Marketplace App (Next.js 16)
+│   └── web/           # Main Marketplace App (Next.js 16 + React 19)
 ├── packages/
-│   ├── database/      # SQL Schema (Supabase-compatible)
-│   └── shared/        # Shared logic (Bidding validation)
+│   ├── database/      # Native SQL Schema (PostgreSQL)
+│   └── shared/        # Isomorphic Business Logic (Bidding validation)
 └── README.md
 ```
 
-## Key Features
-*   **Smart Bidding 2.0**: No "Is this available?" spam. Bids only, with real-time feedback (Victory Halos & deltas).
-*   **Strict Messaging**: Chat unlocks ONLY after a deal is accepted. No pre-deal noise.
-*   **Watchlist System**: Save items for later; automatically tracked when you place a bid.
-*   **Secret Bidding**: Sellers can choose to hide bid amounts for premium items.
-*   **Immersive Gallery**: Immersive, high-performance multi-image viewing with fullscreen capability.
+## 💎 Design Philosophy
+**Apple-Style Minimalism**: "Subtract before you add. If a visual cue works, delete the text."
+
+## 🌟 Key Features
+*   **Smart Bidding 2.0**: Real-time feedback with **Victory Halos** and outbid alerts.
+*   **Strict Messaging**: Chat unlocks ONLY after a deal is accepted.
+*   **Watchlist System**: Save items; automatically tracked when you place a bid.
+*   **Immersive Gallery**: High-performance, fullscreen multi-image viewing.
+
+## 🛠️ Tech Stack
+- **Framework**: Next.js 16.1 (React 19)
+- **Styling**: Tailwind CSS v4 + Framer Motion
+- **Database**: Supabase (Real-time + Auth + Storage)
 
 ## Getting Started
 

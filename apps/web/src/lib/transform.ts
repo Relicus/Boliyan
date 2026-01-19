@@ -8,7 +8,18 @@ import { CITY_COORDINATES } from './locations';
 
 // We need a joined type because we will fetch listings with their sellers
 export type ListingWithSeller = ListingRow & {
-  profiles: ProfileRow | null;
+  profiles?: ProfileRow | null;
+  
+  // Fields from 'marketplace_listings' view
+  seller_name?: string | null;
+  seller_avatar?: string | null;
+  seller_rating?: number | null;
+  seller_rating_count?: number | null;
+  seller_location?: string | null;
+  
+  bid_count?: number | null;
+  high_bid?: number | null;
+  high_bidder_id?: string | null;
 };
 
 export function transformProfileToUser(profile: ProfileRow): User {
@@ -35,7 +46,30 @@ export function transformProfileToUser(profile: ProfileRow): User {
 }
 
 export function transformListingToItem(listing: ListingWithSeller): Item {
-  const seller = listing.profiles ? transformProfileToUser(listing.profiles) : undefined;
+  // Handle both nested 'profiles' (legacy join) and flat 'seller_*' (view)
+  let seller: User | undefined;
+
+  if (listing.profiles) {
+      seller = transformProfileToUser(listing.profiles);
+  } else if (listing.seller_name || listing.seller_id) {
+      // Reconstruct User from flat view columns
+      const cityCoords = listing.seller_location ? CITY_COORDINATES[listing.seller_location] : null;
+      seller = {
+          id: listing.seller_id || 'unknown',
+          name: listing.seller_name || 'Anonymous',
+          avatar: listing.seller_avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (listing.seller_id || 'x'),
+          rating: listing.seller_rating || 0,
+          reviewCount: listing.seller_rating_count || 0,
+          location: {
+              lat: cityCoords?.lat || 24.8607,
+              lng: cityCoords?.lng || 67.0011,
+              address: listing.seller_location || 'Karachi'
+          },
+          isVerified: false,
+          badges: [],
+          stats: { bidsAcceptedByMe: 0, myBidsAccepted: 0 }
+      };
+  }
 
   // Calculate expiry (Default to 72 hours after creation)
   const createdAt = listing.created_at ? new Date(listing.created_at).getTime() : Date.now();
@@ -65,10 +99,14 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     seller: seller,
     askPrice: listing.asked_price,
     category: listing.category || 'Other',
+    condition: (listing as any).condition || 'used',
     isPublicBid: isPublicBid,
-    currentHighBid: undefined,
-    currentHighBidderId: undefined,
-    bidCount: 0,
+    
+    // Server-side stats if available
+    currentHighBid: listing.high_bid !== undefined ? Number(listing.high_bid) : undefined,
+    currentHighBidderId: listing.high_bidder_id || undefined,
+    bidCount: listing.bid_count !== undefined ? Number(listing.bid_count) : 0,
+    
     createdAt: listing.created_at || new Date().toISOString(),
     expiryAt: expiryAt,
     listingDuration: 72,

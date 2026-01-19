@@ -1,6 +1,9 @@
 # MARKETPLACE COMPONENT KNOWLEDGE BASE
 
+> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)** | **[📖 THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
+
 **Context:** Core Domain UI for Listing & Browsing.
+
 
 ## DIRECTORY MAP
 - **`ItemCard.tsx`**: The **Hero Component**.

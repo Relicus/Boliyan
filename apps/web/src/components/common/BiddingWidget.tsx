@@ -228,10 +228,13 @@ const BiddingWidget = memo(({
                 initial={false}
                 disabled={isDisabled}
                 animate={{  
-                  scale: [1, 1.05, 1],
+                  scale: [1, 1.05],
                   x: isBelowMinimum ? [0, -2, 2, -2, 2, 0] : 0
                 }}
-                transition={{ duration: 0.2 }}
+                transition={{ 
+                  scale: { duration: 0.2, repeat: 1, repeatType: "reverse" },
+                  x: { duration: 0.2 }
+                }}
                 onClick={handleInputClick}
                 onKeyDown={handleKeyDown}
                 onChange={handleInputChange}

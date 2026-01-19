@@ -54,12 +54,12 @@ ALTER TABLE search_history ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can view own search history" ON search_history;
 CREATE POLICY "Users can view own search history"
 ON search_history FOR SELECT
-USING (auth.uid() = user_id);
+USING ((SELECT auth.uid()) = user_id);
 
 DROP POLICY IF EXISTS "Users can insert own search history" ON search_history;
 CREATE POLICY "Users can insert own search history"
 ON search_history FOR INSERT
-WITH CHECK (auth.uid() = user_id);
+WITH CHECK ((SELECT auth.uid()) = user_id);
 
 -- Categories table for structured navigation
 CREATE TABLE IF NOT EXISTS categories (

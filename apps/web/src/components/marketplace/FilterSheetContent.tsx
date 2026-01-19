@@ -20,6 +20,7 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
     setFilter('sortBy', 'trending');
     setFilter('minPrice', null);
     setFilter('maxPrice', null);
+    setFilter('condition', 'all');
     setFilter('listingType', 'all');
     if (onClose) onClose();
   };
@@ -45,7 +46,7 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
                 return (
                   <button
                     key={f.id}
-                    onClick={() => setFilter('sortBy', f.id)}
+                    onClick={() => setFilter('sortBy', f.id as any)}
                     className={cn(
                       "flex items-center gap-2 p-3 rounded-xl border transition-all duration-200",
                       isActive 
@@ -120,6 +121,35 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
                   className="rounded-xl border-slate-200 focus:ring-blue-100 h-10"
                 />
               </div>
+            </div>
+          </section>
+
+          <Separator className="bg-slate-100" />
+
+          {/* Condition Section */}
+          <section id="filter-section-condition">
+            <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Condition</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: 'all', label: 'All Items' },
+                { id: 'new', label: '🌟 New' },
+                { id: 'like_new', label: '✨ Like New' },
+                { id: 'used', label: '👌 Used' },
+                { id: 'fair', label: '🔨 Fair' }
+              ].map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setFilter('condition', c.id)}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200",
+                    filters.condition === c.id 
+                      ? "bg-slate-900 border-slate-900 text-white shadow-md" 
+                      : "bg-white border-slate-100 text-slate-600 hover:border-slate-200"
+                  )}
+                >
+                  <span className="text-sm font-bold">{c.label}</span>
+                </button>
+              ))}
             </div>
           </section>
 

@@ -40,6 +40,7 @@ export interface Item {
   seller?: User; // Embedded seller profile for UI & Logic
   askPrice: number;
   category: string;
+  condition: 'new' | 'like_new' | 'used' | 'fair';
   isPublicBid: boolean;
   currentHighBid?: number;
   currentHighBidderId?: string;
@@ -98,6 +99,7 @@ export interface SearchFilters {
     lng: number;
     radiusKm: number;
   };
+  condition?: 'new' | 'like_new' | 'used' | 'fair' | 'all';
   sortBy?: 'newest' | 'price_low' | 'price_high' | 'nearest' | 'ending_soon';
   status?: 'active' | 'all';
 }

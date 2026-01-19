@@ -104,6 +104,26 @@ export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFilte
             </div>
         </div>
 
+        {/* Condition Filter */}
+        <div className="space-y-3">
+             <Label className="text-sm font-medium text-slate-700">Condition</Label>
+             <Select 
+                value={filters.condition || 'all'} 
+                onValueChange={(val: any) => updateFilter('condition', val)}
+             >
+                <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Any Condition" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">Any Condition</SelectItem>
+                    <SelectItem value="new">🌟 Brand New</SelectItem>
+                    <SelectItem value="like_new">✨ Like New / Mint</SelectItem>
+                    <SelectItem value="used">👌 Gently Used</SelectItem>
+                    <SelectItem value="fair">🔨 Heavily Used (Fair)</SelectItem>
+                </SelectContent>
+             </Select>
+        </div>
+
         {/* Apply Button (mainly for Mobile/Explicit action updates) */}
         <Button onClick={() => { executeSearch(); onClose(); }} className="mt-4 w-full bg-slate-900 text-white hover:bg-slate-800">
             Show Results

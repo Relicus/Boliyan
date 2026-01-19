@@ -47,6 +47,7 @@ export interface Database {
           asked_price: number
           category: string | null
           images: string[] | null
+          condition: 'new' | 'like_new' | 'used' | 'fair' | null
           auction_mode: 'hidden' | 'visible' | 'sealed' | null
           status: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at: string | null
@@ -59,6 +60,7 @@ export interface Database {
           asked_price: number
           category?: string | null
           images?: string[] | null
+          condition?: 'new' | 'like_new' | 'used' | 'fair' | null
           auction_mode?: 'hidden' | 'visible' | 'sealed' | null
           status?: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at?: string | null
@@ -71,6 +73,7 @@ export interface Database {
           asked_price?: number
           category?: string | null
           images?: string[] | null
+          condition?: 'new' | 'like_new' | 'used' | 'fair' | null
           auction_mode?: 'hidden' | 'visible' | 'sealed' | null
           status?: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at?: string | null

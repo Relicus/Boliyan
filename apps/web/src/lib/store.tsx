@@ -108,7 +108,7 @@ export function useApp() {
     // Override setFilter to sync both contexts for shared filters
     setFilter: (key: string, value: any) => {
       // Update Marketplace Context
-      if (key === 'category' || key === 'search' || key === 'minPrice' || key === 'maxPrice' || key === 'sortBy' || key === 'listingType') {
+      if (key === 'category' || key === 'search' || key === 'minPrice' || key === 'maxPrice' || key === 'sortBy' || key === 'listingType' || key === 'condition') {
         marketplace.setFilter(key as any, value);
       }
       
@@ -118,7 +118,8 @@ export function useApp() {
         'category': 'category',
         'minPrice': 'minPrice',
         'maxPrice': 'maxPrice',
-        'sortBy': 'sortBy'
+        'sortBy': 'sortBy',
+        'condition': 'condition'
       };
       
       if (key in searchKeyMap) {

@@ -37,6 +37,7 @@ function ListForm() {
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [duration, setDuration] = useState<"24" | "48" | "72">("24");
+  const [condition, setCondition] = useState<'new' | 'like_new' | 'used' | 'fair'>("used");
   
   const [images, setImages] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -58,6 +59,7 @@ function ListForm() {
       setIsPublic(editingItem.isPublicBid);
       setImages(editingItem.images);
       setDuration(editingItem.listingDuration.toString() as "24" | "48" | "72");
+      setCondition(editingItem.condition || "used");
     }
   }, [editingItem]);
 
@@ -134,7 +136,8 @@ function ListForm() {
             auction_mode: isPublic ? 'visible' : 'sealed',
             images: allUrls,
             seller_id: user.id,
-            status: 'active'
+            status: 'active',
+            condition: condition
         };
 
         if (editingItem) {
@@ -285,6 +288,24 @@ function ListForm() {
                 <p className="text-[10px] font-bold text-red-500">Valid price required</p>
               )}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1">Item Condition</Label>
+            <Select 
+              value={condition} 
+              onValueChange={(val: any) => setCondition(val)}
+            >
+              <SelectTrigger id="condition-select" className="bg-slate-50 border-slate-100 h-11 w-full">
+                <SelectValue placeholder="Select Condition" />
+              </SelectTrigger>
+              <SelectContent id="condition-select-content">
+                <SelectItem value="new">🌟 Brand New</SelectItem>
+                <SelectItem value="like_new">✨ Like New / Mint</SelectItem>
+                <SelectItem value="used">👌 Gently Used</SelectItem>
+                <SelectItem value="fair">🔨 Heavily Used (Fair)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
 

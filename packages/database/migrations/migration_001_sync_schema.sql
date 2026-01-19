@@ -24,12 +24,12 @@ ALTER TABLE watchlist ENABLE ROW LEVEL SECURITY;
 -- 5. RLS Policies for watchlist
 CREATE POLICY "Users can view their own watchlist" 
     ON watchlist FOR SELECT 
-    USING (auth.uid() = user_id);
+    USING ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can add to their own watchlist" 
     ON watchlist FOR INSERT 
-    WITH CHECK (auth.uid() = user_id);
+    WITH CHECK ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can remove from their own watchlist" 
     ON watchlist FOR DELETE 
-    USING (auth.uid() = user_id);
+    USING ((SELECT auth.uid()) = user_id);

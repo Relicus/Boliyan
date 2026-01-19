@@ -102,3 +102,18 @@ export function calculatePrivacySafeDistance(
 
   return { distance: safeDist, duration, isOutside };
 }
+
+/**
+ * Centered Price Formatting Utility
+ * 
+ * Rules:
+ * 1. Full numeric display by default.
+ * 2. ONLY shrink for 'compact' view mode IF digits exceed 8 (100,000,000+).
+ */
+export function formatPrice(price: number, viewMode?: string): string {
+  if (viewMode === 'compact' && price >= 100_000_000) {
+    const m = price / 1_000_000;
+    return `${m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)}M`;
+  }
+  return Math.round(price).toLocaleString();
+}

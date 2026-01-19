@@ -2,9 +2,16 @@
 
 **Central Navigation Hub**
 
-This document serves as the master map for the Boliyan monorepo. Use it to navigate between different documentation files ("AGENTS.md") and understand the high-level architecture.
+> **[📖 READ THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
+
+## 🚀 MISSION & VALUES
+Boliyan is built to become the **Default Operating System** for Pakistan's secondary economy. We stand for:
+1. **Respect for Time**: No window shoppers. No "Is this available?".
+2. **High Intent**: Bidding is the only way to start a conversation.
+3. **Ruthless Minimalism**: If a visual cue works, we delete the text.
 
 ## 🗺️ NAVIGATOR
+
 
 ### 📂 Apps (Frontend)
 - **[Web App Logic](file:///d:/VSCode/Boliyan/apps/web/src/lib/AGENTS.md)** (`apps/web/src/lib`) - Store, Mock Data, Utilities.
@@ -23,23 +30,23 @@ This document serves as the master map for the Boliyan monorepo. Use it to navig
 
 ---
 
-## 🏗️ ARCHITECTURE OVERVIEW
+### 🏗️ ARCHITECTURE OVERVIEW
 
 ### Monorepo Structure
 Boliyan uses a **manual monorepo** structure (no Turborepo/Nx yet) to keep things simple.
 
 - **`apps/web`**: The main Next.js 16 application.
-  - Uses a **custom Context Store** (`store.tsx`) for state management (No Redux/Zustand).
-  - **Mock Data First**: Development relies on `mock-data.ts`. Real data sync is a future roadmap item.
+  - Uses a **custom Context Provider architecture** (MarketplaceContext, AuthContext, etc.) for state management.
+  - **Live Data**: Powered by **Supabase**. Real-time subscriptions for bids and messaging.
   
 - **`packages/database`**: The Source of Truth for data.
-  - **Native SQL**: We write raw SQL schema files (`schema.sql`). No ORM.
+  - **Native SQL**: Raw SQL schema files (`schema.sql`). No ORM.
   
 - **`packages/shared`**: Isomorphic business logic.
   - Code here must run in **both** Browser and Node.js environments.
   - Used for validating bids, parsing amounts, etc.
 
 ## 🔍 QUICK LINKS
-- **[Mock Data File](file:///d:/VSCode/Boliyan/apps/web/src/lib/mock-data.ts)**
-- **[Global Store](file:///d:/VSCode/Boliyan/apps/web/src/lib/store.tsx)**
+- **[Global Store (Compatibility Layer)](file:///d:/VSCode/Boliyan/apps/web/src/lib/store.tsx)**
 - **[Database Schema](file:///d:/VSCode/Boliyan/packages/database/schema.sql)**
+

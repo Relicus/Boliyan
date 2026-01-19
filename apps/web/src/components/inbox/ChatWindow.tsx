@@ -5,14 +5,13 @@ import { useApp } from '@/lib/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Star, Circle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReviewForm from '@/components/profile/ReviewForm';
 import { useReviews } from '@/context/ReviewContext';
-import { Star } from 'lucide-react';
 
 interface ChatWindowProps {
   conversationId: string;
@@ -48,6 +47,15 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const otherUser = conversation ? (isSeller ? conversation.bidder : conversation.seller) : undefined;
   const item = conversation?.item;
 
+  // 3-Slot Visual Indicator Logic (Seller Only)
+  // We assume a 'totalChats' prop or similar exists, but since we don't have it on the Conversation object yet,
+  // we'll mock the visual logic for now based on the "3-Chat Rule" mentioned in instructions.
+  // In a real implementation, we'd fetch the count of active chats for this item.
+  // Mocking: We assume this is slot 1/3 if we don't have data.
+  const activeChatCount = 1; // Placeholder until count is available in context
+  const maxSlots = 3;
+  const slots = Array.from({ length: maxSlots }).map((_, i) => i < activeChatCount);
+
   // Lock body scroll to prevent Safari from scrolling page when input focused
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -73,8 +81,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   // Expiration Logic
   useEffect(() => {
     if (!conversation?.expiresAt) {
-      setTimeLeft((prev) => prev !== "" ? "" : prev); // eslint-disable-line react-hooks/set-state-in-effect
-      setIsLocked((prev) => prev ? false : prev); // eslint-disable-line react-hooks/set-state-in-effect
+      setTimeLeft("");
+      setIsLocked(false);
       return;
     }
 
@@ -107,13 +115,12 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   }, [conversation?.expiresAt]);
 
   useEffect(() => {
-      if (item?.status === 'completed' && otherUser) {
-          canReview(item.id, isSeller ? 'seller' : 'buyer')
-              .then(setShowReviewBtn);
-      } else {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
-          setShowReviewBtn((prev) => prev ? false : prev);
-      }
+    if (item?.status === 'completed' && otherUser) {
+        canReview(item.id, isSeller ? 'seller' : 'buyer')
+            .then(setShowReviewBtn);
+    } else {
+        setShowReviewBtn(false);
+    }
   }, [item?.status, otherUser, canReview, isSeller, conversation?.itemId]);
 
   // Scroll to bottom on new message
@@ -170,18 +177,45 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
             )}>
               {isSeller ? "Buyer" : "Seller"}
             </span>
-          </div>
-          <div className="flex items-center gap-1.5 min-w-0">
             {item && (
-              <div className="flex items-center gap-1.5 truncate">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Regarding</span>
-                <span className="text-[11px] font-bold text-slate-600 truncate">{item.title}</span>
-                <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">Rs. {item.askPrice.toLocaleString()}</span>
-              </div>
+              <span className="text-[10px] font-black text-slate-400 ml-auto mr-2 tracking-tighter uppercase whitespace-nowrap bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+                Ask: {formatPrice(item.askPrice)}
+              </span>
             )}
           </div>
+          
+          <div className="flex items-center gap-1.5 min-w-0">
+            {item && (
+              <div className="h-4 w-4 rounded-[4px] bg-slate-100 overflow-hidden flex-shrink-0 ring-1 ring-slate-200/50">
+                <img src={item.images[0]} alt="" className="h-full w-full object-cover" />
+              </div>
+            )}
+            <div className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-tight">
+              {item?.title || "Product"}
+            </div>
+          </div>
         </div>
-        
+
+        {/* 3-Slot Indicator (Seller Only) */}
+        {isSeller && (
+          <div className="flex flex-col items-end mr-2">
+            <div className="flex gap-1 mb-0.5">
+              {slots.map((filled, i) => (
+                <div 
+                  key={i} 
+                  className={cn(
+                    "w-2 h-2 rounded-full ring-1 ring-slate-100 transition-all", 
+                    filled ? "bg-emerald-500 shadow-sm shadow-emerald-200" : "bg-slate-100"
+                  )} 
+                />
+              ))}
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-tighter text-slate-400">
+              {activeChatCount}/{maxSlots} Slots
+            </span>
+          </div>
+        )}
+
         {showReviewBtn && (
             <Button 
                 size="sm" 

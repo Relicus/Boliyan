@@ -29,7 +29,7 @@ USING (true);
 -- Users can only insert reviews where they are the reviewer
 CREATE POLICY "Users can create reviews"
 ON reviews FOR INSERT
-WITH CHECK (auth.uid() = reviewer_id);
+WITH CHECK ((SELECT auth.uid()) = reviewer_id);
 
 -- No updates or deletes allowed (immutable reviews)
 

@@ -11,7 +11,7 @@ import { useTime } from "@/context/TimeContext";
 import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
-import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
+import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import {
   Carousel,
@@ -39,13 +39,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const { now } = useTime(); // Use global heartbeat
   const isWatched = watchedItemIds.includes(item.id);
 
-  // Helper for compact price display (e.g. 185.5k)
-  const formatDisplayPrice = (price: number) => {
-    if (viewMode === 'spacious') {
-      return Math.round(price).toLocaleString();
-    }
-    return (price / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-  };
+  // Price formatting logic handled by centralized utility
+  const displayPrice = (price: number) => formatPrice(price, viewMode);
 
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -345,12 +340,22 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               <div className="absolute top-2 right-2 z-20 flex flex-col items-end gap-1">
                 <motion.div
                   initial={false}
-                  animate={isUrgent ? { scale: [1, 1.05, 1] } : {}}
-                  transition={isUrgent ? { repeat: Infinity, duration: 1.5 } : {}}
+                  animate={isUrgent ? { scale: [1, 1.05] } : {}}
+                  transition={isUrgent ? { repeat: Infinity, duration: 0.75, repeatType: "reverse" } : {}}
                   className={`${statusColor} backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20`}
                 >
                   <span className="text-[10px] font-black tracking-tight leading-none tabular-nums">{timeLeft}</span>
                 </motion.div>
+                
+                {/* Condition Badge */}
+                <div className="bg-white/90 backdrop-blur-md text-slate-900 px-2 py-1 rounded-md flex items-center shadow-lg border border-slate-200 mt-1">
+                  <span className="text-[9px] font-black uppercase tracking-tighter leading-none">
+                    {item.condition === 'new' && '🌟 New'}
+                    {item.condition === 'like_new' && '✨ Mint'}
+                    {item.condition === 'used' && '👌 Used'}
+                    {item.condition === 'fair' && '🔨 Fair'}
+                  </span>
+                </div>
               </div>
 
               {/* Bottom Floating Badges - Replaces old full-width bar */}
@@ -470,7 +475,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 <div className="flex flex-col">
                   <span className={`${getLabelClass()} text-slate-600 font-bold uppercase tracking-wider transition-all`}>Asking</span>
                   <span id={`item-card-${item.id}-ask-price`} className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all`}>
-                    {formatDisplayPrice(item.askPrice)}
+                    {displayPrice(item.askPrice)}
                   </span>
                 </div>
 
@@ -497,7 +502,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                           id={`item-card-${item.id}-high-bid`} 
                           className={`${getPriceClass()} font-black leading-none inline-block`}
                         >
-                          {formatDisplayPrice(item.currentHighBid)}
+                          {displayPrice(item.currentHighBid)}
                         </motion.span>
                         {item.currentHighBidderId === user?.id && (
                           <motion.div
@@ -568,10 +573,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         initial={false}
                         disabled={user?.id === seller?.id}
                         animate={{  
-                          scale: [1, 1.05, 1],
-                          x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -2, 2, -2, 2, 0] : 0
+                          scale: [1, 1.05],
+                          x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -5, 5, -5, 5, 0] : 0
                         }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ 
+                          scale: { duration: 0.2, repeat: 1, repeatType: "reverse" },
+                          x: { duration: 0.2, type: "spring", stiffness: 500, damping: 20 }
+                        }}
                         onClick={handleInputClick}
                         onKeyDown={handleKeyDown}
                         onChange={handleInputChange}
@@ -962,10 +970,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         initial={false}
                         disabled={user?.id === seller?.id}
                         animate={{ 
-                          scale: [1, 1.05, 1],
+                          scale: [1, 1.05],
                           x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -3, 3, -3, 3, 0] : 0
                         }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ 
+                          scale: { duration: 0.2, repeat: 1, repeatType: "reverse" },
+                          x: { duration: 0.2 }
+                        }}
                         onKeyDown={handleKeyDown}
                         onChange={handleInputChange}
                         className={`w-full h-full text-center text-xl font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300 disabled:bg-transparent disabled:text-slate-500 disabled:cursor-not-allowed

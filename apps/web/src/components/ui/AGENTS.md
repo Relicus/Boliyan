@@ -1,5 +1,7 @@
 # UI COMPONENT KNOWLEDGE BASE
 
+> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)** | **[📖 THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
+
 **Context:** Shadcn UI + Radix Primitives.
 
 ## RULE: TREAT AS EXTERNAL LIBRARY

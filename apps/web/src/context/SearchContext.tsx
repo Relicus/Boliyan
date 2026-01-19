@@ -1,11 +1,13 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './AuthContext';
 import type { Item } from '@/types';
 import type { SearchFilters, Category, SearchSuggestion } from '@/types';
 import { sortByDistance } from '@/lib/searchUtils';
+import { generateCacheKey, getFromCache, setCache } from '@/lib/cache';
+import { useBidRealtime } from '@/hooks/useBidRealtime';
 import { transformListingToItem, ListingWithSeller, transformBidToHydratedBid } from '@/lib/transform';
 
 interface SearchContextType {
@@ -64,12 +66,57 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   };
 
   const executeSearch = useCallback(async () => {
+    // Generate cache key
+    const cacheKey = generateCacheKey('search', filters as unknown as Record<string, any>);
+    
+    // --- 1. CHECK CACHE (L1/L2) ---
+    // Only use cache if not page 1? Wait, search is always page 1 currently (no pagination in UI yet)
+    // SWR pattern
+    let usedCache = false;
+    
+    // We can't await easily inside a synchronous-looking start, but we can set state
+    // For search, we might want to check cache first before setting isSearching=true?
+    // Actually, setting isSearching=true is fine, then we check cache.
     setIsSearching(true);
     
+    const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey);
+    if (cachedItems) {
+        setSearchResults(cachedItems);
+        // Note: totalResults might be inaccurate if we don't cache it too, but Item[] is main thing
+        setTotalResults(cachedItems.length); // Approximation or store separately
+        setIsSearching(false);
+        usedCache = true;
+        
+        if (!isStale) {
+            return;
+        }
+        console.log(`[Search] Cache stale for ${cacheKey}, revalidating...`);
+    }
+
     try {
-      let query = supabase
-        .from('listings')
-        .select('*, profiles(*)', { count: 'exact' });
+      let query = (supabase
+        .from('marketplace_listings') as any)
+        .select(`
+            id,
+            title,
+            description,
+            images,
+            seller_id,
+            asked_price,
+            category,
+            auction_mode,
+            created_at,
+            status,
+            seller_name,
+            seller_avatar,
+            seller_rating,
+            seller_rating_count,
+            seller_location,
+            bid_count,
+            high_bid,
+            high_bidder_id,
+            condition
+        `, { count: 'exact' });
         
       if (filters.status !== 'all') {
           query = query.eq('status', 'active'); // defaulting to active if not all? or use filters.status? 
@@ -104,25 +151,16 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         query = query.eq('category', filters.category);
       }
 
-      // Price range
-      if (filters.minPrice !== undefined) {
-        query = query.gte('ask_price', filters.minPrice);
-      }
-      if (filters.maxPrice !== undefined) {
-        query = query.lte('ask_price', filters.maxPrice);
-      }
-
-      // Sorting
-      // Note: 'nearest' is handled client side after fetch usually unless PostGIS
       switch (filters.sortBy) {
         case 'price_low':
-          query = query.order('ask_price', { ascending: true });
+          query = query.order('asked_price', { ascending: true });
           break;
         case 'price_high':
-          query = query.order('ask_price', { ascending: false });
+          query = query.order('asked_price', { ascending: false });
           break;
         case 'ending_soon':
-          query = query.order('expiry_at', { ascending: true });
+          // Using created_at asc as proxy for ending soon (oldest listings end soonest)
+          query = query.order('created_at', { ascending: true });
           break;
         case 'newest':
         default:
@@ -138,35 +176,10 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Transform
         // Need to cast to unknown first to match ListingWithSeller interface structure expectations
         // Transform database rows to items
-        let items = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
+        let items = data.map((row: any) => transformListingToItem(row as unknown as ListingWithSeller));
 
-        // --- FETCH ASSOCIATED BIDS ---
-        if (items.length > 0) {
-          const itemIds = items.map(i => i.id);
-          const { data: bidsData } = await supabase
-            .from('bids')
-            .select('*, profiles(*)')
-            .in('listing_id', itemIds);
-          
-          if (bidsData) {
-            const transformedBids = (bidsData as any[]).map(transformBidToHydratedBid);
-            
-            items = items.map(item => {
-              const itemBids = transformedBids.filter(b => b.itemId === item.id);
-              if (itemBids.length === 0) return item;
-
-              const maxBid = Math.max(...itemBids.map(b => b.amount));
-              const highBid = itemBids.find(b => b.amount === maxBid);
-
-              return {
-                ...item,
-                bidCount: itemBids.length,
-                currentHighBid: maxBid,
-                currentHighBidderId: highBid?.bidderId
-              };
-            });
-          }
-        }
+        // --- PHASE 4 OPTIMIZATION: REMOVED SEPARATE BIDS FETCH ---
+        // Bid stats are now included in the 'marketplace_listings' view.
         
         // Rank results: exact matches first, then partial matches
         if (filters.query) {
@@ -205,6 +218,9 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         
         setSearchResults(items);
         setTotalResults(count || 0);
+        
+        // Cache results
+        setCache(cacheKey, items);
       }
     } catch (err) {
       console.error("Search failed:", err);
@@ -216,6 +232,15 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   }, [filters, user]);
 
   const fetchCategories = useCallback(async () => {
+    // Check Cache (24h TTL)
+    const cacheKey = generateCacheKey('categories', {});
+    const { data: cachedCats, isStale } = await getFromCache<Category[]>(cacheKey, { ttl: 24 * 60 * 60 * 1000 });
+    
+    if (cachedCats) {
+        setCategories(cachedCats);
+        if (!isStale) return;
+    }
+
     const { data, error } = await supabase
       .from('categories')
       .select('*')
@@ -223,6 +248,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     
     if (data) {
       // Get counts per category (active items)
+      // Note: We might want to optimize this count query too or accept it's slow-ish
       const { data: counts } = await supabase
         .from('listings')
         .select('category')
@@ -233,78 +259,92 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         return acc;
       }, {} as Record<string, number>);
       
-      setCategories(data.map((cat: any) => ({
+      const newCategories = data.map((cat: any) => ({
         id: cat.id,
         name: cat.name,
         icon: cat.icon,
         parentId: cat.parent_id,
         count: countMap[cat.id] || 0,
-      })));
+      }));
+
+      setCategories(newCategories);
+      setCache(cacheKey, newCategories, { ttl: 24 * 60 * 60 * 1000 });
     }
   }, []);
+
+  // Debounce ref for suggestions
+  const suggestionDebounceRef = useRef<NodeJS.Timeout>(null);
 
   const fetchSuggestions = useCallback(async (query: string) => {
     if (!query || query.length < 2) {
       setSuggestions([]);
       return;
     }
-
-    const results: SearchSuggestion[] = [];
-
-    // 1. Recent searches from user
-    if (user) {
-      const { data: recent } = await supabase
-        .from('search_history')
-        .select('query')
-        .eq('user_id', user.id)
-        .ilike('query', `%${query}%`)
-        .order('created_at', { ascending: false })
-        .limit(3);
-      
-      if (recent) {
-        const unique = new Set();
-        recent.forEach((r: any) => {
-            if(!unique.has(r.query)) {
-                unique.add(r.query);
-                results.push({ type: 'recent', text: r.query });
-            }
-        });
-      }
+    
+    // Clear previous timer
+    if (suggestionDebounceRef.current) {
+        clearTimeout(suggestionDebounceRef.current);
     }
 
-    // 2. Category suggestions (Top 2)
-    const matchingCats = categories.filter((c) =>
-      c.name.toLowerCase().includes(query.toLowerCase())
-    );
-    results.push(...matchingCats.slice(0, 2).map((c) => ({
-      type: 'category' as const,
-      text: c.name,
-      category: c.id,
-    })));
+    // Set new timer
+    suggestionDebounceRef.current = setTimeout(async () => {
+        const results: SearchSuggestion[] = [];
 
-    // 3. Item Title suggestions (distinct-ish via limit)
-    // Supabase doesn't support 'distinct' easily on select without RPC, 
-    // so we just fetch a few and dedupe client side for now.
-    const { data: titleData } = await supabase
-        .from('listings')
-        .select('title')
-        .eq('status', 'active')
-        .ilike('title', `%${query}%`)
-        .limit(5);
+        // 1. Recent searches from user
+        if (user) {
+          const { data: recent } = await supabase
+            .from('search_history')
+            .select('query')
+            .eq('user_id', user.id)
+            .ilike('query', `%${query}%`)
+            .order('created_at', { ascending: false })
+            .limit(3);
+          
+          if (recent) {
+            const unique = new Set();
+            recent.forEach((r: any) => {
+                if(!unique.has(r.query)) {
+                    unique.add(r.query);
+                    results.push({ type: 'recent', text: r.query });
+                }
+            });
+          }
+        }
 
-    if (titleData) {
-        const uniqueTitles = new Set(results.map(r => r.text.toLowerCase())); // specific dedupe against existing
-        
-        (titleData as any[]).forEach((item) => {
-            const t = item.title;
-            if (!uniqueTitles.has(t.toLowerCase())) {
-                uniqueTitles.add(t.toLowerCase());
-                results.push({ type: 'item', text: t });
-            }
-        });
-    }
+        // 2. Category suggestions (Top 2)
+        const matchingCats = categories.filter((c) =>
+          c.name.toLowerCase().includes(query.toLowerCase())
+        );
+        results.push(...matchingCats.slice(0, 2).map((c) => ({
+          type: 'category' as const,
+          text: c.name,
+          category: c.id,
+        })));
 
-    setSuggestions(results.slice(0, 8)); // Cap total suggestions
+        // 3. Item Title suggestions (distinct-ish via limit)
+        // Supabase doesn't support 'distinct' easily on select without RPC, 
+        // so we just fetch a few and dedupe client side for now.
+        const { data: titleData } = await supabase
+            .from('listings')
+            .select('title')
+            .eq('status', 'active')
+            .ilike('title', `%${query}%`)
+            .limit(5);
+
+        if (titleData) {
+            const uniqueTitles = new Set(results.map(r => r.text.toLowerCase())); // specific dedupe against existing
+            
+            (titleData as any[]).forEach((item) => {
+                const t = item.title;
+                if (!uniqueTitles.has(t.toLowerCase())) {
+                    uniqueTitles.add(t.toLowerCase());
+                    results.push({ type: 'item', text: t });
+                }
+            });
+        }
+
+        setSuggestions(results.slice(0, 8)); // Cap total suggestions
+    }, 300); // 300ms debounce
   }, [user, categories]);
 
   const getSimilarItems = useCallback(async (item: Item): Promise<Item[]> => {
@@ -323,34 +363,25 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // --- Realtime Subscription (Bids) ---
-  useEffect(() => {
-    const channel = supabase
-      .channel('public:search_bids')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bids' }, async (payload) => {
-        const newBidRaw = payload.new as any;
-        
-        // Find if this bid belongs to any of our search results
-        setSearchResults(prevItems => prevItems.map(item => {
-          if (item.id === newBidRaw.listing_id) {
-              const amount = Number(newBidRaw.amount);
-              const currentMax = item.currentHighBid || 0;
-              const isNewHigh = amount > currentMax;
-              return {
-                 ...item,
-                 bidCount: item.bidCount + 1,
-                 currentHighBid: isNewHigh ? amount : currentMax,
-                 currentHighBidderId: isNewHigh ? newBidRaw.bidder_id : item.currentHighBidderId
-              };
-          }
-          return item;
-        }));
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const handleRealtimeBid = useCallback((newBid: any) => {
+      // Find if this bid belongs to any of our search results
+      setSearchResults(prevItems => prevItems.map(item => {
+        if (item.id === newBid.itemId) { // Note: newBid is already transformed/hydrated from hook
+            const amount = Number(newBid.amount);
+            const currentMax = item.currentHighBid || 0;
+            const isNewHigh = amount > currentMax;
+            return {
+               ...item,
+               bidCount: item.bidCount + 1,
+               currentHighBid: isNewHigh ? amount : currentMax,
+               currentHighBidderId: isNewHigh ? newBid.bidderId : item.currentHighBidderId
+            };
+        }
+        return item;
+      }));
   }, []);
+
+  useBidRealtime(handleRealtimeBid);
   
   // Initial category fetch
   useEffect(() => {

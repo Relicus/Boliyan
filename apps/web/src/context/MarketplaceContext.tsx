@@ -6,6 +6,8 @@ import { useAuth } from "./AuthContext";
 import { useTime } from "./TimeContext";
 import { supabase } from "@/lib/supabase";
 import { transformListingToItem, ListingWithSeller, transformBidToHydratedBid, BidWithProfile } from "@/lib/transform";
+import { generateCacheKey, getFromCache, setCache } from "@/lib/cache";
+import { useBidRealtime } from "@/hooks/useBidRealtime";
 
 interface MarketplaceContextType {
   items: Item[];
@@ -32,6 +34,7 @@ interface MarketplaceContextType {
     sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest' | 'watchlist';
     minPrice: number | null;
     maxPrice: number | null;
+    condition: 'new' | 'like_new' | 'used' | 'fair' | 'all';
     listingType: 'all' | 'public' | 'sealed';
   };
   setFilter: (key: keyof MarketplaceContextType['filters'], value: any) => void;
@@ -64,6 +67,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     sortBy: 'trending',
     minPrice: null,
     maxPrice: null,
+    condition: 'all',
     listingType: 'all',
   });
 
@@ -75,14 +79,63 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       if (loadingLockRef.current) return;
       loadingLockRef.current = true;
       
+      const cacheKey = generateCacheKey('marketplace', { ...filters, page: targetPage });
+      let usedCache = false;
+
+      // --- 1. CHECK CACHE (L1/L2) ---
       if (reset) {
-          setIsLoading(true);
-      } else {
-          setIsLoadingMore(true);
+          // Only check cache on reset (initial load or filter change). 
+          // LoadMore usually needs fresh data or sequential cache logic which is complex.
+          const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey);
+          
+          if (cachedItems) {
+              setItems(cachedItems);
+              setHasMore(cachedItems.length === ITEMS_PER_PAGE);
+              setIsLoading(false);
+              usedCache = true;
+              
+              if (!isStale) {
+                  // Fresh cache! No need to fetch.
+                  loadingLockRef.current = false;
+                  return;
+              }
+              // If stale, we continue to fetch in background (SWR)
+              console.log(`[Marketplace] Cache stale for ${cacheKey}, revalidating...`);
+          }
+      }
+
+      if (!usedCache) {
+          if (reset) {
+              setIsLoading(true);
+          } else {
+              setIsLoadingMore(true);
+          }
       }
 
         try {
-            let query = supabase.from('listings').select('*, profiles(*)', { count: 'exact' }).eq('status', 'active');
+            // PHASE 4: Use 'marketplace_listings' Master View for server-side aggregation
+            // This replaces the raw 'listings' fetch + 'profiles' join + separate 'bids' fetch
+            let query = (supabase.from('marketplace_listings') as any).select(`
+                id,
+                title,
+                description,
+                images,
+                seller_id,
+                asked_price,
+                category,
+                auction_mode,
+                created_at,
+                status,
+                seller_name,
+                seller_avatar,
+                seller_rating,
+                seller_rating_count,
+                seller_location,
+                bid_count,
+                high_bid,
+                high_bidder_id,
+                condition
+            `, { count: 'exact' }).eq('status', 'active');
 
             // --- APPLY FILTERS ---
           if (filters.category && filters.category !== "All Items") {
@@ -100,6 +153,11 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           if (filters.maxPrice !== null) {
               query = query.lte('asked_price', filters.maxPrice);
           }
+          
+          if (filters.condition && filters.condition !== 'all') {
+              query = query.eq('condition', filters.condition);
+          }
+
 
           if (filters.listingType === 'public') {
               query = query.eq('auction_mode', 'visible');
@@ -111,10 +169,12 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
            // --- APPLY SORT ---
            // Mapping 'trending' to 'created_at' for now as per plan constraints
            switch (filters.sortBy) {
-              case 'newest':
               case 'trending': 
-                  query = query.order('created_at', { ascending: false });
+                  // Sort by bid_count (popularity), then by created_at (freshness)
+                  query = query.order('bid_count', { ascending: false })
+                               .order('created_at', { ascending: false });
                   break;
+              case 'newest':
               case 'luxury':
                   query = query.order('asked_price', { ascending: false });
                   break;
@@ -141,62 +201,29 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
            let fetchedItems: Item[] = [];
            if (listingsData) {
-               fetchedItems = listingsData.map(row => transformListingToItem(row as unknown as ListingWithSeller));
+               fetchedItems = listingsData.map((row: any) => transformListingToItem(row as unknown as ListingWithSeller));
            }
 
            // --- CLIENT-SIDE SORTING OVERRIDES ---
            // If 'watchlist' sort is selected, we might need to fetch more or re-sort client side 
            // since we can't easily join user specific watchlist state in simple query.
-           // For now, adhering to Server-Side constraint means we might accept inaccurate sort or 
-           // implementation plan caveat.
-           
-           // --- FETCH ASSOCIATED BIDS ---
-           // Only fetch bids for the items we just retrieved
-           if (fetchedItems.length > 0) {
-               const itemIds = fetchedItems.map(i => i.id);
-               const { data: bidsData } = await supabase
-                  .from('bids')
-                  .select('*, profiles(*)')
-                  .in('listing_id', itemIds);
-               
-               if (bidsData) {
-                   const transformedBids = (bidsData as unknown as BidWithProfile[]).map(transformBidToHydratedBid);
-                   
-                   // Merge bids into items
-                   fetchedItems = fetchedItems.map(item => {
-                       const itemBids = transformedBids.filter(b => b.itemId === item.id);
-                       if (itemBids.length === 0) return item;
-
-                       const maxBid = Math.max(...itemBids.map(b => b.amount));
-                       const highBid = itemBids.find(b => b.amount === maxBid);
-
-                       return {
-                           ...item,
-                           bidCount: itemBids.length,
-                           currentHighBid: maxBid,
-                           currentHighBidderId: highBid?.bidderId
-                       };
-                   });
-                   
-                   // Update global bids state (optional, if needed for other UI)
-                   setBids(prev => {
-                       // avoid dups
-                       const existingIds = new Set(prev.map(b => b.id));
-                       const newBids = transformedBids.filter(b => !existingIds.has(b.id));
-                       return [...prev, ...newBids];
-                   });
-               }
-           }
 
            // --- UPDATE STATE ---
            if (reset) {
                setItems(fetchedItems);
+               // Cache the fresh page
+               setCache(cacheKey, fetchedItems);
            } else {
                setItems(prev => {
                    const existingIds = new Set(prev.map(i => i.id));
                    const trulyNew = fetchedItems.filter(i => !existingIds.has(i.id));
                    return [...prev, ...trulyNew];
                });
+               // We only cache individual pages for 'reset' scenarios currently to keep it simple.
+               // Complex pagination caching (merging pages) is error prone.
+               // But we SHOULD cache this new page so if user refreshes on page 3, they might get page 3 fast?
+               // Actually, 'fetchItems' is called with specific page.
+               setCache(cacheKey, fetchedItems);
            }
            
            if (count !== null) {
@@ -208,6 +235,9 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
       } catch (err) {
           console.error("Fetch Items Error:", err);
+          if (err && typeof err === 'object') {
+             console.error("Fetch Items Error Details:", JSON.stringify(err, null, 2));
+          }
       } finally {
           setIsLoading(false);
           setIsLoadingMore(false);
@@ -226,53 +256,30 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       return () => clearTimeout(timeoutId);
   }, [
       filters.category, filters.search, filters.sortBy, filters.minPrice, filters.maxPrice, 
-      filters.listingType
+      filters.listingType, filters.condition
       // Radius/Location ignored for server-side query as per plan/limitations
   ]);
 
   // --- Realtime Subscription (Bids) ---
-  useEffect(() => {
-    const channel = supabase
-      .channel('public:bids')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bids' }, async (payload) => {
-        const newBidRaw = payload.new as any;
-        
-        // Only care if relevant to loaded items? 
-        // Actually, good to know for global state, but mainly for items in view.
-        
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', newBidRaw.bidder_id)
-          .single();
+  const handleRealtimeBid = React.useCallback((newBid: Bid) => {
+      setBids(prev => [...prev, newBid]);
 
-        const newBid: Bid = transformBidToHydratedBid({
-          ...newBidRaw,
-          profiles: profile
-        } as unknown as BidWithProfile);
-
-        setBids(prev => [...prev, newBid]);
-
-        setItems(prevItems => prevItems.map(item => {
-          if (item.id === newBid.itemId) {
-              const currentMax = item.currentHighBid || 0;
-              const isNewHigh = newBid.amount > currentMax;
-              return {
-                 ...item,
-                 bidCount: item.bidCount + 1,
-                 currentHighBid: isNewHigh ? newBid.amount : currentMax,
-                 currentHighBidderId: isNewHigh ? newBid.bidderId : item.currentHighBidderId
-              };
-          }
-          return item;
-        }));
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      setItems(prevItems => prevItems.map(item => {
+        if (item.id === newBid.itemId) {
+            const currentMax = item.currentHighBid || 0;
+            const isNewHigh = newBid.amount > currentMax;
+            return {
+               ...item,
+               bidCount: item.bidCount + 1,
+               currentHighBid: isNewHigh ? newBid.amount : currentMax,
+               currentHighBidderId: isNewHigh ? newBid.bidderId : item.currentHighBidderId
+            };
+        }
+        return item;
+      }));
   }, []);
+
+  useBidRealtime(handleRealtimeBid);
 
   const loadMore = () => {
       if (isLoadingMore || !hasMore || loadingLockRef.current) return;
@@ -457,8 +464,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
             .from('watchlist') as any)
             .insert({ user_id: user.id, listing_id: itemId });
             
-        if (error) {
-             console.error("Failed to add to watchlist:", error);
+          if (error) {
+            console.error("Failed to add to watchlist:", error);
              // Rollback
              setWatchedItemIds(prev => prev.filter(id => id !== itemId));
         }

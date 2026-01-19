@@ -11,6 +11,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { Trophy, Lock } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
+import { formatPrice } from "@/lib/utils";
 
 // ============================================
 // PROPS
@@ -55,14 +56,7 @@ function getTrophySizeClass(viewMode: BiddingViewMode): string {
   }
 }
 
-// Helper for compact price display (e.g. 185.5k)
-function formatDisplayPrice(price: number): string {
-  if (price >= 100000) {
-    const k = price / 1000;
-    return `${k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)}k`;
-  }
-  return price.toLocaleString();
-}
+// Price formatting logic handled by centralized utility
 
 // ============================================
 // COMPONENT
@@ -84,7 +78,7 @@ const PriceDisplay = memo(({
           Asking
         </span>
         <span className={`${getPriceClass(viewMode)} font-black text-slate-800 leading-none transition-all`}>
-          {formatDisplayPrice(askPrice)}
+          {formatPrice(askPrice, viewMode)}
         </span>
       </div>
 
@@ -113,7 +107,7 @@ const PriceDisplay = memo(({
                 }}
                 className={`${getPriceClass(viewMode)} font-black leading-none inline-block`}
               >
-                {formatDisplayPrice(config.currentHighBid)}
+                {formatPrice(config.currentHighBid, viewMode)}
               </motion.span>
               
               {/* Trophy for high bidder */}

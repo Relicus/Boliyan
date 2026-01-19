@@ -1,5 +1,7 @@
 # DATABASE KNOWLEDGE BASE
 
+> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)** | **[📖 THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
+
 **Context:** Raw SQL Schema (Supabase-compatible).
 
 ## OVERVIEW

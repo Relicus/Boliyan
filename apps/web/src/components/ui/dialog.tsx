@@ -104,9 +104,9 @@ function DialogContent({
               {...props}
             >
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, x: "-50%", y: "-48%" }}
-                animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
-                exit={{ opacity: 0, scale: 0.95, x: "-50%", y: "-48%" }}
+                initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 8 }}
                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
               >
                 {children}
