@@ -130,9 +130,6 @@ export default function Navbar() {
           transition={{ type: "spring", bounce: 0, duration: 0.4 }}
           className="flex-1 px-3 md:px-6 max-w-4xl flex justify-center"
         >
-          <div className="hidden lg:block mr-2">
-            <LocationSelector />
-          </div>
           <SearchBar />
         </motion.div>
 

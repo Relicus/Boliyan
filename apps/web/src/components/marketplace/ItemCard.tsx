@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
-import { useState, useMemo, useEffect, memo } from "react";
+import React, { useState, useMemo, useEffect, memo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Lock, Globe, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, Banknote, AlertTriangle, ShieldAlert, TrendingUp } from "lucide-react";
@@ -87,15 +87,31 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
   
   // Watch for outbid events (only if user has an existing bid)
+  // Logic: Only trigger if the high bid CHANGED to something higher than before
+  const prevHighBid = React.useRef(item.currentHighBid);
+
   useEffect(() => {
-    if (!user) return;
-    const hasUserBid = user ? bids.some(b => b.itemId === item.id && b.bidderId === user.id) : false;
-    if (hasUserBid && item.currentHighBid && user && item.currentHighBidderId !== user.id) {
+    if (!user || !item.isPublicBid) return;
+    
+    const hasUserBid = bids.some(b => b.itemId === item.id && b.bidderId === user.id);
+    
+    // Check if someone else just bid higher than the previous known high bid
+    const someoneElseBidHigher = 
+      item.currentHighBid && 
+      prevHighBid.current && 
+      item.currentHighBid > prevHighBid.current && 
+      item.currentHighBidderId !== user.id;
+
+    if (hasUserBid && someoneElseBidHigher) {
        setIsOutbidTrigger(true);
        const timer = setTimeout(() => setIsOutbidTrigger(false), 800);
+       prevHighBid.current = item.currentHighBid; // Update the ref
        return () => clearTimeout(timer);
     }
-  }, [item.currentHighBid, item.currentHighBidderId, user?.id, bids, item.id]);
+
+    // Always keep ref in sync with latest value to detect future changes
+    prevHighBid.current = item.currentHighBid;
+  }, [item.currentHighBid, item.currentHighBidderId, user?.id, bids, item.id, item.isPublicBid]);
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, isOutside, timeLeft, statusColor, isUrgent } = useMemo(() => {
@@ -222,49 +238,51 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <motion.div
-          id={`item-card-${item.id}`}
-          initial={false}
-          animate={{
-            scale: isSuccess ? 1.05 : 1,
-            x: isOutbidTrigger ? [0, -4, 4, -4, 4, 0] : 0,
-          }}
-          transition={{
-            x: { duration: 0.4 },
-            scale: { type: "spring", stiffness: 300, damping: 20 }
-          }}
-          className={`group relative border-none bg-slate-50 rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500
-            ${showHalo ? 'p-[3.5px]' : 'p-0 shadow-sm hover:shadow-md'}
-            ${isOutbidTrigger ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
+          <motion.div
+            id={`item-card-${item.id}`}
+            initial={false}
+            animate={{
+              scale: isSuccess ? 1.05 : 1,
+              x: (isOutbidTrigger && item.isPublicBid) || isSuccess ? [0, -4, 4, -4, 4, 0] : 0,
+            }}
+            transition={{
+              x: { duration: 0.4 },
+              scale: { type: "spring", stiffness: 300, damping: 20 },
+            }}
+            className={`group relative border-none bg-slate-50 rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500
+              ${showHalo ? 'p-[3.5px]' : 'p-0 shadow-sm hover:shadow-md'}
+              ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
 
-          `}
-          style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
-        >
-            {/* Victory Halo - State Based Animated Border Background */}
-            {showHalo && (
-              <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg">
-                {/* Base Layer: Solid Vibrant Color */}
-                <div 
-                   className={`absolute inset-0 
-                     ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
-                       haloTheme === 'green' ? 'bg-[#16a34a]' : 
-                       'bg-[#0ea5e9]'}`}
-                />
-                
-                {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
-                <motion.div 
-                   className={`absolute inset-[-150%] 
-                     ${haloTheme === 'orange' 
-                        ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
-                        : haloTheme === 'green'
-                          ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
-                          : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
-                     }`}
-                   animate={{ rotate: 360 }}
-                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                />
-              </div>
-            )}
+            `}
+            style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+          >
+              {/* Victory Halo - State Based Animated Border Background */}
+              {showHalo && (
+                <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg">
+                  {/* Base Layer: Solid Vibrant Color */}
+                  <div 
+                     className={`absolute inset-0 
+                       ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
+                         haloTheme === 'green' ? 'bg-[#16a34a]' : 
+                         'bg-[#0ea5e9]'}`}
+                  />
+                  
+                  {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
+                  {item.isPublicBid && (
+                    <motion.div 
+                      className={`absolute inset-[-150%] 
+                        ${haloTheme === 'orange' 
+                            ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
+                            : haloTheme === 'green'
+                              ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
+                              : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
+                        }`}
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    />
+                  )}
+                </div>
+              )}
 
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(var(--radius)-3px)]">
             <div
@@ -376,9 +394,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="bg-amber-600/90 backdrop-blur-md text-white p-1.5 rounded-md border border-amber-400/50 shadow-lg cursor-help">
+                          <motion.div 
+                            animate={isSuccess ? { scale: [1, 1.4, 1] } : {}}
+                            transition={{ duration: 0.5 }}
+                            className="bg-amber-600/90 backdrop-blur-md text-white p-1.5 rounded-md border border-amber-400/50 shadow-lg cursor-help"
+                          >
                              <Lock className="h-3 w-3" />
-                          </div>
+                          </motion.div>
                         </TooltipTrigger>
                         <TooltipContent side="left">
                           <p>Secret Bidding</p>
@@ -751,12 +773,18 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             <div className="flex justify-between items-start gap-4">
                <DialogTitle className="text-2xl font-black text-slate-900 leading-tight">{item.title}</DialogTitle>
                <div className="flex gap-2 shrink-0">
-                  {!item.isPublicBid && (
-                    <Badge variant="secondary" className="font-bold bg-amber-500 text-white hover:bg-amber-600 border-none shadow-sm h-7">
-                      <Lock className="h-3.5 w-3.5 mr-1" />
-                      Secret
-                    </Badge>
-                  )}
+                      {!item.isPublicBid && (
+                        <Badge variant="secondary" className="font-bold bg-amber-500 text-white hover:bg-amber-600 border-none shadow-sm h-7">
+                          <motion.div
+                            animate={isSuccess ? { scale: [1, 1.4, 1] } : {}}
+                            transition={{ duration: 0.5 }}
+                            className="flex items-center"
+                          >
+                            <Lock className="h-3.5 w-3.5 mr-1" />
+                          </motion.div>
+                          Secret
+                        </Badge>
+                      )}
                </div>
             </div>
 
@@ -1094,7 +1122,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   Cancel
                 </button>
                 <button
-                  onClick={confirmBid}
+                  onClick={(e) => confirmBid(e)}
                   className={`flex-1 px-4 py-2.5 rounded-xl font-bold text-white shadow-lg shadow-red-200 transition-all active:scale-95
                     ${warning?.type === 'double_bid' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-red-600 hover:bg-red-700'}`}
                 >

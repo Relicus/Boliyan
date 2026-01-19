@@ -38,20 +38,40 @@ export default function MarketplaceGrid() {
   const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters, executeSearch } = useSearch();
 
   const [viewMode, setViewMode] = useState<ViewMode>('compact');
-  
+  const [isChangingView, setIsChangingView] = useState(false);
+  const viewChangeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Decide which items to show
-  // If search query or category is active in SearchContext, we use searchResults
   const isSearchActive = !!searchFilters.query || !!searchFilters.category || searchFilters.minPrice !== undefined || searchFilters.maxPrice !== undefined;
-  
-  // Logic: 
-  // If Search is active, use SearchContext
-  // Else, use MarketplaceContext (default feed)
-  // Note: MarketplaceContext handles infinite scroll better for feed. SearchContext handles global search.
-  // We need to bridge them or decide priority.
-  // For this Phase 7c, SearchContext takes priority when active.
-  
   const displayItems = isSearchActive ? searchResults : marketplaceItems;
-  const isLoading = isSearchActive ? isSearching : mpLoading;
+  
+  // Effective loading state: 
+  // We want to show skeletons if we're REALLY loading or if we're briefly transitioning viewMode
+  const isLoading = (isSearchActive ? isSearching : mpLoading) || isChangingView;
+
+  // Handle view mode changes with a clean "blink" to skeletons
+  const handleViewModeChange = (newMode: ViewMode) => {
+    if (newMode === viewMode) return;
+    
+    // Clear any existing timer
+    if (viewChangeTimerRef.current) clearTimeout(viewChangeTimerRef.current);
+    
+    setIsChangingView(true);
+    setViewMode(newMode);
+    
+    // Brief window to show skeletons and allow browser to recalc layout
+    viewChangeTimerRef.current = setTimeout(() => {
+      setIsChangingView(false);
+      viewChangeTimerRef.current = null;
+    }, 350); // Balanced for speed and visibility
+  };
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (viewChangeTimerRef.current) clearTimeout(viewChangeTimerRef.current);
+    };
+  }, []);
 
   // Sync Search Filters with MP Filters (if needed for UI consistency)
   // OR just use SearchFilters solely.
@@ -214,7 +234,7 @@ export default function MarketplaceGrid() {
                   variant="outline"
                   className="h-auto flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out border-0 shadow-sm hover:shadow-md ring-1 ring-slate-200"
                   onClick={() => {
-                    setViewMode(viewMode === 'compact' ? 'spacious' : 'compact');
+                    handleViewModeChange(viewMode === 'compact' ? 'spacious' : 'compact');
                   }}
                 >
                   {viewMode === 'compact' && <Grid3x3 className="h-5 w-5 text-slate-700" />}
@@ -283,7 +303,7 @@ export default function MarketplaceGrid() {
               id="view-mode-toggles"
               type="single" 
               value={viewMode} 
-              onValueChange={(val) => val && setViewMode(val as ViewMode)}
+              onValueChange={(val) => val && handleViewModeChange(val as ViewMode)}
               className="bg-slate-50 p-1 rounded-xl border border-slate-200 shadow-sm shrink-0"
             >
               <ToggleGroupItem 
@@ -340,52 +360,47 @@ export default function MarketplaceGrid() {
         </div>
       
       
-      <motion.div 
+      <div 
         id="marketplace-grid-container"
         className={`grid gap-3 ${getGridClasses()}`}
         style={getGridStyle()}
       >
         {isLoading ? (
-          // Initial Load Skeletons
-          Array.from({ length: 8 }).map((_, i) => (
-            <motion.div
-              key={`skeleton-initial-${i}`}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
-            >
-              <ItemCardSkeleton viewMode={viewMode} />
-            </motion.div>
-          ))
-        ) : (
+          // Skeletons during Load or View Change
+          // No AnimatePresence wrapper -> Instant mount/unmount logic, but we can animate Entry of new items.
           <>
-            {/* Stable Item List */}
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={`skeleton-initial-${i}`}>
+                <ItemCardSkeleton viewMode={viewMode} />
+              </div>
+            ))}
+          </>
+        ) : (
+          // Actual Content
+          <>
             {displayItems.map((item) => {
-              const seller = item.seller!; // Items are hydrated with sellers in MarketplaceContext
-              
+              const seller = item.seller!;
               return (
-                <div
+                <motion.div 
                   key={item.id}
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  transition={{ duration: 0.3 }} // Smooth entry
                 >
                   <ItemCard item={item} seller={seller} viewMode={viewMode} />
-                </div>
+                </motion.div>
               );
             })}
 
             {/* Infinite Scroll Skeletons */}
             {isLoadingMore && !isSearchActive && Array.from({ length: 4 }).map((_, i) => (
-              <motion.div
-                key={`skeleton-more-${i}`}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-              >
+              <div key={`skeleton-more-${i}`}>
                 <ItemCardSkeleton viewMode={viewMode} />
-              </motion.div>
+              </div>
             ))}
           </>
         )}
-      </motion.div>
+      </div>
 
       {/* Sentinel for Infinite Scroll - Always render so Ref attaches, but logic handles trigger */}
       <div 

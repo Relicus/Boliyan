@@ -67,19 +67,45 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     const nextAmount = amount + getSmartStep(amount);
     setBidAmount(nextAmount.toLocaleString());
 
-    // Confetti Effect
-    const x = e && 'clientX' in e ? e.clientX / window.innerWidth : 0.5;
-    const y = e && 'clientY' in e ? e.clientY / window.innerHeight : 0.5;
+    // Confetti Effect: Targeted to the source button or touch point
+    let x = 0.5;
+    let y = 0.5;
 
-    confetti({
+    if (e) {
+      // If it's a mouse/touch event with coordinates
+      if ('clientX' in e && e.clientX !== 0) {
+        x = e.clientX / window.innerWidth;
+        y = e.clientY / window.innerHeight;
+      } 
+      // Fallback: Use the center of the element that triggered the event
+      else if (e.currentTarget instanceof HTMLElement) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        x = (rect.left + rect.width / 2) / window.innerWidth;
+        y = (rect.top + rect.height / 2) / window.innerHeight;
+      }
+    }
+
+    // Two bursts for a more "directional" feel from the button
+    const commonConfig = {
       origin: { x, y },
-      particleCount: 150,
-      spread: 70,
-      gravity: 1.2,
-      scalar: 1,
+      particleCount: 80,
+      spread: 60,
+      gravity: 1.1,
+      scalar: 0.8,
       zIndex: 9999,
       colors: ['#fbbf24', '#f59e0b', '#d97706', '#ffffff'],
+    };
+
+    // Shoot slightly left and right UPWARDS
+    confetti({
+      ...commonConfig,
+      angle: 60,
     });
+    confetti({
+      ...commonConfig,
+      angle: 120,
+    });
+
 
     // Handle success transition
     if (onBidSuccess) {
@@ -158,12 +184,13 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     executeBid(amount, e);
   }, [bidAmount, item, user?.id, executeBid]);
 
-  const confirmBid = useCallback(() => {
+  const confirmBid = useCallback((e?: React.MouseEvent | React.TouchEvent | any) => {
     if (!warning) return;
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
-    executeBid(amount); // Pass undefined event, will center confetti
+    executeBid(amount, e); 
     setWarning(null);
   }, [warning, bidAmount, executeBid]);
+
 
   const clearWarning = useCallback(() => {
     setWarning(null);

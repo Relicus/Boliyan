@@ -2,13 +2,36 @@
 
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
+import { motion, AnimatePresence } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
+const PopoverContext = React.createContext<{ open: boolean }>({ open: false })
+
 function Popover({
+  children,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
-  return <PopoverPrimitive.Root data-slot="popover" {...props} />
+  const [open, setOpen] = React.useState(props.open ?? props.defaultOpen ?? false)
+
+  React.useEffect(() => {
+    if (props.open !== undefined) setOpen(props.open)
+  }, [props.open])
+
+  return (
+    <PopoverPrimitive.Root
+      {...props}
+      open={props.open !== undefined ? props.open : open}
+      onOpenChange={(val) => {
+        setOpen(val)
+        props.onOpenChange?.(val)
+      }}
+    >
+      <PopoverContext.Provider value={{ open: props.open !== undefined ? props.open : open }}>
+        {children}
+      </PopoverContext.Provider>
+    </PopoverPrimitive.Root>
+  )
 }
 
 function PopoverTrigger({
@@ -21,20 +44,38 @@ function PopoverContent({
   className,
   align = "center",
   sideOffset = 4,
+  children,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+  const { open } = React.useContext(PopoverContext)
+
   return (
-    <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Content
-        data-slot="popover-content"
-        align={align}
-        sideOffset={sideOffset}
-        className={cn(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-md border p-4 shadow-md outline-hidden",
-          className
+    <PopoverPrimitive.Portal forceMount>
+      <AnimatePresence>
+        {open && (
+          <PopoverPrimitive.Content
+            forceMount
+            data-slot="popover-content"
+            align={align}
+            sideOffset={sideOffset}
+            className={cn(
+              "bg-popover text-popover-foreground z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-lg border-none p-4 shadow-2xl outline-hidden",
+              className
+            )}
+            asChild
+            {...props}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 5 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 5 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+            >
+              {children}
+            </motion.div>
+          </PopoverPrimitive.Content>
         )}
-        {...props}
-      />
+      </AnimatePresence>
     </PopoverPrimitive.Portal>
   )
 }
