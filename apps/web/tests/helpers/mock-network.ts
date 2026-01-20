@@ -83,7 +83,7 @@ export async function mockSupabaseNetwork(page: Page) {
                 avatar_url: "https://github.com/shadcn.png",
                 city: "Karachi",
                 rating: 5.0,
-                rating_count: 10,
+                review_count: 10,
                 is_verified: true
             }
         });

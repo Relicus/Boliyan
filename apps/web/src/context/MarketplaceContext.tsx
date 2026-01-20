@@ -248,12 +248,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   // --- EFFECT: Trigger Fetch on Filter Change ---
   useEffect(() => {
       setPage(1);
-      // Debounce could be added here if search typing triggers this strictly
-      const timeoutId = setTimeout(() => {
-          fetchItems(1, true);
-      }, 500); // 500ms debounce for typing/sliders
-
-      return () => clearTimeout(timeoutId);
+      // Removed 500ms debounce - category/sort changes should be instant
+      fetchItems(1, true);
   }, [
       filters.category, filters.search, filters.sortBy, filters.minPrice, filters.maxPrice, 
       filters.listingType, filters.condition
@@ -282,7 +278,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   useBidRealtime(handleRealtimeBid);
 
   const loadMore = () => {
-      if (isLoadingMore || !hasMore || loadingLockRef.current) return;
+      // Prevent loading more if initial load is processing (isLoading)
+      if (isLoading || isLoadingMore || !hasMore || loadingLockRef.current) return;
       const nextPage = page + 1;
       setPage(nextPage);
       fetchItems(nextPage, false);

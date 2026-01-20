@@ -13,6 +13,7 @@ interface AuthContextType {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   getUser: (id: string) => User | undefined; // Keep for compat, though less useful with real auth
+  updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -162,6 +163,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return user?.id === id ? user : undefined;
   };
 
+  const updateProfile = async (data: Partial<User>) => {
+      if (!user) return;
+      
+      const updates: any = {};
+      if (data.name) updates.full_name = data.name;
+      if (data.avatar) updates.avatar_url = data.avatar;
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+        
+      if (error) {
+          console.error('[AuthContext] Update failed:', error);
+          throw error;
+      }
+      
+      // Update local state
+      setUser(prev => prev ? { ...prev, ...data } : null);
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -169,7 +191,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       login, 
       logout, 
-      getUser 
+      getUser,
+      updateProfile
     }}>
       {children}
     </AuthContext.Provider>

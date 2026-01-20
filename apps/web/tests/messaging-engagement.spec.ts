@@ -42,6 +42,8 @@ test.describe('Messaging & Engagement', () => {
   });
 
   test('should allow messaging when conversation exists', async ({ page }) => {
+
+
       // 1. Mock a conversation being present - return RAW DB shape expecting by ChatContext hydration
       const rawMockConversation = {
           id: 'conv-123',
@@ -58,17 +60,24 @@ test.describe('Messaging & Engagement', () => {
           listings: {
             id: '00000000-0000-0000-0000-000000000023',
             title: "Test Item Camera",
+            description: "Nice Camera",
             images: ["https://placehold.co/400"],
             asked_price: 13100,
+            created_at: new Date().toISOString(),
+            status: 'active',
+            seller_id: 'seller-123',
             profiles: { // The seller of the listing
                 id: 'seller-123',
-                full_name: 'Demo Seller'
+                full_name: 'Demo Seller',
+                avatar_url: 'https://github.com/shadcn.png'
             }
           },
           seller_profile: {
              id: 'seller-123',
              full_name: 'Demo Seller',
              avatar_url: 'https://github.com/shadcn.png',
+             rating: 5.0,
+             rating_count: 10,
              is_verified: true
           },
           bidder_profile: {
@@ -83,35 +92,42 @@ test.describe('Messaging & Engagement', () => {
       await page.route(/\/rest\/v1\/conversations.*/, async route => {
           await route.fulfill({ json: [rawMockConversation] });
       });
+      
+      // Mock Messages to prevent empty state or crash
+      await page.route(/\/rest\/v1\/messages.*/, async route => {
+          await route.fulfill({ json: [] });
+      });
+      
+      // Mock Reviews (safety)
+      await page.route(/\/rest\/v1\/reviews.*/, async route => {
+           await route.fulfill({ json: [] });
+      });
 
       // Reload to fetch conversations
       await page.reload();
       await page.waitForSelector('[id^="item-card-"]', { state: 'visible' });
 
-      // 2. Open Inbox/Chat UI (Assuming there is a way to navigate there, e.g. via specific URL or Navbar)
-      // Since specific UI navigation to inbox isn't fully detailed in context, let's assume we can go to /inbox/conv-123 or similar?
-      // Or check if the Modal/Card now shows a "Chat" button? 
-      // User rules say "Unlocks ONLY after deal acceptance".
-      // Usually this means the "Place Bid" button might become "Chat" or a new button appears?
-      // Let's check `ItemCard.tsx` logic again? No, let's assume we go to the Inbox page directly for now, 
-      // OR check if the "Chat" button appears on the card if `hasConversation` logic exists.
+      // 2. Go to Inbox
+      await page.goto('/inbox');
       
-      // Let's assume we navigate to inbox for verification as that's safer.
-      await page.goto('/inbox'); // Standard route
+      // 3. Select the conversation
+      // Check for title visibility first
+      const convLocator = page.locator(`text=${rawMockConversation.listings.title}`).first();
+      await expect(convLocator).toBeVisible({ timeout: 10000 });
+      await convLocator.click();
       
-      // Verify the conversation is listed
-      await expect(page.locator(`text=${mockConversation.item.title}`)).toBeVisible({ timeout: 10000 });
+      // 4. Verify "Speak Your Price" (placeholder) is gone
+      await expect(page.locator('text=Speak Your Price')).not.toBeVisible();
+
+      // 5. Check for Chat Window
+      await expect(page.locator('#chat-window')).toBeVisible({ timeout: 5000 });
       
-      // Click it
-      await page.locator(`text=${mockConversation.item.title}`).click();
+      // 6. Verify Header Content
+      await expect(page.locator('#chat-header')).toBeVisible();
+      await expect(page.locator('#chat-header')).toContainText('Demo Seller');
       
-      // Check for Chat Window
-      await expect(page.locator('#chat-window')).toBeVisible();
-      
-      // Check Input is unlocked
-      const input = page.locator('#chat-input-field');
-      await expect(input).toBeEnabled();
-      await expect(input).not.toBeDisabled();
+      // 7. Verify Input Area enabled
+      await expect(page.locator('#chat-input-field')).toBeEnabled();
       
       console.log('[Test] Verified messaging enabled for existing conversation.');
   });

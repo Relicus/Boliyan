@@ -103,7 +103,8 @@ export function useApp() {
     
     now: time.now,
     acceptBid: acceptBidCompat, // Override with composite function
-    isLoading: marketplace.isLoading, // Explicitly map common conflicts if any
+    isLoading: auth.isLoading, // Stability Fix: Navbar should only load on AUTH check, not marketplace fetches
+    isMarketplaceLoading: marketplace.isLoading, // Expose specific loading state if needed
     
     // Override setFilter to sync both contexts for shared filters
     setFilter: (key: string, value: any) => {

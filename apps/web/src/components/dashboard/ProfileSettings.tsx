@@ -14,7 +14,7 @@ import { User, MapPin, Star, Edit2, Save, Camera, Phone, ShieldCheck } from "luc
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 
 export function ProfileSettings() {
-  const { user } = useApp();
+  const { user, updateProfile } = useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -34,10 +34,14 @@ export function ProfileSettings() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    setIsSaving(false);
-    setIsEditing(false);
+    try {
+        await updateProfile({ name: name });
+        setIsEditing(false);
+    } catch (e) {
+        console.error("Update failed", e);
+    } finally {
+        setIsSaving(false);
+    }
   };
 
   return (

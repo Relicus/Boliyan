@@ -42,7 +42,9 @@ export default function MarketplaceGrid() {
   const viewChangeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Decide which items to show
-  const isSearchActive = !!searchFilters.query || !!searchFilters.category || searchFilters.minPrice !== undefined || searchFilters.maxPrice !== undefined;
+  // Only switch to search mode when there's an actual TEXT query
+  // Category filtering should use MarketplaceContext to avoid double-fetching
+  const isSearchActive = !!searchFilters.query;
   const displayItems = isSearchActive ? searchResults : marketplaceItems;
   
   // Effective loading state: 
@@ -73,15 +75,9 @@ export default function MarketplaceGrid() {
     };
   }, []);
 
-  // Sync Search Filters with MP Filters (if needed for UI consistency)
-  // OR just use SearchFilters solely.
-  
-  // Trigger search execution when filters change (handled in SearchContext effect usually, or we call it)
-  useEffect(() => {
-      if (isSearchActive) {
-          executeSearch();
-      }
-  }, [searchFilters, executeSearch, isSearchActive]);
+  // NOTE: Removed duplicate executeSearch trigger.
+  // SearchContext.executeSearch is called internally when filters change via its own useEffect.
+  // Double-triggering was causing visual "refresh" flicker.
   
   
   // Infinite Scroll Trigger
@@ -124,9 +120,10 @@ export default function MarketplaceGrid() {
     return {};
   };
 
-  // Helper to sync UI to SearchContext
+  // Helper to sync category changes to MarketplaceContext (not SearchContext)
+  // This prevents category changes from interfering with the search query state
   const handleCategoryChange = (val: string | null) => {
-      setSearchFilters({ ...searchFilters, category: val || undefined });
+      setMpFilter('category', val);
   };
 
   return (
@@ -174,18 +171,18 @@ export default function MarketplaceGrid() {
 
                 {/* 2. Category Tab */}
                 <Select 
-                  value={searchFilters.category || 'All Items'} 
+                  value={mpFilters.category || 'All Items'} 
                   onValueChange={(value) => handleCategoryChange(value === 'All Items' ? null : value)}
                 >
                   <SelectTrigger id="mobile-category-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
                      {(() => {
-                        const activeCat = CATEGORIES.find(c => c.label === searchFilters.category) || CATEGORIES[0];
+                        const activeCat = CATEGORIES.find(c => c.label === mpFilters.category) || CATEGORIES[0];
                         const Icon = activeCat.icon;
                         return (
                           <>
                             <Icon className="h-5 w-5 text-blue-500" />
                             <span className="text-[10px] font-medium leading-none text-slate-600 truncate w-full text-center">
-                              {searchFilters.category ? searchFilters.category.split(' ')[0] : 'Categories'}
+                              {mpFilters.category ? mpFilters.category.split(' ')[0] : 'Categories'}
                             </span>
                           </>
                         );
@@ -273,7 +270,7 @@ export default function MarketplaceGrid() {
               <SmartFilterBar />
               
               <AnimatePresence>
-                {(searchFilters.query || searchFilters.category) && (
+                {(searchFilters.query || mpFilters.category) && (
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -282,11 +279,11 @@ export default function MarketplaceGrid() {
                   >
                     <div className="h-6 w-px bg-slate-200 mx-2" />
                     <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 font-bold py-1 px-3 flex items-center gap-2 rounded-full whitespace-nowrap">
-                      {searchFilters.query ? `"${searchFilters.query}"` : searchFilters.category}
+                      {searchFilters.query ? `"${searchFilters.query}"` : mpFilters.category}
                       <button 
                         onClick={() => {
                           if (searchFilters.query) setSearchFilters({...searchFilters, query: ''});
-                          if (searchFilters.category) setSearchFilters({...searchFilters, category: undefined});
+                          if (mpFilters.category) setMpFilter('category', null);
                         }}
                         className="hover:bg-blue-100 p-0.5 rounded-full transition-colors"
                       >

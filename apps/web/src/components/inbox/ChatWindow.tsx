@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Star, Circle } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReviewForm from '@/components/profile/ReviewForm';

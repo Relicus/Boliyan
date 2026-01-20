@@ -1,5 +1,6 @@
 "use client";
 
+import React, { memo, useCallback } from "react";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useSearch } from "@/context/SearchContext";
 import { cn } from "@/lib/utils";
@@ -14,22 +15,18 @@ export const FILTERS = [
   { id: 'watchlist', label: 'Watchlist', icon: Bookmark, color: "text-amber-500", fill: "fill-amber-500/10" },
 ] as const;
 
-export default function SmartFilterBar() {
+function SmartFilterBar() {
   const { filters: mpFilters, setFilter: setMpFilter } = useMarketplace();
-  const { filters: searchFilters, updateFilter: updateSearchFilter, isSearching: isGlobalSearchActive } = useSearch();
+  const { filters: searchFilters, updateFilter: updateSearchFilter } = useSearch();
 
-  // Determine effective context
   // Only switch to search mode when there's an actual search QUERY (not category)
   // Category from FilterSheet should use MarketplaceContext
   const isSearchMode = !!searchFilters.query;
 
-  const handleFilterClick = (id: string) => {
+  const handleFilterClick = useCallback((id: string) => {
     if (isSearchMode) {
        // Map to SearchContext supported sorts
-       // 'trending' -> default/newest?
-       // 'luxury' -> price_high?
-       // 'watchlist' -> ignored or implemented?
-       let sortVal: any = id; // Try direct map
+       let sortVal: any = id; 
        
        if (id === 'luxury') sortVal = 'price_high';
        if (id === 'trending') sortVal = 'newest'; // Fallback
@@ -39,13 +36,14 @@ export default function SmartFilterBar() {
     } else {
        setMpFilter('sortBy', id as any);
     }
-  };
+  }, [isSearchMode, setMpFilter, updateSearchFilter]);
+
+  const currentSort = isSearchMode ? searchFilters.sortBy : mpFilters.sortBy;
 
   return (
     <div id="smart-filter-bar-root" className="w-full flex items-center justify-between md:justify-start gap-4 overflow-x-auto scrollbar-hide px-4 py-1">
       {FILTERS.map((f) => {
         const Icon = f.icon;
-        const currentSort = isSearchMode ? searchFilters.sortBy : mpFilters.sortBy;
         
         // Map active state logic
         let isActive = currentSort === f.id;
@@ -91,3 +89,5 @@ export default function SmartFilterBar() {
     </div>
   );
 }
+
+export default memo(SmartFilterBar);
