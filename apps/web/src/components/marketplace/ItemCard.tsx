@@ -39,6 +39,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const { now } = useTime(); // Use global heartbeat
   const isWatched = watchedItemIds.includes(item.id);
 
+  useEffect(() => {
+    console.log(`[ItemCard] MOUNTED id=${item.id}`);
+    return () => console.log(`[ItemCard] UNMOUNTED id=${item.id}`);
+  }, [item.id]);
+
   // Price formatting logic handled by centralized utility
   const displayPrice = (price: number) => formatPrice(price, viewMode);
 
@@ -110,52 +115,48 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, isOutside, timeLeft, statusColor, isUrgent } = useMemo(() => {
-    // Return placeholder during SSR/initial hydration if now is null or user is missing
-    if (now === null || !user) {
-      return {
-        distance: 0,
-        duration: 0,
-        isOutside: false,
-        timeLeft: "--:--:--",
-        listingType: "72h", // Default
-        statusColor: "bg-black/60",
-        isUrgent: false
-      };
-    }
-
-    // Distance Calculation (Privacy Safe)
-    const { distance: dist, duration: dur, isOutside: outside } = seller?.location 
-      ? calculatePrivacySafeDistance(user.location, seller.location) 
-      : { distance: 0, duration: 0, isOutside: false };
-
-    // Time Left calculation
-    const diff = new Date(item.expiryAt).getTime() - now;
-    const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
-    const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
-    
-    // Determine listing type (24, 48, 72)
-    const totalDiff = new Date(item.expiryAt).getTime() - new Date(item.createdAt).getTime();
-    const totalHours = Math.round(totalDiff / 3600000);
-    let type = "72h";
-    if (totalHours <= 24) type = "24h";
-    else if (totalHours <= 48) type = "48h";
-
-    const timeStr = hoursLeft >= 24 
-      ? `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`
-      : `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
-
-    // Ending soon logic
+    // 1. Time Logic - Independent of User
+    // Default values if 'now' is missing (SSR)
+    let timeStr = "--:--:--";
     let statusColor = "bg-black/60";
     let isUrgent = false;
-    if (hoursLeft < 2) {
-      statusColor = "bg-red-600";
-      isUrgent = true;
-    } else if (hoursLeft < 6) {
-      statusColor = "bg-orange-600";
-    } else if (hoursLeft < 12) {
-      statusColor = "bg-amber-600";
+    let type = "72h";
+
+    if (now !== null) {
+      // Time Left calculation
+      const diff = new Date(item.expiryAt).getTime() - now;
+      const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
+      const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
+      const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
+      
+      // Determine listing type (24, 48, 72)
+      const totalDiff = new Date(item.expiryAt).getTime() - new Date(item.createdAt).getTime();
+      const totalHours = Math.round(totalDiff / 3600000);
+      
+      if (totalHours <= 24) type = "24h";
+      else if (totalHours <= 48) type = "48h";
+
+      timeStr = hoursLeft >= 24 
+        ? `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`
+        : `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
+
+      // Ending soon logic
+      if (hoursLeft < 2) {
+        statusColor = "bg-red-600";
+        isUrgent = true;
+      } else if (hoursLeft < 6) {
+        statusColor = "bg-orange-600";
+      } else if (hoursLeft < 12) {
+        statusColor = "bg-amber-600";
+      }
     }
+
+    // 2. Distance Logic - Dependent on User
+    // If user is missing, we default to 0/hidden. This is an unavoidable "pop-in" 
+    // when location becomes available, but better than blocking the whole card state.
+    const { distance: dist, duration: dur, isOutside: outside } = (user?.location && seller?.location)
+      ? calculatePrivacySafeDistance(user.location, seller.location) 
+      : { distance: 0, duration: 0, isOutside: true }; // Default to 'outside' to hide badge if unknown
 
     return { 
       distance: dist, 
@@ -535,9 +536,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 </div>
               )}
 
-              {/* Smart Stepper Input Row - Stacked Layout */}
-              <div className="flex flex-col gap-2 mt-1">
-                <div className="flex h-9 w-full">
+                <div className="flex flex-col gap-2 mt-1">
+                 {console.log(`[ItemCard Render] id=${item.id} isSuccess=${isSuccess}`)}
+                  <div className="flex h-9 w-full">
                   <div className={`flex flex-1 border border-slate-300 rounded-md shadow-sm overflow-hidden ${user?.id === seller?.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Large Touch Target */}
                     <button

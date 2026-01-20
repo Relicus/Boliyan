@@ -59,6 +59,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   }, [bidAmount]);
 
   const executeBid = useCallback((amount: number, e?: React.MouseEvent | React.TouchEvent | any) => {
+    console.log('[useBidding] executeBid called. Setting isSuccess=true');
     // Place bid logic via store
     placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
     setIsSuccess(true);
@@ -111,10 +112,10 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     if (onBidSuccess) {
       setTimeout(() => {
         onBidSuccess();
-        setIsSuccess(false);
+        // setIsSuccess(false); // DEBUG: Keep visible for test
       }, 1500);
     } else {
-      setTimeout(() => setIsSuccess(false), 1500);
+      // setTimeout(() => setIsSuccess(false), 1500); // DEBUG: Keep visible
     }
   }, [item, placeBid, onBidSuccess]);
 

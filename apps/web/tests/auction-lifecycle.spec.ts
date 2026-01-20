@@ -1,6 +1,7 @@
 
 import { test, expect } from '@playwright/test';
 import { loginUser } from './helpers/auth';
+import { mockSupabaseNetwork } from './helpers/mock-network';
 
 test.describe('Auction Lifecycle & Engagement', () => {
   test.beforeEach(async ({ page }) => {
@@ -8,6 +9,9 @@ test.describe('Auction Lifecycle & Engagement', () => {
     page.on('console', msg => {
       console.log(`[BROWSER] ${msg.type()}: ${msg.text()}`);
     });
+
+    // MOCK NETWORK to bypass Auth/RLS blocks
+    await mockSupabaseNetwork(page);
 
     // Navigate to local dev server and login as a test user
     // No email provided = auto-signup/login a unique test user
