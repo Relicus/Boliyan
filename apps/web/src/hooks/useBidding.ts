@@ -20,8 +20,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const [error, setError] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [animTrigger, setAnimTrigger] = useState(0);
-  const [lastDelta, setLastDelta] = useState<number | null>(null);
-  const [showDelta, setShowDelta] = useState(false);
 
   // Sync bid amount when external minimum bid updates (e.g. someone else bids)
   useEffect(() => {
@@ -46,17 +44,24 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     const step = getSmartStep(current);
     const delta = step * direction;
     
-    // We allow the price to drop into the 'error' zone so the user gets visual feedback
+    // Calculate minimum allowed bid based on item state
+    const minBid = item.isPublicBid && item.currentHighBid
+      ? item.currentHighBid + getSmartStep(item.currentHighBid)
+      : getMinimumAllowedBid(item.askPrice);
+
+    // If attempting to go below minimum, show error and block
+    if (current + delta < minBid) {
+      setError(true);
+      setTimeout(() => setError(false), 1000);
+      return;
+    }
+    
+    // Otherwise allow update
     const newValue = Math.max(0, current + delta);
     
     setBidAmount(newValue.toLocaleString());
-    setLastDelta(delta);
-    setShowDelta(true);
     setAnimTrigger(prev => prev + 1);
-    
-    // Auto-hide delta after animation
-    setTimeout(() => setShowDelta(false), 800);
-  }, [bidAmount]);
+  }, [bidAmount, item]);
 
   const executeBid = useCallback((amount: number, e?: React.MouseEvent | React.TouchEvent | any) => {
     // Place bid logic via store
@@ -230,8 +235,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     error,
     isSuccess,
     animTrigger,
-    lastDelta,
-    showDelta,
     handleSmartAdjust,
     handleBid: attemptBid, // Renamed exposed Prop for compat
     confirmBid,

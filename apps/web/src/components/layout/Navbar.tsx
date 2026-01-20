@@ -83,6 +83,7 @@ export default function Navbar() {
   return (
     <nav 
       id="navbar-01" 
+      suppressHydrationWarning={true}
       className={`fixed top-0 left-0 right-0 z-50 w-full border-b bg-white transition-transform duration-300 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}

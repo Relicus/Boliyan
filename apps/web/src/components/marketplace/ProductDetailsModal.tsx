@@ -1,18 +1,19 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import confetti from "canvas-confetti";
+import { motion } from "framer-motion";
 import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
-import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-
-import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, TrendingUp } from "lucide-react";
+import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
-import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
-import Link from "next/link";
+import { calculatePrivacySafeDistance } from "@/lib/utils";
+
+import { ProductGallery } from "./product-modal/ProductGallery";
+import { ProductInfo } from "./product-modal/ProductInfo";
+import { BiddingDashboard } from "./product-modal/BiddingDashboard";
+import { FullscreenGallery } from "./product-modal/FullscreenGallery";
 
 interface ProductDetailsModalProps {
   item: Item;
@@ -22,7 +23,7 @@ interface ProductDetailsModalProps {
 }
 
 export default function ProductDetailsModal({ item, seller, isOpen, onClose }: ProductDetailsModalProps) {
-  const { placeBid, user, bids, toggleWatch, watchedItemIds, now } = useApp();
+  const { user, bids, toggleWatch, watchedItemIds, now } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
 
   // Hook for encapsulated bidding logic
@@ -31,6 +32,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     setBidAmount,
     error,
     isSuccess,
+    // isSubmitting removed as it is not returned by useBidding
     animTrigger,
     lastDelta,
     showDelta,
@@ -46,6 +48,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
   const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
+  
+  // Halo Logic
   const showHalo = isHighBidder || hasPriorBid || isWatched;
   const haloTheme = isHighBidder 
     ? 'orange' 
@@ -55,7 +59,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
   useEffect(() => {
     if (isOpen) {
-        // Reset state when opening - getSmartStep is stable from hook
+        // Reset state when opening
         const initialBidValue = item.isPublicBid && item.currentHighBid
           ? item.currentHighBid + getSmartStep(item.currentHighBid)
           : item.askPrice;
@@ -74,14 +78,9 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, isOutside, timeLeft, isUrgent } = useMemo(() => {
-    if (now === 0 || !user) return { distance: 0, duration: 0, isOutside: false, timeLeft: "Loading...", isUrgent: false };
-
-    // Distance Calculation (Privacy Safe)
-    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(user.location, seller.location);
-    
-    // Time Left calculation
-
-    const diff = new Date(item.expiryAt).getTime() - now;
+    // Timer Logic - Independent of User
+    const currentTime = now || Date.now();
+    const diff = new Date(item.expiryAt).getTime() - currentTime;
     const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
     const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
     const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
@@ -95,6 +94,19 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
       isUrgent = true;
     }
 
+    // Distance Logic - Needs User
+    if (!user) {
+        return { 
+            distance: 0, 
+            duration: 0, 
+            isOutside: false, 
+            timeLeft: timeStr, 
+            isUrgent 
+        };
+    }
+
+    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(user.location, seller.location);
+
     return { 
       distance: dist, 
       duration: dur, 
@@ -106,413 +118,78 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="w-[94vw] max-w-[94vw] max-h-[92vh] overflow-y-auto overflow-x-hidden md:overflow-hidden md:w-[920px] md:max-w-[920px] lg:w-[1000px] lg:max-w-[1000px] md:h-[88vh] md:max-h-[88vh] p-0 pr-0 bg-white border-none shadow-2xl rounded-2xl">
+      <DialogContent showCloseButton={false} className="w-[94vw] max-w-[94vw] max-h-[92vh] overflow-hidden md:w-[920px] md:max-w-[920px] lg:w-[1000px] lg:max-w-[1000px] md:h-[88vh] md:max-h-[88vh] p-0 pr-0 bg-white border-none shadow-2xl rounded-2xl">
+        <DialogClose 
+          id={`close-listing-btn-${item.id}`}
+          className="absolute right-4 top-4 z-[50] p-2 bg-white/85 hover:bg-white text-slate-700 hover:text-red-500 rounded-full shadow-lg transition-all active:scale-90"
+        >
+          <X className="h-5 w-5" />
+        </DialogClose>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col h-full"
         >
           {/* Top Section: Dynamic Gallery */}
-          <div id={`product-details-gallery-${item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0">
-             {/* Victory Halo - State Based Animated Border Background */}
-              {showHalo && (
-                <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-                  {/* Base Layer: Solid Vibrant Color */}
-                  <div 
-                     className={`absolute inset-0 opacity-20
-                       ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
-                         haloTheme === 'green' ? 'bg-[#16a34a]' : 
-                         'bg-[#0ea5e9]'}`}
-                  />
-                  
-                  {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
-                  {item.isPublicBid && (
-                    <motion.div 
-                      className={`absolute inset-[-150%] opacity-30
-                        ${haloTheme === 'orange' 
-                            ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
-                            : haloTheme === 'green'
-                              ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
-                              : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
-                        }`}
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    />
-                  )}
-                </div>
-              )}
-             <div 
-                id={`product-details-image-${item.id}`}
-                className="relative h-[240px] sm:h-[320px] md:h-full w-full overflow-hidden cursor-pointer z-10"
-              >
-               <AnimatePresence mode="wait">
-                 <motion.img 
-                    key={currentImg}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                    src={item.images[currentImg]} 
-                    className="h-full w-full object-cover"
-                 />
-               </AnimatePresence>
-                
-               <div className="absolute top-4 right-4 z-20">
-                 <DialogClose 
-                   id={`close-listing-btn-${item.id}`}
-                   className="p-2 bg-white/85 hover:bg-white text-slate-700 hover:text-red-500 rounded-full shadow-lg transition-all active:scale-90"
-                 >
-                   <X className="h-5 w-5" />
-                 </DialogClose>
-               </div>
-
-               <div className="absolute bottom-4 right-4 z-20">
-                 <button
-                   id={`expand-gallery-btn-${item.id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowFullscreen(true);
-                    }}
-                    className="p-2 bg-white/85 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90"
-                 >
-                    <Maximize2 className="h-5 w-5" />
-                 </button>
-               </div>
-
-               {item.images.length > 1 && (
-                 <>
-                   <button 
-                     className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       setCurrentImg(prev => (prev > 0 ? prev - 1 : item.images.length - 1));
-                     }}
-                   >
-                     <ChevronLeft className="h-6 w-6" />
-                   </button>
-                   <button 
-                     className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       setCurrentImg(prev => (prev < item.images.length - 1 ? prev + 1 : 0));
-                     }}
-                   >
-                     <ChevronRight className="h-6 w-6" />
-                   </button>
-                 </>
-               )}
-             </div>
-             
-             {/* Thumbs Overlay */}
-             {item.images.length > 1 && (
-               <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4">
-                 {item.images.map((img, i) => (
-                   <button
-                     key={i}
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       setCurrentImg(i);
-                     }}
-                     className={`h-12 w-12 rounded-lg border-2 overflow-hidden transition-all ${i === currentImg ? 'border-blue-500 scale-110 shadow-lg' : 'border-white/50 grayscale-[50%] hover:grayscale-0'}`}
-                   >
-                     <img src={img} className="h-full w-full object-cover" alt="" />
-                   </button>
-                 ))}
-               </div>
-             )}
-          </div>
+          <ProductGallery 
+            item={item}
+            currentImg={currentImg}
+            setCurrentImg={setCurrentImg}
+            setShowFullscreen={setShowFullscreen}
+            showHalo={showHalo}
+            haloTheme={haloTheme}
+          />
 
           {/* Bottom Section: Product Details & Bidding */}
-          <div id={`product-details-body-${item.id}`} className="flex-1 flex flex-col p-6 md:flex-[0_0_40%] md:min-h-0">
+          <div id={`product-details-body-${item.id}`} className="flex-1 flex flex-col p-4 sm:p-6 md:flex-[0_0_40%] md:min-h-0 bg-white relative z-10">
             <div id={`product-details-grid-${item.id}`} className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] h-full min-w-0 w-full">
-              <div id={`product-details-left-${item.id}`} className="flex flex-col gap-4 sm:gap-5 min-w-0">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="min-w-0">
-                    <DialogTitle className="text-xl sm:text-2xl font-black text-slate-900 leading-tight mb-2 line-clamp-2">{item.title}</DialogTitle>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline" className="font-bold bg-blue-50 text-blue-700 border-blue-100">Verified Listing</Badge>
-                      {!item.isPublicBid && (
-                        <Badge variant="secondary" className="font-bold bg-amber-500 text-white border-none shadow-sm">
-                          <Lock className="h-3.5 w-3.5 mr-1" />
-                          Secret Bidding
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="h-10 w-10" />
-                </div>
+              
+              {/* Left Column: Info */}
+              <ProductInfo 
+                item={item}
+                seller={seller}
+                isOutside={isOutside}
+                duration={duration}
+                distance={distance}
+                isWatched={isWatched}
+                onToggleWatch={toggleWatch}
+              />
 
-                {/* Description */}
-                <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-slate-900">Description</h4>
-                  <p className="text-[13px] sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
-                    {item.description}
-                  </p>
-                </div>
-
-                {/* Seller Info */}
-                <div className="grid grid-cols-[1fr_auto] items-start gap-3 sm:gap-4 rounded-xl border border-slate-100 px-3 py-2.5 sm:py-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-10 w-10 rounded-full bg-slate-200 overflow-hidden">
-                      <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <div className="font-bold text-slate-900 text-sm truncate line-clamp-1">{seller.name}</div>
-                        <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0.5 px-1.5 text-[10px] shrink-0">
-                          ⭐ <span className="ml-0.5">{seller.rating}</span>
-                        </Badge>
-                      </div>
-                      <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                        <MapPin className="h-3 w-3 text-red-500" />
-                        <span className="truncate line-clamp-1">{getFuzzyLocationString(seller.location.address)}</span>
-                      </div>
-                      {!isOutside && (
-                        <div className="text-xs text-slate-500 font-medium flex items-center gap-1 mt-0.5 tabular-nums">
-                          {duration} min drive ({distance} km)
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="w-full sm:w-auto grid grid-cols-1 gap-2 justify-self-end">
-                    <Link
-                      id={`view-details-btn-${item.id}`}
-                      href={`/product/${item.id}`}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 h-9 sm:h-10 px-3 sm:px-4 rounded-full border border-slate-900 bg-slate-900 text-white hover:bg-slate-800 hover:border-slate-800 transition-all duration-300 font-bold text-[11px] sm:text-xs shadow-sm order-2 sm:order-none"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Full Details
-                    </Link>
-                    <button
-                      id={`toggle-watch-btn-${item.id}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleWatch(item.id);
-                      }}
-                      className={`w-full sm:w-auto flex items-center gap-2 h-9 sm:h-10 px-3 sm:px-4 rounded-full border transition-all duration-300 font-bold text-[11px] sm:text-xs order-1 sm:order-none
-                        ${isWatched 
-                          ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' 
-                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
-                        }`}
-                    >
-                      <Bookmark className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
-                      {isWatched ? 'Watching' : 'Watch'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
+              {/* Right Column: Dashboard */}
               <div id={`product-details-right-${item.id}`} className="h-full min-w-0">
-                <div id={`product-details-dashboard-${item.id}`} className="w-full h-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5 flex flex-col">
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="flex flex-col rounded-xl bg-white border border-slate-200 px-2.5 sm:px-3 py-2">
-                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-1">Ask Price</div>
-                      <div className="text-base sm:text-lg font-black text-slate-900 leading-none">
-                        {formatPrice(item.askPrice)}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-center justify-center text-center rounded-xl bg-white border border-slate-200 px-2.5 sm:px-3 py-2">
-                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-1">
-                        {item.isPublicBid ? "High Bid" : "Bids"}
-                      </div>
-                      <div className={`text-base sm:text-lg font-black leading-none ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-500'}`}>
-                        {item.isPublicBid && item.currentHighBid
-                          ? formatPrice(item.currentHighBid)
-                          : `${item.bidCount} Bids`
-                        }
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col items-end text-right rounded-xl bg-white border border-slate-200 px-2.5 sm:px-3 py-2">
-                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-1">Ends In</div>
-                      <div className={`text-base sm:text-lg font-black leading-none tabular-nums ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}>
-                        {timeLeft}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 sm:mt-5 flex flex-col gap-3 sm:gap-4">
-                    <div className={`flex h-14 sm:h-16 w-full border border-slate-300 rounded-xl sm:rounded-2xl shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
-                      {/* Decrement Button - Extra Large for Modal */}
-                      <button
-                        id={`modal-item-card-${item.id}-decrement-btn`}
-                        onClick={(e) => handleSmartAdjust(e, -1)}
-                        disabled={user?.id === seller.id}
-                        className="w-14 sm:w-16 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
-                      >
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6" /></svg>
-                      </button>
-
-                      {/* Input */}
-                      <div className="relative flex-1">
-                        <AnimatePresence>
-                          {showDelta && lastDelta !== null && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10, scale: 0.5 }}
-                              animate={{ opacity: 1, y: -50, scale: 1.4 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              className={`absolute left-1/2 -translate-x-1/2 font-black text-lg z-50 pointer-events-none drop-shadow-lg
-                                ${lastDelta > 0 ? 'text-amber-600' : 'text-red-600'}`}
-                            >
-                              {lastDelta > 0 ? `+${lastDelta.toLocaleString()}` : lastDelta.toLocaleString()}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        <motion.input
-                          id={`modal-bid-input-${item.id}`}
-                          type="text"
-                          value={bidAmount}
-                          key={`modal-input-${animTrigger}`}
-                          initial={false}
-                          disabled={user?.id === seller.id}
-                          animate={{ 
-                            scale: [1, 1.05],
-                            x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -5, 5, -5, 5, 0] : 0
-                          }}
-                          transition={{ 
-                            scale: { duration: 0.2, repeat: 1, repeatType: "reverse" },
-                            x: { duration: 0.2, type: "spring", stiffness: 500, damping: 20 }
-                          }}
-                          onKeyDown={handleKeyDown}
-                          onChange={handleInputChange}
-                          className={`w-full h-full text-center text-xl sm:text-2xl font-black text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300 disabled:bg-transparent disabled:text-slate-500 disabled:cursor-not-allowed
-                                ${(parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? 'bg-red-50 text-red-900' : 'bg-white'}
-                              `}
-                        />
-                      </div>
-
-                      {/* Increment Button - Extra Large for Modal */}
-                      <button
-                        id={`modal-item-card-${item.id}-increment-btn`}
-                        onClick={(e) => handleSmartAdjust(e, 1)}
-                        disabled={user?.id === seller.id}
-                        className="w-14 sm:w-16 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
-                      >
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mt-auto pt-4 sm:pt-5">
-                    {/* Submit Bid Button */}
-                    <button
-                      id={`modal-item-card-${item.id}-place-bid-btn`}
-                      onClick={(e) => handleBid(e)}
-                      disabled={isSuccess || user?.id === seller.id}
-                      className={`h-14 sm:h-16 w-full rounded-xl sm:rounded-2xl font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg sm:text-xl flex items-center justify-center
-                        ${isSuccess 
-                          ? 'bg-amber-600 text-white scale-105' 
-                          : user?.id === seller.id
-                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
-                            : isHighBidder 
-                              ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                              : hasPriorBid
-                                ? 'bg-green-600 hover:bg-green-700 text-white'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
-                        }`}
-                    >
-                      {isSuccess ? (
-                        <span className="flex items-center gap-2">
-                           <motion.svg 
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-6 h-6" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </motion.svg>
-                          <span className="text-base">Bid Placed!</span>
-                        </span>
-                      ) : user?.id === seller.id ? (
-                        "Your Listing"
-                      ) : isHighBidder ? (
-                        <span className="flex items-center gap-1.5">
-                          <TrendingUp className="w-5 h-5" />
-                          Raise Bid
-                        </span>
-                      ) : hasPriorBid ? (
-                        <span className="flex items-center gap-1.5">
-                          <Gavel className="w-5 h-5" />
-                          Bid Again
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5">
-                          <Gavel className="w-5 h-5" />
-                          Place Bid
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
+                <BiddingDashboard 
+                  item={item}
+                  user={user}
+                  seller={seller}
+                  bidAmount={bidAmount}
+                  timeLeft={timeLeft}
+                  isUrgent={isUrgent}
+                  isHighBidder={isHighBidder}
+                  hasPriorBid={!!hasPriorBid}
+                  isSuccess={isSuccess}
+                  error={error}
+                  lastDelta={lastDelta}
+                  showDelta={showDelta}
+                  animTrigger={animTrigger}
+                  onSmartAdjust={handleSmartAdjust}
+                  onBid={handleBid}
+                  onKeyDown={handleKeyDown}
+                  onInputChange={handleInputChange}
+                  getSmartStep={getSmartStep}
+                />
               </div>
             </div>
           </div>
         </motion.div>
       </DialogContent>
 
-      {/* Fullscreen Gallery View */}
-      <Dialog open={showFullscreen} onOpenChange={setShowFullscreen}>
-        <DialogContent 
-          showCloseButton={false} 
-          className="fixed inset-0 z-[100] w-screen h-[100svh] m-0 p-0 bg-black/95 border-none shadow-none top-0 left-0 translate-x-0 translate-y-0 rounded-none flex items-center justify-center overflow-hidden max-w-none sm:max-w-none md:max-w-none lg:max-w-none xl:max-w-none"
-        >
-            <DialogTitle className="sr-only">Full Screen Product Gallery</DialogTitle>
-            <DialogClose className="absolute top-4 right-4 z-[110] p-2 bg-white/85 hover:bg-white text-slate-700 hover:text-red-500 rounded-full shadow-lg transition-all active:scale-90">
-              <X className="h-5 w-5" />
-              <span className="sr-only">Close</span>
-            </DialogClose>
-            
-            <div className="relative w-full h-full flex items-center justify-center p-0">
-               <AnimatePresence mode="wait">
-                 <motion.img 
-                    key={currentImg}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.05 }}
-                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                    src={item.images[currentImg]} 
-                    className="max-w-full max-h-full w-auto h-auto object-contain pointer-events-none select-none"
-                 />
-               </AnimatePresence>
-
-               {/* Fullscreen Navigation */}
-               {item.images.length > 1 && (
-                 <>
-                  {currentImg > 0 && (
-                    <button 
-                      className="absolute left-4 sm:left-10 p-4 bg-white/5 hover:bg-white/10 text-white rounded-full backdrop-blur-xl border border-white/10 transition-all active:scale-90 z-[110]"
-                      onClick={() => setCurrentImg(prev => prev - 1)}
-                    >
-                      <ChevronLeft className="h-10 w-10" />
-                    </button>
-                  )}
-                  {currentImg < item.images.length - 1 && (
-                    <button 
-                      className="absolute right-4 sm:right-10 p-4 bg-white/5 hover:bg-white/10 text-white rounded-full backdrop-blur-xl border border-white/10 transition-all active:scale-90 z-[110]"
-                      onClick={() => setCurrentImg(prev => prev + 1)}
-                    >
-                      <ChevronRight className="h-10 w-10" />
-                    </button>
-                  )}
-                  <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-3 z-[110]">
-                    {item.images.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentImg(i)}
-                        className={`h-2 rounded-full transition-all duration-300 ${i === currentImg ? 'w-10 bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'w-2 bg-white/30 hover:bg-white/50'}`}
-                      />
-                    ))}
-                  </div>
-                 </>
-               )}
-            </div>
-        </DialogContent>
-      </Dialog>
+      <FullscreenGallery 
+        isOpen={showFullscreen}
+        onOpenChange={setShowFullscreen}
+        item={item}
+        currentImg={currentImg}
+        setCurrentImg={setCurrentImg}
+      />
     </Dialog>
   );
 }
