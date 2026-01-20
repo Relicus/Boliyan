@@ -15,34 +15,38 @@ This document describes the complete feature discovery, registry, and testing in
 ## 📋 What We Built
 
 ### 1. Feature Registry (`src/lib/feature-registry.json`)
-A comprehensive JSON mapping of **all 179 interactive features** across the application, organized into 9 logical clusters:
-
-- **Auth & Onboarding** (23 features)
-- **Auction Lifecycle** (5 features)
-- **Discovery Layer** (31 features)
-- **Dashboard & Seller** (27 features)
-- **Create Listing** (18 features)
-- **Inbox & Messaging** (13 features)
-- **Trust & Profiles** (5 features)
-- **Layout & Navigation** (25 features)
-- **Notifications** (1 feature)
+A comprehensive JSON mapping of **all 179 interactive features** across the application, organized into 9 logical clusters.
 
 ### 2. Automated Validation Script (`scripts/validate-features.js`)
-A Node.js script that scans the entire codebase to:
-- Extract all `id="..."` attributes
-- Count interactive elements (buttons, inputs, forms, links)
-- Compare discovered IDs against the registry
-- Generate a detailed audit report
-- Calculate coverage percentage
+A Node.js script that scans the entire codebase to extract IDs and validate against the registry.
 
-### 3. Audit Report (`feature-audit-report.json`)
-Auto-generated JSON report containing:
-- Total files scanned
-- All discovered IDs by file
-- Interactive element counts
-- Missing IDs (in code but not registry)
-- Unused IDs (in registry but not code)
-- Coverage metrics
+### 3. **Advanced Topology Analysis** (`scripts/analyze-topology.ts`)
+A sophisticated TypeScript tool that provides deep architectural insights:
+
+**Capabilities:**
+- **Dynamic ID Detection**: Tracks template literals like `` id={`item-${id}`} ``
+- **Test Coverage Analysis**: Scans test files to show which IDs are tested vs. untested
+- **Duplicate Detection**: Finds IDs used in multiple locations
+- **Orphan Detection**: Identifies IDs with no interaction handlers
+- **State Flow Mapping**: Tracks hook usage (`useApp`, `useBidding`, etc.) and state sharing
+- **Route Graph**: Maps navigation flow via `<Link>` components
+- **Mermaid Diagrams**: Generates visual component relationship graphs
+
+**Latest Analysis Results:**
+```
+Total Components:     109
+Total IDs:            278 (175 static + 103 dynamic)
+Test Coverage:        12% (33 covered, 241 uncovered)
+Duplicates:           3 IDs
+Orphans:              268 IDs (no handlers)
+State Connections:    381 (shared state)
+Route Links:          23
+```
+
+### 4. Audit Reports
+- `feature-audit-report.json` - Simple validation report
+- `topology-report.json` - Comprehensive architectural analysis (6,768 lines)
+- `topology-diagram.mmd` - Mermaid flowchart of component relationships
 
 ---
 
@@ -92,12 +96,17 @@ const PATTERNS = {
 
 ## 🛠️ How to Use the Scripts
 
-### Running the Validation Script
+### Running the Simple Validation Script
 
 ```bash
 # From apps/web directory
-node scripts/validate-features.js
+npm run validate-features
 ```
+
+**Use this when:**
+- You want a quick check of registry coverage
+- You're adding/removing IDs and need to update the registry
+- You want to see missing/unused IDs
 
 **Output:**
 ```
@@ -106,13 +115,85 @@ node scripts/validate-features.js
 ✅ Found 179 unique IDs
 ✅ Found 316 interactive elements
 
-🔍 Comparing with feature registry...
-📊 Registry Coverage: 179 IDs registered
-⚠️  Missing from Registry: 0 IDs
-🗑️  Unused in Registry: 0 IDs
-
 Coverage: 100.00%
 ```
+
+### Running the Advanced Topology Analysis
+
+```bash
+# From project root
+npx tsx scripts/analyze-topology.ts
+```
+
+**Use this when:**
+- You need deep architectural insights
+- You want to see test coverage breakdown
+- You're looking for duplicates or orphans
+- You need to understand component relationships
+- You want to visualize the component graph
+
+**Output:**
+```
+==================================================
+       TOPOLOGY ANALYSIS COMPLETE
+==================================================
+
+ Components:        109
+ Total IDs:         278
+   - Static:        175
+   - Dynamic:       103
+ State Connections: 381
+ Route Links:       23
+
+ TEST COVERAGE:
+   Covered:   33 IDs
+   Uncovered: 241 IDs
+   Coverage:  12%
+
+ ORPHAN IDs (no handler): 268
+   - auth-layout-root (div) at apps\web\src\app\(auth)\layout.tsx:16
+   - signin-card (div) at apps\web\src\app\(auth)\signin\page.tsx:134
+   ... and 266 more
+
+ Output Files:
+   - topology-report.json (Full data)
+   - topology-diagram.mmd (Mermaid flowchart)
+==================================================
+```
+
+### Understanding the Topology Report
+
+The `topology-report.json` contains:
+
+```json
+{
+  "components": [...],        // All components with metadata
+  "features": {...},          // IDs grouped by prefix
+  "links": [...],             // Component relationships
+  "routes": [...],            // Navigation links
+  "diagnostics": {
+    "duplicateIds": [...],    // IDs used in multiple places
+    "orphanIds": [...],       // IDs with no handlers
+    "dynamicIdPatterns": [...] // Template literal IDs
+  },
+  "testCoverage": {
+    "coveredIds": [...],      // IDs with tests
+    "uncoveredIds": [...],    // IDs without tests
+    "coveragePercent": 12,
+    "testSelectors": [...],   // All test selectors found
+    "patterns": [...]         // Dynamic ID patterns in tests
+  },
+  "stats": {...}
+}
+```
+
+**Key Sections:**
+- **components**: Shows each component's IDs, state hooks, and route links
+- **diagnostics.duplicateIds**: Find IDs that need to be made unique
+- **diagnostics.orphanIds**: Find IDs that may need interaction handlers
+- **testCoverage.uncoveredIds**: Prioritize these for test implementation
+
+---
 
 ### Understanding the Audit Report
 

@@ -1,0 +1,607 @@
+flowchart TD
+  layout{{"layout"}}
+  page[["page"]]
+  page[["page"]]
+  route[["route"]]
+  page[["page"]]
+  page[["page"]]
+  page[["page"]]
+  page[["page"]]
+  layout{{"layout"}}
+  page[["page"]]
+  page[["page"]]
+  page[["page"]]
+  page[["page"]]
+  template[["template"]]
+  DihariLogo("DihariLogo")
+  BiddingWidget("BiddingWidget")
+  GamificationBadge("GamificationBadge")
+  index("index")
+  PriceDisplay("PriceDisplay")
+  VerifiedBadge("VerifiedBadge")
+  VictoryHalo("VictoryHalo")
+  AchievementSection("AchievementSection")
+  ListingActionMenu("ListingActionMenu")
+  MyBidCard("MyBidCard")
+  MyListingsTable("MyListingsTable")
+  ProfileSettings("ProfileSettings")
+  SellerStats("SellerStats")
+  WatchedItemCard("WatchedItemCard")
+  ChatWindow("ChatWindow")
+  ConversationList("ConversationList")
+  BottomNav("BottomNav")
+  Navbar("Navbar")
+  ScrollToTop("ScrollToTop")
+  SearchDropdown("SearchDropdown")
+  Sidebar("Sidebar")
+  CategoryBar("CategoryBar")
+  FilterSheetContent("FilterSheetContent")
+  ItemCard("ItemCard")
+  ItemCardSkeleton("ItemCardSkeleton")
+  LocationSelector("LocationSelector")
+  MarketplaceGrid("MarketplaceGrid")
+  PriceSelector("PriceSelector")
+  ProductDetailsModal("ProductDetailsModal")
+  SmartFilterBar("SmartFilterBar")
+  NotificationDropdown("NotificationDropdown")
+  NotificationItem("NotificationItem")
+  ProfileCompleteness("ProfileCompleteness")
+  ReviewForm("ReviewForm")
+  ReviewList("ReviewList")
+  StarRating("StarRating")
+  CategoryNav("CategoryNav")
+  SearchBar("SearchBar")
+  SearchFilters("SearchFilters")
+  SimilarItems("SimilarItems")
+  DeleteConfirmationDialog("DeleteConfirmationDialog")
+  SellerBidCard("SellerBidCard")
+  avatar("avatar")
+  badge("badge")
+  button("button")
+  card("card")
+  carousel("carousel")
+  command("command")
+  dialog("dialog")
+  dropdown_menu("dropdown-menu")
+  EmptyState("EmptyState")
+  input("input")
+  label("label")
+  popover("popover")
+  scroll_area("scroll-area")
+  select("select")
+  separator("separator")
+  sheet("sheet")
+  slider("slider")
+  sonner("sonner")
+  switch("switch")
+  tabs("tabs")
+  textarea("textarea")
+  toggle_group("toggle-group")
+  toggle("toggle")
+  tooltip("tooltip")
+  AuthContext("AuthContext")
+  ChatContext("ChatContext")
+  DashboardContext("DashboardContext")
+  MarketplaceContext("MarketplaceContext")
+  NotificationContext("NotificationContext")
+  ReviewContext("ReviewContext")
+  SearchContext("SearchContext")
+  TimeContext("TimeContext")
+  useBidding("useBidding")
+  useBidRealtime("useBidRealtime")
+  useIntersectionObserver("useIntersectionObserver")
+  bidding("bidding")
+  cache("cache")
+  locations("locations")
+  constants("constants")
+  locations("locations")
+  profileScore("profileScore")
+  searchUtils("searchUtils")
+  store("store")
+  supabase("supabase")
+  transform("transform")
+  uploadImage("uploadImage")
+  utils("utils")
+  bidding("bidding")
+  dashboard("dashboard")
+  database_types("database.types")
+  index("index")
+  notification("notification")
+  review("review")
+
+  page --> card
+  page --> input
+  page --> label
+  page --> button
+  page --> select
+  page -.-> page
+  page -.-> BiddingWidget
+  page -.-> MyBidCard
+  page -.-> ProfileSettings
+  page -.-> WatchedItemCard
+  page -.-> ChatWindow
+  page -.-> ConversationList
+  page -.-> BottomNav
+  page -.-> Navbar
+  page -.-> SearchDropdown
+  page -.-> Sidebar
+  page -.-> CategoryBar
+  page -.-> ItemCard
+  page -.-> LocationSelector
+  page -.-> PriceSelector
+  page -.-> ProductDetailsModal
+  page -.-> SellerBidCard
+  page -.-> EmptyState
+  page -.-> DashboardContext
+  page -.-> useBidding
+  page --> tabs
+  page --> badge
+  page --> DeleteConfirmationDialog
+  page --> SellerStats
+  page --> MyListingsTable
+  layout --> Navbar
+  layout --> Sidebar
+  layout --> BottomNav
+  layout --> ScrollToTop
+  layout --> sonner
+  page --> textarea
+  page --> MarketplaceGrid
+  page --> VerifiedBadge
+  page --> GamificationBadge
+  page --> AchievementSection
+  page --> ProfileCompleteness
+  page --> ReviewList
+  BiddingWidget --> button
+  BiddingWidget -.-> page
+  BiddingWidget -.-> MyBidCard
+  BiddingWidget -.-> ProfileSettings
+  BiddingWidget -.-> WatchedItemCard
+  BiddingWidget -.-> ChatWindow
+  BiddingWidget -.-> ConversationList
+  BiddingWidget -.-> BottomNav
+  BiddingWidget -.-> Navbar
+  BiddingWidget -.-> SearchDropdown
+  BiddingWidget -.-> Sidebar
+  BiddingWidget -.-> CategoryBar
+  BiddingWidget -.-> ItemCard
+  BiddingWidget -.-> LocationSelector
+  BiddingWidget -.-> PriceSelector
+  BiddingWidget -.-> ProductDetailsModal
+  BiddingWidget -.-> SellerBidCard
+  BiddingWidget -.-> EmptyState
+  BiddingWidget -.-> DashboardContext
+  BiddingWidget -.-> useBidding
+  GamificationBadge --> tooltip
+  VerifiedBadge --> tooltip
+  AchievementSection --> GamificationBadge
+  AchievementSection --> card
+  ListingActionMenu --> button
+  MyBidCard --> badge
+  MyBidCard --> ProductDetailsModal
+  MyBidCard -.-> page
+  MyBidCard -.-> BiddingWidget
+  MyBidCard -.-> ProfileSettings
+  MyBidCard -.-> WatchedItemCard
+  MyBidCard -.-> ChatWindow
+  MyBidCard -.-> ConversationList
+  MyBidCard -.-> BottomNav
+  MyBidCard -.-> Navbar
+  MyBidCard -.-> SearchDropdown
+  MyBidCard -.-> Sidebar
+  MyBidCard -.-> CategoryBar
+  MyBidCard -.-> ItemCard
+  MyBidCard -.-> LocationSelector
+  MyBidCard -.-> PriceSelector
+  MyBidCard -.-> SellerBidCard
+  MyBidCard -.-> EmptyState
+  MyBidCard -.-> DashboardContext
+  MyBidCard -.-> useBidding
+  MyListingsTable --> badge
+  ProfileSettings --> card
+  ProfileSettings --> avatar
+  ProfileSettings --> input
+  ProfileSettings --> label
+  ProfileSettings --> button
+  ProfileSettings --> separator
+  ProfileSettings --> badge
+  ProfileSettings --> VerifiedBadge
+  ProfileSettings -.-> page
+  ProfileSettings -.-> BiddingWidget
+  ProfileSettings -.-> MyBidCard
+  ProfileSettings -.-> WatchedItemCard
+  ProfileSettings -.-> ChatWindow
+  ProfileSettings -.-> ConversationList
+  ProfileSettings -.-> BottomNav
+  ProfileSettings -.-> Navbar
+  ProfileSettings -.-> SearchDropdown
+  ProfileSettings -.-> Sidebar
+  ProfileSettings -.-> CategoryBar
+  ProfileSettings -.-> ItemCard
+  ProfileSettings -.-> LocationSelector
+  ProfileSettings -.-> PriceSelector
+  ProfileSettings -.-> ProductDetailsModal
+  ProfileSettings -.-> SellerBidCard
+  ProfileSettings -.-> EmptyState
+  ProfileSettings -.-> DashboardContext
+  ProfileSettings -.-> useBidding
+  SellerStats --> card
+  WatchedItemCard --> badge
+  WatchedItemCard --> ProductDetailsModal
+  WatchedItemCard --> button
+  WatchedItemCard -.-> page
+  WatchedItemCard -.-> BiddingWidget
+  WatchedItemCard -.-> MyBidCard
+  WatchedItemCard -.-> ProfileSettings
+  WatchedItemCard -.-> ChatWindow
+  WatchedItemCard -.-> ConversationList
+  WatchedItemCard -.-> BottomNav
+  WatchedItemCard -.-> Navbar
+  WatchedItemCard -.-> SearchDropdown
+  WatchedItemCard -.-> Sidebar
+  WatchedItemCard -.-> CategoryBar
+  WatchedItemCard -.-> ItemCard
+  WatchedItemCard -.-> LocationSelector
+  WatchedItemCard -.-> PriceSelector
+  WatchedItemCard -.-> SellerBidCard
+  WatchedItemCard -.-> EmptyState
+  WatchedItemCard -.-> DashboardContext
+  WatchedItemCard -.-> useBidding
+  ChatWindow --> avatar
+  ChatWindow --> button
+  ChatWindow --> input
+  ChatWindow --> VerifiedBadge
+  ChatWindow --> ReviewForm
+  ChatWindow -.-> page
+  ChatWindow -.-> BiddingWidget
+  ChatWindow -.-> MyBidCard
+  ChatWindow -.-> ProfileSettings
+  ChatWindow -.-> WatchedItemCard
+  ChatWindow -.-> ConversationList
+  ChatWindow -.-> BottomNav
+  ChatWindow -.-> Navbar
+  ChatWindow -.-> SearchDropdown
+  ChatWindow -.-> Sidebar
+  ChatWindow -.-> CategoryBar
+  ChatWindow -.-> ItemCard
+  ChatWindow -.-> LocationSelector
+  ChatWindow -.-> PriceSelector
+  ChatWindow -.-> ProductDetailsModal
+  ChatWindow -.-> SellerBidCard
+  ChatWindow -.-> EmptyState
+  ChatWindow -.-> DashboardContext
+  ChatWindow -.-> useBidding
+  ConversationList --> card
+  ConversationList --> avatar
+  ConversationList --> VerifiedBadge
+  ConversationList -.-> page
+  ConversationList -.-> BiddingWidget
+  ConversationList -.-> MyBidCard
+  ConversationList -.-> ProfileSettings
+  ConversationList -.-> WatchedItemCard
+  ConversationList -.-> ChatWindow
+  ConversationList -.-> BottomNav
+  ConversationList -.-> Navbar
+  ConversationList -.-> SearchDropdown
+  ConversationList -.-> Sidebar
+  ConversationList -.-> CategoryBar
+  ConversationList -.-> ItemCard
+  ConversationList -.-> LocationSelector
+  ConversationList -.-> PriceSelector
+  ConversationList -.-> ProductDetailsModal
+  ConversationList -.-> SellerBidCard
+  ConversationList -.-> EmptyState
+  ConversationList -.-> DashboardContext
+  ConversationList -.-> useBidding
+  BottomNav --> sheet
+  BottomNav --> FilterSheetContent
+  BottomNav -.-> page
+  BottomNav -.-> BiddingWidget
+  BottomNav -.-> MyBidCard
+  BottomNav -.-> ProfileSettings
+  BottomNav -.-> WatchedItemCard
+  BottomNav -.-> ChatWindow
+  BottomNav -.-> ConversationList
+  BottomNav -.-> Navbar
+  BottomNav -.-> SearchDropdown
+  BottomNav -.-> Sidebar
+  BottomNav -.-> CategoryBar
+  BottomNav -.-> ItemCard
+  BottomNav -.-> LocationSelector
+  BottomNav -.-> PriceSelector
+  BottomNav -.-> ProductDetailsModal
+  BottomNav -.-> SellerBidCard
+  BottomNav -.-> EmptyState
+  BottomNav -.-> DashboardContext
+  BottomNav -.-> useBidding
+  Navbar --> input
+  Navbar --> button
+  Navbar --> avatar
+  Navbar --> LocationSelector
+  Navbar --> VerifiedBadge
+  Navbar --> SearchBar
+  Navbar --> NotificationDropdown
+  Navbar -.-> page
+  Navbar -.-> BiddingWidget
+  Navbar -.-> MyBidCard
+  Navbar -.-> ProfileSettings
+  Navbar -.-> WatchedItemCard
+  Navbar -.-> ChatWindow
+  Navbar -.-> ConversationList
+  Navbar -.-> BottomNav
+  Navbar -.-> SearchDropdown
+  Navbar -.-> Sidebar
+  Navbar -.-> CategoryBar
+  Navbar -.-> ItemCard
+  Navbar -.-> PriceSelector
+  Navbar -.-> ProductDetailsModal
+  Navbar -.-> SellerBidCard
+  Navbar -.-> EmptyState
+  Navbar -.-> DashboardContext
+  Navbar -.-> useBidding
+  SearchDropdown --> input
+  SearchDropdown --> badge
+  SearchDropdown -.-> page
+  SearchDropdown -.-> BiddingWidget
+  SearchDropdown -.-> MyBidCard
+  SearchDropdown -.-> ProfileSettings
+  SearchDropdown -.-> WatchedItemCard
+  SearchDropdown -.-> ChatWindow
+  SearchDropdown -.-> ConversationList
+  SearchDropdown -.-> BottomNav
+  SearchDropdown -.-> Navbar
+  SearchDropdown -.-> Sidebar
+  SearchDropdown -.-> CategoryBar
+  SearchDropdown -.-> ItemCard
+  SearchDropdown -.-> LocationSelector
+  SearchDropdown -.-> PriceSelector
+  SearchDropdown -.-> ProductDetailsModal
+  SearchDropdown -.-> SellerBidCard
+  SearchDropdown -.-> EmptyState
+  SearchDropdown -.-> DashboardContext
+  SearchDropdown -.-> useBidding
+  Sidebar --> scroll_area
+  Sidebar --> separator
+  Sidebar --> LocationSelector
+  Sidebar -.-> page
+  Sidebar -.-> BiddingWidget
+  Sidebar -.-> MyBidCard
+  Sidebar -.-> ProfileSettings
+  Sidebar -.-> WatchedItemCard
+  Sidebar -.-> ChatWindow
+  Sidebar -.-> ConversationList
+  Sidebar -.-> BottomNav
+  Sidebar -.-> Navbar
+  Sidebar -.-> SearchDropdown
+  Sidebar -.-> CategoryBar
+  Sidebar -.-> ItemCard
+  Sidebar -.-> PriceSelector
+  Sidebar -.-> ProductDetailsModal
+  Sidebar -.-> SellerBidCard
+  Sidebar -.-> EmptyState
+  Sidebar -.-> DashboardContext
+  Sidebar -.-> useBidding
+  CategoryBar -.-> page
+  CategoryBar -.-> BiddingWidget
+  CategoryBar -.-> MyBidCard
+  CategoryBar -.-> ProfileSettings
+  CategoryBar -.-> WatchedItemCard
+  CategoryBar -.-> ChatWindow
+  CategoryBar -.-> ConversationList
+  CategoryBar -.-> BottomNav
+  CategoryBar -.-> Navbar
+  CategoryBar -.-> SearchDropdown
+  CategoryBar -.-> Sidebar
+  CategoryBar -.-> ItemCard
+  CategoryBar -.-> LocationSelector
+  CategoryBar -.-> PriceSelector
+  CategoryBar -.-> ProductDetailsModal
+  CategoryBar -.-> SellerBidCard
+  CategoryBar -.-> EmptyState
+  CategoryBar -.-> DashboardContext
+  CategoryBar -.-> useBidding
+  FilterSheetContent --> button
+  FilterSheetContent --> input
+  FilterSheetContent --> label
+  FilterSheetContent --> separator
+  FilterSheetContent --> scroll_area
+  FilterSheetContent --> badge
+  ItemCard --> card
+  ItemCard --> dialog
+  ItemCard --> badge
+  ItemCard --> GamificationBadge
+  ItemCard --> VerifiedBadge
+  ItemCard -.-> page
+  ItemCard -.-> BiddingWidget
+  ItemCard -.-> MyBidCard
+  ItemCard -.-> ProfileSettings
+  ItemCard -.-> WatchedItemCard
+  ItemCard -.-> ChatWindow
+  ItemCard -.-> ConversationList
+  ItemCard -.-> BottomNav
+  ItemCard -.-> Navbar
+  ItemCard -.-> SearchDropdown
+  ItemCard -.-> Sidebar
+  ItemCard -.-> CategoryBar
+  ItemCard -.-> LocationSelector
+  ItemCard -.-> PriceSelector
+  ItemCard -.-> ProductDetailsModal
+  ItemCard -.-> SellerBidCard
+  ItemCard -.-> EmptyState
+  ItemCard -.-> DashboardContext
+  ItemCard -.-> useBidding
+  ItemCardSkeleton --> card
+  LocationSelector --> button
+  LocationSelector --> popover
+  LocationSelector --> command
+  LocationSelector --> slider
+  LocationSelector -.-> page
+  LocationSelector -.-> BiddingWidget
+  LocationSelector -.-> MyBidCard
+  LocationSelector -.-> ProfileSettings
+  LocationSelector -.-> WatchedItemCard
+  LocationSelector -.-> ChatWindow
+  LocationSelector -.-> ConversationList
+  LocationSelector -.-> BottomNav
+  LocationSelector -.-> Navbar
+  LocationSelector -.-> SearchDropdown
+  LocationSelector -.-> Sidebar
+  LocationSelector -.-> CategoryBar
+  LocationSelector -.-> ItemCard
+  LocationSelector -.-> PriceSelector
+  LocationSelector -.-> ProductDetailsModal
+  LocationSelector -.-> SellerBidCard
+  LocationSelector -.-> EmptyState
+  LocationSelector -.-> DashboardContext
+  LocationSelector -.-> useBidding
+  MarketplaceGrid --> EmptyState
+  MarketplaceGrid --> CategoryNav
+  MarketplaceGrid --> button
+  MarketplaceGrid --> badge
+  MarketplaceGrid --> toggle_group
+  PriceSelector --> popover
+  PriceSelector --> button
+  PriceSelector --> input
+  PriceSelector --> label
+  PriceSelector --> badge
+  PriceSelector -.-> page
+  PriceSelector -.-> BiddingWidget
+  PriceSelector -.-> MyBidCard
+  PriceSelector -.-> ProfileSettings
+  PriceSelector -.-> WatchedItemCard
+  PriceSelector -.-> ChatWindow
+  PriceSelector -.-> ConversationList
+  PriceSelector -.-> BottomNav
+  PriceSelector -.-> Navbar
+  PriceSelector -.-> SearchDropdown
+  PriceSelector -.-> Sidebar
+  PriceSelector -.-> CategoryBar
+  PriceSelector -.-> ItemCard
+  PriceSelector -.-> LocationSelector
+  PriceSelector -.-> ProductDetailsModal
+  PriceSelector -.-> SellerBidCard
+  PriceSelector -.-> EmptyState
+  PriceSelector -.-> DashboardContext
+  PriceSelector -.-> useBidding
+  ProductDetailsModal --> dialog
+  ProductDetailsModal --> badge
+  ProductDetailsModal -.-> page
+  ProductDetailsModal -.-> BiddingWidget
+  ProductDetailsModal -.-> MyBidCard
+  ProductDetailsModal -.-> ProfileSettings
+  ProductDetailsModal -.-> WatchedItemCard
+  ProductDetailsModal -.-> ChatWindow
+  ProductDetailsModal -.-> ConversationList
+  ProductDetailsModal -.-> BottomNav
+  ProductDetailsModal -.-> Navbar
+  ProductDetailsModal -.-> SearchDropdown
+  ProductDetailsModal -.-> Sidebar
+  ProductDetailsModal -.-> CategoryBar
+  ProductDetailsModal -.-> ItemCard
+  ProductDetailsModal -.-> LocationSelector
+  ProductDetailsModal -.-> PriceSelector
+  ProductDetailsModal -.-> SellerBidCard
+  ProductDetailsModal -.-> EmptyState
+  ProductDetailsModal -.-> DashboardContext
+  ProductDetailsModal -.-> useBidding
+  NotificationDropdown --> badge
+  NotificationDropdown --> button
+  NotificationDropdown --> scroll_area
+  ProfileCompleteness --> button
+  ReviewForm --> dialog
+  ReviewForm --> button
+  ReviewForm --> textarea
+  ReviewForm --> label
+  ReviewList --> avatar
+  ReviewList --> badge
+  CategoryNav --> button
+  CategoryNav --> scroll_area
+  SearchBar --> input
+  SearchBar --> button
+  SearchFilters --> button
+  SearchFilters --> slider
+  SearchFilters --> label
+  SimilarItems --> WatchedItemCard
+  SimilarItems --> scroll_area
+  DeleteConfirmationDialog --> button
+  DeleteConfirmationDialog --> input
+  SellerBidCard --> avatar
+  SellerBidCard --> button
+  SellerBidCard --> badge
+  SellerBidCard -.-> page
+  SellerBidCard -.-> BiddingWidget
+  SellerBidCard -.-> MyBidCard
+  SellerBidCard -.-> ProfileSettings
+  SellerBidCard -.-> WatchedItemCard
+  SellerBidCard -.-> ChatWindow
+  SellerBidCard -.-> ConversationList
+  SellerBidCard -.-> BottomNav
+  SellerBidCard -.-> Navbar
+  SellerBidCard -.-> SearchDropdown
+  SellerBidCard -.-> Sidebar
+  SellerBidCard -.-> CategoryBar
+  SellerBidCard -.-> ItemCard
+  SellerBidCard -.-> LocationSelector
+  SellerBidCard -.-> PriceSelector
+  SellerBidCard -.-> ProductDetailsModal
+  SellerBidCard -.-> EmptyState
+  SellerBidCard -.-> DashboardContext
+  SellerBidCard -.-> useBidding
+  carousel --> button
+  EmptyState --> button
+  EmptyState -.-> page
+  EmptyState -.-> BiddingWidget
+  EmptyState -.-> MyBidCard
+  EmptyState -.-> ProfileSettings
+  EmptyState -.-> WatchedItemCard
+  EmptyState -.-> ChatWindow
+  EmptyState -.-> ConversationList
+  EmptyState -.-> BottomNav
+  EmptyState -.-> Navbar
+  EmptyState -.-> SearchDropdown
+  EmptyState -.-> Sidebar
+  EmptyState -.-> CategoryBar
+  EmptyState -.-> ItemCard
+  EmptyState -.-> LocationSelector
+  EmptyState -.-> PriceSelector
+  EmptyState -.-> ProductDetailsModal
+  EmptyState -.-> SellerBidCard
+  EmptyState -.-> DashboardContext
+  EmptyState -.-> useBidding
+  DashboardContext -.-> page
+  DashboardContext -.-> BiddingWidget
+  DashboardContext -.-> MyBidCard
+  DashboardContext -.-> ProfileSettings
+  DashboardContext -.-> WatchedItemCard
+  DashboardContext -.-> ChatWindow
+  DashboardContext -.-> ConversationList
+  DashboardContext -.-> BottomNav
+  DashboardContext -.-> Navbar
+  DashboardContext -.-> SearchDropdown
+  DashboardContext -.-> Sidebar
+  DashboardContext -.-> CategoryBar
+  DashboardContext -.-> ItemCard
+  DashboardContext -.-> LocationSelector
+  DashboardContext -.-> PriceSelector
+  DashboardContext -.-> ProductDetailsModal
+  DashboardContext -.-> SellerBidCard
+  DashboardContext -.-> EmptyState
+  DashboardContext -.-> useBidding
+  useBidding -.-> page
+  useBidding -.-> BiddingWidget
+  useBidding -.-> MyBidCard
+  useBidding -.-> ProfileSettings
+  useBidding -.-> WatchedItemCard
+  useBidding -.-> ChatWindow
+  useBidding -.-> ConversationList
+  useBidding -.-> BottomNav
+  useBidding -.-> Navbar
+  useBidding -.-> SearchDropdown
+  useBidding -.-> Sidebar
+  useBidding -.-> CategoryBar
+  useBidding -.-> ItemCard
+  useBidding -.-> LocationSelector
+  useBidding -.-> PriceSelector
+  useBidding -.-> ProductDetailsModal
+  useBidding -.-> SellerBidCard
+  useBidding -.-> EmptyState
+  useBidding -.-> DashboardContext
