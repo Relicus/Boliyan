@@ -6,6 +6,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import StarRating from "@/components/profile/StarRating";
 import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/lib/store";
@@ -105,7 +106,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[800px] p-0 overflow-hidden bg-white border-none shadow-2xl rounded-2xl">
+      <DialogContent showCloseButton={false} className="sm:max-w-[1100px] p-0 overflow-hidden bg-white border-none shadow-2xl rounded-2xl">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
