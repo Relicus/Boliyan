@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
 import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import StarRating from "@/components/profile/StarRating";
+
 import { MapPin, Lock, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/lib/store";
@@ -106,14 +106,14 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[1100px] p-0 overflow-hidden bg-white border-none shadow-2xl rounded-2xl">
+      <DialogContent showCloseButton={false} className="sm:max-w-[800px] p-0 overflow-hidden bg-white border-none shadow-2xl rounded-2xl">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row h-full max-h-[90vh]"
+          className="flex flex-col h-full max-h-[90vh]"
         >
-          {/* Left Side: Dynamic Gallery */}
-          <div className="relative w-full md:w-1/2 bg-slate-100 group">
+          {/* Top Section: Dynamic Gallery */}
+          <div className="relative w-full bg-slate-100 group">
              {/* Victory Halo - State Based Animated Border Background */}
               {showHalo && (
                 <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -142,7 +142,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                 </div>
               )}
              <div 
-                className="relative h-[300px] md:h-full w-full overflow-hidden cursor-pointer z-10"
+                className="relative h-[400px] w-full overflow-hidden cursor-pointer z-10"
                 onClick={() => setShowFullscreen(true)}
               >
                <AnimatePresence mode="wait">
@@ -212,7 +212,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
              )}
           </div>
 
-          {/* Right Side: Product Details & Bidding */}
+          {/* Bottom Section: Product Details & Bidding */}
           <div className="flex-1 flex flex-col p-6 overflow-y-auto">
             <div className="flex justify-between items-start mb-4">
                <div>
@@ -227,20 +227,35 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     )}
                   </div>
                </div>
-               <DialogClose className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+               <DialogClose 
+                 id={`close-listing-btn-${item.id}`}
+                 className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+               >
                  <X className="h-6 w-6" />
                </DialogClose>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div className="grid grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
                 <div className="flex flex-col">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">Ask Price</div>
                 <div className="text-xl font-black text-slate-900 leading-none">
                     {formatPrice(item.askPrice)}
                 </div>
                 </div>
+
+                <div className="flex flex-col items-center justify-start text-center border-x border-slate-200/60">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">
+                    {item.isPublicBid ? "High Bid" : "Bids"}
+                  </div>
+                  <div className={`text-xl font-black leading-none ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-500'}`}>
+                    {item.isPublicBid && item.currentHighBid
+                      ? formatPrice(item.currentHighBid)
+                      : `${item.bidCount} Bids`
+                    }
+                  </div>
+                </div>
                 
-                <div className="flex flex-col items-center justify-center py-2 px-1 text-center">
+                <div className="flex flex-col items-end text-right">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-0.5">Ends In</div>
                 <div className={`text-xl font-black leading-none tabular-nums ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}>
                     {timeLeft}
@@ -289,7 +304,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     Full Details
                 </Link>
                 <button
-                    id={`toggle-watch-modal-btn-${item.id}`}
+                    id={`toggle-watch-btn-${item.id}`}
                     onClick={(e) => {
                     e.stopPropagation();
                     toggleWatch(item.id);
@@ -312,7 +327,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                   <div className={`flex h-12 w-full border border-slate-300 rounded-lg shadow-sm overflow-hidden ${user?.id === seller.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Extra Large for Modal */}
                     <button
-                      id={`modal-decrement-btn-${item.id}`}
+                      id={`modal-item-card-${item.id}-decrement-btn`}
                       onClick={(e) => handleSmartAdjust(e, -1)}
                       disabled={user?.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
@@ -361,7 +376,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
                     {/* Increment Button - Extra Large for Modal */}
                     <button
-                      id={`modal-increment-btn-${item.id}`}
+                      id={`modal-item-card-${item.id}-increment-btn`}
                       onClick={(e) => handleSmartAdjust(e, 1)}
                       disabled={user?.id === seller.id}
                       className="w-14 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
@@ -372,6 +387,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
                   {/* Submit Bid Button */}
                   <button
+                    id={`modal-item-card-${item.id}-place-bid-btn`}
                     onClick={(e) => handleBid(e)}
                     disabled={isSuccess || user?.id === seller.id}
                     className={`h-12 w-full rounded-lg font-bold shadow-sm transition-all duration-300 active:scale-95 text-lg flex items-center justify-center

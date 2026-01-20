@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { useApp } from "@/lib/store";
 import { motion } from "framer-motion";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
+import BannerAd from "@/components/ads/BannerAd";
 import { cn } from "@/lib/utils";
 
 import { usePathname } from "next/navigation";
@@ -150,27 +151,9 @@ export default function Sidebar() {
 
           <Separator className="bg-slate-100" />
 
-          {/* Saved Searches */}
-          <div className="px-1">
-             <h3 className="mb-3 text-sm font-semibold text-slate-900 font-outfit flex items-center gap-2.5">
-               <div className="p-1 rounded-md bg-rose-100/50 text-rose-600">
-                 <Tag className="h-3.5 w-3.5" />
-               </div>
-               Saved Searches
-             </h3>
-             <div className="flex flex-wrap gap-2">
-                {['iPhone 15 Pro', 'Gaming Laptop', 'Vintage Watch'].map((search) => (
-                  <button 
-                    key={search}
-                    id={`sidebar-saved-search-${search.toLowerCase().replace(/\s+/g, '-')}`}
-                    onClick={() => setFilter('search', search)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white text-slate-600 rounded-full border border-slate-200 shadow-sm hover:border-rose-200 hover:text-rose-600 hover:bg-rose-50 transition-all group"
-                  >
-                    <Search className="h-3 w-3 text-slate-400 group-hover:text-rose-400" />
-                    {search}
-                  </button>
-                ))}
-             </div>
+          {/* Banner Ad */}
+          <div className="px-1 pt-1 pb-1">
+             <BannerAd variant="sidebar" />
           </div>
 
           <Separator className="bg-slate-100" />

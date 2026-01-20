@@ -84,7 +84,7 @@ export default function SearchBar() {
       </div>
 
       <AnimatePresence>
-        {isOpen && (suggestions.length > 0 || inputValue.length > 1) && (
+        {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -115,6 +115,25 @@ export default function SearchBar() {
                     )}
                     </button>
                 ))}
+                </div>
+            )}
+
+            {/* Saved Searches (Migrated from Sidebar) */}
+            {inputValue.length === 0 && (
+                <div className="mt-2 mb-2 px-2">
+                    <h4 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Saved Searches</h4>
+                    <div className="flex flex-wrap gap-2">
+                        {['iPhone 15 Pro', 'Gaming Laptop', 'Vintage Watch', 'Sony WH-1000XM5', 'MacBook Air M2'].map((search) => (
+                            <button
+                                key={search}
+                                onClick={() => handleSearch(search)}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-slate-50 text-slate-600 rounded-md border border-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100 transition-colors"
+                            >
+                                <span className="truncate max-w-[120px]">{search}</span>
+                                <div className="h-1 w-1 rounded-full bg-slate-300" />
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
             

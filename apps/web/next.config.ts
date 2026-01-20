@@ -6,7 +6,20 @@ const nextConfig: NextConfig = {
     "http://192.168.18.125:3000",
     "http://100.64.100.6:3000",
     "http://localhost:3000",
+    "http://0.0.0.0:3000",
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

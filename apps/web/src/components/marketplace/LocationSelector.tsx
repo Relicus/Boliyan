@@ -222,7 +222,6 @@ function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
               id="loc-option-whole-country"
               onClick={() => {
                 handleRadiusChange([500]);
-                setSelectedCity(null);
               }}
               className={cn(isWholeCountry && "text-slate-900", "cursor-pointer")}
             >

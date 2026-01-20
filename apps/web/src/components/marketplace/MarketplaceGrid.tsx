@@ -5,6 +5,7 @@ import { useRef, useState, useEffect } from "react";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useSearch } from "@/context/SearchContext";
 import ItemCard from "./ItemCard";
+import AdCard from "@/components/ads/AdCard";
 import ItemCardSkeleton from "./ItemCardSkeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import SmartFilterBar, { FILTERS } from "./SmartFilterBar";
@@ -376,17 +377,32 @@ export default function MarketplaceGrid() {
         ) : (
           // Actual Content
           <>
-            {displayItems.map((item) => {
+            {displayItems.map((item, index) => {
               const seller = item.seller!;
+              const isAdSpot = (index + 1) % 6 === 0;
+
               return (
-                <motion.div 
-                  key={item.id}
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  transition={{ duration: 0.3 }} // Smooth entry
-                >
-                  <ItemCard item={item} seller={seller} viewMode={viewMode} />
-                </motion.div>
+                <div key={`container-${item.id}`} className="contents">
+                  <motion.div 
+                    key={item.id}
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    transition={{ duration: 0.3 }} // Smooth entry
+                  >
+                    <ItemCard item={item} seller={seller} viewMode={viewMode} />
+                  </motion.div>
+                  
+                  {isAdSpot && (
+                    <motion.div
+                       key={`ad-card-${index}`}
+                       initial={{ opacity: 0 }} 
+                       animate={{ opacity: 1 }} 
+                       transition={{ duration: 0.3 }}
+                    >
+                      <AdCard id={`in-feed-${index}`} viewMode={viewMode} />
+                    </motion.div>
+                  )}
+                </div>
               );
             })}
 

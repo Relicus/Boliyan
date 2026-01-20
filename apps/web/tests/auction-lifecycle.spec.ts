@@ -21,15 +21,15 @@ test.describe('Auction Lifecycle & Engagement', () => {
     // Wait for items to load and ensure they are visible
     await page.waitForSelector('[id^="item-card-"]', { state: 'visible', timeout: 15000 });
     
-    // Log visible root cards for debugging (avoid greedy sub-element IDs)
-    const rootCards = page.locator('#marketplace-grid-container > div > [id^="item-card-"]');
+    // Log visible root cards for debugging
+    const rootCards = page.locator('#marketplace-grid-container [id^="item-card-"]');
     const count = await rootCards.count();
     console.log(`Found ${count} actual item cards on landing page`);
   });
 
   test('should place a valid bid from the Item Card', async ({ page }) => {
     // Find the first biddable item card (not owned by us)
-    const rootCards = page.locator('#marketplace-grid-container > div > [id^="item-card-"]');
+    const rootCards = page.locator('#marketplace-grid-container [id^="item-card-"]');
     const biddableCards = rootCards.filter({
       has: page.locator('button[id$="-place-bid-btn"]:not([disabled])')
     });
@@ -66,17 +66,19 @@ test.describe('Auction Lifecycle & Engagement', () => {
     } catch (e) {
         // No warning appeared, proceed normal
     }
-    // Verify success state (Card might cycle states, so check for Success Msg OR High Bidder status)
-    // We re-select the card by ID directly to avoid filter issues (e.g. if button becomes disabled or text changes)
+    // Verify success state
     const updatedCard = page.locator(`#item-card-${itemId}`);
-    await expect(updatedCard).toHaveClass(/p-\[3.5px\]/); // Halo style adds padding
-    
-    // Optional: Check text if stable
-    // await expect(itemCard.locator(`#item-card-${itemId}-success-msg`)).toBeVisible();
+    await expect(updatedCard.locator('text=Bid Placed!')).toBeVisible({ timeout: 5000 });
+    console.log('[Test] Success message "Bid Placed!" appeared.');
+
+    // Verify it RESETS after timeout
+    await page.waitForTimeout(2500); // 1500ms in code + buffer
+    await expect(updatedCard.locator('text=Bid Placed!')).not.toBeVisible();
+    console.log('[Test] Success message "Bid Placed!" disappeared (Fixed).');
   });
 
   test('should handle 70% minimum bid rule on Card', async ({ page }) => {
-    const rootCards = page.locator('#marketplace-grid-container > div > [id^="item-card-"]');
+    const rootCards = page.locator('#marketplace-grid-container [id^="item-card-"]');
     const biddableCards = rootCards.filter({
       has: page.locator('button[id$="-place-bid-btn"]:not([disabled])')
     });
@@ -105,7 +107,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
   });
 
   test('should place bid from Product Modal', async ({ page }) => {
-    const rootCards = page.locator('#marketplace-grid-container > div > [id^="item-card-"]');
+    const rootCards = page.locator('#marketplace-grid-container [id^="item-card-"]');
     const biddableCards = rootCards.filter({
       has: page.locator('button[id$="-place-bid-btn"]:not([disabled])')
     });
@@ -132,14 +134,17 @@ test.describe('Auction Lifecycle & Engagement', () => {
     console.log("Success message 'Placed!' found in modal");
     
     // Modal should close after success (logic in useBidding.ts: onBidSuccess after 1500ms)
-    // We add a little extra time for the exit animation
+    // We expect the success message to be gone (and isSuccess=false) before hiding starts or during it
+    await page.waitForTimeout(2000);
+    
+    // Check if dialog is hidden
     await expect(dialog).toBeHidden({ timeout: 15000 });
     console.log("Modal closed successfully");
   });
 
   test('should toggle watchlist and show Blue Halo', async ({ page }) => {
     // Pick first item
-    const rootCards = page.locator('#marketplace-grid-container > div > [id^="item-card-"]');
+    const rootCards = page.locator('#marketplace-grid-container [id^="item-card-"]');
     const itemCard = rootCards.first();
     const itemId = (await itemCard.getAttribute('id'))?.replace('item-card-', '');
     if (!itemId) throw new Error("Could not find item ID");
@@ -164,7 +169,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
   });
 
   test('should show "Already Winning" warning on double bid', async ({ page }) => {
-    const rootCards = page.locator('#marketplace-grid-container > div > [id^="item-card-"]');
+    const rootCards = page.locator('#marketplace-grid-container [id^="item-card-"]');
     const biddableCards = rootCards.filter({
       has: page.locator('button[id$="-place-bid-btn"]:not([disabled])')
     });

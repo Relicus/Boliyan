@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
-import StarRating from "@/components/profile/StarRating";
+
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -336,7 +336,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                        {seller.isVerified && <VerifiedBadge size="md" />}
                     </div>
                     <div className="flex items-center gap-2 mt-1">
-                      <StarRating rating={seller.rating} count={seller.reviewCount} readonly size={14} />
+                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 font-bold px-2 py-0.5 text-xs">
+                        ⭐ {seller.rating}
+                      </Badge>
+                      <span className="text-xs text-slate-400 font-bold uppercase tracking-tight">({seller.reviewCount} Reviews)</span>
                     </div>
                   </div>
                 </div>
