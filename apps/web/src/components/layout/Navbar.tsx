@@ -33,6 +33,7 @@ export default function Navbar() {
   const currentTab = searchParams.get('tab');
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const [mounted, setMounted] = useState(false);
 
   // Other notifications
   const unreadMsgCount = (messages || []).filter(m => !m.isRead && m.senderId !== user?.id).length;
@@ -42,6 +43,10 @@ export default function Navbar() {
   
   const myBidsItems = user ? items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id)) : [];
   const currentOutbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const controlNavbar = () => {
@@ -152,7 +157,7 @@ export default function Navbar() {
           </Button>
 
           <AnimatePresence mode="wait">
-            {isLoading ? (
+            {!mounted || isLoading ? (
               <motion.div
                 key="loading"
                 layout="position"
