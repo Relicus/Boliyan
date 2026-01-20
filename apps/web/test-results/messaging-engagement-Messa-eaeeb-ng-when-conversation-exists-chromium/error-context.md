@@ -1,0 +1,85 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e20]:
+        - button "Karachi" [ref=e23]:
+          - img
+          - generic [ref=e24]: Karachi
+        - link "Sell Item" [ref=e25] [cursor=pointer]:
+          - /url: /list
+          - img
+          - generic [ref=e26]: Sell Item
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - link "Market" [ref=e29] [cursor=pointer]:
+              - /url: /
+              - img
+              - generic [ref=e30]: Market
+            - link "Offers" [ref=e31] [cursor=pointer]:
+              - /url: /dashboard?tab=active-bids
+              - img
+              - generic [ref=e32]: Offers
+            - link "Bids" [ref=e33] [cursor=pointer]:
+              - /url: /dashboard?tab=my-bids
+              - img
+              - generic [ref=e34]: Bids
+            - link "Chat" [ref=e35] [cursor=pointer]:
+              - /url: /inbox
+              - img
+              - generic [ref=e36]: Chat
+            - button "Notifications" [ref=e38]:
+              - img
+              - generic [ref=e39]: Notifications
+          - img [ref=e41] [cursor=pointer]
+  - main [ref=e43]:
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - heading "Messages" [level=1] [ref=e48]
+          - tablist [ref=e50]:
+            - tab "All 1" [selected] [ref=e51]:
+              - img
+              - text: All
+              - generic [ref=e52]: "1"
+            - tab "Offers" [ref=e53]:
+              - img
+              - text: Offers
+            - tab "Bids 1" [ref=e54]:
+              - img
+              - text: Bids
+              - generic [ref=e55]: "1"
+        - tabpanel [ref=e57]:
+          - generic [ref=e60] [cursor=pointer]:
+            - generic [ref=e61]:
+              - generic [ref=e64]: "?"
+              - generic [ref=e66]: Bid
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - heading "Anonymous" [level=4] [ref=e69]
+                - generic [ref=e70]: less than a minute
+              - generic [ref=e71]:
+                - generic [ref=e72]: Product
+                - generic [ref=e73]: 23h 59m
+              - paragraph [ref=e74]: Message the user...
+      - generic [ref=e76]:
+        - img [ref=e78]
+        - generic [ref=e80]:
+          - heading "Speak Your Price" [level=2] [ref=e81]
+          - paragraph [ref=e82]: Choose a chat from the left to arrange pick-up and complete the deal.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e88] [cursor=pointer]:
+    - img [ref=e89]
+  - alert [ref=e92]
+```

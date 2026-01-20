@@ -537,7 +537,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               )}
 
                 <div className="flex flex-col gap-2 mt-1">
-                 {console.log(`[ItemCard Render] id=${item.id} isSuccess=${isSuccess}`)}
                   <div className="flex h-9 w-full">
                   <div className={`flex flex-1 border border-slate-300 rounded-md shadow-sm overflow-hidden ${user?.id === seller?.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
                     {/* Decrement Button - Large Touch Target */}

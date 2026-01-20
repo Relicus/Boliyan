@@ -97,15 +97,19 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       colors: ['#fbbf24', '#f59e0b', '#d97706', '#ffffff'],
     };
 
-    // Shoot slightly left and right UPWARDS
-    confetti({
-      ...commonConfig,
-      angle: 60,
-    });
-    confetti({
-      ...commonConfig,
-      angle: 120,
-    });
+    try {
+      // Shoot slightly left and right UPWARDS
+      confetti({
+        ...commonConfig,
+        angle: 60,
+      });
+      confetti({
+        ...commonConfig,
+        angle: 120,
+      });
+    } catch (err) {
+      console.warn('[useBidding] Confetti failed (likely headless env):', err);
+    }
 
 
     // Handle success transition
@@ -148,6 +152,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     if (item.isPublicBid) {
       // For Public auctions, warn if they are already the high bidder
       if (item.currentHighBidderId === user.id) {
+        console.log('[useBidding] attemptBid: user is high bidder. Showing warning.');
         setWarning({
           type: 'double_bid',
           message: "You are already the highest bidder. Do you want to increase your bid?"

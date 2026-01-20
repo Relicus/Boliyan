@@ -115,7 +115,15 @@ export async function mockSupabaseNetwork(page: Page) {
       }
   });
 
-  // 5. Mock Watchlist (Upsert/Delete/Get)
+  // 5. Mock Conversations (GET only for now)
+  await page.route(/\/rest\/v1\/conversations.*/, async route => {
+      // Return empty or mock based on query?
+      // For now, return empty to prevent errors
+      // If we need to test threading, we might need to populate this
+      await route.fulfill({ json: [] });
+  });
+
+  // 6. Mock Watchlist (Upsert/Delete/Get)
   await page.route(/\/rest\/v1\/watchlist.*/, async route => {
      if (route.request().method() === 'POST') {
         await route.fulfill({ json: [{ id: `watch-${Date.now()}`, ...route.request().postDataJSON() }] });
