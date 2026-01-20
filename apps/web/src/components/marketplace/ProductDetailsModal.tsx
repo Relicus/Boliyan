@@ -34,8 +34,6 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     isSuccess,
     // isSubmitting removed as it is not returned by useBidding
     animTrigger,
-    lastDelta,
-    showDelta,
     handleSmartAdjust,
     handleBid,
     handleKeyDown,
@@ -138,6 +136,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             setShowFullscreen={setShowFullscreen}
             showHalo={showHalo}
             haloTheme={haloTheme}
+            timeLeft={timeLeft}
+            isUrgent={isUrgent}
           />
 
           {/* Bottom Section: Product Details & Bidding */}
@@ -157,26 +157,24 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
               {/* Right Column: Dashboard */}
               <div id={`product-details-right-${item.id}`} className="h-full min-w-0">
-                <BiddingDashboard 
-                  item={item}
-                  user={user}
-                  seller={seller}
-                  bidAmount={bidAmount}
-                  timeLeft={timeLeft}
-                  isUrgent={isUrgent}
-                  isHighBidder={isHighBidder}
-                  hasPriorBid={!!hasPriorBid}
-                  isSuccess={isSuccess}
-                  error={error}
-                  lastDelta={lastDelta}
-                  showDelta={showDelta}
-                  animTrigger={animTrigger}
-                  onSmartAdjust={handleSmartAdjust}
-                  onBid={handleBid}
-                  onKeyDown={handleKeyDown}
-                  onInputChange={handleInputChange}
-                  getSmartStep={getSmartStep}
-                />
+                  <BiddingDashboard 
+                    item={item}
+                    user={user}
+                    seller={seller}
+                    bidAmount={bidAmount}
+                    timeLeft={timeLeft}
+                    isUrgent={isUrgent}
+                    isHighBidder={isHighBidder}
+                    hasPriorBid={!!hasPriorBid}
+                    isSuccess={isSuccess}
+                    error={error}
+                    animTrigger={animTrigger}
+                    onSmartAdjust={handleSmartAdjust}
+                    onBid={handleBid}
+                    onKeyDown={handleKeyDown}
+                    onInputChange={handleInputChange}
+                    getSmartStep={getSmartStep}
+                  />
               </div>
             </div>
           </div>

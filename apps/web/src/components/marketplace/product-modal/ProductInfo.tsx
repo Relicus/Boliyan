@@ -30,7 +30,7 @@ export function ProductInfo({
     <div id={`product-details-left-${item.id}`} className="flex flex-col gap-3 min-w-0 h-full">
       <div className="flex justify-between items-start gap-2">
         <div className="min-w-0">
-          <DialogTitle className="text-xl sm:text-2xl font-black text-slate-900 leading-tight mb-2 line-clamp-2">
+          <DialogTitle className="text-xl sm:text-2xl font-black font-outfit text-slate-900 leading-tight mb-2 line-clamp-2">
             {item.title}
           </DialogTitle>
           <div className="flex flex-wrap gap-2">

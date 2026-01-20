@@ -58,7 +58,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   }
 
   return (
-    <div id={`bid-card-${bid.id}`} className="bg-slate-50 border border-slate-200 rounded-xl hover:shadow-md transition-all p-3">
+    <div id={`bid-card-${bid.id}`} className="@container bg-slate-50 border border-slate-200 rounded-xl hover:shadow-md transition-all p-3">
       {/* MOBILE Layout (md:hidden) */}
       <div id={`bid-card-mobile-${bid.id}`} className="flex flex-col gap-2 md:hidden">
         {/* Top Row: User (65%) | Price (35%) */}
@@ -89,7 +89,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
           </div>
 
           <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right shrink-0 flex flex-col items-end">
-            <p id={`bid-amount-mobile-${bid.id}`} className="font-black text-blue-600 leading-none truncate text-[clamp(1rem,5vw,1.25rem)]">Rs. {bid.amount.toLocaleString()}</p>
+            <p id={`bid-amount-mobile-${bid.id}`} className="font-black text-blue-600 leading-none truncate text-[clamp(1rem,5cqi,1.25rem)] font-outfit">Rs. {bid.amount.toLocaleString()}</p>
             {!isOutside && (
               <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-1 text-[10px] text-muted-foreground font-medium whitespace-nowrap">
                 <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
@@ -135,7 +135,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             
             <div id={`bidder-info-desktop-${bid.id}`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 id={`bidder-name-desktop-${bid.id}`} className="font-bold text-sm text-slate-900 truncate">{bidder.name}</h4>
+                  <h4 id={`bidder-name-desktop-${bid.id}`} className="font-bold text-[clamp(0.875rem,3cqi,1rem)] text-slate-900 truncate">{bidder.name}</h4>
                   <div id={`bidder-rating-desktop-${bid.id}`} className="flex items-center gap-0.5 text-xs text-amber-500 font-bold">
                     <Star className="h-3 w-3 fill-amber-500" />
                     {bidder.rating}
@@ -167,7 +167,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
 
           <div id={`bid-card-desktop-right-${bid.id}`} className="flex flex-row items-center gap-6">
               <div className="text-left">
-                <p id={`bid-amount-desktop-${bid.id}`} className="text-2xl font-black text-blue-600">Rs. {bid.amount.toLocaleString()}</p>
+                <p id={`bid-amount-desktop-${bid.id}`} className="text-[clamp(1.25rem,4cqi,1.75rem)] font-black text-blue-600 font-outfit">Rs. {bid.amount.toLocaleString()}</p>
               </div>
 
               <div id={`bid-actions-desktop-${bid.id}`} className="flex gap-2">

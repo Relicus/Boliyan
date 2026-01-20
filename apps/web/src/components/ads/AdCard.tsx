@@ -21,7 +21,7 @@ export default function AdCard({ id, viewMode = 'compact' }: AdCardProps) {
   return (
     <Card 
       id={`ad-card-${id}`}
-      className="group relative flex flex-col overflow-hidden rounded-lg border-none bg-slate-50 shadow-sm hover:shadow-md transition-shadow"
+      className="@container group relative flex flex-col overflow-hidden rounded-lg border-none bg-slate-50 shadow-sm hover:shadow-md transition-shadow"
     >
       {/* Image Section - Same as ItemCard */}
       <div className={`relative ${sizes.imageHeight} w-full overflow-hidden bg-slate-100 shrink-0`}>
@@ -60,18 +60,18 @@ export default function AdCard({ id, viewMode = 'compact' }: AdCardProps) {
         <div className="flex items-end justify-between transition-all min-h-[2.25rem]">
           <div className="flex flex-col">
             <span className={`${typography.label} text-slate-600 font-bold uppercase tracking-wider`}>Starting</span>
-            <span className={`${typography.price} font-black text-slate-800 leading-none`}>Free Trial</span>
+            <span className={`${typography.price} font-black text-slate-800 leading-none font-outfit`}>Free Trial</span>
           </div>
           <div className="flex flex-col items-end">
             <span className={`${typography.label} text-slate-600 font-bold uppercase tracking-wider`}>Then</span>
-            <span className={`${typography.price} font-black text-indigo-600 leading-none`}>$9.99/mo</span>
+            <span className={`${typography.price} font-black text-indigo-600 leading-none font-outfit`}>$9.99/mo</span>
           </div>
         </div>
 
         {/* Spacious Mode Description - Same as ItemCard */}
         {viewMode === 'spacious' && (
           <div className="mt-2 mb-1">
-            <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-medium">
+            <p className="text-[clamp(0.75rem,3cqi,0.875rem)] text-slate-600 line-clamp-3 leading-relaxed font-medium">
               Stream your favorite movies, TV shows, and exclusives. Start your free trial today.
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function AdCard({ id, viewMode = 'compact' }: AdCardProps) {
           {/* Fake Input Row - Same height as ItemCard stepper (h-9) */}
           <div className="flex h-9 w-full">
             <div className="flex-1 border border-slate-200 rounded-md bg-slate-50 flex items-center justify-center">
-              <span className="text-xs font-medium text-slate-400">Watch anytime, anywhere</span>
+              <span className="text-[clamp(0.75rem,4cqi,1rem)] font-medium text-slate-400">Watch anytime, anywhere</span>
             </div>
           </div>
 
@@ -91,7 +91,7 @@ export default function AdCard({ id, viewMode = 'compact' }: AdCardProps) {
             href="#" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold text-sm tracking-wide bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white gap-1.5"
+            className="w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold font-outfit text-[clamp(0.75rem,4cqi,1rem)] tracking-wide bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white gap-1.5"
           >
             Learn More
             <ExternalLink className="h-3.5 w-3.5" />

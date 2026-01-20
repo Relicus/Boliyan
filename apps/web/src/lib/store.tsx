@@ -109,7 +109,8 @@ export function useApp() {
     // Override setFilter to sync both contexts for shared filters
     setFilter: (key: string, value: any) => {
       // Update Marketplace Context
-      if (key === 'category' || key === 'search' || key === 'minPrice' || key === 'maxPrice' || key === 'sortBy' || key === 'listingType' || key === 'condition') {
+      // Fix: Added 'radius' to allowed keys so location slider works
+      if (key === 'category' || key === 'search' || key === 'minPrice' || key === 'maxPrice' || key === 'sortBy' || key === 'listingType' || key === 'condition' || key === 'radius') {
         marketplace.setFilter(key as any, value);
       }
       

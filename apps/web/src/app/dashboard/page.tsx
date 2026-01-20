@@ -316,13 +316,13 @@ function DashboardContent() {
                 )}
 
                 {itemsWithBids.map(item => (
-                  <div key={item.id} className="border border-slate-200 rounded-xl overflow-hidden mb-6 bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div key={item.id} className="@container border border-slate-200 rounded-xl overflow-hidden mb-6 bg-white shadow-sm transition-shadow hover:shadow-md">
                     <div className="flex items-start justify-between p-3 bg-slate-50 border-b border-slate-200 w-full gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <img src={item.images[0]} alt="" className="h-10 w-10 rounded-md object-cover border border-slate-200 shrink-0" />
                         <div className="min-w-0">
-                          <h3 className="font-bold text-slate-900 text-sm truncate">{item.title}</h3>
-                          <p className="text-[10px] text-muted-foreground truncate">Asking: Rs. {item.askPrice.toLocaleString()}</p>
+                          <h3 className="font-bold text-slate-900 text-[clamp(0.875rem,4cqi,1.125rem)] truncate">{item.title}</h3>
+                          <p className="text-[clamp(0.625rem,3cqi,0.875rem)] text-muted-foreground truncate">Asking: Rs. {item.askPrice.toLocaleString()}</p>
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1 shrink-0">
@@ -382,7 +382,7 @@ function DashboardContent() {
               <div className="m-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {myItems.map(item => (
-                    <div key={item.id} id={`listing-card-${item.id}`} className="p-3 bg-white border rounded-xl flex gap-3 transition-all hover:shadow-md">
+                    <div key={item.id} id={`listing-card-${item.id}`} className="@container p-3 bg-white border rounded-xl flex gap-3 transition-all hover:shadow-md">
                       <div className="relative shrink-0">
                         <img id={`listing-img-${item.id}`} src={item.images[0]} alt="" className="h-16 w-16 md:h-20 md:w-20 rounded-lg object-cover bg-slate-100" />
                         {item.images.length > 1 && (
@@ -393,8 +393,8 @@ function DashboardContent() {
                       </div>
                       <div id={`listing-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
                         <div>
-                          <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-0.5 text-sm md:text-base">{item.title}</h3>
-                          <p id={`listing-price-${item.id}`} className="text-xs md:text-sm text-blue-600 font-bold mb-1.5">Rs. {item.askPrice.toLocaleString()}</p>
+                          <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-0.5 text-[clamp(0.875rem,5cqi,1.125rem)]">{item.title}</h3>
+                          <p id={`listing-price-${item.id}`} className="text-[clamp(0.75rem,4cqi,1rem)] text-blue-600 font-bold mb-1.5">Rs. {item.askPrice.toLocaleString()}</p>
                           <div className="flex items-center gap-2 mb-2">
                              <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
                                {item.listingDuration}h

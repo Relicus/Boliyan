@@ -36,7 +36,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
     <div 
       id={`my-bid-card-${item.id}`} 
       onClick={() => setIsModalOpen(true)}
-      className="p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm cursor-pointer"
+      className="@container p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm cursor-pointer"
     >
       <div className="relative shrink-0">
         <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
@@ -50,8 +50,8 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
       <div id={`my-bid-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
         <div>
           <div className="flex justify-between items-start">
-            <h3 id={`my-bid-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2">{item.title}</h3>
-            <span id={`my-bid-amount-${item.id}`} className="text-sm font-black text-blue-600 shrink-0">
+            <h3 id={`my-bid-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2 text-[clamp(1rem,5cqi,1.25rem)]">{item.title}</h3>
+            <span id={`my-bid-amount-${item.id}`} className="text-[clamp(0.875rem,4cqi,1.125rem)] font-black text-blue-600 shrink-0 font-outfit">
               Rs. {userBid.amount.toLocaleString()}
             </span>
           </div>

@@ -11,6 +11,7 @@ import { useTime } from "@/context/TimeContext";
 import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
+import { BiddingControls } from "@/components/common/BiddingControls";
 import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import ProductDetailsModal from "./ProductDetailsModal";
@@ -79,10 +80,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     handleBid,
     handleInputChange, 
     getSmartStep,
-    animTrigger,
-    lastDelta,
-    showDelta
+    animTrigger
   } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
+
+  const minBid = item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7;
 
   // Check if user has bid on this item before
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
@@ -183,35 +184,19 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   };
 
   const getTitleClass = () => {
-    switch (viewMode) {
-      case 'spacious': return 'text-fluid-h3';
-      case 'comfortable': return 'text-fluid-body';
-      default: return 'text-sm';
-    }
+    return 'text-[clamp(0.875rem,5cqi,1.25rem)]';
   };
 
   const getPriceClass = () => {
-    switch (viewMode) {
-      case 'spacious': return 'text-fluid-price-lg';
-      case 'comfortable': return 'text-fluid-h3';
-      default: return 'text-fluid-price-sm';
-    }
+    return 'font-outfit text-[clamp(1rem,6cqi,1.5rem)]';
   };
 
   const getLabelClass = () => {
-    switch (viewMode) {
-      case 'spacious': return 'text-xs';
-      case 'comfortable': return 'text-[10px]';
-      default: return 'text-[9px]';
-    }
+    return 'text-[clamp(0.625rem,2.5cqi,0.75rem)]';
   };
 
   const getTrophySizeClass = () => {
-    switch (viewMode) {
-      case 'spacious': return 'w-7 h-7 p-1.5';
-      case 'comfortable': return 'w-6 h-6 p-1';
-      default: return 'w-5 h-5 p-1';
-    }
+    return 'w-[clamp(1.25rem,6cqi,1.75rem)] h-[clamp(1.25rem,6cqi,1.75rem)] p-[clamp(0.25rem,1cqi,0.375rem)]';
   };
 
   const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
@@ -246,7 +231,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`group relative border-none bg-slate-50 rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500
+            className={`@container group relative border-none bg-slate-50 rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500
               ${showHalo ? 'p-[3.5px]' : 'p-0 shadow-sm hover:shadow-md'}
               ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
 
@@ -332,7 +317,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               <div id={`item-card-${item.id}-location-badge-wrapper`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
                 <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
                   <MapPin className="h-3 w-3" />
-                  <span className="text-[10px] font-black tracking-tight leading-none truncate max-w-[120px]">
+                  <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none truncate max-w-[120px]">
                     {seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown Location'}
                   </span>
                 </div>
@@ -346,12 +331,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   transition={isUrgent ? { repeat: Infinity, duration: 0.75, repeatType: "reverse" } : {}}
                   className={`${statusColor} backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20`}
                 >
-                  <span className="text-[10px] font-black tracking-tight leading-none tabular-nums">{timeLeft}</span>
+                  <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none tabular-nums">{timeLeft}</span>
                 </motion.div>
                 
                 {/* Condition Badge */}
                 <div className="bg-white/90 backdrop-blur-md text-slate-900 px-2 py-1 rounded-md flex items-center shadow-lg border border-slate-200 mt-1">
-                  <span className="text-[9px] font-black uppercase tracking-tighter leading-none">
+                  <span className="text-[clamp(0.5625rem,2.25cqi,0.6875rem)] font-black uppercase tracking-tighter leading-none">
                     {item.condition === 'new' && '🌟 New'}
                     {item.condition === 'like_new' && '✨ Mint'}
                     {item.condition === 'used' && '👌 Used'}
@@ -367,7 +352,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 <div className="absolute bottom-2 left-2 z-20 flex items-center gap-1">
                   <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
                     <MapPin className="h-3 w-3 text-red-500" />
-                    <span className="text-[10px] font-bold tracking-wide tabular-nums leading-none">
+                    <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-bold tracking-wide tabular-nums leading-none">
                       {distance}km • {duration}min
                     </span>
                   </div>
@@ -442,13 +427,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     </div>
                   )}
                   
-                  <span className={`text-[10px] font-bold text-slate-700 truncate leading-none ${viewMode === 'comfortable' ? 'text-slate-500 max-w-[80px]' : ''}`}>
+                  <span className={`text-[clamp(0.625rem,2.5cqi,0.75rem)] font-bold text-slate-700 truncate leading-none ${viewMode === 'comfortable' ? 'text-slate-500 max-w-[80px]' : ''}`}>
                     {seller?.name || 'Unknown Seller'}
                   </span>
                   {seller?.isVerified && <VerifiedBadge size="sm" />}
 
                   <div className="flex items-center gap-1">
-                    <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0 px-1 text-[9px] shrink-0 h-3.5 flex items-center leading-none">
+                    <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0 px-1 text-[clamp(0.5625rem,2.25cqi,0.6875rem)] shrink-0 h-3.5 flex items-center leading-none">
                       ⭐ <span className="ml-0.5 leading-none">{seller?.rating || 0}</span>
                       <span className="ml-0.5 text-yellow-600/80 font-normal leading-none">({seller?.reviewCount || 0})</span>
                     </Badge>
@@ -488,26 +473,26 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     {item.isPublicBid ? "High Bid" : "Secret"}
                   </span>
                   <div className="flex items-center gap-1.5 transition-all h-6">
-                    {item.isPublicBid && item.currentHighBid ? (
-                      <div className="flex items-center gap-1.5">
-                        <motion.span 
-                          key={item.currentHighBid}
-                          initial={{ scale: 1.4, color: "#3b82f6" }}
-                          animate={{ 
-                            scale: 1, 
-                          color: item.currentHighBidderId === user?.id ? "#d97706" : "#2563eb" 
-                          }}
-                          transition={{ 
-                            type: "spring", 
-                            stiffness: 260, 
-                            damping: 20,
-                            duration: 0.6
-                          }}
-                          id={`item-card-${item.id}-high-bid`} 
-                          className={`${getPriceClass()} font-black leading-none inline-block truncate max-w-[100px]`}
-                        >
-                          {displayPrice(item.currentHighBid)}
-                        </motion.span>
+                      {item.isPublicBid && item.currentHighBid ? (
+                        <div className="flex items-center gap-1.5">
+                          <motion.span 
+                            key={item.currentHighBid}
+                            initial={{ scale: 1.4, color: "#3b82f6" }}
+                            animate={{ 
+                              scale: 1, 
+                            color: item.currentHighBidderId === user?.id ? "#d97706" : "#2563eb" 
+                            }}
+                            transition={{ 
+                              type: "spring", 
+                              stiffness: 260, 
+                              damping: 20,
+                              duration: 0.6
+                            }}
+                            id={`item-card-${item.id}-high-bid`} 
+                            className={`${getPriceClass()} font-black leading-none inline-block truncate max-w-[100px] font-outfit`}
+                          >
+                            {displayPrice(item.currentHighBid)}
+                          </motion.span>
                         {item.currentHighBidderId === user?.id && (
                           <motion.div
                             initial={{ scale: 0, rotate: -20 }}
@@ -522,7 +507,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         )}
                       </div>
                     ) : (
-                      <span id={`item-card-${item.id}-bid-count`} className={`${getPriceClass()} font-black text-blue-600 leading-none truncate`}>
+                      <span id={`item-card-${item.id}-bid-count`} className={`${getPriceClass()} font-black text-blue-600 leading-none truncate font-outfit`}>
                         {item.bidCount} {item.bidCount === 1 ? 'Bid' : 'Bids'}
                       </span>
                     )}
@@ -533,117 +518,29 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {/* Spacious Mode Description */}
               {viewMode === 'spacious' && (
                 <div className="mt-2 mb-1 animate-in fade-in duration-300">
-                  <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-medium">
+                  <p className="text-[clamp(0.75rem,3cqi,0.875rem)] text-slate-600 line-clamp-3 leading-relaxed font-medium">
                     {item.description}
                   </p>
                 </div>
               )}
 
                 <div className="flex flex-col gap-1.5 mt-0.5">
-                  <div className="flex h-8 w-full">
-                  <div className={`flex flex-1 border border-slate-300 rounded-md shadow-sm overflow-hidden ${user?.id === seller?.id ? 'opacity-50 bg-slate-100 grayscale' : ''}`}>
-                    {/* Decrement Button - Large Touch Target */}
-                    <button
-                      id={`item-card-${item.id}-decrement-btn`}
-                      onClick={(e) => handleSmartAdjust(e, -1)}
-                      disabled={user?.id === seller?.id}
-                      className="w-10 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-600 hover:text-red-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18 12H6" /></svg>
-                    </button>
-
-                    {/* Input */}
-                    <div className="relative flex-1">
-                      <AnimatePresence>
-                        {showDelta && lastDelta !== null && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.5 }}
-                            animate={{ opacity: 1, y: -40, scale: 1.2 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            className={`absolute left-1/2 -translate-x-1/2 font-black text-sm z-50 pointer-events-none drop-shadow-md
-                              ${lastDelta > 0 ? 'text-amber-600' : 'text-red-600'}`}
-                          >
-                            {lastDelta > 0 ? `+${lastDelta.toLocaleString()}` : lastDelta.toLocaleString()}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      <motion.input
-                        id={`item-card-${item.id}-bid-input`}
-                        type="text"
-                        value={bidAmount}
-                        key={`input-${animTrigger}`}
-                        initial={false}
-                        disabled={user?.id === seller?.id}
-                        animate={{  
-                          scale: [1, 1.05],
-                          x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -5, 5, -5, 5, 0] : 0
-                        }}
-                        transition={{ 
-                          scale: { duration: 0.2, repeat: 1, repeatType: "reverse" },
-                          x: { duration: 0.2, type: "spring", stiffness: 500, damping: 20 }
-                        }}
-                        onClick={handleInputClick}
-                        onKeyDown={handleKeyDown}
-                        onChange={handleInputChange}
-                        className={`w-full h-full text-center text-sm font-bold text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300 disabled:bg-transparent disabled:text-slate-500 disabled:cursor-not-allowed
-                                ${(parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? 'bg-red-50 text-red-900' : 'bg-white'}
-                              `}
-                      />
-                    </div>
-
-                    {/* Increment Button - Large Touch Target */}
-                    <button
-                      id={`item-card-${item.id}-increment-btn`}
-                      onClick={(e) => handleSmartAdjust(e, 1)}
-                      disabled={user?.id === seller?.id}
-                      className="w-10 bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-600 hover:text-amber-600 transition-colors active:bg-slate-200 disabled:cursor-not-allowed disabled:active:bg-slate-50"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v12m6-6H6" /></svg>
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  id={`item-card-${item.id}-place-bid-btn`}
-                  onClick={handleBid}
-                  disabled={isSuccess || user?.id === seller?.id}
-                  className={`w-full h-8 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold text-sm tracking-wide
-                    ${isSuccess 
-                      ? 'bg-amber-600 text-white scale-105' 
-                      : user?.id === seller?.id
-                        ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100'
-                        : isHighBidder 
-                          ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                          : hasPriorBid
-                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    }`}
-                >
-                  {isSuccess ? (
-                    <span id={`item-card-${item.id}-success-msg`} className="flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                      Bid Placed!
-                    </span>
-                  ) : user?.id === seller?.id ? (
-                    "Your Listing"
-                  ) : isHighBidder ? (
-                    <span className="flex items-center gap-1.5">
-                      <TrendingUp className="w-4 h-4" />
-                      Raise Bid
-                    </span>
-                  ) : hasPriorBid ? (
-                    <span className="flex items-center gap-1.5">
-                      <Gavel className="w-4 h-4" />
-                      Bid Again
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1.5">
-                      <Gavel className="w-4 h-4" />
-                      Place Bid
-                    </span>
-                  )}
-                </button>
+                  <BiddingControls
+                    bidAmount={bidAmount}
+                    isSuccess={isSuccess}
+                    isOwner={user?.id === seller?.id}
+                    isHighBidder={isHighBidder}
+                    hasPriorBid={!!hasPriorBid}
+                    error={!!error}
+                    minBid={minBid}
+                    animTrigger={animTrigger}
+                    viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
+                    onSmartAdjust={handleSmartAdjust}
+                    onBid={handleBid}
+                    onKeyDown={handleKeyDown}
+                    onInputChange={handleInputChange}
+                    onInputClick={handleInputClick}
+                  />
               </div>
             </CardContent>
           </Card>

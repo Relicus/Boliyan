@@ -6,6 +6,8 @@ import { useApp } from "@/lib/store";
 import { Item, User } from "@/types";
 import { getSmartStep, getMinimumAllowedBid } from "@/lib/bidding";
 
+import { toast } from "sonner";
+
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
   const { placeBid, user, bids } = useApp();
 
@@ -147,6 +149,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     }
 
     if (!user) {
+      toast.error("Please login to place a bid");
       // Should ideally redirect to login, but for now just return to prevent crash
       // The UI should handle showing the sign-in state usually
       return;

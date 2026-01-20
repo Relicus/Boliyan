@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Maximize2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { Item } from "@/types";
 
 interface ProductGalleryProps {
@@ -11,6 +11,8 @@ interface ProductGalleryProps {
   setShowFullscreen: (show: boolean) => void;
   showHalo: boolean;
   haloTheme: 'orange' | 'green' | 'blue';
+  timeLeft?: string;
+  isUrgent?: boolean;
 }
 
 export function ProductGallery({
@@ -19,7 +21,9 @@ export function ProductGallery({
   setCurrentImg,
   setShowFullscreen,
   showHalo,
-  haloTheme
+  haloTheme,
+  timeLeft,
+  isUrgent
 }: ProductGalleryProps) {
   return (
     <div id={`product-details-gallery-${item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[240px] sm:h-[320px] md:h-full">
@@ -68,7 +72,20 @@ export function ProductGallery({
           />
         </AnimatePresence>
         
-        <div className="absolute bottom-4 right-4 z-20">
+        {/* Time Remaining Overlay - Top Left */}
+        {timeLeft && (
+          <div className="absolute top-4 left-4 z-20">
+            <div className={`
+              flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md shadow-lg border border-white/20
+              ${isUrgent ? 'bg-red-500/80 text-white' : 'bg-black/60 text-white'}
+            `}>
+              <Clock className="h-4 w-4" />
+              <span className="text-sm font-bold font-outfit tabular-nums tracking-wide">{timeLeft}</span>
+            </div>
+          </div>
+        )}
+        
+        <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
           <button
             id={`expand-gallery-btn-${item.id}`}
             onClick={(e) => {

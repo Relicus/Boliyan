@@ -8,6 +8,15 @@ import { motion } from "framer-motion";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import BannerAd from "@/components/ads/BannerAd";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 import { usePathname } from "next/navigation";
 
@@ -88,36 +97,34 @@ export default function Sidebar() {
           
           {/* Location (Standalone Dropdown) */}
           <div className="px-1">
-            <LocationSelector variant="sidebar-compact" />
+            <h3 className="mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Location</h3>
+            <LocationSelector variant="sidebar-compact" className="shadow-none border-slate-200" />
           </div>
 
           {/* Price Range */}
-          <div className="bg-white/40 rounded-2xl p-4 border border-slate-200/50 shadow-sm">
-            <h3 className="mb-4 text-sm font-semibold text-slate-900 font-outfit flex items-center gap-2.5">
-               <div className="p-1 rounded-md bg-blue-100/50 text-blue-600">
-                <CircleDollarSign className="h-3.5 w-3.5" />
-              </div>
-              Price Range
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative group">
-                <input 
+          <div className="px-1">
+            <h3 className="mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Price Range</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="relative">
+                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-medium">₨</span>
+                 <Input 
                   id="sidebar-min-price-input"
                   type="number" 
                   placeholder="Min" 
                   value={filters.minPrice || ''}
                   onChange={(e) => setFilter('minPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none placeholder:text-slate-300 font-medium text-slate-700 hover:border-slate-300"
+                  className="pl-7 bg-white border-slate-200 focus-visible:ring-blue-500/20"
                 />
               </div>
-              <div className="relative group">
-                <input 
+              <div className="relative">
+                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-medium">₨</span>
+                 <Input 
                   id="sidebar-max-price-input"
                   type="number" 
                   placeholder="Max" 
                   value={filters.maxPrice || ''}
                   onChange={(e) => setFilter('maxPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none placeholder:text-slate-300 font-medium text-slate-700 hover:border-slate-300"
+                  className="pl-7 bg-white border-slate-200 focus-visible:ring-blue-500/20"
                 />
               </div>
             </div>
@@ -125,26 +132,22 @@ export default function Sidebar() {
 
           {/* Condition */}
           <div className="px-1">
-            <h3 className="mb-3 text-sm font-semibold text-slate-900 font-outfit flex items-center gap-2.5">
-               <div className="p-1 rounded-md bg-violet-100/50 text-violet-600">
-                <Sparkles className="h-3.5 w-3.5" />
-              </div>
-              Condition
-            </h3>
-            <div className="space-y-0.5">
-              {['Brand New', 'Like New', 'Excellent', 'Good', 'Fair'].map((condition) => (
-                <label key={condition} id={`sidebar-condition-label-${condition.toLowerCase().replace(/\s+/g, '-')}`} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer group">
-                  <div className="relative flex items-center">
-                    <input 
-                      id={`sidebar-condition-checkbox-${condition.toLowerCase().replace(/\s+/g, '-')}`}
-                      type="checkbox" 
-                      className="peer h-4 w-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500/20 cursor-pointer transition-all" 
-                    />
-                  </div>
-                  <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">{condition}</span>
-                </label>
-              ))}
-            </div>
+            <h3 className="mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Condition</h3>
+            <Select 
+              value={filters.condition || 'all'} 
+              onValueChange={(val) => setFilter('condition', val)}
+            >
+              <SelectTrigger id="sidebar-condition-select" className="w-full bg-white border-slate-200 focus:ring-blue-500/20">
+                <SelectValue placeholder="Any Condition" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Any Condition</SelectItem>
+                <SelectItem value="new">Brand New</SelectItem>
+                <SelectItem value="like_new">Like New</SelectItem>
+                <SelectItem value="used">Used (Good)</SelectItem>
+                <SelectItem value="fair">Fair</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
 
@@ -160,8 +163,9 @@ export default function Sidebar() {
 
           {/* Reset Filters - Integrated */}
           <div className="px-1 pt-2">
-            <button 
+            <Button 
               id="sidebar-reset-filters-btn"
+              variant="ghost"
               onClick={() => {
                 setFilter('category', null);
                 setFilter('search', "");
@@ -170,11 +174,11 @@ export default function Sidebar() {
                 setFilter('maxPrice', null);
                 setFilter('listingType', 'all');
               }}
-              className="w-full flex items-center justify-center gap-2 py-3 text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all group border border-dashed border-slate-200 hover:border-rose-200"
+              className="w-full justify-center gap-2 text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl"
             >
               <RefreshCcw className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform duration-500" />
               Reset All Filters
-            </button>
+            </Button>
           </div>
         </div>
       </ScrollArea>
