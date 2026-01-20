@@ -65,8 +65,9 @@ export default function SignUpPage() {
     setIsLoading(true);
     
     try {
+      console.log("[SignUp] Attempting signup for:", email);
       // Create user with metadata
-      const { error } = await supabase.auth.signUp({ 
+      const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
         options: { 
@@ -78,12 +79,15 @@ export default function SignUpPage() {
         }
       });
 
+      console.log("[SignUp] Result:", { session: !!data?.session, user: !!data?.user, error: error?.message });
+
       if (error) {
          console.error("Signup error:", error.message);
          // Ideally show error to user
          setIsShaking(true);
       } else {
          // Success!
+         console.log("[SignUp] Success! Redirecting to /");
          router.push("/");
          router.refresh();
       }

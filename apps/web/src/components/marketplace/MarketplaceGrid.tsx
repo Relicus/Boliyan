@@ -231,6 +231,7 @@ export default function MarketplaceGrid() {
 
                 {/* 4. View Toggle (Cycle) */}
                 <Button
+                  id="mobile-view-toggle"
                   variant="outline"
                   className="h-auto flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out border-0 shadow-sm hover:shadow-md ring-1 ring-slate-200"
                   onClick={() => {

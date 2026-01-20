@@ -17,9 +17,10 @@ export default function CategoryNav() {
   };
 
   return (
-    <ScrollArea className="w-full whitespace-nowrap pb-2">
+    <ScrollArea id="category-bar-root" className="w-full whitespace-nowrap pb-2">
       <div className="flex w-max space-x-2 p-1">
         <Button
+          id="category-btn-all"
           variant={filters.category === undefined ? "default" : "outline"}
           size="sm"
           onClick={() => handleSelect(undefined)}
@@ -40,6 +41,7 @@ export default function CategoryNav() {
 
           return (
             <Button
+              id={`category-btn-${category.label.toLowerCase().replace(/\s+/g, '-')}`}
               key={category.label}
               variant={isActive ? "default" : "outline"}
               size="sm"

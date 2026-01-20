@@ -24,13 +24,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   // Fetch full profile data from Supabase 'profiles' table
-  const fetchProfile = async (supabaseUser: any) => {
-    try {
-      let { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', supabaseUser.id)
-        .single();
+    const fetchProfile = async (supabaseUser: any) => {
+        console.log("[AuthContext] Fetching profile for:", supabaseUser.id);
+        try {
+            let { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', supabaseUser.id)
+                .single();
+
+            console.log("[AuthContext] Profile fetch result:", { hasData: !!data, error });
 
       // Handle 'Row not found' (PGRST116) or null data
       if (!data && (error?.code === 'PGRST116' || !error)) {
@@ -98,30 +101,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    // 1. Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        fetchProfile(session.user);
-      } else {
-        setUser(null);
-        setIsLoading(false);
-      }
-    });
+  // Use a ref to track the last processed user ID to avoid race conditions 
+  // and stale closures in the onAuthStateChange listener.
+  const lastProcessedUserId = React.useRef<string | null>(null);
 
-    // 2. Listen for auth changes
+  useEffect(() => {
+    // Consolidate auth initialization to a single listener.
+    // onAuthStateChange fires 'INITIAL_SESSION' immediately on mount, 
+    // managing both initial load and subsequent updates.
+    
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("[AuthContext] Auth state change:", _event, session?.user?.id);
       setSession(session);
+
       if (session?.user) {
-         // Only fetch if we don't have the user or it's a different user
-         if (!user || user.id !== session.user.id) {
+         // Check against Ref to strictly deduplicate fetches
+         if (session.user.id !== lastProcessedUserId.current) {
+            console.log("[AuthContext] New user detected, fetching profile...");
+            lastProcessedUserId.current = session.user.id;
             setIsLoading(true);
             fetchProfile(session.user);
+         } else {
+            // Same user, no action needed unless we want to silent re-validate
+            console.log("[AuthContext] User already processed, skipping fetch");
          }
       } else {
+        console.log("[AuthContext] No session user, clearing state");
+        lastProcessedUserId.current = null;
         setUser(null);
         setIsLoading(false);
       }

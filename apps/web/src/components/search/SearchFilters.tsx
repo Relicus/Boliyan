@@ -31,7 +31,7 @@ export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFilte
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
             <h3 className="font-semibold text-lg text-slate-900">Filters</h3>
             <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500 h-8 px-2 text-xs">
+                <Button id="sidebar-reset-filters-btn" variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500 h-8 px-2 text-xs">
                     <RotateCcw className="h-3 w-3 mr-1" /> Reset
                 </Button>
                 {isMobile && (
@@ -84,6 +84,7 @@ export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFilte
                 <div className="border rounded-lg px-3 py-2 bg-slate-50 flex-1">
                     <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Min</span>
                     <input 
+                        id="sidebar-min-price-input"
                         type="number" 
                         className="bg-transparent w-full text-sm font-semibold outline-none text-slate-900"
                         value={filters.minPrice || ''}
@@ -94,6 +95,7 @@ export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFilte
                 <div className="border rounded-lg px-3 py-2 bg-slate-50 flex-1">
                     <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Max</span>
                     <input 
+                        id="sidebar-max-price-input"
                         type="number" 
                         className="bg-transparent w-full text-sm font-semibold outline-none text-slate-900"
                         value={filters.maxPrice || ''}
@@ -125,7 +127,7 @@ export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFilte
         </div>
 
         {/* Apply Button (mainly for Mobile/Explicit action updates) */}
-        <Button onClick={() => { executeSearch(); onClose(); }} className="mt-4 w-full bg-slate-900 text-white hover:bg-slate-800">
+        <Button id="filter-apply-btn" onClick={() => { executeSearch(); onClose(); }} className="mt-4 w-full bg-slate-900 text-white hover:bg-slate-800">
             Show Results
         </Button>
       </div>

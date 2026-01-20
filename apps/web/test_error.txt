@@ -1,0 +1,34 @@
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] ΓÇ║ tests\create-listing.spec.ts:33:7 ΓÇ║ Create Listing Flow ΓÇ║ should validate required fields and shake
+[1A[2K  1) [chromium] ΓÇ║ tests\create-listing.spec.ts:33:7 ΓÇ║ Create Listing Flow ΓÇ║ should validate required fields and shake 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('Please enter a title for your item')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText('Please enter a title for your item')[22m
+
+
+      35 |     
+      36 |     // Check for validation messages
+    > 37 |     await expect(page.getByText('Please enter a title for your item')).toBeVisible();
+         |                                                                        ^
+      38 |     await expect(page.getByText('Selection required')).toBeVisible();
+      39 |     await expect(page.getByText('Valid price required')).toBeVisible();
+      40 |   });
+        at D:\VSCode\Boliyan\apps\web\tests\create-listing.spec.ts:37:72
+
+    Error Context: test-results\create-listing-Create-List-0fa32-e-required-fields-and-shake-chromium\error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] ΓÇ║ tests\create-listing.spec.ts:33:7 ΓÇ║ Create Listing Flow ΓÇ║ should validate required fields and shake 
+
+[36m  Serving HTML report at http://localhost:7201. Press Ctrl+C to quit.[39m

@@ -1,0 +1,113 @@
+
+Running 5 tests using 5 workers
+
+  Γ£ô  1 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:64:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should toggle view modes (3.3s)
+  Γ£ÿ  2 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:90:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should apply mobile filters (3.0s)
+  Γ£ÿ  4 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:9:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should allow searching for items (3.1s)
+  Γ£ÿ  5 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:27:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories (8.1s)
+  Γ£ÿ  3 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:43:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should handle location changes (8.1s)
+
+
+  1) [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:9:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should allow searching for items 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('Search: laptop').or(getByText('"laptop"'))
+    Expected: visible
+    Error: strict mode violation: getByText('Search: laptop').or(getByText('"laptop"')) resolved to 2 elements:
+        1) <span data-slot="badge" class="justify-center border text-xs w-fit shrink-0 [&>svg]:size-3 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden [a&]:hover:bg-secondary/90 bg-blue-50 text-blue-700 border-blue-100 font-bold py-1 px-3 flex items-center gap-2 rounded-full whitespace-nowrap">ΓÇª</span> aka getByText('"laptop"')
+        2) <span data-slot="badge" class="justify-center border text-xs w-fit shrink-0 [&>svg]:size-3 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden [a&]:hover:bg-secondary/90 bg-blue-600 text-white border-blue-600 font-bold py-1.5 px-4 flex items-center gap-2 rounded-full whitespace-nowrap shadow-sm">ΓÇª</span> aka getByText('Search: laptop')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText('Search: laptop').or(getByText('"laptop"'))[22m
+
+
+      18 |     // On desktop, it's in #smart-filters-row. On mobile, it's a dedicated badge.
+      19 |     const searchBadge = page.getByText('Search: laptop').or(page.getByText('"laptop"'));
+    > 20 |     await expect(searchBadge).toBeVisible();
+         |                               ^
+      21 |     
+      22 |     // Verify results presence (or empty state)
+      23 |     const grid = page.locator('#marketplace-grid-container');
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:20:31
+
+    Error Context: test-results\marketplace-discovery-Mark-a485d-d-allow-searching-for-items-chromium\error-context.md
+
+  2) [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:27:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#category-btn-vehicles')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('#category-btn-vehicles')[22m
+
+
+      33 |     // Note: ID is generated as category-btn-vehicles
+      34 |     const vehiclesBtn = page.locator('#category-btn-vehicles');
+    > 35 |     await expect(vehiclesBtn).toBeVisible();
+         |                               ^
+      36 |     await vehiclesBtn.click();
+      37 |     
+      38 |     // Verify active badge for category
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:35:31
+
+    Error Context: test-results\marketplace-discovery-Mark-502e3-navigate-through-categories-chromium\error-context.md
+
+  3) [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:43:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should handle location changes 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#location-popover-trigger')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('#location-popover-trigger')[22m
+
+
+      44 |     // Check default location
+      45 |     const locationBtn = page.locator('#location-popover-trigger');
+    > 46 |     await expect(locationBtn).toBeVisible();
+         |                               ^
+      47 |     await expect(locationBtn).toContainText('Karachi');
+      48 |     
+      49 |     // Open location popover
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:46:31
+
+    Error Context: test-results\marketplace-discovery-Mark-f08f6-uld-handle-location-changes-chromium\error-context.md
+
+  4) [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:90:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should apply mobile filters 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('#mobile-sort-select').or(locator('#mobile-category-select')) resolved to 2 elements:
+        1) <button dir="ltr" type="button" role="combobox" data-state="closed" data-size="default" aria-expanded="false" id="mobile-sort-select" aria-autocomplete="none" data-slot="select-trigger" aria-controls="radix-_R_2kpbbe9lb_" class="data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:ΓÇª>ΓÇª</button> aka locator('#mobile-sort-select')
+        2) <button dir="ltr" type="button" role="combobox" data-state="closed" data-size="default" aria-expanded="false" aria-autocomplete="none" data-slot="select-trigger" id="mobile-category-select" aria-controls="radix-_R_4kpbbe9lb_" class="data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hoΓÇª>ΓÇª</button> aka locator('#mobile-category-select')
+
+    Call log:
+    [2m    - checking visibility of locator('#mobile-sort-select').or(locator('#mobile-category-select'))[22m
+
+
+      94 |     
+      95 |     // If not visible, we might be on desktop (check #smart-filters-row instead)
+    > 96 |     if (await filterTrigger.isVisible()) {
+         |                             ^
+      97 |       await filterTrigger.first().click();
+      98 |       
+      99 |       const filterSheet = page.locator('#filter-sheet-root');
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:96:29
+
+    Error Context: test-results\marketplace-discovery-Mark-b6ca0-should-apply-mobile-filters-chromium\error-context.md
+
+  4 failed
+    [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:9:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should allow searching for items 
+    [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:27:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories 
+    [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:43:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should handle location changes 
+    [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:90:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should apply mobile filters 
+  1 passed (10.1s)

@@ -1,0 +1,153 @@
+
+Running 10 tests using 7 workers
+
+  Γ£ô   2 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:9:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should allow searching for items (3.7s)
+  Γ£ô   4 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:81:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should apply mobile filters (3.6s)
+  Γ£ô   6 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:42:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should handle location changes (3.9s)
+  Γ£ô   5 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:65:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should toggle view modes (4.4s)
+  Γ£ÿ   3 [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:23:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories (7.6s)
+  Γ£ÿ   1 [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:23:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories (8.8s)
+  Γ£ô   9 [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:65:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should toggle view modes (3.1s)
+  Γ£ÿ  10 [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:81:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should apply mobile filters (7.6s)
+  Γ£ÿ   7 [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:9:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should allow searching for items (13.7s)
+  Γ£ÿ   8 [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:42:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should handle location changes (11.2s)
+
+
+  1) [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:23:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#category-btn-vehicles')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('#category-btn-vehicles')[22m
+
+
+      31 |     // Click on a specific category (e.g., Vehicles)
+      32 |     const vehiclesBtn = page.locator('#category-btn-vehicles');
+    > 33 |     await expect(vehiclesBtn).toBeVisible();
+         |                               ^
+      34 |     await vehiclesBtn.click();
+      35 |     
+      36 |     // Verify active badge for category or URL update
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:33:31
+
+    Error Context: test-results\marketplace-discovery-Mark-502e3-navigate-through-categories-chromium\error-context.md
+
+  2) [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:9:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should allow searching for items 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('#marketplace-grid-root').getByText(/laptop/i).first()
+    Expected: visible
+    Received: hidden
+    Timeout:  10000ms
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('#marketplace-grid-root').getByText(/laptop/i).first()[22m
+    [2m    13 ├ù locator resolved to <span data-slot="badge" class="justify-center border text-xs w-fit shrink-0 [&>svg]:size-3 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden [a&]:hover:bg-secondary/90 bg-blue-50 text-blue-700 border-blue-100 font-bold py-1 px-3 flex items-center gap-2 rounded-full whitespace-nowrap">ΓÇª</span>[22m
+    [2m       - unexpected value "hidden"[22m
+
+
+      18 |     // Use .first() to handle cases where both mobile and desktop badges are in domestic DOM
+      19 |     const searchBadge = page.locator('#marketplace-grid-root').getByText(/laptop/i).first();
+    > 20 |     await expect(searchBadge).toBeVisible({ timeout: 10000 });
+         |                               ^
+      21 |   });
+      22 |
+      23 |   test('should navigate through categories', async ({ page }) => {
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:20:31
+
+    Error Context: test-results\marketplace-discovery-Mark-a485d-d-allow-searching-for-items-Mobile-Chrome\error-context.md
+
+  3) [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:23:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('#category-bar-root')
+    Expected: visible
+    Received: hidden
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('#category-bar-root')[22m
+    [2m    8 ├ù locator resolved to <div dir="ltr" id="category-bar-root" data-slot="scroll-area" class="relative w-full whitespace-nowrap pb-2">ΓÇª</div>[22m
+    [2m      - unexpected value "hidden"[22m
+
+
+      27 |     // Check desktop category bar (CategoryNav) - it should be visible now
+      28 |     const categoryBar = page.locator('#category-bar-root');
+    > 29 |     await expect(categoryBar).toBeVisible();
+         |                               ^
+      30 |     
+      31 |     // Click on a specific category (e.g., Vehicles)
+      32 |     const vehiclesBtn = page.locator('#category-btn-vehicles');
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:29:31
+
+    Error Context: test-results\marketplace-discovery-Mark-502e3-navigate-through-categories-Mobile-Chrome\error-context.md
+
+  4) [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:42:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should handle location changes 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('#location-popover-trigger')
+    Expected: visible
+    Received: hidden
+    Timeout:  10000ms
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('#location-popover-trigger')[22m
+    [2m    13 ├ù locator resolved to <button type="button" title="Karachi" data-state="closed" aria-expanded="false" aria-haspopup="dialog" data-slot="popover-trigger" id="location-popover-trigger" aria-controls="radix-_R_r5lb_" class="justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invΓÇª>ΓÇª</button>[22m
+    [2m       - unexpected value "hidden"[22m
+
+
+      43 |     // Wait for hydration
+      44 |     const locationBtn = page.locator('#location-popover-trigger');
+    > 45 |     await expect(locationBtn).toBeVisible({ timeout: 10000 });
+         |                               ^
+      46 |     await expect(locationBtn).toContainText('Karachi');
+      47 |     
+      48 |     // Open location popover
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:45:31
+
+    Error Context: test-results\marketplace-discovery-Mark-f08f6-uld-handle-location-changes-Mobile-Chrome\error-context.md
+
+  5) [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:81:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should apply mobile filters 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#filter-sheet-root')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('#filter-sheet-root')[22m
+
+
+      91 |     
+      92 |     const filterSheet = page.locator('#filter-sheet-root');
+    > 93 |     await expect(filterSheet).toBeVisible();
+         |                               ^
+      94 |     
+      95 |     // Change sorting
+      96 |     await filterSheet.getByText('Price: High to Low').click();
+        at D:\VSCode\Boliyan\apps\web\tests\marketplace-discovery.spec.ts:93:31
+
+    Error Context: test-results\marketplace-discovery-Mark-b6ca0-should-apply-mobile-filters-Mobile-Chrome\error-context.md
+
+  5 failed
+    [chromium] ΓÇ║ tests\marketplace-discovery.spec.ts:23:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories 
+    [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:9:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should allow searching for items 
+    [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:23:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should navigate through categories 
+    [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:42:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should handle location changes 
+    [Mobile Chrome] ΓÇ║ tests\marketplace-discovery.spec.ts:81:7 ΓÇ║ Marketplace Discovery & Navigation ΓÇ║ should apply mobile filters 
+  5 passed (19.4s)

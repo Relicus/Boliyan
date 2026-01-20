@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-17T19:25:36.518Z",
+  "timestamp": "2026-01-20T04:53:06.431Z",
   "routes": [
     "/",
     "/signin",
@@ -15,17 +15,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nSell Item\nAll\nPublic\nSecret\nKarachi"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nAll\nPublic\nSecret"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -65,20 +65,27 @@
           "text": "BOLIYAN"
         },
         {
-          "id": "location-selector-root",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "location-popover-trigger",
-          "tagName": "BUTTON",
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
           "text": "",
-          "type": "button"
+          "type": "text",
+          "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Sell Item"
+          "text": "Karachi\nSell Item"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Karachi"
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Karachi",
+          "type": "button"
         },
         {
           "id": "navbar-sell-btn-12",
@@ -97,17 +104,17 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "All\nPublic\nSecret\nKarachi\nAll\nPrice Range\nPKR\nPKR\n"
+          "text": "All\nPublic\nSecret\nKarachi\nAll\nPrice Range\nConditio"
         },
         {
           "id": "sidebar-01",
           "tagName": "ASIDE",
-          "text": "All\nPublic\nSecret\nKarachi\nAll\nPrice Range\nPKR\nPKR\n"
+          "text": "All\nPublic\nSecret\nKarachi\nAll\nPrice Range\nConditio"
         },
         {
           "id": "sidebar-scroll-area-02",
           "tagName": "DIV",
-          "text": "Karachi\nAll\nPrice Range\nPKR\nPKR\nCondition\nBrand Ne"
+          "text": "Karachi\nAll\nPrice Range\nCondition\nBrand New\nLike N"
         },
         {
           "id": "location-selector-sidebar-compact",
@@ -247,6 +254,12 @@
           "type": "button"
         },
         {
+          "id": "mobile-view-toggle",
+          "tagName": "BUTTON",
+          "text": "View",
+          "type": "submit"
+        },
+        {
           "id": "location-selector-root",
           "tagName": "DIV",
           "text": "Karachi"
@@ -374,6 +387,89 @@
           "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
         },
         {
+          "id": "category-bar-root",
+          "tagName": "DIV",
+          "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
+        },
+        {
+          "id": "category-btn-all",
+          "tagName": "BUTTON",
+          "text": "All",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-mobiles",
+          "tagName": "BUTTON",
+          "text": "Mobiles",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-electronics",
+          "tagName": "BUTTON",
+          "text": "Electronics",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-appliances",
+          "tagName": "BUTTON",
+          "text": "Appliances",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-furniture",
+          "tagName": "BUTTON",
+          "text": "Furniture",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-fashion",
+          "tagName": "BUTTON",
+          "text": "Fashion",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-sports",
+          "tagName": "BUTTON",
+          "text": "Sports",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-gaming",
+          "tagName": "BUTTON",
+          "text": "Gaming",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-watches",
+          "tagName": "BUTTON",
+          "text": "Watches",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-audio",
+          "tagName": "BUTTON",
+          "text": "Audio",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-cameras",
+          "tagName": "BUTTON",
+          "text": "Cameras",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-hobbies",
+          "tagName": "BUTTON",
+          "text": "Hobbies",
+          "type": "submit"
+        },
+        {
+          "id": "category-btn-community",
+          "tagName": "BUTTON",
+          "text": "Community",
+          "type": "submit"
+        },
+        {
           "id": "marketplace-grid-container",
           "tagName": "DIV",
           "text": ""
@@ -467,35 +563,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"rHuBw_FIgg43VtfCaJTH1\""
-        },
-        {
-          "id": "devtools-indicator",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "next-logo",
-          "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
-        },
-        {
-          "id": "next_logo_paint0_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_paint1_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_mask0",
-          "tagName": "mask"
-        },
-        {
-          "id": "__next-route-announcer__",
-          "tagName": "DIV",
-          "text": ""
+          "text": "self.__next_r=\"irsDygRTeCbrRlFnxFzcz\""
         }
       ]
     },
@@ -506,17 +574,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nSell Item\nWelcome Back\nSign in to c"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nWelcome Back\nSign"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -556,20 +624,27 @@
           "text": "BOLIYAN"
         },
         {
-          "id": "location-selector-root",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "location-popover-trigger",
-          "tagName": "BUTTON",
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
           "text": "",
-          "type": "button"
+          "type": "text",
+          "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Sell Item"
+          "text": "Karachi\nSell Item"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Karachi"
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Karachi",
+          "type": "button"
         },
         {
           "id": "navbar-sell-btn-12",
@@ -744,30 +819,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"q6CFBEOEXrnqImY-_7bn5\""
-        },
-        {
-          "id": "devtools-indicator",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "next-logo",
-          "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
-        },
-        {
-          "id": "next_logo_paint0_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_paint1_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_mask0",
-          "tagName": "mask"
+          "text": "self.__next_r=\"7X5kCwuWGh7C2J91MyFil\""
         },
         {
           "id": "__next-route-announcer__",
@@ -783,17 +835,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nSell Item\nList an Item\nMinimalist l"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nList an Item\nMini"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -833,20 +885,27 @@
           "text": "BOLIYAN"
         },
         {
-          "id": "location-selector-root",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "location-popover-trigger",
-          "tagName": "BUTTON",
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
           "text": "",
-          "type": "button"
+          "type": "text",
+          "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Sell Item"
+          "text": "Karachi\nSell Item"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Karachi"
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Karachi",
+          "type": "button"
         },
         {
           "id": "navbar-sell-btn-12",
@@ -951,6 +1010,12 @@
           "text": "",
           "type": "number",
           "placeholder": "0"
+        },
+        {
+          "id": "condition-select",
+          "tagName": "BUTTON",
+          "text": "👌 Gently Used",
+          "type": "button"
         },
         {
           "id": "description-textarea",
@@ -1093,30 +1158,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"1LTCUPjKKpq6-wNUnNaJi\""
-        },
-        {
-          "id": "devtools-indicator",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "next-logo",
-          "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
-        },
-        {
-          "id": "next_logo_paint0_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_paint1_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_mask0",
-          "tagName": "mask"
+          "text": "self.__next_r=\"ChQ6TeDDUZ2EgxvuFGpiR\""
         },
         {
           "id": "__next-route-announcer__",
@@ -1132,17 +1174,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nSell Item\nMessages\nAll\nOffers\nBids\n"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nMessages\nAll\nOffe"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -1182,20 +1224,27 @@
           "text": "BOLIYAN"
         },
         {
-          "id": "location-selector-root",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "location-popover-trigger",
-          "tagName": "BUTTON",
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
           "text": "",
-          "type": "button"
+          "type": "text",
+          "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Sell Item"
+          "text": "Karachi\nSell Item"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Karachi"
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Karachi",
+          "type": "button"
         },
         {
           "id": "navbar-sell-btn-12",
@@ -1363,30 +1412,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"vaHv03qNRnelo08NyUtP2\""
-        },
-        {
-          "id": "devtools-indicator",
-          "tagName": "DIV",
-          "text": "1\n2\nIssues"
-        },
-        {
-          "id": "next-logo",
-          "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
-        },
-        {
-          "id": "next_logo_paint0_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_paint1_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_mask0",
-          "tagName": "mask"
+          "text": "self.__next_r=\"IG4atUKfzKEWLEVTmZIF-\""
         },
         {
           "id": "__next-route-announcer__",
@@ -1402,17 +1428,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nSell Item\nDashboard\n\nManage your ma"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nDashboard\n\nManage"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nSell Item"
+          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -1452,20 +1478,27 @@
           "text": "BOLIYAN"
         },
         {
-          "id": "location-selector-root",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "location-popover-trigger",
-          "tagName": "BUTTON",
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
           "text": "",
-          "type": "button"
+          "type": "text",
+          "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Sell Item"
+          "text": "Karachi\nSell Item"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Karachi"
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Karachi",
+          "type": "button"
         },
         {
           "id": "navbar-sell-btn-12",
@@ -1692,30 +1725,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"aV0f1pB-ejLXnXyzaaHkt\""
-        },
-        {
-          "id": "devtools-indicator",
-          "tagName": "DIV",
-          "text": ""
-        },
-        {
-          "id": "next-logo",
-          "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
-        },
-        {
-          "id": "next_logo_paint0_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_paint1_linear_1357_10853",
-          "tagName": "linearGradient"
-        },
-        {
-          "id": "next_logo_mask0",
-          "tagName": "mask"
+          "text": "self.__next_r=\"k9-LrAPz0pXCbFUI1Saut\""
         },
         {
           "id": "__next-route-announcer__",

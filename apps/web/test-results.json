@@ -40,6 +40,22 @@
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
         "timeout": 30000
+      },
+      {
+        "outputDir": "D:/VSCode/Boliyan/apps/web/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "D:/VSCode/Boliyan/apps/web/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
       }
     ],
     "shard": null,
@@ -47,91 +63,107 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.57.0",
-    "workers": 7,
+    "workers": 4,
     "webServer": {
-      "command": "npm run dev",
-      "url": "http://192.168.18.125:3000",
+      "command": "npm run dev -H localhost",
+      "url": "http://localhost:3000",
       "reuseExistingServer": true
     }
   },
   "suites": [
     {
-      "title": "verification-70-rule.spec.ts",
-      "file": "verification-70-rule.spec.ts",
+      "title": "auction-lifecycle.spec.ts",
+      "file": "auction-lifecycle.spec.ts",
       "column": 0,
       "line": 0,
-      "specs": [
+      "specs": [],
+      "suites": [
         {
-          "title": "70% Minimum Bid Rule Verification",
-          "ok": false,
-          "tags": [],
-          "tests": [
+          "title": "Auction Lifecycle & Engagement",
+          "file": "auction-lifecycle.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
             {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
+              "title": "should place a valid bid from the Item Card",
+              "ok": false,
+              "tags": [],
+              "tests": [
                 {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 8542,
-                  "error": {
-                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\u001b[22m\n",
-                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\u001b[22m\n\n    at D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts:43:57",
-                    "location": {
-                      "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts",
-                      "column": 57,
-                      "line": 43
-                    },
-                    "snippet": "\u001b[0m \u001b[90m 41 |\u001b[39m   \u001b[90m// Click bid button - should trigger success\u001b[39m\n \u001b[90m 42 |\u001b[39m   \u001b[36mawait\u001b[39m bidBtn\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 43 |\u001b[39m   \u001b[36mawait\u001b[39m expect(itemCard\u001b[33m.\u001b[39mlocator(\u001b[32m'[id*=\"success-msg\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 44 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts",
-                        "column": 57,
-                        "line": 43
-                      },
-                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\u001b[22m\n\n\n  41 |   // Click bid button - should trigger success\n  42 |   await bidBtn.click();\n> 43 |   await expect(itemCard.locator('[id*=\"success-msg\"]')).toBeVisible();\n     |                                                         ^\n  44 | });\n  45 |\n    at D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts:43:57"
-                    }
-                  ],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-01-20T03:10:12.950Z",
+                  "timeout": 30000,
                   "annotations": [],
-                  "attachments": [
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
                     {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "D:\\VSCode\\Boliyan\\apps\\web\\test-results\\verification-70-rule-70-Minimum-Bid-Rule-Verification-chromium\\error-context.md"
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 16896,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#item-card-i2')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#item-card-i2')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#item-card-i2')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#item-card-i2')\u001b[22m\n\n    at D:\\VSCode\\Boliyan\\apps\\web\\tests\\auction-lifecycle.spec.ts:22:28",
+                        "location": {
+                          "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\auction-lifecycle.spec.ts",
+                          "column": 28,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 20 |\u001b[39m     \u001b[90m// We'll target item 'i2' (iPhone 15) which is sold by u2\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[36mconst\u001b[39m itemCard \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'#item-card-i2'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(itemCard)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m     \u001b[36mconst\u001b[39m input \u001b[33m=\u001b[39m itemCard\u001b[33m.\u001b[39mlocator(\u001b[32m'#item-card-i2-bid-input'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 25 |\u001b[39m     \u001b[36mconst\u001b[39m bidBtn \u001b[33m=\u001b[39m itemCard\u001b[33m.\u001b[39mlocator(\u001b[32m'#item-card-i2-place-bid-btn'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\auction-lifecycle.spec.ts",
+                            "column": 28,
+                            "line": 22
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#item-card-i2')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#item-card-i2')\u001b[22m\n\n\n  20 |     // We'll target item 'i2' (iPhone 15) which is sold by u2\n  21 |     const itemCard = page.locator('#item-card-i2');\n> 22 |     await expect(itemCard).toBeVisible();\n     |                            ^\n  23 |\n  24 |     const input = itemCard.locator('#item-card-i2-bid-input');\n  25 |     const bidBtn = itemCard.locator('#item-card-i2-place-bid-btn');\n    at D:\\VSCode\\Boliyan\\apps\\web\\tests\\auction-lifecycle.spec.ts:22:28"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Login failed/Email unconfirmed for e2e-1768887122491@demo.com, attempting signup...\n"
+                        },
+                        {
+                          "text": "Signup successful for e2e-1768887122491@demo.com\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-20T05:32:02.294Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\VSCode\\Boliyan\\apps\\web\\test-results\\auction-lifecycle-Auction--d14d8-alid-bid-from-the-Item-Card-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\auction-lifecycle.spec.ts",
+                        "column": 28,
+                        "line": 22
+                      }
                     }
                   ],
-                  "errorLocation": {
-                    "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts",
-                    "column": 57,
-                    "line": 43
-                  }
+                  "status": "unexpected"
                 }
               ],
-              "status": "unexpected"
+              "id": "f4e4e57213659729da1b-6b42bc484769a38cf6f6",
+              "file": "auction-lifecycle.spec.ts",
+              "line": 15,
+              "column": 7
             }
-          ],
-          "id": "787b89305178e266f45c-837c0de629e139df7907",
-          "file": "verification-70-rule.spec.ts",
-          "line": 4,
-          "column": 5
+          ]
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-20T03:10:08.041Z",
-    "duration": 14517.368,
+    "startTime": "2026-01-20T05:32:01.120Z",
+    "duration": 21433.385,
     "expected": 0,
     "skipped": 0,
     "unexpected": 1,
