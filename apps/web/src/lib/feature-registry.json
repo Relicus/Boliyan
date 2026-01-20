@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "version": "3.0",
+    "last_updated": "2026-01-20",
+    "total_features": 179,
+    "coverage_target": "100%",
+    "audit_method": "automated_script_extraction"
+  },
+  "clusters": [
+    {
+      "id": "auth-flows",
+      "name": "Authentication & Onboarding",
+      "features": [
+        { "id": "auth-layout", "name": "Auth Layout Container", "ui_ids": ["auth-layout-root"] },
+        { "id": "signin-flow", "name": "Sign In Form", "ui_ids": ["signin-card", "signin-header", "signin-title", "signin-description", "signin-form-container", "signin-form", "email-input", "password-input", "signin-submit-btn", "signup-link"] },
+        { "id": "signup-flow", "name": "Sign Up Form", "ui_ids": ["signup-card", "signup-header", "signup-title", "signup-description", "signup-form-container", "signup-form", "name-input", "phone-input", "confirm-password-input", "city-select", "city-select-content", "signup-submit-btn", "signin-link"] }
+      ],
+      "test_files": ["apps/web/tests/auth-flows.spec.ts"]
+    },
+    {
+      "id": "auction-lifecycle",
+      "name": "Auction & Bidding",
+      "features": [
+        { "id": "bid-stepper-product", "name": "Product Page Stepper", "ui_ids": ["decrement-bid-btn", "bid-input", "increment-bid-btn", "place-bid-btn"] },
+        { "id": "product-page-nav", "name": "Product Page Navigation", "ui_ids": ["back-to-marketplace-btn"] }
+      ],
+      "test_files": ["apps/web/tests/verification-70-rule.spec.ts", "apps/web/tests/smart_bidding_verification.spec.ts"]
+    },
+    {
+      "id": "discovery-layer",
+      "name": "Discovery & Navigation",
+      "features": [
+        { "id": "global-search", "name": "Full-Text Global Search", "ui_ids": ["navbar-search-input"] },
+        { "id": "category-nav-desktop", "name": "Category Scroll (Desktop)", "ui_ids": ["category-bar-root", "category-bar-row"] },
+        { "id": "category-nav-mobile", "name": "Category Select (Mobile)", "ui_ids": ["mobile-category-select"] },
+        { "id": "mobile-filters", "name": "Mobile Filter Sheet", "ui_ids": ["filter-sheet-root", "filter-apply-btn", "filter-section-sort", "filter-section-categories", "filter-section-price", "filter-section-condition", "filter-section-type"] },
+        { "id": "location-gps", "name": "GPS Location Selection", "ui_ids": ["location-popover-trigger", "loc-option-near-me-direct", "location-popover-trigger-mobile"] },
+        { "id": "location-sidebar", "name": "Location Sidebar Variants", "ui_ids": ["location-selector-root", "location-selector-sidebar-compact", "location-sidebar-trigger", "loc-option-whole-country"] },
+        { "id": "price-range", "name": "Price Filter Bounds", "ui_ids": ["price-selector-trigger", "sidebar-min-price-input", "sidebar-max-price-input"] },
+        { "id": "ui-density", "name": "View Mode Persistence", "ui_ids": ["view-mode-toggles"] },
+        { "id": "smart-filters", "name": "Smart Quick Filters", "ui_ids": ["smart-filter-bar-root", "smart-filters-row"] },
+        { "id": "mobile-sort", "name": "Mobile Sort Select", "ui_ids": ["mobile-sort-select"] },
+        { "id": "mobile-type", "name": "Mobile Type Select", "ui_ids": ["mobile-type-select"] },
+        { "id": "sidebar-reset", "name": "Sidebar Reset Filters", "ui_ids": ["sidebar-reset-filters-btn"] },
+        { "id": "scroll-to-top", "name": "Scroll to Top Button", "ui_ids": ["scroll-to-top-btn"] },
+        { "id": "marketplace-grid", "name": "Marketplace Grid Container", "ui_ids": ["marketplace-grid-root", "marketplace-grid-container", "mobile-search-filter-container"] }
+      ],
+      "test_files": ["apps/web/tests/marketplace-discovery.spec.ts"]
+    },
+    {
+      "id": "dashboard-seller",
+      "name": "Dashboard & Seller Tools",
+      "features": [
+        { "id": "dashboard-layout", "name": "Dashboard Root Layout", "ui_ids": ["dashboard-root", "dashboard-title", "dashboard-subtitle"] },
+        { "id": "dashboard-actions", "name": "Dashboard Quick Actions", "ui_ids": ["dashboard-messages-btn", "dashboard-new-listing-btn", "dashboard-new-listing-plus"] },
+        { "id": "dashboard-tabs", "name": "Dashboard Tab Navigation", "ui_ids": ["dashboard-tabs", "dashboard-tabs-list", "dashboard-tabs-list-desktop"] },
+        { "id": "dashboard-tab-triggers", "name": "Dashboard Tab Triggers", "ui_ids": ["tab-trigger-active-bids", "tab-trigger-active-bids-mobile", "tab-trigger-my-bids", "tab-trigger-my-bids-mobile", "tab-trigger-my-listings", "tab-trigger-my-listings-mobile", "tab-trigger-watchlist", "tab-trigger-watchlist-mobile"] },
+        { "id": "dashboard-tab-badges", "name": "Dashboard Tab Badges", "ui_ids": ["tab-badge-active-bids", "tab-badge-my-bids", "tab-badge-my-listings", "tab-badge-watchlist"] },
+        { "id": "profile-settings", "name": "Profile Settings Form", "ui_ids": ["profile-settings-root", "profile-settings-card", "profile-settings-avatar", "change-avatar-btn", "edit-profile-btn", "name-display", "phone-display", "location-display", "cancel-edit-btn", "save-profile-btn"] },
+        { "id": "delete-confirmation", "name": "Delete Listing Confirmation", "ui_ids": ["delete-confirmation-input"] }
+      ],
+      "test_files": ["apps/web/tests/dashboard-seller.spec.ts"]
+    },
+    {
+      "id": "list-item-flow",
+      "name": "Create Listing Flow",
+      "features": [
+        { "id": "list-page-layout", "name": "List Page Container", "ui_ids": ["list-page-container", "list-item-card", "list-item-header", "list-item-title-heading", "list-item-description-text"] },
+        { "id": "list-item-form", "name": "Listing Creation Form", "ui_ids": ["list-item-form", "title-input", "category-select", "category-select-content", "price-input", "condition-select", "condition-select-content", "description-textarea"] },
+        { "id": "image-upload", "name": "Image Upload Interface", "ui_ids": ["images-label", "images-preview-container", "add-image-label", "camera-icon", "add-photo-text", "image-upload-input"] },
+        { "id": "bidding-style-select", "name": "Bidding Style Selection", "ui_ids": ["bidding-style-heading", "public-auction-option", "sealed-bids-option"] },
+        { "id": "listing-actions", "name": "Listing Form Actions", "ui_ids": ["cancel-listing-btn", "post-listing-btn"] },
+        { "id": "listing-type-pills", "name": "Listing Type Pills", "ui_ids": ["listing-type-pill"] }
+      ],
+      "test_files": ["apps/web/tests/create-listing.spec.ts"]
+    },
+    {
+      "id": "inbox-messaging",
+      "name": "Inbox & Messaging",
+      "features": [
+        { "id": "inbox-layout", "name": "Inbox Container Layout", "ui_ids": ["inbox-container", "inbox-sidebar"] },
+        { "id": "inbox-tabs", "name": "Inbox Tab Navigation", "ui_ids": ["inbox-tabs-list", "inbox-all-tab", "inbox-offers-tab", "inbox-bids-tab"] },
+        { "id": "chat-window", "name": "Chat Window Interface", "ui_ids": ["chat-window", "chat-window-container", "chat-header", "chat-messages", "chat-input-area", "chat-input-field", "chat-send-btn", "chat-back-btn", "chat-call-btn"] },
+        { "id": "conversation-list", "name": "Conversation List", "ui_ids": ["active-indicator"] }
+      ],
+      "test_files": ["apps/web/tests/messaging.spec.ts"]
+    },
+    {
+      "id": "trust-engagement",
+      "name": "Trust & Profiles",
+      "features": [
+        { "id": "review-flow", "name": "Peer Review System", "ui_ids": ["review-form-modal", "submit-review-btn", "review-content", "star-rating-component"] },
+        { "id": "review-list", "name": "Review List Display", "ui_ids": ["review-list-empty"] },
+        { "id": "profile-strength", "name": "Profile Strength Meter", "ui_ids": ["profile-completeness-card"] }
+      ],
+      "test_files": ["apps/web/tests/user-engagement.spec.ts"]
+    },
+    {
+      "id": "layout-navigation",
+      "name": "Layout & Navigation",
+      "features": [
+        { "id": "root-layout", "name": "Root Layout Structure", "ui_ids": ["root-body-01", "layout-wrapper-02", "main-content-03"] },
+        { "id": "navbar-structure", "name": "Navbar Structure", "ui_ids": ["navbar-01", "navbar-container-02", "navbar-left-section-03", "navbar-right-section-11"] },
+        { "id": "navbar-logo", "name": "Navbar Logo Elements", "ui_ids": ["navbar-logo-link-04", "navbar-logo-svg-05", "navbar-logo-path-06", "navbar-logo-dot-07", "navbar-brand-name-08", "navbar-brand-urdu-09", "navbar-brand-english-10"] },
+        { "id": "navbar-actions", "name": "Navbar Action Buttons", "ui_ids": ["navbar-sell-btn-12", "navbar-sell-plus-icon-13", "navbar-loading-avatar", "navbar-signin-btn"] },
+        { "id": "navbar-links", "name": "Navbar Navigation Links", "ui_ids": ["navbar-market-btn", "navbar-market-icon", "navbar-offers-btn", "navbar-offers-icon", "navbar-bids-btn", "navbar-bids-icon", "navbar-chat-btn", "navbar-chat-icon"] },
+        { "id": "navbar-avatar", "name": "Navbar User Avatar", "ui_ids": ["navbar-avatar-18", "navbar-avatar-image-19", "navbar-avatar-fallback-20"] },
+        { "id": "bottom-nav", "name": "Bottom Navigation (Mobile)", "ui_ids": ["bottom-nav-container-01", "bottom-nav-wrapper-02", "filters-sheet-title"] },
+        { "id": "sidebar-desktop", "name": "Desktop Sidebar", "ui_ids": ["sidebar-01", "sidebar-scroll-area-02"] }
+      ],
+      "test_files": ["apps/web/tests/navigation.spec.ts"]
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "features": [
+        { "id": "notification-bell", "name": "Notification Bell", "ui_ids": ["notification-bell-btn"] }
+      ],
+      "test_files": ["apps/web/tests/notifications.spec.ts"]
+    }
+  ]
+}

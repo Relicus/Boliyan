@@ -1,0 +1,2457 @@
+{
+  "nodes": [
+    {
+      "name": "layout",
+      "path": "apps\\web\\src\\app\\(auth)\\layout.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "auth"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\(auth)\\signin\\page.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "signin",
+        "email",
+        "password",
+        "signup"
+      ],
+      "interactableCount": 10
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\(auth)\\signup\\page.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "signup",
+        "name",
+        "email",
+        "phone",
+        "password",
+        "confirm",
+        "city",
+        "signin"
+      ],
+      "interactableCount": 15
+    },
+    {
+      "name": "route",
+      "path": "apps\\web\\src\\app\\auth\\callback\\route.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\categories\\page.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\dashboard\\page.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "dashboard",
+        "tab"
+      ],
+      "interactableCount": 21
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\dashboard\\seller\\page.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\inbox\\page.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "inbox",
+        "chat"
+      ],
+      "interactableCount": 7
+    },
+    {
+      "name": "layout",
+      "path": "apps\\web\\src\\app\\layout.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "root",
+        "layout",
+        "main"
+      ],
+      "interactableCount": 3
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\list\\page.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "list",
+        "images",
+        "add",
+        "camera",
+        "image",
+        "title",
+        "category",
+        "price",
+        "condition",
+        "description",
+        "bidding",
+        "public",
+        "sealed",
+        "cancel",
+        "post"
+      ],
+      "interactableCount": 24
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\page.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\product\\[id]\\page.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "back",
+        "decrement",
+        "bid",
+        "increment",
+        "place"
+      ],
+      "interactableCount": 5
+    },
+    {
+      "name": "page",
+      "path": "apps\\web\\src\\app\\profile\\page.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "template",
+      "path": "apps\\web\\src\\app\\template.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "DihariLogo",
+      "path": "apps\\web\\src\\components\\branding\\DihariLogo.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "BiddingWidget",
+      "path": "apps\\web\\src\\components\\common\\BiddingWidget.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "GamificationBadge",
+      "path": "apps\\web\\src\\components\\common\\GamificationBadge.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "index",
+      "path": "apps\\web\\src\\components\\common\\index.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "PriceDisplay",
+      "path": "apps\\web\\src\\components\\common\\PriceDisplay.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "VerifiedBadge",
+      "path": "apps\\web\\src\\components\\common\\VerifiedBadge.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "VictoryHalo",
+      "path": "apps\\web\\src\\components\\common\\VictoryHalo.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "AchievementSection",
+      "path": "apps\\web\\src\\components\\dashboard\\AchievementSection.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "ListingActionMenu",
+      "path": "apps\\web\\src\\components\\dashboard\\ListingActionMenu.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "MyBidCard",
+      "path": "apps\\web\\src\\components\\dashboard\\MyBidCard.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "MyListingsTable",
+      "path": "apps\\web\\src\\components\\dashboard\\MyListingsTable.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "ProfileSettings",
+      "path": "apps\\web\\src\\components\\dashboard\\ProfileSettings.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "profile",
+        "change",
+        "edit",
+        "name",
+        "phone",
+        "location",
+        "cancel",
+        "save"
+      ],
+      "interactableCount": 11
+    },
+    {
+      "name": "SellerStats",
+      "path": "apps\\web\\src\\components\\dashboard\\SellerStats.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "WatchedItemCard",
+      "path": "apps\\web\\src\\components\\dashboard\\WatchedItemCard.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "ChatWindow",
+      "path": "apps\\web\\src\\components\\inbox\\ChatWindow.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "chat"
+      ],
+      "interactableCount": 8
+    },
+    {
+      "name": "ConversationList",
+      "path": "apps\\web\\src\\components\\inbox\\ConversationList.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "BottomNav",
+      "path": "apps\\web\\src\\components\\layout\\BottomNav.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "bottom",
+        "filters"
+      ],
+      "interactableCount": 3
+    },
+    {
+      "name": "Navbar",
+      "path": "apps\\web\\src\\components\\layout\\Navbar.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "navbar"
+      ],
+      "interactableCount": 26
+    },
+    {
+      "name": "ScrollToTop",
+      "path": "apps\\web\\src\\components\\layout\\ScrollToTop.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "scroll"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "SearchDropdown",
+      "path": "apps\\web\\src\\components\\layout\\SearchDropdown.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "navbar"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "Sidebar",
+      "path": "apps\\web\\src\\components\\layout\\Sidebar.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "sidebar"
+      ],
+      "interactableCount": 5
+    },
+    {
+      "name": "CategoryBar",
+      "path": "apps\\web\\src\\components\\marketplace\\CategoryBar.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "category"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "FilterSheetContent",
+      "path": "apps\\web\\src\\components\\marketplace\\FilterSheetContent.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "filter"
+      ],
+      "interactableCount": 7
+    },
+    {
+      "name": "ItemCard",
+      "path": "apps\\web\\src\\components\\marketplace\\ItemCard.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "ItemCardSkeleton",
+      "path": "apps\\web\\src\\components\\marketplace\\ItemCardSkeleton.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "LocationSelector",
+      "path": "apps\\web\\src\\components\\marketplace\\LocationSelector.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "location",
+        "loc"
+      ],
+      "interactableCount": 7
+    },
+    {
+      "name": "MarketplaceGrid",
+      "path": "apps\\web\\src\\components\\marketplace\\MarketplaceGrid.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "marketplace",
+        "mobile",
+        "smart",
+        "view",
+        "category"
+      ],
+      "interactableCount": 9
+    },
+    {
+      "name": "PriceSelector",
+      "path": "apps\\web\\src\\components\\marketplace\\PriceSelector.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "price"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "ProductDetailsModal",
+      "path": "apps\\web\\src\\components\\marketplace\\ProductDetailsModal.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "SmartFilterBar",
+      "path": "apps\\web\\src\\components\\marketplace\\SmartFilterBar.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "smart"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "NotificationDropdown",
+      "path": "apps\\web\\src\\components\\notifications\\NotificationDropdown.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "notification"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "NotificationItem",
+      "path": "apps\\web\\src\\components\\notifications\\NotificationItem.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "ProfileCompleteness",
+      "path": "apps\\web\\src\\components\\profile\\ProfileCompleteness.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "profile"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "ReviewForm",
+      "path": "apps\\web\\src\\components\\profile\\ReviewForm.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "review",
+        "submit"
+      ],
+      "interactableCount": 3
+    },
+    {
+      "name": "ReviewList",
+      "path": "apps\\web\\src\\components\\profile\\ReviewList.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "review"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "StarRating",
+      "path": "apps\\web\\src\\components\\profile\\StarRating.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "star"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "CategoryNav",
+      "path": "apps\\web\\src\\components\\search\\CategoryNav.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "SearchBar",
+      "path": "apps\\web\\src\\components\\search\\SearchBar.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "SearchFilters",
+      "path": "apps\\web\\src\\components\\search\\SearchFilters.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "SimilarItems",
+      "path": "apps\\web\\src\\components\\search\\SimilarItems.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "DeleteConfirmationDialog",
+      "path": "apps\\web\\src\\components\\seller\\DeleteConfirmationDialog.tsx",
+      "type": "component",
+      "idPrefixes": [
+        "delete"
+      ],
+      "interactableCount": 1
+    },
+    {
+      "name": "SellerBidCard",
+      "path": "apps\\web\\src\\components\\seller\\SellerBidCard.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "avatar",
+      "path": "apps\\web\\src\\components\\ui\\avatar.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "badge",
+      "path": "apps\\web\\src\\components\\ui\\badge.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "button",
+      "path": "apps\\web\\src\\components\\ui\\button.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "card",
+      "path": "apps\\web\\src\\components\\ui\\card.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "carousel",
+      "path": "apps\\web\\src\\components\\ui\\carousel.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "command",
+      "path": "apps\\web\\src\\components\\ui\\command.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "dialog",
+      "path": "apps\\web\\src\\components\\ui\\dialog.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "dropdown-menu",
+      "path": "apps\\web\\src\\components\\ui\\dropdown-menu.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "EmptyState",
+      "path": "apps\\web\\src\\components\\ui\\EmptyState.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "input",
+      "path": "apps\\web\\src\\components\\ui\\input.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "label",
+      "path": "apps\\web\\src\\components\\ui\\label.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "popover",
+      "path": "apps\\web\\src\\components\\ui\\popover.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "scroll-area",
+      "path": "apps\\web\\src\\components\\ui\\scroll-area.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "select",
+      "path": "apps\\web\\src\\components\\ui\\select.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "separator",
+      "path": "apps\\web\\src\\components\\ui\\separator.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "sheet",
+      "path": "apps\\web\\src\\components\\ui\\sheet.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "slider",
+      "path": "apps\\web\\src\\components\\ui\\slider.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "sonner",
+      "path": "apps\\web\\src\\components\\ui\\sonner.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "switch",
+      "path": "apps\\web\\src\\components\\ui\\switch.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "tabs",
+      "path": "apps\\web\\src\\components\\ui\\tabs.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "textarea",
+      "path": "apps\\web\\src\\components\\ui\\textarea.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "toggle-group",
+      "path": "apps\\web\\src\\components\\ui\\toggle-group.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "toggle",
+      "path": "apps\\web\\src\\components\\ui\\toggle.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "tooltip",
+      "path": "apps\\web\\src\\components\\ui\\tooltip.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "AuthContext",
+      "path": "apps\\web\\src\\context\\AuthContext.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "ChatContext",
+      "path": "apps\\web\\src\\context\\ChatContext.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "DashboardContext",
+      "path": "apps\\web\\src\\context\\DashboardContext.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "MarketplaceContext",
+      "path": "apps\\web\\src\\context\\MarketplaceContext.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "NotificationContext",
+      "path": "apps\\web\\src\\context\\NotificationContext.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "ReviewContext",
+      "path": "apps\\web\\src\\context\\ReviewContext.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "SearchContext",
+      "path": "apps\\web\\src\\context\\SearchContext.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "TimeContext",
+      "path": "apps\\web\\src\\context\\TimeContext.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "useBidding",
+      "path": "apps\\web\\src\\hooks\\useBidding.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "useBidRealtime",
+      "path": "apps\\web\\src\\hooks\\useBidRealtime.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "useIntersectionObserver",
+      "path": "apps\\web\\src\\hooks\\useIntersectionObserver.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "bidding",
+      "path": "apps\\web\\src\\lib\\bidding.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "cache",
+      "path": "apps\\web\\src\\lib\\cache.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "locations",
+      "path": "apps\\web\\src\\lib\\constants\\locations.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "constants",
+      "path": "apps\\web\\src\\lib\\constants.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "locations",
+      "path": "apps\\web\\src\\lib\\locations.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "profileScore",
+      "path": "apps\\web\\src\\lib\\profileScore.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "searchUtils",
+      "path": "apps\\web\\src\\lib\\searchUtils.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "store",
+      "path": "apps\\web\\src\\lib\\store.tsx",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "supabase",
+      "path": "apps\\web\\src\\lib\\supabase.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "transform",
+      "path": "apps\\web\\src\\lib\\transform.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "uploadImage",
+      "path": "apps\\web\\src\\lib\\uploadImage.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "utils",
+      "path": "apps\\web\\src\\lib\\utils.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "bidding",
+      "path": "apps\\web\\src\\types\\bidding.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "dashboard",
+      "path": "apps\\web\\src\\types\\dashboard.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "database.types",
+      "path": "apps\\web\\src\\types\\database.types.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "index",
+      "path": "apps\\web\\src\\types\\index.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "notification",
+      "path": "apps\\web\\src\\types\\notification.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    },
+    {
+      "name": "review",
+      "path": "apps\\web\\src\\types\\review.ts",
+      "type": "component",
+      "idPrefixes": [],
+      "interactableCount": 0
+    }
+  ],
+  "features": {
+    "auth": [
+      "auth-layout-root"
+    ],
+    "signin": [
+      "signin-card",
+      "signin-header",
+      "signin-title",
+      "signin-description",
+      "signin-form-container",
+      "signin-form",
+      "signin-submit-btn",
+      "signin-link"
+    ],
+    "email": [
+      "email-input"
+    ],
+    "password": [
+      "password-input"
+    ],
+    "signup": [
+      "signup-link",
+      "signup-card",
+      "signup-header",
+      "signup-title",
+      "signup-description",
+      "signup-form-container",
+      "signup-form",
+      "signup-submit-btn"
+    ],
+    "name": [
+      "name-input",
+      "name-display"
+    ],
+    "phone": [
+      "phone-input",
+      "phone-display"
+    ],
+    "confirm": [
+      "confirm-password-input"
+    ],
+    "city": [
+      "city-select",
+      "city-select-content"
+    ],
+    "dashboard": [
+      "dashboard-root",
+      "dashboard-title",
+      "dashboard-subtitle",
+      "dashboard-messages-btn",
+      "dashboard-new-listing-btn",
+      "dashboard-new-listing-plus",
+      "dashboard-tabs",
+      "dashboard-tabs-list",
+      "dashboard-tabs-list-desktop"
+    ],
+    "tab": [
+      "tab-trigger-active-bids-mobile",
+      "tab-trigger-my-bids-mobile",
+      "tab-trigger-my-listings-mobile",
+      "tab-trigger-watchlist-mobile",
+      "tab-trigger-active-bids",
+      "tab-badge-active-bids",
+      "tab-trigger-my-bids",
+      "tab-badge-my-bids",
+      "tab-trigger-my-listings",
+      "tab-badge-my-listings",
+      "tab-trigger-watchlist",
+      "tab-badge-watchlist"
+    ],
+    "inbox": [
+      "inbox-container",
+      "inbox-sidebar",
+      "inbox-tabs-list",
+      "inbox-all-tab",
+      "inbox-offers-tab",
+      "inbox-bids-tab"
+    ],
+    "chat": [
+      "chat-window-container",
+      "chat-window",
+      "chat-header",
+      "chat-back-btn",
+      "chat-call-btn",
+      "chat-messages",
+      "chat-input-area",
+      "chat-input-field",
+      "chat-send-btn"
+    ],
+    "root": [
+      "root-body-01"
+    ],
+    "layout": [
+      "layout-wrapper-02"
+    ],
+    "main": [
+      "main-content-03"
+    ],
+    "list": [
+      "list-page-container",
+      "list-item-card",
+      "list-item-header",
+      "list-item-title-heading",
+      "list-item-description-text",
+      "list-item-form"
+    ],
+    "images": [
+      "images-label",
+      "images-preview-container"
+    ],
+    "add": [
+      "add-image-label",
+      "add-photo-text"
+    ],
+    "camera": [
+      "camera-icon"
+    ],
+    "image": [
+      "image-upload-input"
+    ],
+    "title": [
+      "title-input"
+    ],
+    "category": [
+      "category-select",
+      "category-select-content",
+      "category-bar-root",
+      "category-bar-row"
+    ],
+    "price": [
+      "price-input",
+      "price-selector-trigger"
+    ],
+    "condition": [
+      "condition-select",
+      "condition-select-content"
+    ],
+    "description": [
+      "description-textarea"
+    ],
+    "bidding": [
+      "bidding-style-heading"
+    ],
+    "public": [
+      "public-auction-option"
+    ],
+    "sealed": [
+      "sealed-bids-option"
+    ],
+    "cancel": [
+      "cancel-listing-btn",
+      "cancel-edit-btn"
+    ],
+    "post": [
+      "post-listing-btn"
+    ],
+    "back": [
+      "back-to-marketplace-btn"
+    ],
+    "decrement": [
+      "decrement-bid-btn"
+    ],
+    "bid": [
+      "bid-input"
+    ],
+    "increment": [
+      "increment-bid-btn"
+    ],
+    "place": [
+      "place-bid-btn"
+    ],
+    "profile": [
+      "profile-settings-root",
+      "profile-settings-card",
+      "profile-settings-avatar",
+      "profile-completeness-card"
+    ],
+    "change": [
+      "change-avatar-btn"
+    ],
+    "edit": [
+      "edit-profile-btn"
+    ],
+    "location": [
+      "location-display",
+      "location-selector-sidebar-compact",
+      "location-selector-root",
+      "location-popover-trigger-mobile",
+      "location-sidebar-trigger",
+      "location-popover-trigger"
+    ],
+    "save": [
+      "save-profile-btn"
+    ],
+    "bottom": [
+      "bottom-nav-container-01",
+      "bottom-nav-wrapper-02"
+    ],
+    "filters": [
+      "filters-sheet-title"
+    ],
+    "navbar": [
+      "navbar-01",
+      "navbar-container-02",
+      "navbar-left-section-03",
+      "navbar-logo-link-04",
+      "navbar-logo-svg-05",
+      "navbar-logo-path-06",
+      "navbar-logo-dot-07",
+      "navbar-brand-name-08",
+      "navbar-brand-urdu-09",
+      "navbar-brand-english-10",
+      "navbar-right-section-11",
+      "navbar-sell-btn-12",
+      "navbar-sell-plus-icon-13",
+      "navbar-loading-avatar",
+      "navbar-market-btn",
+      "navbar-market-icon",
+      "navbar-offers-btn",
+      "navbar-offers-icon",
+      "navbar-bids-btn",
+      "navbar-bids-icon",
+      "navbar-chat-btn",
+      "navbar-chat-icon",
+      "navbar-avatar-18",
+      "navbar-avatar-image-19",
+      "navbar-avatar-fallback-20",
+      "navbar-signin-btn",
+      "navbar-search-input"
+    ],
+    "scroll": [
+      "scroll-to-top-btn"
+    ],
+    "sidebar": [
+      "sidebar-01",
+      "sidebar-scroll-area-02",
+      "sidebar-min-price-input",
+      "sidebar-max-price-input",
+      "sidebar-reset-filters-btn"
+    ],
+    "filter": [
+      "filter-sheet-root",
+      "filter-section-sort",
+      "filter-section-categories",
+      "filter-section-price",
+      "filter-section-condition",
+      "filter-section-type",
+      "filter-apply-btn"
+    ],
+    "loc": [
+      "loc-option-whole-country",
+      "loc-option-near-me-direct"
+    ],
+    "marketplace": [
+      "marketplace-grid-root",
+      "marketplace-grid-container"
+    ],
+    "mobile": [
+      "mobile-search-filter-container",
+      "mobile-sort-select",
+      "mobile-category-select",
+      "mobile-type-select"
+    ],
+    "smart": [
+      "smart-filters-row",
+      "smart-filter-bar-root"
+    ],
+    "view": [
+      "view-mode-toggles"
+    ],
+    "notification": [
+      "notification-bell-btn"
+    ],
+    "review": [
+      "review-form-modal",
+      "review-content",
+      "review-list-empty"
+    ],
+    "submit": [
+      "submit-review-btn"
+    ],
+    "star": [
+      "star-rating-component"
+    ],
+    "delete": [
+      "delete-confirmation-input"
+    ]
+  },
+  "links": [
+    {
+      "source": "page",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "label",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "email-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "page",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "label",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "select",
+      "type": "hierarchy"
+    },
+    {
+      "source": "name-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "email-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "phone-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "phone-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "phone-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "phone-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "phone-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "phone-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "phone-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "password-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "confirm-password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "confirm-password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "confirm-password-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "confirm-password-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "confirm-password-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "confirm-password-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "confirm-password-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "page",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "SellerBidCard",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "MyBidCard",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "WatchedItemCard",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "tabs",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "ProductDetailsModal",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "DeleteConfirmationDialog",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "SellerStats",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "MyListingsTable",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "ConversationList",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "ChatWindow",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "tabs",
+      "type": "hierarchy"
+    },
+    {
+      "source": "layout",
+      "target": "Navbar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "layout",
+      "target": "Sidebar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "layout",
+      "target": "BottomNav",
+      "type": "hierarchy"
+    },
+    {
+      "source": "layout",
+      "target": "ScrollToTop",
+      "type": "hierarchy"
+    },
+    {
+      "source": "layout",
+      "target": "sonner",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "label",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "textarea",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "camera-icon",
+      "target": "Navbar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "image-upload-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "image-upload-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "image-upload-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "image-upload-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "image-upload-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "image-upload-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "image-upload-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "title-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "title-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "title-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "title-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "title-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "title-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "title-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "price-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "price-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "price-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "price-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "page",
+      "target": "MarketplaceGrid",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "VerifiedBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "GamificationBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "bid-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "bid-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "bid-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "bid-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "bid-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "bid-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "bid-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "page",
+      "target": "ProfileSettings",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "AchievementSection",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "tabs",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "ProfileCompleteness",
+      "type": "hierarchy"
+    },
+    {
+      "source": "page",
+      "target": "ReviewList",
+      "type": "hierarchy"
+    },
+    {
+      "source": "BiddingWidget",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "GamificationBadge",
+      "target": "tooltip",
+      "type": "hierarchy"
+    },
+    {
+      "source": "VerifiedBadge",
+      "target": "tooltip",
+      "type": "hierarchy"
+    },
+    {
+      "source": "AchievementSection",
+      "target": "GamificationBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "AchievementSection",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ListingActionMenu",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "MyBidCard",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "MyBidCard",
+      "target": "ProductDetailsModal",
+      "type": "hierarchy"
+    },
+    {
+      "source": "MyListingsTable",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileSettings",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileSettings",
+      "target": "avatar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileSettings",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileSettings",
+      "target": "label",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileSettings",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileSettings",
+      "target": "separator",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileSettings",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileSettings",
+      "target": "VerifiedBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "name-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "name-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "SellerStats",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "WatchedItemCard",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "WatchedItemCard",
+      "target": "ProductDetailsModal",
+      "type": "hierarchy"
+    },
+    {
+      "source": "WatchedItemCard",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ChatWindow",
+      "target": "avatar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ChatWindow",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ChatWindow",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ChatWindow",
+      "target": "VerifiedBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ChatWindow",
+      "target": "ReviewForm",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ConversationList",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ConversationList",
+      "target": "avatar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ConversationList",
+      "target": "VerifiedBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "BottomNav",
+      "target": "sheet",
+      "type": "hierarchy"
+    },
+    {
+      "source": "BottomNav",
+      "target": "FilterSheetContent",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Navbar",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Navbar",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Navbar",
+      "target": "avatar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Navbar",
+      "target": "LocationSelector",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Navbar",
+      "target": "VerifiedBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Navbar",
+      "target": "SearchBar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Navbar",
+      "target": "NotificationDropdown",
+      "type": "hierarchy"
+    },
+    {
+      "source": "navbar-market-icon",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-offers-icon",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-bids-icon",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-chat-icon",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "SearchDropdown",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SearchDropdown",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "navbar-search-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-search-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-search-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-search-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-search-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-search-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "navbar-search-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "Sidebar",
+      "target": "scroll-area",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Sidebar",
+      "target": "separator",
+      "type": "hierarchy"
+    },
+    {
+      "source": "Sidebar",
+      "target": "LocationSelector",
+      "type": "hierarchy"
+    },
+    {
+      "source": "sidebar-min-price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-min-price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-min-price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-min-price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-min-price-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-min-price-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-min-price-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-max-price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-max-price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-max-price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-max-price-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-max-price-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-max-price-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "sidebar-max-price-input",
+      "target": "DeleteConfirmationDialog",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "FilterSheetContent",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "FilterSheetContent",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "FilterSheetContent",
+      "target": "label",
+      "type": "hierarchy"
+    },
+    {
+      "source": "FilterSheetContent",
+      "target": "separator",
+      "type": "hierarchy"
+    },
+    {
+      "source": "FilterSheetContent",
+      "target": "scroll-area",
+      "type": "hierarchy"
+    },
+    {
+      "source": "FilterSheetContent",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ItemCard",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ItemCard",
+      "target": "dialog",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ItemCard",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ItemCard",
+      "target": "GamificationBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ItemCard",
+      "target": "VerifiedBadge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ItemCardSkeleton",
+      "target": "card",
+      "type": "hierarchy"
+    },
+    {
+      "source": "LocationSelector",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "LocationSelector",
+      "target": "popover",
+      "type": "hierarchy"
+    },
+    {
+      "source": "LocationSelector",
+      "target": "command",
+      "type": "hierarchy"
+    },
+    {
+      "source": "LocationSelector",
+      "target": "slider",
+      "type": "hierarchy"
+    },
+    {
+      "source": "MarketplaceGrid",
+      "target": "EmptyState",
+      "type": "hierarchy"
+    },
+    {
+      "source": "MarketplaceGrid",
+      "target": "CategoryNav",
+      "type": "hierarchy"
+    },
+    {
+      "source": "MarketplaceGrid",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "MarketplaceGrid",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "MarketplaceGrid",
+      "target": "toggle-group",
+      "type": "hierarchy"
+    },
+    {
+      "source": "PriceSelector",
+      "target": "popover",
+      "type": "hierarchy"
+    },
+    {
+      "source": "PriceSelector",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "PriceSelector",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "PriceSelector",
+      "target": "label",
+      "type": "hierarchy"
+    },
+    {
+      "source": "PriceSelector",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProductDetailsModal",
+      "target": "dialog",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProductDetailsModal",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "NotificationDropdown",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "NotificationDropdown",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "NotificationDropdown",
+      "target": "scroll-area",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ProfileCompleteness",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ReviewForm",
+      "target": "dialog",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ReviewForm",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ReviewForm",
+      "target": "textarea",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ReviewForm",
+      "target": "label",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ReviewList",
+      "target": "avatar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "ReviewList",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "CategoryNav",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "CategoryNav",
+      "target": "scroll-area",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SearchBar",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SearchBar",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SearchFilters",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SearchFilters",
+      "target": "slider",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SearchFilters",
+      "target": "label",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SimilarItems",
+      "target": "WatchedItemCard",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SimilarItems",
+      "target": "scroll-area",
+      "type": "hierarchy"
+    },
+    {
+      "source": "DeleteConfirmationDialog",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "DeleteConfirmationDialog",
+      "target": "input",
+      "type": "hierarchy"
+    },
+    {
+      "source": "delete-confirmation-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "delete-confirmation-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "delete-confirmation-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "delete-confirmation-input",
+      "target": "page",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "delete-confirmation-input",
+      "target": "ProfileSettings",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "delete-confirmation-input",
+      "target": "SearchDropdown",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "delete-confirmation-input",
+      "target": "Sidebar",
+      "type": "entity-bridge"
+    },
+    {
+      "source": "SellerBidCard",
+      "target": "avatar",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SellerBidCard",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "SellerBidCard",
+      "target": "badge",
+      "type": "hierarchy"
+    },
+    {
+      "source": "carousel",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "EmptyState",
+      "target": "button",
+      "type": "hierarchy"
+    },
+    {
+      "source": "toggle-group",
+      "target": "toggle-group",
+      "type": "hierarchy"
+    }
+  ],
+  "stats": {
+    "totalComponents": 109,
+    "totalInteractables": 172,
+    "standardIds": 172
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "config": {
+    "configFile": "D:\\VSCode\\Boliyan\\apps\\web\\playwright.config.ts",
+    "rootDir": "D:/VSCode/Boliyan/apps/web/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "D:/VSCode/Boliyan/apps/web/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "D:/VSCode/Boliyan/apps/web/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 7,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://192.168.18.125:3000",
+      "reuseExistingServer": true
+    }
+  },
+  "suites": [
+    {
+      "title": "verification-70-rule.spec.ts",
+      "file": "verification-70-rule.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "70% Minimum Bid Rule Verification",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 8542,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\u001b[22m\n\n    at D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts:43:57",
+                    "location": {
+                      "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts",
+                      "column": 57,
+                      "line": 43
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 41 |\u001b[39m   \u001b[90m// Click bid button - should trigger success\u001b[39m\n \u001b[90m 42 |\u001b[39m   \u001b[36mawait\u001b[39m bidBtn\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 43 |\u001b[39m   \u001b[36mawait\u001b[39m expect(itemCard\u001b[33m.\u001b[39mlocator(\u001b[32m'[id*=\"success-msg\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 44 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 45 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts",
+                        "column": 57,
+                        "line": 43
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.group').filter({ has: locator('input[id*=\"bid-input\"]') }).first().locator('[id*=\"success-msg\"]')\u001b[22m\n\n\n  41 |   // Click bid button - should trigger success\n  42 |   await bidBtn.click();\n> 43 |   await expect(itemCard.locator('[id*=\"success-msg\"]')).toBeVisible();\n     |                                                         ^\n  44 | });\n  45 |\n    at D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts:43:57"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-01-20T03:10:12.950Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\VSCode\\Boliyan\\apps\\web\\test-results\\verification-70-rule-70-Minimum-Bid-Rule-Verification-chromium\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\VSCode\\Boliyan\\apps\\web\\tests\\verification-70-rule.spec.ts",
+                    "column": 57,
+                    "line": 43
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "787b89305178e266f45c-837c0de629e139df7907",
+          "file": "verification-70-rule.spec.ts",
+          "line": 4,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-20T03:10:08.041Z",
+    "duration": 14517.368,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

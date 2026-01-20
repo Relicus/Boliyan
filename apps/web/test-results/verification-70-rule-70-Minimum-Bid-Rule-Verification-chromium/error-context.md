@@ -1,0 +1,1093 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search..." [ref=e19]
+      - generic [ref=e20]:
+        - link "Sell Item" [ref=e21] [cursor=pointer]:
+          - /url: /signin
+          - img
+          - generic [ref=e22]: Sell Item
+        - link "Sign In" [ref=e24] [cursor=pointer]:
+          - /url: /signin
+  - generic [ref=e25]:
+    - complementary [ref=e26]:
+      - generic [ref=e28]:
+        - button "All" [ref=e29]:
+          - img [ref=e31]
+          - generic [ref=e35]: All
+        - button "Public" [ref=e36]:
+          - img [ref=e37]
+          - generic [ref=e40]: Public
+        - button "Secret" [ref=e41]:
+          - img [ref=e42]
+          - generic [ref=e45]: Secret
+      - generic [ref=e49]:
+        - button "Karachi All" [ref=e52]:
+          - generic [ref=e53]:
+            - img
+            - generic [ref=e54]: Karachi
+          - generic [ref=e55]: All
+        - generic [ref=e56]:
+          - heading "Price Range" [level=3] [ref=e57]:
+            - img [ref=e59]
+            - text: Price Range
+          - generic [ref=e62]:
+            - spinbutton [ref=e64]
+            - spinbutton [ref=e66]
+        - generic [ref=e67]:
+          - heading "Condition" [level=3] [ref=e68]:
+            - img [ref=e70]
+            - text: Condition
+          - generic [ref=e73]:
+            - generic [ref=e74] [cursor=pointer]:
+              - checkbox "Brand New" [ref=e76]
+              - generic [ref=e77]: Brand New
+            - generic [ref=e78] [cursor=pointer]:
+              - checkbox "Like New" [ref=e80]
+              - generic [ref=e81]: Like New
+            - generic [ref=e82] [cursor=pointer]:
+              - checkbox "Excellent" [ref=e84]
+              - generic [ref=e85]: Excellent
+            - generic [ref=e86] [cursor=pointer]:
+              - checkbox "Good" [ref=e88]
+              - generic [ref=e89]: Good
+            - generic [ref=e90] [cursor=pointer]:
+              - checkbox "Fair" [ref=e92]
+              - generic [ref=e93]: Fair
+        - generic [ref=e94]:
+          - heading "Saved Searches" [level=3] [ref=e95]:
+            - img [ref=e97]
+            - text: Saved Searches
+          - generic [ref=e100]:
+            - button "iPhone 15 Pro" [ref=e101]:
+              - img [ref=e102]
+              - text: iPhone 15 Pro
+            - button "Gaming Laptop" [ref=e105]:
+              - img [ref=e106]
+              - text: Gaming Laptop
+            - button "Vintage Watch" [ref=e109]:
+              - img [ref=e110]
+              - text: Vintage Watch
+        - button "Reset All Filters" [ref=e114]:
+          - img [ref=e115]
+          - text: Reset All Filters
+    - main [ref=e120]:
+      - generic [ref=e123]:
+        - generic [ref=e126]:
+          - generic [ref=e128]:
+            - button "Trending" [ref=e129]:
+              - img [ref=e130]
+              - generic [ref=e132]: Trending
+            - button "Near Me" [ref=e133]:
+              - img [ref=e134]
+              - generic [ref=e137]: Near Me
+            - button "Ending Soon" [ref=e138]:
+              - img [ref=e139]
+              - generic [ref=e142]: Ending Soon
+            - button "High Value" [ref=e143]:
+              - img [ref=e144]
+              - generic [ref=e147]: High Value
+            - button "Just Listed" [ref=e148]:
+              - img [ref=e149]
+              - generic [ref=e152]: Just Listed
+            - button "Watchlist" [ref=e153]:
+              - img [ref=e154]
+              - generic [ref=e156]: Watchlist
+          - group [ref=e157]:
+            - radio "Compact View" [ref=e158]:
+              - img
+            - radio "Comfortable View" [checked] [ref=e159]:
+              - img
+            - radio "Spacious View" [ref=e160]:
+              - img
+        - generic [ref=e165]:
+          - button "All" [ref=e166]
+          - button "Mobiles" [ref=e167]:
+            - img
+            - text: Mobiles
+          - button "Electronics" [ref=e168]:
+            - img
+            - text: Electronics
+          - button "Appliances" [ref=e169]:
+            - img
+            - text: Appliances
+          - button "Furniture" [ref=e170]:
+            - img
+            - text: Furniture
+          - button "Fashion" [ref=e171]:
+            - img
+            - text: Fashion
+          - button "Sports" [ref=e172]:
+            - img
+            - text: Sports
+          - button "Gaming" [ref=e173]:
+            - img
+            - text: Gaming
+          - button "Watches" [ref=e174]:
+            - img
+            - text: Watches
+          - button "Audio" [ref=e175]:
+            - img
+            - text: Audio
+          - button "Cameras" [ref=e176]:
+            - img
+            - text: Cameras
+          - button "Hobbies" [ref=e177]:
+            - img
+            - text: Hobbies
+          - button "Community" [ref=e178]:
+            - img
+            - text: Community
+        - generic [ref=e179]:
+          - generic [ref=e182] [cursor=pointer]:
+            - generic [ref=e183]:
+              - region [ref=e184]:
+                - group [ref=e187]:
+                  - img "Keychron K2 Mechanical Keyboard - 1" [ref=e189]
+              - generic [ref=e191]:
+                - img [ref=e192]
+                - generic [ref=e195]: Karachi
+              - generic [ref=e196]:
+                - generic [ref=e198]: "--:--:--"
+                - generic [ref=e200]: 👌 Used
+              - generic [ref=e202]:
+                - img [ref=e203]
+                - generic [ref=e206]: 0km • 0min
+              - img [ref=e209]
+            - generic [ref=e212]:
+              - heading "Keychron K2 Mechanical Keyboard" [level=3] [ref=e213]
+              - generic [ref=e214]:
+                - generic [ref=e215]: Ahmed Ali
+                - generic [ref=e217]:
+                  - text: ⭐
+                  - generic [ref=e218]: "4.8"
+                  - generic [ref=e219]: (124)
+              - generic [ref=e220]:
+                - generic [ref=e221]:
+                  - generic [ref=e222]: Asking
+                  - generic [ref=e223]: 18,000
+                - generic [ref=e224]:
+                  - generic [ref=e225]: Secret
+                  - generic [ref=e227]: 4 Bids
+              - generic [ref=e228]:
+                - generic [ref=e230]:
+                  - button [ref=e231]:
+                    - img [ref=e232]
+                  - textbox [ref=e234]: 12,700
+                  - button [ref=e235]:
+                    - img [ref=e236]
+                - button "Place Bid" [active] [ref=e238]:
+                  - generic [ref=e239]:
+                    - img [ref=e240]
+                    - text: Place Bid
+          - generic [ref=e248] [cursor=pointer]:
+            - generic [ref=e249]:
+              - region [ref=e250]:
+                - group [ref=e253]:
+                  - img "Vintage Nikon F3 - 1" [ref=e255]
+              - generic [ref=e257]:
+                - img [ref=e258]
+                - generic [ref=e261]: Karachi
+              - generic [ref=e262]:
+                - generic [ref=e264]: "--:--:--"
+                - generic [ref=e266]: 👌 Used
+              - generic [ref=e268]:
+                - img [ref=e269]
+                - generic [ref=e272]: 0km • 0min
+            - generic [ref=e273]:
+              - heading "Vintage Nikon F3" [level=3] [ref=e274]
+              - generic [ref=e275]:
+                - generic [ref=e276]: Demo Seller
+                - generic [ref=e278]:
+                  - text: ⭐
+                  - generic [ref=e279]: "4.8"
+                  - generic [ref=e280]: (12)
+              - generic [ref=e281]:
+                - generic [ref=e282]:
+                  - generic [ref=e283]: Asking
+                  - generic [ref=e284]: 45,000
+                - generic [ref=e285]:
+                  - generic [ref=e286]: High Bid
+                  - generic [ref=e289]: 58,000
+              - generic [ref=e290]:
+                - generic [ref=e292]:
+                  - button [ref=e293]:
+                    - img [ref=e294]
+                  - textbox [ref=e296]: 58,500
+                  - button [ref=e297]:
+                    - img [ref=e298]
+                - button "Place Bid" [ref=e300]:
+                  - generic [ref=e301]:
+                    - img [ref=e302]
+                    - text: Place Bid
+          - generic [ref=e310] [cursor=pointer]:
+            - generic [ref=e311]:
+              - region [ref=e312]:
+                - group [ref=e315]:
+                  - img "Apple Watch Series 8 45mm - 1" [ref=e317]
+              - generic [ref=e319]:
+                - img [ref=e320]
+                - generic [ref=e323]: Karachi
+              - generic [ref=e324]:
+                - generic [ref=e326]: "--:--:--"
+                - generic [ref=e328]: 👌 Used
+              - generic [ref=e330]:
+                - img [ref=e331]
+                - generic [ref=e334]: 0km • 0min
+            - generic [ref=e335]:
+              - heading "Apple Watch Series 8 45mm" [level=3] [ref=e336]
+              - generic [ref=e337]:
+                - generic [ref=e338]: Sara Khan
+                - generic [ref=e340]:
+                  - text: ⭐
+                  - generic [ref=e341]: "4.5"
+                  - generic [ref=e342]: (89)
+              - generic [ref=e343]:
+                - generic [ref=e344]:
+                  - generic [ref=e345]: Asking
+                  - generic [ref=e346]: 95,000
+                - generic [ref=e347]:
+                  - generic [ref=e348]: High Bid
+                  - generic [ref=e351]: 106,000
+              - generic [ref=e352]:
+                - generic [ref=e354]:
+                  - button [ref=e355]:
+                    - img [ref=e356]
+                  - textbox [ref=e358]: 107,000
+                  - button [ref=e359]:
+                    - img [ref=e360]
+                - button "Place Bid" [ref=e362]:
+                  - generic [ref=e363]:
+                    - img [ref=e364]
+                    - text: Place Bid
+          - generic [ref=e372] [cursor=pointer]:
+            - generic [ref=e373]:
+              - region [ref=e374]:
+                - group [ref=e377]:
+                  - img "Solid Sheesham Dining Table (6 Seater) - 1" [ref=e379]
+              - generic [ref=e381]:
+                - img [ref=e382]
+                - generic [ref=e385]: Karachi
+              - generic [ref=e386]:
+                - generic [ref=e388]: "--:--:--"
+                - generic [ref=e390]: 👌 Used
+              - generic [ref=e392]:
+                - img [ref=e393]
+                - generic [ref=e396]: 0km • 0min
+            - generic [ref=e397]:
+              - heading "Solid Sheesham Dining Table (6 Seater)" [level=3] [ref=e398]
+              - generic [ref=e399]:
+                - generic [ref=e400]: Zain Malik
+                - generic [ref=e402]:
+                  - text: ⭐
+                  - generic [ref=e403]: "4.2"
+                  - generic [ref=e404]: (67)
+              - generic [ref=e405]:
+                - generic [ref=e406]:
+                  - generic [ref=e407]: Asking
+                  - generic [ref=e408]: 55,000
+                - generic [ref=e409]:
+                  - generic [ref=e410]: High Bid
+                  - generic [ref=e413]: 60,000
+              - generic [ref=e414]:
+                - generic [ref=e416]:
+                  - button [ref=e417]:
+                    - img [ref=e418]
+                  - textbox [ref=e420]: 60,500
+                  - button [ref=e421]:
+                    - img [ref=e422]
+                - button "Place Bid" [ref=e424]:
+                  - generic [ref=e425]:
+                    - img [ref=e426]
+                    - text: Place Bid
+          - generic [ref=e434] [cursor=pointer]:
+            - generic [ref=e435]:
+              - region [ref=e436]:
+                - group [ref=e439]:
+                  - img "iPhone 13 Pro - 256GB - Sierra Blue - 1" [ref=e441]
+              - generic [ref=e443]:
+                - img [ref=e444]
+                - generic [ref=e447]: Karachi
+              - generic [ref=e448]:
+                - generic [ref=e450]: "--:--:--"
+                - generic [ref=e452]: 👌 Used
+              - generic [ref=e454]:
+                - img [ref=e455]
+                - generic [ref=e458]: 0km • 0min
+            - generic [ref=e459]:
+              - heading "iPhone 13 Pro - 256GB - Sierra Blue" [level=3] [ref=e460]
+              - generic [ref=e461]:
+                - generic [ref=e462]: Ahmed Ali
+                - generic [ref=e464]:
+                  - text: ⭐
+                  - generic [ref=e465]: "4.8"
+                  - generic [ref=e466]: (124)
+              - generic [ref=e467]:
+                - generic [ref=e468]:
+                  - generic [ref=e469]: Asking
+                  - generic [ref=e470]: 185,000
+                - generic [ref=e471]:
+                  - generic [ref=e472]: High Bid
+                  - generic [ref=e475]: 220,500
+              - generic [ref=e476]:
+                - generic [ref=e478]:
+                  - button [ref=e479]:
+                    - img [ref=e480]
+                  - textbox [ref=e482]: 221,500
+                  - button [ref=e483]:
+                    - img [ref=e484]
+                - button "Place Bid" [ref=e486]:
+                  - generic [ref=e487]:
+                    - img [ref=e488]
+                    - text: Place Bid
+          - generic [ref=e496] [cursor=pointer]:
+            - generic [ref=e497]:
+              - region [ref=e498]:
+                - group [ref=e501]:
+                  - img "Rolex Submariner Date (Replica High End) - 1" [ref=e503]
+              - generic [ref=e505]:
+                - img [ref=e506]
+                - generic [ref=e509]: Karachi
+              - generic [ref=e510]:
+                - generic [ref=e512]: "--:--:--"
+                - generic [ref=e514]: 👌 Used
+              - generic [ref=e516]:
+                - img [ref=e517]
+                - generic [ref=e520]: 0km • 0min
+            - generic [ref=e521]:
+              - heading "Rolex Submariner Date (Replica High End)" [level=3] [ref=e522]
+              - generic [ref=e523]:
+                - generic [ref=e524]: Ahmed Ali
+                - generic [ref=e526]:
+                  - text: ⭐
+                  - generic [ref=e527]: "4.8"
+                  - generic [ref=e528]: (124)
+              - generic [ref=e529]:
+                - generic [ref=e530]:
+                  - generic [ref=e531]: Asking
+                  - generic [ref=e532]: 25,000
+                - generic [ref=e533]:
+                  - generic [ref=e534]: High Bid
+                  - generic [ref=e537]: 27,500
+              - generic [ref=e538]:
+                - generic [ref=e540]:
+                  - button [ref=e541]:
+                    - img [ref=e542]
+                  - textbox [ref=e544]: 28,000
+                  - button [ref=e545]:
+                    - img [ref=e546]
+                - button "Place Bid" [ref=e548]:
+                  - generic [ref=e549]:
+                    - img [ref=e550]
+                    - text: Place Bid
+          - generic [ref=e558] [cursor=pointer]:
+            - generic [ref=e559]:
+              - region [ref=e560]:
+                - group [ref=e563]:
+                  - img "Solid Sheesham Dining Table - 1" [ref=e565]
+              - generic [ref=e567]:
+                - img [ref=e568]
+                - generic [ref=e571]: Karachi
+              - generic [ref=e572]:
+                - generic [ref=e574]: "--:--:--"
+                - generic [ref=e576]: 👌 Used
+              - generic [ref=e578]:
+                - img [ref=e579]
+                - generic [ref=e582]: 0km • 0min
+            - generic [ref=e583]:
+              - heading "Solid Sheesham Dining Table" [level=3] [ref=e584]
+              - generic [ref=e585]:
+                - generic [ref=e586]: Zain Malik
+                - generic [ref=e588]:
+                  - text: ⭐
+                  - generic [ref=e589]: "4.2"
+                  - generic [ref=e590]: (67)
+              - generic [ref=e591]:
+                - generic [ref=e592]:
+                  - generic [ref=e593]: Asking
+                  - generic [ref=e594]: 55,000
+                - generic [ref=e595]:
+                  - generic [ref=e596]: High Bid
+                  - generic [ref=e599]: 62,500
+              - generic [ref=e600]:
+                - generic [ref=e602]:
+                  - button [ref=e603]:
+                    - img [ref=e604]
+                  - textbox [ref=e606]: 63,000
+                  - button [ref=e607]:
+                    - img [ref=e608]
+                - button "Place Bid" [ref=e610]:
+                  - generic [ref=e611]:
+                    - img [ref=e612]
+                    - text: Place Bid
+          - generic [ref=e620] [cursor=pointer]:
+            - generic [ref=e621]:
+              - region [ref=e622]:
+                - group [ref=e625]:
+                  - img "Sony WH-1000XM4 - 1" [ref=e627]
+              - generic [ref=e629]:
+                - img [ref=e630]
+                - generic [ref=e633]: Karachi
+              - generic [ref=e634]:
+                - generic [ref=e636]: "--:--:--"
+                - generic [ref=e638]: 👌 Used
+              - generic [ref=e640]:
+                - img [ref=e641]
+                - generic [ref=e644]: 0km • 0min
+              - img [ref=e647]
+            - generic [ref=e650]:
+              - heading "Sony WH-1000XM4" [level=3] [ref=e651]
+              - generic [ref=e652]:
+                - generic [ref=e653]: Ahmed Ali
+                - generic [ref=e655]:
+                  - text: ⭐
+                  - generic [ref=e656]: "4.8"
+                  - generic [ref=e657]: (124)
+              - generic [ref=e658]:
+                - generic [ref=e659]:
+                  - generic [ref=e660]: Asking
+                  - generic [ref=e661]: 55,000
+                - generic [ref=e662]:
+                  - generic [ref=e663]: Secret
+                  - generic [ref=e665]: 2 Bids
+              - generic [ref=e666]:
+                - generic [ref=e668]:
+                  - button [ref=e669]:
+                    - img [ref=e670]
+                  - textbox [ref=e672]: 38,500
+                  - button [ref=e673]:
+                    - img [ref=e674]
+                - button "Place Bid" [ref=e676]:
+                  - generic [ref=e677]:
+                    - img [ref=e678]
+                    - text: Place Bid
+          - generic [ref=e686] [cursor=pointer]:
+            - generic [ref=e687]:
+              - region [ref=e688]:
+                - group [ref=e691]:
+                  - img "Herman Miller Aeron Office Chair - 1" [ref=e693]
+              - generic [ref=e695]:
+                - img [ref=e696]
+                - generic [ref=e699]: Karachi
+              - generic [ref=e700]:
+                - generic [ref=e702]: "--:--:--"
+                - generic [ref=e704]: 👌 Used
+              - generic [ref=e706]:
+                - img [ref=e707]
+                - generic [ref=e710]: 0km • 0min
+            - generic [ref=e711]:
+              - heading "Herman Miller Aeron Office Chair" [level=3] [ref=e712]
+              - generic [ref=e713]:
+                - generic [ref=e714]: Zain Malik
+                - generic [ref=e716]:
+                  - text: ⭐
+                  - generic [ref=e717]: "4.2"
+                  - generic [ref=e718]: (67)
+              - generic [ref=e719]:
+                - generic [ref=e720]:
+                  - generic [ref=e721]: Asking
+                  - generic [ref=e722]: 180,000
+                - generic [ref=e723]:
+                  - generic [ref=e724]: High Bid
+                  - generic [ref=e727]: 204,000
+              - generic [ref=e728]:
+                - generic [ref=e730]:
+                  - button [ref=e731]:
+                    - img [ref=e732]
+                  - textbox [ref=e734]: 205,000
+                  - button [ref=e735]:
+                    - img [ref=e736]
+                - button "Place Bid" [ref=e738]:
+                  - generic [ref=e739]:
+                    - img [ref=e740]
+                    - text: Place Bid
+          - generic [ref=e748] [cursor=pointer]:
+            - generic [ref=e749]:
+              - region [ref=e750]:
+                - group [ref=e753]:
+                  - img "Dell XPS 15 9500 - 1" [ref=e755]
+              - generic [ref=e757]:
+                - img [ref=e758]
+                - generic [ref=e761]: Karachi
+              - generic [ref=e762]:
+                - generic [ref=e764]: "--:--:--"
+                - generic [ref=e766]: 👌 Used
+              - generic [ref=e768]:
+                - img [ref=e769]
+                - generic [ref=e772]: 0km • 0min
+            - generic [ref=e773]:
+              - heading "Dell XPS 15 9500" [level=3] [ref=e774]
+              - generic [ref=e775]:
+                - generic [ref=e776]: Sara Khan
+                - generic [ref=e778]:
+                  - text: ⭐
+                  - generic [ref=e779]: "4.5"
+                  - generic [ref=e780]: (89)
+              - generic [ref=e781]:
+                - generic [ref=e782]:
+                  - generic [ref=e783]: Asking
+                  - generic [ref=e784]: 280,000
+                - generic [ref=e785]:
+                  - generic [ref=e786]: High Bid
+                  - generic [ref=e789]: 245,000
+              - generic [ref=e790]:
+                - generic [ref=e792]:
+                  - button [ref=e793]:
+                    - img [ref=e794]
+                  - textbox [ref=e796]: 246,000
+                  - button [ref=e797]:
+                    - img [ref=e798]
+                - button "Place Bid" [ref=e800]:
+                  - generic [ref=e801]:
+                    - img [ref=e802]
+                    - text: Place Bid
+          - generic [ref=e810] [cursor=pointer]:
+            - generic [ref=e811]:
+              - region [ref=e812]:
+                - group [ref=e815]:
+                  - img "PlayStation 5 Disc Edition - 1" [ref=e817]
+              - generic [ref=e819]:
+                - img [ref=e820]
+                - generic [ref=e823]: Karachi
+              - generic [ref=e824]:
+                - generic [ref=e826]: "--:--:--"
+                - generic [ref=e828]: 👌 Used
+              - generic [ref=e830]:
+                - img [ref=e831]
+                - generic [ref=e834]: 0km • 0min
+            - generic [ref=e835]:
+              - heading "PlayStation 5 Disc Edition" [level=3] [ref=e836]
+              - generic [ref=e837]:
+                - generic [ref=e838]: Zain Malik
+                - generic [ref=e840]:
+                  - text: ⭐
+                  - generic [ref=e841]: "4.2"
+                  - generic [ref=e842]: (67)
+              - generic [ref=e843]:
+                - generic [ref=e844]:
+                  - generic [ref=e845]: Asking
+                  - generic [ref=e846]: 140,000
+                - generic [ref=e847]:
+                  - generic [ref=e848]: High Bid
+                  - generic [ref=e851]: 157,500
+              - generic [ref=e852]:
+                - generic [ref=e854]:
+                  - button [ref=e855]:
+                    - img [ref=e856]
+                  - textbox [ref=e858]: 158,500
+                  - button [ref=e859]:
+                    - img [ref=e860]
+                - button "Place Bid" [ref=e862]:
+                  - generic [ref=e863]:
+                    - img [ref=e864]
+                    - text: Place Bid
+          - generic [ref=e872] [cursor=pointer]:
+            - generic [ref=e873]:
+              - region [ref=e874]:
+                - group [ref=e877]:
+                  - img "Gym Dumbbell Set (Pair of 10kg) - 1" [ref=e879]
+              - generic [ref=e881]:
+                - img [ref=e882]
+                - generic [ref=e885]: Karachi
+              - generic [ref=e886]:
+                - generic [ref=e888]: "--:--:--"
+                - generic [ref=e890]: 👌 Used
+              - generic [ref=e892]:
+                - img [ref=e893]
+                - generic [ref=e896]: 0km • 0min
+            - generic [ref=e897]:
+              - heading "Gym Dumbbell Set (Pair of 10kg)" [level=3] [ref=e898]
+              - generic [ref=e899]:
+                - generic [ref=e900]: Ahmed Ali
+                - generic [ref=e902]:
+                  - text: ⭐
+                  - generic [ref=e903]: "4.8"
+                  - generic [ref=e904]: (124)
+              - generic [ref=e905]:
+                - generic [ref=e906]:
+                  - generic [ref=e907]: Asking
+                  - generic [ref=e908]: 8,000
+                - generic [ref=e909]:
+                  - generic [ref=e910]: High Bid
+                  - generic [ref=e913]: 7,000
+              - generic [ref=e914]:
+                - generic [ref=e916]:
+                  - button [ref=e917]:
+                    - img [ref=e918]
+                  - textbox [ref=e920]: 7,100
+                  - button [ref=e921]:
+                    - img [ref=e922]
+                - button "Place Bid" [ref=e924]:
+                  - generic [ref=e925]:
+                    - img [ref=e926]
+                    - text: Place Bid
+          - generic [ref=e934] [cursor=pointer]:
+            - generic [ref=e935]:
+              - region [ref=e936]:
+                - group [ref=e939]:
+                  - img "KitchenAid Stand Mixer - 1" [ref=e941]
+              - generic [ref=e943]:
+                - img [ref=e944]
+                - generic [ref=e947]: Karachi
+              - generic [ref=e948]:
+                - generic [ref=e950]: "--:--:--"
+                - generic [ref=e952]: 👌 Used
+              - generic [ref=e954]:
+                - img [ref=e955]
+                - generic [ref=e958]: 0km • 0min
+            - generic [ref=e959]:
+              - heading "KitchenAid Stand Mixer" [level=3] [ref=e960]
+              - generic [ref=e961]:
+                - generic [ref=e962]: Ahmed Ali
+                - generic [ref=e964]:
+                  - text: ⭐
+                  - generic [ref=e965]: "4.8"
+                  - generic [ref=e966]: (124)
+              - generic [ref=e967]:
+                - generic [ref=e968]:
+                  - generic [ref=e969]: Asking
+                  - generic [ref=e970]: 65,000
+                - generic [ref=e971]:
+                  - generic [ref=e972]: High Bid
+                  - generic [ref=e975]: 60,500
+              - generic [ref=e976]:
+                - generic [ref=e978]:
+                  - button [ref=e979]:
+                    - img [ref=e980]
+                  - textbox [ref=e982]: 61,000
+                  - button [ref=e983]:
+                    - img [ref=e984]
+                - button "Place Bid" [ref=e986]:
+                  - generic [ref=e987]:
+                    - img [ref=e988]
+                    - text: Place Bid
+          - generic [ref=e996] [cursor=pointer]:
+            - generic [ref=e997]:
+              - region [ref=e998]:
+                - group [ref=e1001]:
+                  - img "Nike Air Jordan 1 High OG - 1" [ref=e1003]
+              - generic [ref=e1005]:
+                - img [ref=e1006]
+                - generic [ref=e1009]: Karachi
+              - generic [ref=e1010]:
+                - generic [ref=e1012]: "--:--:--"
+                - generic [ref=e1014]: 👌 Used
+              - generic [ref=e1016]:
+                - img [ref=e1017]
+                - generic [ref=e1020]: 0km • 0min
+            - generic [ref=e1021]:
+              - heading "Nike Air Jordan 1 High OG" [level=3] [ref=e1022]
+              - generic [ref=e1023]:
+                - generic [ref=e1024]: Ahmed Ali
+                - generic [ref=e1026]:
+                  - text: ⭐
+                  - generic [ref=e1027]: "4.8"
+                  - generic [ref=e1028]: (124)
+              - generic [ref=e1029]:
+                - generic [ref=e1030]:
+                  - generic [ref=e1031]: Asking
+                  - generic [ref=e1032]: 35,000
+                - generic [ref=e1033]:
+                  - generic [ref=e1034]: High Bid
+                  - generic [ref=e1037]: 42,000
+              - generic [ref=e1038]:
+                - generic [ref=e1040]:
+                  - button [ref=e1041]:
+                    - img [ref=e1042]
+                  - textbox [ref=e1044]: 42,500
+                  - button [ref=e1045]:
+                    - img [ref=e1046]
+                - button "Place Bid" [ref=e1048]:
+                  - generic [ref=e1049]:
+                    - img [ref=e1050]
+                    - text: Place Bid
+          - generic [ref=e1058] [cursor=pointer]:
+            - generic [ref=e1059]:
+              - region [ref=e1060]:
+                - group [ref=e1063]:
+                  - img "iPhone 13 Pro - 256GB - Sierra Blue - 1" [ref=e1065]
+              - generic [ref=e1067]:
+                - img [ref=e1068]
+                - generic [ref=e1071]: Karachi
+              - generic [ref=e1072]:
+                - generic [ref=e1074]: "--:--:--"
+                - generic [ref=e1076]: 👌 Used
+              - generic [ref=e1078]:
+                - img [ref=e1079]
+                - generic [ref=e1082]: 0km • 0min
+            - generic [ref=e1083]:
+              - heading "iPhone 13 Pro - 256GB - Sierra Blue" [level=3] [ref=e1084]
+              - generic [ref=e1085]:
+                - generic [ref=e1086]: Ahmed Ali
+                - generic [ref=e1088]:
+                  - text: ⭐
+                  - generic [ref=e1089]: "4.8"
+                  - generic [ref=e1090]: (124)
+              - generic [ref=e1091]:
+                - generic [ref=e1092]:
+                  - generic [ref=e1093]: Asking
+                  - generic [ref=e1094]: 185,000
+                - generic [ref=e1095]:
+                  - generic [ref=e1096]: High Bid
+                  - generic [ref=e1099]: 130,500
+              - generic [ref=e1100]:
+                - generic [ref=e1102]:
+                  - button [ref=e1103]:
+                    - img [ref=e1104]
+                  - textbox [ref=e1106]: 131,500
+                  - button [ref=e1107]:
+                    - img [ref=e1108]
+                - button "Place Bid" [ref=e1110]:
+                  - generic [ref=e1111]:
+                    - img [ref=e1112]
+                    - text: Place Bid
+          - generic [ref=e1120] [cursor=pointer]:
+            - generic [ref=e1121]:
+              - region [ref=e1122]:
+                - group [ref=e1125]:
+                  - img "Vintage Leather Jacket - Brown - 1" [ref=e1127]
+              - generic [ref=e1129]:
+                - img [ref=e1130]
+                - generic [ref=e1133]: Karachi
+              - generic [ref=e1134]:
+                - generic [ref=e1136]: "--:--:--"
+                - generic [ref=e1138]: 👌 Used
+              - generic [ref=e1140]:
+                - img [ref=e1141]
+                - generic [ref=e1144]: 0km • 0min
+              - img [ref=e1147]
+            - generic [ref=e1150]:
+              - heading "Vintage Leather Jacket - Brown" [level=3] [ref=e1151]
+              - generic [ref=e1152]:
+                - generic [ref=e1153]: Sara Khan
+                - generic [ref=e1155]:
+                  - text: ⭐
+                  - generic [ref=e1156]: "4.5"
+                  - generic [ref=e1157]: (89)
+              - generic [ref=e1158]:
+                - generic [ref=e1159]:
+                  - generic [ref=e1160]: Asking
+                  - generic [ref=e1161]: 12,000
+                - generic [ref=e1162]:
+                  - generic [ref=e1163]: Secret
+                  - generic [ref=e1165]: 1 Bid
+              - generic [ref=e1166]:
+                - generic [ref=e1168]:
+                  - button [ref=e1169]:
+                    - img [ref=e1170]
+                  - textbox [ref=e1172]: 8,400
+                  - button [ref=e1173]:
+                    - img [ref=e1174]
+                - button "Place Bid" [ref=e1176]:
+                  - generic [ref=e1177]:
+                    - img [ref=e1178]
+                    - text: Place Bid
+          - generic [ref=e1186] [cursor=pointer]:
+            - generic [ref=e1187]:
+              - region [ref=e1188]:
+                - group [ref=e1191]:
+                  - img "Sony WH-1000XM4 Noise Cancelling Headphones - 1" [ref=e1193]
+              - generic [ref=e1195]:
+                - img [ref=e1196]
+                - generic [ref=e1199]: Karachi
+              - generic [ref=e1200]:
+                - generic [ref=e1202]: "--:--:--"
+                - generic [ref=e1204]: 👌 Used
+              - generic [ref=e1206]:
+                - img [ref=e1207]
+                - generic [ref=e1210]: 0km • 0min
+              - img [ref=e1213]
+            - generic [ref=e1216]:
+              - heading "Sony WH-1000XM4 Noise Cancelling Headphones" [level=3] [ref=e1217]
+              - generic [ref=e1218]:
+                - generic [ref=e1219]: Ahmed Ali
+                - generic [ref=e1221]:
+                  - text: ⭐
+                  - generic [ref=e1222]: "4.8"
+                  - generic [ref=e1223]: (124)
+              - generic [ref=e1224]:
+                - generic [ref=e1225]:
+                  - generic [ref=e1226]: Asking
+                  - generic [ref=e1227]: 55,000
+                - generic [ref=e1228]:
+                  - generic [ref=e1229]: Secret
+                  - generic [ref=e1231]: 1 Bid
+              - generic [ref=e1232]:
+                - generic [ref=e1234]:
+                  - button [ref=e1235]:
+                    - img [ref=e1236]
+                  - textbox [ref=e1238]: 38,500
+                  - button [ref=e1239]:
+                    - img [ref=e1240]
+                - button "Place Bid" [ref=e1242]:
+                  - generic [ref=e1243]:
+                    - img [ref=e1244]
+                    - text: Place Bid
+          - generic [ref=e1252] [cursor=pointer]:
+            - generic [ref=e1253]:
+              - region [ref=e1254]:
+                - group [ref=e1257]:
+                  - img "Canon EOS R5 Body Only - 1" [ref=e1259]
+              - generic [ref=e1261]:
+                - img [ref=e1262]
+                - generic [ref=e1265]: Karachi
+              - generic [ref=e1266]:
+                - generic [ref=e1268]: "--:--:--"
+                - generic [ref=e1270]: 👌 Used
+              - generic [ref=e1272]:
+                - img [ref=e1273]
+                - generic [ref=e1276]: 0km • 0min
+            - generic [ref=e1277]:
+              - heading "Canon EOS R5 Body Only" [level=3] [ref=e1278]
+              - generic [ref=e1279]:
+                - generic [ref=e1280]: Sara Khan
+                - generic [ref=e1282]:
+                  - text: ⭐
+                  - generic [ref=e1283]: "4.5"
+                  - generic [ref=e1284]: (89)
+              - generic [ref=e1285]:
+                - generic [ref=e1286]:
+                  - generic [ref=e1287]: Asking
+                  - generic [ref=e1288]: 750,000
+                - generic [ref=e1289]:
+                  - generic [ref=e1290]: High Bid
+                  - generic [ref=e1293]: 798,000
+              - generic [ref=e1294]:
+                - generic [ref=e1296]:
+                  - button [ref=e1297]:
+                    - img [ref=e1298]
+                  - textbox [ref=e1300]: 799,000
+                  - button [ref=e1301]:
+                    - img [ref=e1302]
+                - button "Place Bid" [ref=e1304]:
+                  - generic [ref=e1305]:
+                    - img [ref=e1306]
+                    - text: Place Bid
+          - generic [ref=e1314] [cursor=pointer]:
+            - generic [ref=e1315]:
+              - region [ref=e1316]:
+                - group [ref=e1319]:
+                  - img "Persian Rug (Machine Made) - 1" [ref=e1321]
+              - generic [ref=e1323]:
+                - img [ref=e1324]
+                - generic [ref=e1327]: Karachi
+              - generic [ref=e1328]:
+                - generic [ref=e1330]: "--:--:--"
+                - generic [ref=e1332]: 👌 Used
+              - generic [ref=e1334]:
+                - img [ref=e1335]
+                - generic [ref=e1338]: 0km • 0min
+              - img [ref=e1341]
+            - generic [ref=e1344]:
+              - heading "Persian Rug (Machine Made)" [level=3] [ref=e1345]
+              - generic [ref=e1346]:
+                - generic [ref=e1347]: Zain Malik
+                - generic [ref=e1349]:
+                  - text: ⭐
+                  - generic [ref=e1350]: "4.2"
+                  - generic [ref=e1351]: (67)
+              - generic [ref=e1352]:
+                - generic [ref=e1353]:
+                  - generic [ref=e1354]: Asking
+                  - generic [ref=e1355]: 25,000
+                - generic [ref=e1356]:
+                  - generic [ref=e1357]: Secret
+                  - generic [ref=e1359]: 1 Bid
+              - generic [ref=e1360]:
+                - generic [ref=e1362]:
+                  - button [ref=e1363]:
+                    - img [ref=e1364]
+                  - textbox [ref=e1366]: 17,500
+                  - button [ref=e1367]:
+                    - img [ref=e1368]
+                - button "Place Bid" [ref=e1370]:
+                  - generic [ref=e1371]:
+                    - img [ref=e1372]
+                    - text: Place Bid
+          - generic [ref=e1380] [cursor=pointer]:
+            - generic [ref=e1381]:
+              - region [ref=e1382]:
+                - group [ref=e1385]:
+                  - img "JBL Flip 6 Bluetooth Speaker - 1" [ref=e1387]
+              - generic [ref=e1389]:
+                - img [ref=e1390]
+                - generic [ref=e1393]: Karachi
+              - generic [ref=e1394]:
+                - generic [ref=e1396]: "--:--:--"
+                - generic [ref=e1398]: 👌 Used
+              - generic [ref=e1400]:
+                - img [ref=e1401]
+                - generic [ref=e1404]: 0km • 0min
+            - generic [ref=e1405]:
+              - heading "JBL Flip 6 Bluetooth Speaker" [level=3] [ref=e1406]
+              - generic [ref=e1407]:
+                - generic [ref=e1408]: Sara Khan
+                - generic [ref=e1410]:
+                  - text: ⭐
+                  - generic [ref=e1411]: "4.5"
+                  - generic [ref=e1412]: (89)
+              - generic [ref=e1413]:
+                - generic [ref=e1414]:
+                  - generic [ref=e1415]: Asking
+                  - generic [ref=e1416]: 22,000
+                - generic [ref=e1417]:
+                  - generic [ref=e1418]: High Bid
+                  - generic [ref=e1421]: 15,900
+              - generic [ref=e1422]:
+                - generic [ref=e1424]:
+                  - button [ref=e1425]:
+                    - img [ref=e1426]
+                  - textbox [ref=e1428]: 16,400
+                  - button [ref=e1429]:
+                    - img [ref=e1430]
+                - button "Place Bid" [ref=e1432]:
+                  - generic [ref=e1433]:
+                    - img [ref=e1434]
+                    - text: Place Bid
+          - generic [ref=e1442] [cursor=pointer]:
+            - generic [ref=e1443]:
+              - region [ref=e1444]:
+                - group [ref=e1447]:
+                  - img "Nespresso Vertuo Next Coffee Machine - 1" [ref=e1449]
+              - generic [ref=e1451]:
+                - img [ref=e1452]
+                - generic [ref=e1455]: Karachi
+              - generic [ref=e1456]:
+                - generic [ref=e1458]: "--:--:--"
+                - generic [ref=e1460]: 👌 Used
+              - generic [ref=e1462]:
+                - img [ref=e1463]
+                - generic [ref=e1466]: 0km • 0min
+              - img [ref=e1469]
+            - generic [ref=e1472]:
+              - heading "Nespresso Vertuo Next Coffee Machine" [level=3] [ref=e1473]
+              - generic [ref=e1474]:
+                - generic [ref=e1475]: Ahmed Ali
+                - generic [ref=e1477]:
+                  - text: ⭐
+                  - generic [ref=e1478]: "4.8"
+                  - generic [ref=e1479]: (124)
+              - generic [ref=e1480]:
+                - generic [ref=e1481]:
+                  - generic [ref=e1482]: Asking
+                  - generic [ref=e1483]: 35,000
+                - generic [ref=e1484]:
+                  - generic [ref=e1485]: Secret
+                  - generic [ref=e1487]: 1 Bid
+              - generic [ref=e1488]:
+                - generic [ref=e1490]:
+                  - button [ref=e1491]:
+                    - img [ref=e1492]
+                  - textbox [ref=e1494]: 24,500
+                  - button [ref=e1495]:
+                    - img [ref=e1496]
+                - button "Place Bid" [ref=e1498]:
+                  - generic [ref=e1499]:
+                    - img [ref=e1500]
+                    - text: Place Bid
+          - generic [ref=e1508] [cursor=pointer]:
+            - generic [ref=e1509]:
+              - region [ref=e1510]:
+                - group [ref=e1513]:
+                  - img "Camping Tent (4 Person) - 1" [ref=e1515]
+              - generic [ref=e1517]:
+                - img [ref=e1518]
+                - generic [ref=e1521]: Karachi
+              - generic [ref=e1522]:
+                - generic [ref=e1524]: "--:--:--"
+                - generic [ref=e1526]: 👌 Used
+              - generic [ref=e1528]:
+                - img [ref=e1529]
+                - generic [ref=e1532]: 0km • 0min
+              - img [ref=e1535]
+            - generic [ref=e1538]:
+              - heading "Camping Tent (4 Person)" [level=3] [ref=e1539]
+              - generic [ref=e1540]:
+                - generic [ref=e1541]: Zain Malik
+                - generic [ref=e1543]:
+                  - text: ⭐
+                  - generic [ref=e1544]: "4.2"
+                  - generic [ref=e1545]: (67)
+              - generic [ref=e1546]:
+                - generic [ref=e1547]:
+                  - generic [ref=e1548]: Asking
+                  - generic [ref=e1549]: 9,000
+                - generic [ref=e1550]:
+                  - generic [ref=e1551]: Secret
+                  - generic [ref=e1553]: 0 Bids
+              - generic [ref=e1554]:
+                - generic [ref=e1556]:
+                  - button [ref=e1557]:
+                    - img [ref=e1558]
+                  - textbox [ref=e1560]: 6,300
+                  - button [ref=e1561]:
+                    - img [ref=e1562]
+                - button "Place Bid" [ref=e1564]:
+                  - generic [ref=e1565]:
+                    - img [ref=e1566]
+                    - text: Place Bid
+          - generic [ref=e1574] [cursor=pointer]:
+            - generic [ref=e1575]:
+              - region [ref=e1576]:
+                - group [ref=e1579]:
+                  - img "Acoustic Guitar - Yamaha F310 - 1" [ref=e1581]
+              - generic [ref=e1583]:
+                - img [ref=e1584]
+                - generic [ref=e1587]: Karachi
+              - generic [ref=e1588]:
+                - generic [ref=e1590]: "--:--:--"
+                - generic [ref=e1592]: 👌 Used
+              - generic [ref=e1594]:
+                - img [ref=e1595]
+                - generic [ref=e1598]: 0km • 0min
+            - generic [ref=e1599]:
+              - heading "Acoustic Guitar - Yamaha F310" [level=3] [ref=e1600]
+              - generic [ref=e1601]:
+                - generic [ref=e1602]: Sara Khan
+                - generic [ref=e1604]:
+                  - text: ⭐
+                  - generic [ref=e1605]: "4.5"
+                  - generic [ref=e1606]: (89)
+              - generic [ref=e1607]:
+                - generic [ref=e1608]:
+                  - generic [ref=e1609]: Asking
+                  - generic [ref=e1610]: 22,000
+                - generic [ref=e1611]:
+                  - generic [ref=e1612]: High Bid
+                  - generic [ref=e1614]: 0 Bids
+              - generic [ref=e1615]:
+                - generic [ref=e1617]:
+                  - button [ref=e1618]:
+                    - img [ref=e1619]
+                  - textbox [ref=e1621]: 15,400
+                  - button [ref=e1622]:
+                    - img [ref=e1623]
+                - button "Raise Bid" [ref=e1625]:
+                  - generic [ref=e1626]:
+                    - img [ref=e1627]
+                    - text: Raise Bid
+  - region "Notifications alt+T"
+  - generic [ref=e1634] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e1635]:
+      - img [ref=e1636]
+    - generic [ref=e1639]:
+      - button "Open issues overlay" [ref=e1640]:
+        - generic [ref=e1641]:
+          - generic [ref=e1642]: "0"
+          - generic [ref=e1643]: "1"
+        - generic [ref=e1644]: Issue
+      - button "Collapse issues badge" [ref=e1645]:
+        - img [ref=e1646]
+  - alert [ref=e1648]
+```

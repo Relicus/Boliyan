@@ -102,9 +102,7 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 - **State**: Mock data is loaded by default in `AppProvider`. Tests run against this mock state.
 
 ## ROADMAP & CURRENT TASKS
-- **Notification System**: Real-time alerts for `isOutbidTrigger`.
-- **Payment Integration**: Transition from "deal acceptance" to secure escrow.
-- **Trust & Verification**: User ratings and reviews implementation.
+- **SEO & Performance**: Audit and optimize Core Web Vitals.
 
 ## RULES FOR AI AGENTS
 1.  **Minimalist Check**: Before implementing, ask "Can this be done with FEWER elements?"
