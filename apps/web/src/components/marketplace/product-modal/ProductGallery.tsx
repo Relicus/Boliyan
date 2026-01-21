@@ -26,7 +26,7 @@ export function ProductGallery({
   isUrgent
 }: ProductGalleryProps) {
   return (
-    <div id={`product-details-gallery-${item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[300px] sm:h-[400px] md:h-full">
+    <div id={`product-details-gallery-${item.slug || item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[300px] sm:h-[400px] md:h-full">
       {/* Victory Halo - State Based Animated Border Background */}
       {showHalo && (
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -56,7 +56,7 @@ export function ProductGallery({
       )}
 
       <div 
-        id={`product-details-image-${item.id}`}
+        id={`product-details-image-${item.slug || item.id}`}
         className="relative h-full w-full overflow-hidden z-10"
       >
         <AnimatePresence mode="wait">
@@ -87,7 +87,7 @@ export function ProductGallery({
         
         <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
           <button
-            id={`expand-gallery-btn-${item.id}`}
+            id={`expand-gallery-btn-${item.slug || item.id}`}
             onClick={(e) => {
               e.stopPropagation();
               setShowFullscreen(true);

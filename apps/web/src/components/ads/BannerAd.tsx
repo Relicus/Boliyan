@@ -3,13 +3,14 @@ import { ArrowRight } from "lucide-react";
 
 interface BannerAdProps {
   variant?: "sidebar" | "header";
+  index?: number;
 }
 
-export default function BannerAd({ variant = "sidebar" }: BannerAdProps) {
+export default function BannerAd({ variant = "sidebar", index }: BannerAdProps) {
   if (variant === "sidebar") {
     return (
       <div 
-        id="banner-ad-sidebar"
+        id={`banner-ad-sidebar${index !== undefined ? `-${index}` : ''}`}
         className="mx-3 mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-5 text-white shadow-lg shadow-indigo-200"
       >
         <div className="mb-4">

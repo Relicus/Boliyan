@@ -209,7 +209,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   return (
     <>
       <motion.div
-        id={`item-card-${item.id}`}
+        id={`item-card-${item.slug || item.id}`}
         onClick={() => setIsDialogOpen(true)}
         initial={false}
             animate={{
@@ -257,7 +257,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(var(--radius)-3px)]">
             <div
-              id={`item-card-${item.id}-image-wrapper`}
+              id={`item-card-${item.slug || item.id}-image-wrapper`}
               className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 group/gallery`}
             >
               <Carousel
@@ -269,7 +269,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     <CarouselItem key={i} className="pl-0 h-full">
                       <div className="relative w-full h-full flex items-center justify-center">
                         <img
-                          id={`item-card-${item.id}-image-${i}`}
+                          id={`item-card-${item.slug || item.id}-image-${i}`}
                           src={src}
                           alt={`${item.title} - ${i + 1}`}
                           className="object-cover w-full h-full object-center"
@@ -303,7 +303,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               </Carousel>
 
               {/* Top-Left Location Badge */}
-              <div id={`item-card-${item.id}-location-badge-wrapper`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
+              <div id={`item-card-${item.slug || item.id}-location-badge-wrapper`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
                 <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
                   <MapPin className="h-3 w-3" />
                   <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none truncate max-w-[120px]">
@@ -356,7 +356,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <motion.div
-                            id={`item-card-${item.id}-watch-indicator`}
+                            id={`item-card-${item.slug || item.id}-watch-indicator`}
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             whileHover={{ scale: 1.1 }}
@@ -402,7 +402,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             <CardContent className="p-1.5 flex flex-col gap-1 flex-1 z-10 transition-all">
               {/* Title - Natural height with clamping */}
               <div className="flex items-start">
-                <h3 id={`item-card-${item.id}-title`} className={`font-bold ${getTitleClass()} text-slate-900 leading-tight line-clamp-2 transition-all w-full`} title={item.title}>
+                <h3 id={`item-card-${item.slug || item.id}-title`} className={`font-bold ${getTitleClass()} text-slate-900 leading-tight line-clamp-2 transition-all w-full`} title={item.title}>
                   {item.title}
                 </h3>
               </div>
@@ -447,7 +447,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               <div className="flex items-end justify-between transition-all min-h-[2.25rem]">
                 <div className="flex flex-col">
                   <span className={`${getLabelClass()} text-slate-600 font-bold uppercase tracking-wider transition-all`}>Asking</span>
-                  <span id={`item-card-${item.id}-ask-price`} className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all truncate max-w-[100px]`}>
+                  <span id={`item-card-${item.slug || item.id}-ask-price`} className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all truncate max-w-[100px]`}>
                     {displayPrice(item.askPrice)}
                   </span>
                 </div>
@@ -472,7 +472,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                               damping: 20,
                               duration: 0.6
                             }}
-                            id={`item-card-${item.id}-high-bid`} 
+                            id={`item-card-${item.slug || item.id}-high-bid`} 
                             className={`${getPriceClass()} font-black leading-none inline-block truncate max-w-[100px] font-outfit`}
                           >
                             {displayPrice(item.currentHighBid)}
@@ -491,7 +491,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         )}
                       </div>
                     ) : (
-                      <span id={`item-card-${item.id}-bid-count`} className={`${getPriceClass()} font-black text-blue-600 leading-none truncate font-outfit`}>
+                      <span id={`item-card-${item.slug || item.id}-bid-count`} className={`${getPriceClass()} font-black text-blue-600 leading-none truncate font-outfit`}>
                         {item.bidCount} {item.bidCount === 1 ? 'Bid' : 'Bids'}
                       </span>
                     )}
@@ -520,7 +520,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
                     viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
-                    idPrefix={`item-card-${item.id}`}
+                    idPrefix={`item-card-${item.slug || item.id}`}
                     onSmartAdjust={handleSmartAdjust}
                     onBid={handleBid}
                     onKeyDown={handleKeyDown}

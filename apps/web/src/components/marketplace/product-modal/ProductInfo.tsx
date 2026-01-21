@@ -27,7 +27,7 @@ export function ProductInfo({
   onToggleWatch
 }: ProductInfoProps) {
   return (
-    <div id={`product-details-left-${item.id}`} className="flex flex-col gap-3 min-w-0 h-full">
+    <div id={`product-details-left-${item.slug || item.id}`} className="flex flex-col gap-3 min-w-0 h-full mt-2">
       <div className="flex justify-between items-start gap-2">
         <div className="min-w-0">
           <DialogTitle className="text-xl sm:text-2xl font-black font-outfit text-slate-900 leading-tight mb-2 line-clamp-2">
@@ -81,7 +81,7 @@ export function ProductInfo({
 
             <div className="flex gap-2">
                <button
-                  id={`toggle-watch-btn-${item.id}`}
+                  id={`toggle-watch-btn-${item.slug || item.id}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     onToggleWatch(item.id);
@@ -96,7 +96,7 @@ export function ProductInfo({
                   <Bookmark className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
                 </button>
                 <Link
-                  id={`view-details-btn-${item.id}`}
+                  id={`view-details-btn-${item.slug || item.id}`}
                   href={`/product/${item.slug || item.id}`}
                   className="flex items-center justify-center gap-2 h-9 px-3 rounded-full border border-slate-900 bg-slate-900 text-white hover:bg-slate-800 transition-all duration-300 font-bold text-[11px] shadow-sm"
                 >

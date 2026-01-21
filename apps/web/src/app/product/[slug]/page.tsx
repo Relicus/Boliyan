@@ -32,7 +32,8 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     handleBid,
     handleKeyDown,
     handleInputChange,
-    getSmartStep
+    getSmartStep,
+    pendingConfirmation
   } = useBidding(item, seller, () => {});
 
   const [now, setNow] = useState(() => Date.now());
@@ -88,7 +89,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
 
         <div className="flex gap-2">
           <Button 
-            id={`share-btn-${item.id}`}
+            id={`share-btn-${item.slug || item.id}`}
             variant="outline" 
             size="icon" 
             className="rounded-full h-10 w-10"
@@ -101,7 +102,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
             <Share2 className="h-4 w-4" />
           </Button>
           <Button 
-            id={`watch-btn-${item.id}`}
+            id={`watch-btn-${item.slug || item.id}`}
             variant={isWatched ? "secondary" : "outline"} 
             size="icon" 
             className={`rounded-full h-10 w-10 transition-colors ${isWatched ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}`}
@@ -112,10 +113,10 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
         </div>
       </header>
 
-      <main className="container mx-auto max-w-6xl mt-6 px-4">
+      <main className="container mx-auto max-w-7xl mt-6 px-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Left Column: Gallery */}
+          {/* Block 1: Gallery (Left Col Top) */}
           <div className="lg:col-span-7 space-y-6">
             <div className="relative aspect-square sm:aspect-[4/3] rounded-3xl overflow-hidden bg-white shadow-xl border border-slate-100 group">
               <AnimatePresence mode="wait">
@@ -173,153 +174,158 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                 ))}
               </div>
             )}
-
-            {/* Detailed Description */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 space-y-4">
-              <h2 className="text-xl font-bold text-slate-900">Description</h2>
-              <p className="text-slate-600 leading-relaxed text-lg whitespace-pre-wrap">
-                {item.description}
-              </p>
-            </div>
           </div>
 
-          {/* Right Column: Bidding & Info */}
-          <div className="lg:col-span-5 space-y-6">
-            <div 
-              className={`bg-white rounded-3xl p-8 shadow-lg border border-slate-100 space-y-8 sticky top-24 transition-all
-                ${isHighBidder ? 'ring-4 ring-amber-400' : ''}
-              `}
-            >
-              {isHighBidder && (
-                <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-center font-bold text-sm mb-4 animate-pulse flex items-center justify-center gap-2">
-                  <Zap className="h-4 w-4 fill-current" />
-                  You are the high bidder!
-                </div>
-              )}
+          {/* Block 2: Bidding (Right Col) */}
+          <div className="lg:col-span-5 space-y-6 lg:row-span-2">
+              <div 
+                className={`bg-white rounded-3xl p-6 shadow-lg border border-slate-100 space-y-4 sticky top-24 transition-all
+                  ${isHighBidder ? 'ring-4 ring-amber-400' : ''}
+                `}
+              >
+                {isHighBidder && (
+                  <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-center font-bold text-sm mb-2 animate-pulse flex items-center justify-center gap-2">
+                    <Zap className="h-4 w-4 fill-current" />
+                    You are the high bidder!
+                  </div>
+                )}
 
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100 font-bold px-3 py-1">
-                    {item.category}
-                  </Badge>
-                  <Badge variant="outline" className="bg-white text-slate-700 border-slate-200 font-bold px-3 py-1 uppercase tracking-wider text-xs">
-                    {item.condition === 'new' && '🌟 New'}
-                    {item.condition === 'like_new' && '✨ Mint'}
-                    {item.condition === 'used' && '👌 Used'}
-                    {item.condition === 'fair' && '🔨 Fair'}
-                  </Badge>
-                  {!item.isPublicBid && (
-                    <Badge variant="secondary" className="bg-amber-500 text-white font-bold px-3 py-1 flex items-center gap-1.5 border-none">
-                      <Lock className="h-3.5 w-3.5" />
-                      Secret Bids
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100 font-bold px-3 py-1">
+                      {item.category}
                     </Badge>
-                  )}
-                </div>
-                <h1 className="text-fluid-h1 font-black text-slate-900 leading-tight">
-                  {item.title}
-                </h1>
-              </div>
-
-              {/* Price Grid */}
-              <div className="grid grid-cols-3 gap-6 py-6 border-y border-slate-50">
-                <div className="space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Ask Price</span>
-                  <div className="text-fluid-h2 font-black text-slate-800">Rs. {Math.round(item.askPrice).toLocaleString()}</div>
-                </div>
-                <div className="space-y-1 text-center border-x border-slate-100">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                    {item.isPublicBid ? "High Bid" : "Bids"}
-                  </span>
-                  <div className={`text-2xl font-black ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-500'}`}>
-                    {item.isPublicBid && item.currentHighBid
-                      ? `Rs. ${Math.round(item.currentHighBid).toLocaleString()}`
-                      : `${item.bidCount} Bids`
-                    }
+                    <Badge variant="outline" className="bg-white text-slate-700 border-slate-200 font-bold px-3 py-1 uppercase tracking-wider text-xs">
+                      {item.condition === 'new' && '🌟 New'}
+                      {item.condition === 'like_new' && '✨ Mint'}
+                      {item.condition === 'used' && '👌 Used'}
+                      {item.condition === 'fair' && '🔨 Fair'}
+                    </Badge>
+                    {!item.isPublicBid && (
+                      <Badge variant="secondary" className="bg-amber-500 text-white font-bold px-3 py-1 flex items-center gap-1.5 border-none">
+                        <Lock className="h-3.5 w-3.5" />
+                        Secret Bids
+                      </Badge>
+                    )}
                   </div>
+                  <h1 className="text-[clamp(1.5rem,4cqi,2.2rem)] font-black text-slate-900 leading-tight">
+                    {item.title}
+                  </h1>
                 </div>
-                <div className="space-y-1 text-right">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Ends In</span>
-                  <div className={`text-2xl font-black tabular-nums ${isUrgent ? 'text-red-500 animate-pulse' : 'text-slate-800'}`}>
-                    {timeLeft}
-                  </div>
-                </div>
-              </div>
 
-              {/* Bidding Section */}
-              <div className="space-y-4 pt-4">
-                <div className="flex flex-col gap-4">
-                  <div className="flex h-16 w-full">
-                    <div className={`flex flex-1 border-2 border-slate-200 rounded-l-2xl shadow-sm overflow-hidden transition-colors focus-within:border-blue-500 ${isSeller ? 'opacity-50 grayscale bg-slate-100' : 'bg-slate-50'}`}>
-                      <button
-                        id="decrement-bid-btn"
-                        onClick={(e) => handleSmartAdjust(e, -1)}
-                        disabled={isSeller}
-                        className="w-16 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-300"
-                      >
-                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M18 12H6" /></svg>
-                      </button>
-
-                      <div className="relative flex-1 bg-white">
-                        <AnimatePresence>
-                          {showDelta && lastDelta !== null && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10, scale: 0.5 }}
-                              animate={{ opacity: 1, y: -60, scale: 1.5 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              className={`absolute left-1/2 -translate-x-1/2 font-black text-xl z-50 pointer-events-none drop-shadow-xl
-                                ${lastDelta > 0 ? 'text-amber-600' : 'text-red-600'}`}
-                            >
-                              {lastDelta > 0 ? `+${lastDelta.toLocaleString()}` : lastDelta.toLocaleString()}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        <motion.input
-                          id="bid-input"
-                          type="text"
-                          value={bidAmount}
-                          key={`input-${animTrigger}`}
-                          initial={false}
-                          disabled={isSeller}
-                          animate={{ 
-                            scale: [1, 1.02, 1],
-                            x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -4, 4, -4, 4, 0] : 0
-                          }}
-                          transition={{ duration: 0.2 }}
-                          onKeyDown={handleKeyDown}
-                          onChange={handleInputChange}
-                          className="w-full h-full text-center text-2xl font-black text-slate-900 focus:outline-none px-4 bg-transparent"
-                        />
+                {/* Unified Bidding Section - Stacked Layout */}
+                <div className="flex flex-col gap-4 py-4 border-y border-slate-50">
+                  {/* Row 1: Price & High Bid */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-28">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Ask Price</span>
+                      <div className="text-[clamp(1.25rem,5cqi,2rem)] font-black text-slate-800 leading-none">
+                        Rs. {Math.round(item.askPrice).toLocaleString()}
                       </div>
-
-                      <button
-                        id="increment-bid-btn"
-                        onClick={(e) => handleSmartAdjust(e, 1)}
-                        disabled={isSeller}
-                        className="w-16 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-300"
-                      >
-                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M12 6v12m6-6H6" /></svg>
-                      </button>
                     </div>
-
-                    <Button
-                      id="place-bid-btn"
-                      onClick={handleBid}
-                      disabled={isSuccess || isSeller}
-                      className={`h-16 px-10 rounded-l-none rounded-r-2xl font-black text-xl shadow-lg transition-all active:scale-95 min-w-[160px]
-                        ${isSuccess 
-                          ? 'bg-amber-600 text-white hover:bg-amber-700' 
-                          : isSeller
-                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
-                        }`}
-                    >
-                      {isSuccess ? "Placed!" : isSeller ? "Your Item" : "Place Bid"}
-                    </Button>
+                    <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-28">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
+                        {item.isPublicBid ? "High Bid" : "Bids"}
+                      </span>
+                      <div className={`text-[clamp(1.25rem,5cqi,2rem)] font-black leading-none ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-500'}`}>
+                         {item.isPublicBid && item.currentHighBid
+                           ? `Rs. ${Math.round(item.currentHighBid).toLocaleString()}`
+                           : `${item.bidCount}`
+                         }
+                      </div>
+                    </div>
                   </div>
-                  {error && <p className="text-red-500 text-sm font-bold text-center">{error}</p>}
+
+                  {/* Row 2: Timer (Centered) */}
+                  <div className="flex flex-col items-center justify-center p-3 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm">
+                     <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Ends In</span>
+                     <div className={`text-[clamp(1.25rem,4cqi,2rem)] font-black tabular-nums ${isUrgent ? 'text-red-500 animate-pulse' : 'text-slate-800'}`}>
+                       {timeLeft}
+                     </div>
+                  </div>
+
+                {/* Row 3: Stepper Input */}
+                <div className={`flex h-16 w-full border-2 border-slate-200 rounded-2xl shadow-sm overflow-hidden transition-colors focus-within:border-blue-500 ${isSeller ? 'opacity-50 grayscale bg-slate-100' : 'bg-slate-50'}`}>
+                  <button
+                    id="decrement-bid-btn"
+                    onClick={(e) => handleSmartAdjust(e, -1)}
+                    disabled={isSeller}
+                    className="w-16 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-300"
+                  >
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M18 12H6" /></svg>
+                  </button>
+
+                  <div className="relative flex-1 bg-white flex items-center justify-center">
+                    <AnimatePresence>
+                      {showDelta && lastDelta !== null && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                          animate={{ opacity: 1, y: -40, scale: 1.5 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          className={`absolute font-black text-lg z-50 pointer-events-none drop-shadow-xl
+                            ${lastDelta > 0 ? 'text-amber-600' : 'text-red-600'}`}
+                        >
+                          {lastDelta > 0 ? `+${lastDelta.toLocaleString()}` : lastDelta.toLocaleString()}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <motion.input
+                      id="bid-input"
+                      type="text"
+                      value={bidAmount}
+                      key={`input-${animTrigger}`}
+                      initial={false}
+                      disabled={isSeller}
+                      animate={{ 
+                        scale: [1, 1.02, 1],
+                        x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -4, 4, -4, 4, 0] : 0
+                      }}
+                      transition={{ duration: 0.2 }}
+                      onKeyDown={handleKeyDown}
+                      onChange={handleInputChange}
+                      className="w-full h-full text-center text-fluid-price-sm font-black text-slate-900 focus:outline-none bg-transparent"
+                    />
+                  </div>
+
+                  <button
+                    id="increment-bid-btn"
+                    onClick={(e) => handleSmartAdjust(e, 1)}
+                    disabled={isSeller}
+                    className="w-16 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-300"
+                  >
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M12 6v12m6-6H6" /></svg>
+                  </button>
                 </div>
+
+                {/* Row 4: Place Bid Button */}
+                <Button
+                  id="place-bid-btn"
+                  onClick={handleBid}
+                  disabled={isSuccess || isSeller}
+                  className={`h-16 w-full rounded-2xl font-black text-xl shadow-lg transition-all active:scale-95
+                    ${isSuccess 
+                      ? 'bg-amber-600 text-white hover:bg-amber-700' 
+                      : isSeller
+                        ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
+                        : pendingConfirmation
+                          ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
+                          : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                >
+                  {isSuccess 
+                    ? "Placed!" 
+                    : isSeller 
+                      ? "Your Item" 
+                      : pendingConfirmation 
+                        ? pendingConfirmation.message 
+                        : "Place Bid"
+                  }
+                </Button>
               </div>
+
+              {/* Error Message */}
+              {error && <p className="text-red-500 text-sm font-bold text-center mt-2 mb-4">{error}</p>}
 
               {/* Seller Card */}
               <div className="bg-slate-50 rounded-2xl p-6 flex flex-col gap-4">
@@ -358,6 +364,16 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                    ))}
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Block 3: Description (Left Col Bottom) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 space-y-4">
+              <h2 className="text-xl font-bold text-slate-900">Description</h2>
+              <p className="text-slate-600 leading-relaxed text-lg whitespace-pre-wrap">
+                {item.description}
+              </p>
             </div>
           </div>
 
