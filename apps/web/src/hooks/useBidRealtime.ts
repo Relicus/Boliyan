@@ -17,8 +17,8 @@ export function useBidRealtime(onBid: (bid: Bid) => void) {
         // Fetch profile to hydrate the bid
         // Note: In high volume, this might be a bottleneck. 
         // Future optimization: Include bidder info in the bid payload via webhook or denormalization
-        const { data: profile } = await (supabase
-          .from('profiles') as any)
+        const { data: profile } = await supabase
+          .from('profiles')
           .select('*')
           .eq('id', newBidRaw.bidder_id)
           .single();

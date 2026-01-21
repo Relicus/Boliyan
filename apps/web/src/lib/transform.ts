@@ -20,6 +20,8 @@ export type ListingWithSeller = ListingRow & {
   bid_count?: number | null;
   high_bid?: number | null;
   high_bidder_id?: string | null;
+  
+  slug?: string | null;
 };
 
 export function transformProfileToUser(profile: ProfileRow): User {
@@ -92,7 +94,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
 
   return {
     id: listing.id,
-    slug: (listing as any).slug || undefined,
+    slug: listing.slug || undefined,
     title: listing.title,
     description: listing.description || '',
     images: imageUrls,

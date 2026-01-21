@@ -139,12 +139,13 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Save to search history
         if (user) {
           /* Fire and forget history insert */
-          (supabase.from('search_history') as any)
+          supabase
+            .from('search_history')
             .insert({
               user_id: user.id,
               query: filters.query,
             })
-            .then(({ error }: any) => {
+            .then(({ error }) => {
               if (error) console.warn("Search history save failed", error);
             });
         }

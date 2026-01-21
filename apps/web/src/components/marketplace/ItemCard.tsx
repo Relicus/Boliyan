@@ -12,7 +12,6 @@ import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
 import ProductDetailsModal from "./ProductDetailsModal";
-import Link from "next/link";
 import {
   Carousel,
   CarouselContent,

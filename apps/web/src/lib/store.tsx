@@ -92,6 +92,26 @@ export function useApp() {
   type MarketplaceFilterKey = keyof MarketplaceFilters;
   type SearchFilters = typeof search.filters;
   type SearchFilterKey = keyof SearchFilters;
+  const marketplaceFilterKeys: MarketplaceFilterKey[] = [
+    'category',
+    'search',
+    'minPrice',
+    'maxPrice',
+    'sortBy',
+    'listingType',
+    'condition',
+    'radius'
+  ];
+  const searchKeyMap: Partial<Record<MarketplaceFilterKey, SearchFilterKey>> = {
+    search: 'query',
+    category: 'category',
+    minPrice: 'minPrice',
+    maxPrice: 'maxPrice',
+    sortBy: 'sortBy',
+    condition: 'condition'
+  };
+  const isMarketplaceFilterKey = (key: string): key is MarketplaceFilterKey =>
+    marketplaceFilterKeys.includes(key as MarketplaceFilterKey);
 
   return {
     ...auth,
@@ -112,32 +132,24 @@ export function useApp() {
     isMarketplaceLoading: marketplace.isLoading, // Expose specific loading state if needed
     
     // Override setFilter to sync both contexts for shared filters
-    setFilter: (key: string, value: any) => {
+    setFilter: (key: string, value: unknown) => {
       // Update Marketplace Context
       // Fix: Added 'radius' to allowed keys so location slider works
-      if (key === 'category' || key === 'search' || key === 'minPrice' || key === 'maxPrice' || key === 'sortBy' || key === 'listingType' || key === 'condition' || key === 'radius') {
-        marketplace.setFilter(key as any, value);
+      if (isMarketplaceFilterKey(key)) {
+        marketplace.setFilter(key, value as MarketplaceFilters[typeof key]);
       }
-      
+
       // Update Search Context if it's a shared filter
-      const searchKeyMap: Record<string, string> = {
-        'search': 'query',
-        'category': 'category',
-        'minPrice': 'minPrice',
-        'maxPrice': 'maxPrice',
-        'sortBy': 'sortBy',
-        'condition': 'condition'
-      };
-      
-      if (key in searchKeyMap) {
-        let searchValue = value;
-        if (key === 'sortBy') {
+      const searchKey = searchKeyMap[key as MarketplaceFilterKey];
+      if (searchKey) {
+        let searchValue = value as SearchFilters[typeof searchKey];
+        if (searchKey === 'sortBy') {
           // Map Marketplace Sorts to Search Sorts
           if (value === 'luxury') searchValue = 'price_high';
           if (value === 'trending') searchValue = 'newest';
           if (value === 'watchlist') return; // Not supported in search
         }
-        search.updateFilter(searchKeyMap[key] as any, searchValue);
+        search.updateFilter(searchKey, searchValue);
       }
     }
   };

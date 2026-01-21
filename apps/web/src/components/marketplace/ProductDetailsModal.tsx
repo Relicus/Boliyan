@@ -14,7 +14,6 @@ import { ProductGallery } from "./product-modal/ProductGallery";
 import { ProductInfo } from "./product-modal/ProductInfo";
 import { BiddingDashboard } from "./product-modal/BiddingDashboard";
 import { FullscreenGallery } from "./product-modal/FullscreenGallery";
-import { useRouter } from "next/navigation";
 
 interface ProductDetailsModalProps {
   item: Item;

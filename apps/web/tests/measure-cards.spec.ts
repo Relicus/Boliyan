@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 test('measure card heights', async ({ page }) => {
   page.on('console', msg => {
@@ -10,8 +10,8 @@ test('measure card heights', async ({ page }) => {
   // Wait for items to load
   await page.waitForSelector('[id^="item-card-"]');
   
-  const cards = await page.evaluate(() => {
-    const results: any[] = [];
+  await page.evaluate(() => {
+    const results: Array<{ id: string; type: string; height: number; width: number }> = [];
     
     // Find Item Cards
     const itemCards = document.querySelectorAll('[id^="item-card-"][id$="-title"]');

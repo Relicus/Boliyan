@@ -51,6 +51,7 @@ export interface Database {
           auction_mode: 'hidden' | 'visible' | 'sealed' | null
           status: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at: string | null
+          slug: string | null
         }
         Insert: {
           id?: string
@@ -64,6 +65,7 @@ export interface Database {
           auction_mode?: 'hidden' | 'visible' | 'sealed' | null
           status?: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at?: string | null
+          slug?: string | null
         }
         Update: {
           id?: string
@@ -77,6 +79,7 @@ export interface Database {
           auction_mode?: 'hidden' | 'visible' | 'sealed' | null
           status?: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at?: string | null
+          slug?: string | null
         }
       }
       bids: {
@@ -184,6 +187,7 @@ export interface Database {
           high_bid: number | null
           high_bidder_id: string | null
           condition: 'new' | 'like_new' | 'used' | 'fair' | null
+          slug: string | null
         }
         Insert: {
           id?: string
@@ -205,6 +209,7 @@ export interface Database {
           high_bid?: number | null
           high_bidder_id?: string | null
           condition?: 'new' | 'like_new' | 'used' | 'fair' | null
+          slug?: string | null
         }
         Update: {
           id?: string
@@ -226,6 +231,7 @@ export interface Database {
           high_bid?: number | null
           high_bidder_id?: string | null
           condition?: 'new' | 'like_new' | 'used' | 'fair' | null
+          slug?: string | null
         }
       }
       watchlist: {

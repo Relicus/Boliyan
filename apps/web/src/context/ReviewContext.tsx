@@ -44,7 +44,7 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
       role: data.role,
     };
 
-    const { error } = await (supabase.from('reviews') as any).insert(reviewPayload);
+    const { error } = await supabase.from('reviews').insert(reviewPayload);
 
     if (error) {
       return { success: false, error: error.message };

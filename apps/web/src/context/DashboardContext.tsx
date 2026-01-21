@@ -44,7 +44,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       // Transform to ManagedListing
       // Note: view_count might not exist yet in DB, defaulting to mock random for demo if missing
       type ListingRow = Database['public']['Tables']['listings']['Row'];
-      type ListingWithBidCount = ListingRow & { bids?: { count: number }[] };
+      type ListingWithBidCount = ListingRow & { bids?: { count: number }[]; view_count?: number | null };
 
       const listings: ManagedListing[] = (listingsData as ListingWithBidCount[] || []).map((item) => ({
         ...item,
@@ -63,7 +63,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         images: item.images || [], // Ensure array
         seller: user, // user is seller
         bidCount: item.bids?.[0]?.count || 0,
-        views: (item as any).view_count || Math.floor(Math.random() * 50) + 10, // Mock if missing
+        views: item.view_count ?? Math.floor(Math.random() * 50) + 10, // Mock if missing
         unreadBids: 0, // TODO: Implement unread logic with notifications
         lastActivity: item.created_at || new Date().toISOString(), // separate activity field later?
       }));
@@ -105,8 +105,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
   const updateListingStatus = async (itemId: string, status: 'active' | 'completed' | 'cancelled') => {
     try {
-      const { error } = await (supabase
-        .from('listings') as any)
+      const { error } = await supabase
+        .from('listings')
         .update({ status })
         .eq('id', itemId);
 

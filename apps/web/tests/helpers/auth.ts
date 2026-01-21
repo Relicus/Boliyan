@@ -14,7 +14,7 @@ export async function loginUser(page: Page, email?: string, password = 'password
     // If we see the avatar, we're good
     await expect(page.locator('#navbar-avatar-18')).toBeVisible({ timeout: 5000 });
     console.log(`[loginUser] Login successful for ${testEmail}`);
-  } catch (e) {
+  } catch {
     // Check if it's an unconfirmed email or invalid credentials
     const errorLog = page.locator('text=Email not confirmed');
     const invalidCredsLog = page.locator('text=Invalid login credentials');
@@ -48,7 +48,8 @@ export async function loginUser(page: Page, email?: string, password = 'password
         await expect(page.locator('#navbar-avatar-18')).toBeVisible({ timeout: 15000 });
         console.log(`[loginUser] Signup and Auto-Login successful for ${testEmail}`);
       } catch (signupError) {
-        console.error(`[loginUser] Auth verification failed for ${testEmail}: ${(signupError as any).message}`);
+        const message = signupError instanceof Error ? signupError.message : 'Unknown error';
+        console.error(`[loginUser] Auth verification failed for ${testEmail}: ${message}`);
         // If we are on / and still see Sign In, something is wrong with the mock session persistence
         const signInVisible = await page.locator('#navbar-signin-btn').isVisible();
         const loadingVisible = await page.locator('#navbar-loading-avatar').isVisible();

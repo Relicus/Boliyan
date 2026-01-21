@@ -73,7 +73,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
   const isSeller = user?.id === seller.id;
 
   return (
-    <div id={`product-page-${item.id}`} className="min-h-screen bg-slate-50/50 pb-20">
+    <div id={`product-page-${item.slug || item.id}`} className="min-h-screen bg-slate-50/50 pb-20">
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex items-center justify-between">
         <Button 
@@ -406,7 +406,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const fetchItem = async () => {
       setIsLoading(true);
       try {
-        let query = (supabase.from('marketplace_listings') as any).select('*');
+        let query = supabase.from('marketplace_listings').select('*');
         
         if (isUUID) {
             query = query.eq('id', slugOrId);

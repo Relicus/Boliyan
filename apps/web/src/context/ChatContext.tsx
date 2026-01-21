@@ -258,8 +258,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       content
     };
 
-    const { data, error } = await (supabase
-      .from('messages') as any)
+    const { data, error } = await supabase
+      .from('messages')
       .insert(insertPayload)
       .select()
       .single();
@@ -279,8 +279,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           last_message: content,
           updated_at: new Date().toISOString()
         };
-        await (supabase
-          .from('conversations') as any)
+        await supabase
+          .from('conversations')
           .update(conversationUpdates)
           .eq('id', conversationId);
 
@@ -301,7 +301,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
                   is_read: false,
                   metadata: { conversationId }
                 };
-                await (supabase.from('notifications') as any).insert(notificationPayload);
+                await supabase.from('notifications').insert(notificationPayload);
             }
         }
     }
@@ -318,8 +318,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     ));
 
     // DB Update
-    const { error } = await (supabase
-      .from('messages') as any)
+    const { error } = await supabase
+      .from('messages')
       .update({ is_read: true })
       .eq('conversation_id', conversationId)
       .neq('sender_id', user.id)
@@ -344,8 +344,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       updated_at: new Date().toISOString()
     };
 
-    const { data, error } = await (supabase
-      .from('conversations') as any)
+    const { data, error } = await supabase
+      .from('conversations')
       .insert(insertPayload)
       .select()
       .single();
@@ -353,8 +353,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     if (data) {
         return data.id;
     } else if (error?.code === '23505') { // Unique constraint violation (race condition)
-        const { data: exist } = await (supabase
-          .from('conversations') as any)
+        const { data: exist } = await supabase
+          .from('conversations')
           .select('*')
           .eq('listing_id', itemId)
           .eq('bidder_id', bidderId)

@@ -142,7 +142,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 bid_count,
                 high_bid,
                 high_bidder_id,
-                condition
+                condition,
+                slug
             `, { count: 'exact' }).eq('status', 'active');
 
             // --- APPLY FILTERS ---
@@ -298,8 +299,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
      if (updates.status) dbUpdates.status = updates.status;
      if (updates.title) dbUpdates.title = updates.title;
 
-     const { error } = await (supabase
-       .from('listings') as any)
+     const { error } = await supabase
+       .from('listings')
        .update(dbUpdates)
        .eq('id', id);
      
@@ -378,8 +379,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       status: 'pending'
     };
 
-    const { data, error } = await (supabase
-      .from('bids') as any)
+    const { data, error } = await supabase
+      .from('bids')
       .upsert(bidPayload, { onConflict: 'listing_id,bidder_id' })
       .select();
 
@@ -458,8 +459,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
     if (isWatched) {
         // Remove
-        const { error } = await (supabase
-            .from('watchlist') as any)
+        const { error } = await supabase
+            .from('watchlist')
             .delete()
             .match({ user_id: user.id, listing_id: itemId });
         
@@ -470,8 +471,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         }
     } else {
         // Add
-        const { error } = await (supabase
-            .from('watchlist') as any)
+        const { error } = await supabase
+            .from('watchlist')
             .insert({ user_id: user.id, listing_id: itemId });
             
           if (error) {
@@ -491,8 +492,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
   const rejectBid = async (bidId: string) => {
       const bidUpdates: BidUpdate = { status: 'ignored' };
-      const { error } = await (supabase
-        .from('bids') as any)
+      const { error } = await supabase
+        .from('bids')
         .update(bidUpdates)
         .eq('id', bidId);
       if (error) console.error("Failed to reject bid", error);
@@ -501,8 +502,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
   const acceptBid = async (bidId: string) => {
       const bidUpdates: BidUpdate = { status: 'accepted' };
-      const { error } = await (supabase
-        .from('bids') as any)
+      const { error } = await supabase
+        .from('bids')
         .update(bidUpdates)
         .eq('id', bidId);
       if (error) return undefined;

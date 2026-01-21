@@ -171,24 +171,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateProfile = async (data: Partial<User>) => {
-      if (!user) return;
-      
-      const updates: ProfileUpdate = {};
-      if (data.name) updates.full_name = data.name;
-      if (data.avatar) updates.avatar_url = data.avatar;
-      
-      const { error } = await (supabase
-        .from('profiles') as any)
-        .update(updates)
-        .eq('id', user.id);
-        
-      if (error) {
-          console.error('[AuthContext] Update failed:', error);
-          throw error;
-      }
-      
-      // Update local state
-      setUser(prev => prev ? { ...prev, ...data } : null);
+    if (!user) return;
+
+    const updates: ProfileUpdate = {};
+    if (data.name) updates.full_name = data.name;
+    if (data.avatar) updates.avatar_url = data.avatar;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('[AuthContext] Update failed:', error);
+      throw error;
+    }
+
+    // Update local state
+    setUser(prev => (prev ? { ...prev, ...data } : null));
   };
 
   return (

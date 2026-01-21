@@ -6,7 +6,7 @@ test.describe('Marketplace Discovery & Navigation', () => {
     await page.goto('/');
   });
 
-  test('should allow searching for items', async ({ page, isMobile }) => {
+  test('should allow searching for items', async ({ page }) => {
     const searchInput = page.locator('#navbar-search-input');
     await expect(searchInput).toBeVisible();
     

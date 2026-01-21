@@ -36,8 +36,6 @@ test.describe('Profile Management & Reviews', () => {
     // Mock Reviews
     await page.route(/\/rest\/v1\/reviews.*/, async route => {
         const method = route.request().method();
-        const url = route.request().url();
-        
         if (method === 'POST') {
              // Submit Review
              const data = route.request().postDataJSON();

@@ -64,7 +64,6 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   const modalInitialValueStr = await modalInput.inputValue();
   const modalInitialValue = parseFloat(modalInitialValueStr.replace(/,/g, ''));
   
-  const modalMinusBtn = dialog.locator('button[id*="modal-decrement-btn"]');
   const modalPlusBtn = dialog.locator('button[id*="modal-increment-btn"]');
 
   await modalPlusBtn.click();

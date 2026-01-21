@@ -21,7 +21,6 @@ import { useApp } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { uploadListingImage } from "@/lib/uploadImage";
 import { supabase } from "@/lib/supabase";
-import { Database } from "@/types/database.types";
 import { generateSlug } from "@/lib/utils";
 
 function ListForm() {
@@ -119,7 +118,7 @@ function ListForm() {
         // But let's check schema... Assuming DB has default or we omit and let DB handle.
         // Actually, better to insert a known value if we want consistency.
         
-        const listingData: any = {
+        const listingData = {
             title,
             category,
             asked_price: parseFloat(askPrice),
@@ -140,7 +139,7 @@ function ListForm() {
               slug: generateSlug(title)
             };
             
-            const { error } = await (supabase.from('listings') as any).insert([insertPayload]);
+            const { error } = await supabase.from('listings').insert([insertPayload]);
             
             if (error) throw error;
             router.push("/");
