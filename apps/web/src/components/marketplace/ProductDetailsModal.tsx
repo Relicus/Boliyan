@@ -14,6 +14,7 @@ import { ProductGallery } from "./product-modal/ProductGallery";
 import { ProductInfo } from "./product-modal/ProductInfo";
 import { BiddingDashboard } from "./product-modal/BiddingDashboard";
 import { FullscreenGallery } from "./product-modal/FullscreenGallery";
+import { useRouter } from "next/navigation";
 
 interface ProductDetailsModalProps {
   item: Item;
@@ -33,6 +34,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     setBidAmount,
     error,
     isSuccess,
+    pendingConfirmation,
     // isSubmitting removed as it is not returned by useBidding
     animTrigger,
     handleSmartAdjust,
@@ -113,11 +115,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
       timeLeft: timeStr,
       isUrgent
     };
-  }, [item.expiryAt, now, user, seller.location]);
+  }, [item.expiryAt, now, fallbackNow, user, seller.location]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="w-[94vw] max-w-[94vw] max-h-[92vh] overflow-hidden md:w-[920px] md:max-w-[920px] lg:w-[1000px] lg:max-w-[1000px] md:h-[88vh] md:max-h-[88vh] p-0 pr-0 bg-white border-none shadow-2xl rounded-2xl">
+      <DialogContent showCloseButton={false} className="w-[94vw] max-w-[94vw] max-h-[92vh] overflow-y-auto md:w-[920px] md:max-w-[920px] lg:w-[1000px] lg:max-w-[1000px] md:h-[88vh] md:max-h-[88vh] p-0 pr-0 bg-white border-none shadow-2xl rounded-2xl">
         <DialogClose 
           id={`close-listing-btn-${item.id}`}
           className="absolute right-4 top-4 z-[50] p-2 bg-white/85 hover:bg-white text-slate-700 hover:text-red-500 rounded-full shadow-lg transition-all active:scale-90"
@@ -127,7 +129,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col h-full"
+          className="flex flex-col h-auto min-h-full md:h-full md:overflow-hidden"
         >
           {/* Top Section: Dynamic Gallery */}
           <ProductGallery 
@@ -142,8 +144,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
           />
 
           {/* Bottom Section: Product Details & Bidding */}
-          <div id={`product-details-body-${item.id}`} className="flex-1 flex flex-col p-4 sm:p-6 md:flex-[0_0_40%] md:min-h-0 bg-white relative z-10">
-            <div id={`product-details-grid-${item.id}`} className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] h-full min-w-0 w-full">
+          <div id={`product-details-body-${item.id}`} className="flex-none md:flex-1 flex flex-col p-4 sm:p-6 pb-6 sm:pb-8 bg-white relative z-10 md:overflow-y-auto">
+            <div id={`product-details-grid-${item.id}`} className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] w-full">
               
               {/* Left Column: Info */}
               <ProductInfo 
@@ -163,12 +165,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     user={user}
                     seller={seller}
                     bidAmount={bidAmount}
-                    timeLeft={timeLeft}
-                    isUrgent={isUrgent}
                     isHighBidder={isHighBidder}
                     hasPriorBid={!!hasPriorBid}
                     isSuccess={isSuccess}
                     error={error}
+                    pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
                     onSmartAdjust={handleSmartAdjust}
                     onBid={handleBid}

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-20T04:53:06.431Z",
+  "timestamp": "2026-01-21T05:14:43.459Z",
   "routes": [
     "/",
     "/signin",
@@ -15,17 +15,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nAll\nPublic\nSecret"
+          "text": "بولیاں\nBOLIYAN\nJust\nCategories\nType\nView\nKarachi\nP"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -74,7 +74,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Karachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -104,27 +104,27 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "All\nPublic\nSecret\nKarachi\nAll\nPrice Range\nConditio"
+          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
         },
         {
           "id": "sidebar-01",
           "tagName": "ASIDE",
-          "text": "All\nPublic\nSecret\nKarachi\nAll\nPrice Range\nConditio"
+          "text": "AllPublicSecret[data-radix-scroll-area-viewport]{s"
         },
         {
           "id": "sidebar-scroll-area-02",
           "tagName": "DIV",
-          "text": "Karachi\nAll\nPrice Range\nCondition\nBrand New\nLike N"
+          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
         },
         {
           "id": "location-selector-sidebar-compact",
           "tagName": "DIV",
-          "text": "Karachi\nAll"
+          "text": "Karachi∞"
         },
         {
           "id": "location-sidebar-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi\nAll",
+          "text": "Karachi∞",
           "type": "button"
         },
         {
@@ -142,77 +142,15 @@
           "placeholder": "Max"
         },
         {
-          "id": "sidebar-condition-label-brand-new",
-          "tagName": "LABEL",
-          "text": "Brand New"
-        },
-        {
-          "id": "sidebar-condition-checkbox-brand-new",
-          "tagName": "INPUT",
-          "text": "",
-          "type": "checkbox"
-        },
-        {
-          "id": "sidebar-condition-label-like-new",
-          "tagName": "LABEL",
-          "text": "Like New"
-        },
-        {
-          "id": "sidebar-condition-checkbox-like-new",
-          "tagName": "INPUT",
-          "text": "",
-          "type": "checkbox"
-        },
-        {
-          "id": "sidebar-condition-label-excellent",
-          "tagName": "LABEL",
-          "text": "Excellent"
-        },
-        {
-          "id": "sidebar-condition-checkbox-excellent",
-          "tagName": "INPUT",
-          "text": "",
-          "type": "checkbox"
-        },
-        {
-          "id": "sidebar-condition-label-good",
-          "tagName": "LABEL",
-          "text": "Good"
-        },
-        {
-          "id": "sidebar-condition-checkbox-good",
-          "tagName": "INPUT",
-          "text": "",
-          "type": "checkbox"
-        },
-        {
-          "id": "sidebar-condition-label-fair",
-          "tagName": "LABEL",
-          "text": "Fair"
-        },
-        {
-          "id": "sidebar-condition-checkbox-fair",
-          "tagName": "INPUT",
-          "text": "",
-          "type": "checkbox"
-        },
-        {
-          "id": "sidebar-saved-search-iphone-15-pro",
+          "id": "sidebar-condition-select",
           "tagName": "BUTTON",
-          "text": "iPhone 15 Pro",
-          "type": "submit"
+          "text": "",
+          "type": "button"
         },
         {
-          "id": "sidebar-saved-search-gaming-laptop",
-          "tagName": "BUTTON",
-          "text": "Gaming Laptop",
-          "type": "submit"
-        },
-        {
-          "id": "sidebar-saved-search-vintage-watch",
-          "tagName": "BUTTON",
-          "text": "Vintage Watch",
-          "type": "submit"
+          "id": "banner-ad-sidebar",
+          "tagName": "DIV",
+          "text": "AdSupercharge Your WorkflowGet 50% off professiona"
         },
         {
           "id": "sidebar-reset-filters-btn",
@@ -223,17 +161,17 @@
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
         },
         {
           "id": "marketplace-grid-root",
           "tagName": "DIV",
-          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
         },
         {
           "id": "mobile-search-filter-container",
           "tagName": "DIV",
-          "text": "JustCategoriesTypeViewKarachiPrice"
+          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
         },
         {
           "id": "mobile-sort-select",
@@ -279,12 +217,12 @@
         {
           "id": "smart-filters-row",
           "tagName": "DIV",
-          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+          "text": "TrendingNear MeEnding SoonHigh ValueJust ListedWat"
         },
         {
           "id": "smart-filter-bar-root",
           "tagName": "DIV",
-          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+          "text": "TrendingNear MeEnding SoonHigh ValueJust ListedWat"
         },
         {
           "id": "smart-filter-btn-trending",
@@ -384,12 +322,12 @@
         {
           "id": "category-bar-row",
           "tagName": "DIV",
-          "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
+          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
         },
         {
           "id": "category-bar-root",
           "tagName": "DIV",
-          "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
+          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
         },
         {
           "id": "category-btn-all",
@@ -477,12 +415,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-link-post",
@@ -563,7 +501,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"irsDygRTeCbrRlFnxFzcz\""
+          "text": "self.__next_r=\"drvV01TgGinMWiwO_GJbN\""
         }
       ]
     },
@@ -574,17 +512,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nWelcome Back\nSign"
+          "text": "بولیاں\nBOLIYAN\nWelcome Back\nSign in to continue to"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -633,7 +571,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Karachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -733,12 +671,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-link-post",
@@ -819,7 +757,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"7X5kCwuWGh7C2J91MyFil\""
+          "text": "self.__next_r=\"6pqSEn7ybYTcf_Pbi6kn7\""
         },
         {
           "id": "__next-route-announcer__",
@@ -835,17 +773,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nList an Item\nMini"
+          "text": "بولیاں\nBOLIYAN\nList an Item\nMinimalist listing. Se"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -894,7 +832,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Karachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -1072,12 +1010,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-link-post",
@@ -1158,7 +1096,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"ChQ6TeDDUZ2EgxvuFGpiR\""
+          "text": "self.__next_r=\"jGHU7FjlsiLWEIWqd9ThP\""
         },
         {
           "id": "__next-route-announcer__",
@@ -1174,17 +1112,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nMessages\nAll\nOffe"
+          "text": "بولیاں\nBOLIYAN\nMessages\nAll\nOffers\nBids\n\nNo active"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -1233,7 +1171,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Karachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -1321,17 +1259,17 @@
         {
           "id": "chat-window-container",
           "tagName": "DIV",
-          "text": "Speak Your Price\n\nChoose a chat from the left to a"
+          "text": "Speak Your PriceChoose a chat from the left to arr"
         },
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-link-post",
@@ -1412,7 +1350,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"IG4atUKfzKEWLEVTmZIF-\""
+          "text": "self.__next_r=\"LrUgAdwU9HHT_mQEb5ctu\""
         },
         {
           "id": "__next-route-announcer__",
@@ -1428,17 +1366,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item\nDashboard\n\nManage"
+          "text": "بولیاں\nBOLIYAN\nDashboard\n\nManage your marketplace "
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -1487,7 +1425,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "Karachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -1517,17 +1455,17 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nOffe"
         },
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nOffe"
         },
         {
           "id": "dashboard-root",
           "tagName": "DIV",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nOffe"
         },
         {
           "id": "dashboard-title",
@@ -1556,12 +1494,12 @@
         {
           "id": "dashboard-tabs",
           "tagName": "DIV",
-          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0\nNo activ"
+          "text": "Offers\nBids\nListings\nWatchlist\nNo activity\n\nNo one"
         },
         {
           "id": "dashboard-tabs-list",
           "tagName": "DIV",
-          "text": "OffersBidsListingsWatchlist"
+          "text": "Offers\nBids\nListings\nWatchlist"
         },
         {
           "id": "tab-trigger-active-bids-mobile",
@@ -1590,12 +1528,12 @@
         {
           "id": "dashboard-tabs-list-desktop",
           "tagName": "DIV",
-          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0"
+          "text": "Offers0Bids0My Listings0Watchlist0"
         },
         {
           "id": "tab-trigger-active-bids",
           "tagName": "BUTTON",
-          "text": "Offers\n0",
+          "text": "Offers0",
           "type": "button"
         },
         {
@@ -1606,7 +1544,7 @@
         {
           "id": "tab-trigger-my-bids",
           "tagName": "BUTTON",
-          "text": "Bids\n0",
+          "text": "Bids0",
           "type": "button"
         },
         {
@@ -1617,7 +1555,7 @@
         {
           "id": "tab-trigger-my-listings",
           "tagName": "BUTTON",
-          "text": "My Listings\n0",
+          "text": "My Listings0",
           "type": "button"
         },
         {
@@ -1628,7 +1566,7 @@
         {
           "id": "tab-trigger-watchlist",
           "tagName": "BUTTON",
-          "text": "Watchlist\n0",
+          "text": "Watchlist0",
           "type": "button"
         },
         {
@@ -1639,12 +1577,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "PostMarketInboxDashboard"
+          "text": "Post\nMarket\nInbox\nDashboard"
         },
         {
           "id": "bottom-nav-link-post",
@@ -1725,7 +1663,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"k9-LrAPz0pXCbFUI1Saut\""
+          "text": "self.__next_r=\"8wCuiRHAqDIPkoVDqFlzD\""
         },
         {
           "id": "__next-route-announcer__",

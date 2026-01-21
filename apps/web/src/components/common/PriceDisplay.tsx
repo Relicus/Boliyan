@@ -9,7 +9,7 @@
 
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Trophy, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
 import { formatPrice } from "@/lib/utils";
 

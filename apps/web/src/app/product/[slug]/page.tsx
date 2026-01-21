@@ -11,16 +11,15 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
+import { toast } from "sonner";
+import { Item, User } from "@/types";
+import { supabase } from "@/lib/supabase";
+import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 
-
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+function ProductContent({ item, seller }: { item: Item; seller: User }) {
   const router = useRouter();
-  const { items, user, toggleWatch, watchedItemIds, getUser } = useApp();
-  
-  const item = items.find((i) => i.id === id);
-  const seller = item ? getUser(item.sellerId) : null;
-  const isWatched = watchedItemIds.includes(id);
+  const { user, toggleWatch, watchedItemIds } = useApp();
+  const isWatched = watchedItemIds.includes(item.id);
 
   const {
     bidAmount,
@@ -34,10 +33,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     handleKeyDown,
     handleInputChange,
     getSmartStep
-  } = useBidding(item!, seller!, () => {});
+  } = useBidding(item, seller, () => {});
 
   const [now, setNow] = useState(() => Date.now());
   const [currentImg, setCurrentImg] = useState(0);
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Bid placed successfully!", {
+        description: `You placed a bid of Rs. ${bidAmount} on ${item?.title}`
+      });
+    }
+  }, [isSuccess, bidAmount, item?.title]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -45,8 +52,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   }, []);
 
   const { duration, timeLeft, isUrgent } = useMemo(() => {
-    if (!item || !seller) return { duration: 0, timeLeft: "", isUrgent: false };
-    
     const { duration: dur } = user ? calculatePrivacySafeDistance(user.location, seller.location) : { duration: 0 };
     const diff = new Date(item.expiryAt).getTime() - now;
     const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
@@ -63,18 +68,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       isUrgent: hoursLeft < 2
     };
   }, [item, seller, now, user]);
-
-  if (!item || !seller) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <h1 className="text-2xl font-bold text-slate-900">Item not found</h1>
-        <Button onClick={() => router.push("/")} variant="outline">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Marketplace
-        </Button>
-      </div>
-    );
-  }
 
   const isHighBidder = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isSeller = user?.id === seller.id;
@@ -208,6 +201,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100 font-bold px-3 py-1">
                     {item.category}
+                  </Badge>
+                  <Badge variant="outline" className="bg-white text-slate-700 border-slate-200 font-bold px-3 py-1 uppercase tracking-wider text-xs">
+                    {item.condition === 'new' && '🌟 New'}
+                    {item.condition === 'like_new' && '✨ Mint'}
+                    {item.condition === 'used' && '👌 Used'}
+                    {item.condition === 'fair' && '🔨 Fair'}
                   </Badge>
                   {!item.isPublicBid && (
                     <Badge variant="secondary" className="bg-amber-500 text-white font-bold px-3 py-1 flex items-center gap-1.5 border-none">
@@ -366,4 +365,101 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       </main>
     </div>
   );
+}
+
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  // In Next.js App Router dynamic segments, the key matches the folder name [slug]
+  // BUT: The params object passed might still be using the old key if we only renamed the folder 
+  // and didn't restart the dev server or if Next.js caches the route param names.
+  // However, `params` is typed as { id: string } in the prop definition above which might be wrong now.
+  // Let's type it loosely to inspect what we get, or safely assume it maps to [slug] -> params.slug
+  
+  // Actually, wait. The prop definition `params: Promise<{ id: string }>` was from the old code.
+  // Since I renamed the folder to `[slug]`, the param key will be `slug`.
+  // I need to update the type definition and usage.
+  
+  const resolvedParams = use(params) as unknown as { slug?: string; id?: string };
+  const slugOrId = resolvedParams.slug || resolvedParams.id || '';
+  
+  const router = useRouter();
+  const { items, getUser } = useApp();
+  
+  // 1. Determine if param is UUID (Legacy ID) or Slug
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+  
+  // 2. Try Global Store first (fastest)
+  const storeItem = items.find((i) => 
+    isUUID ? i.id === slugOrId : i.slug === slugOrId
+  );
+  
+  // 3. Local State for direct fetch fallback
+  const [fetchedItem, setFetchedItem] = useState<Item | null>(null);
+  const [isLoading, setIsLoading] = useState(!storeItem);
+  const [fetchError, setFetchError] = useState(false);
+
+  useEffect(() => {
+    if (storeItem) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchItem = async () => {
+      setIsLoading(true);
+      try {
+        let query = (supabase.from('marketplace_listings') as any).select('*');
+        
+        if (isUUID) {
+            query = query.eq('id', slugOrId);
+        } else {
+            query = query.eq('slug', slugOrId);
+        }
+
+        const { data, error } = await query.single();
+
+        if (error || !data) {
+          console.error("Error fetching item:", error);
+          setFetchError(true);
+        } else {
+          // Transform using the same logic as the grid
+          const newItem = transformListingToItem(data as unknown as ListingWithSeller);
+          setFetchedItem(newItem);
+        }
+      } catch (err) {
+        console.error("Exception fetching item:", err);
+        setFetchError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchItem();
+  }, [slugOrId, storeItem, isUUID]);
+
+  // Combined Item
+  const item = storeItem || fetchedItem;
+  // Seller is embedded in the item by transformListingToItem, or we try getUser if it's missing (legacy)
+  const seller = item?.seller || (item ? getUser(item.sellerId) : null);
+
+  if (isLoading) {
+    return (
+       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
+         <p className="text-slate-500 font-medium">Loading details...</p>
+       </div>
+    );
+  }
+
+  if (fetchError || !item || !seller) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <h1 className="text-2xl font-bold text-slate-900">Item not found</h1>
+        <Button onClick={() => router.push("/")} variant="outline">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Marketplace
+        </Button>
+      </div>
+    );
+  }
+
+  return <ProductContent item={item} seller={seller} />;
 }

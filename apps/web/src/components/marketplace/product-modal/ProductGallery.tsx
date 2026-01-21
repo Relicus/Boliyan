@@ -26,7 +26,7 @@ export function ProductGallery({
   isUrgent
 }: ProductGalleryProps) {
   return (
-    <div id={`product-details-gallery-${item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[240px] sm:h-[320px] md:h-full">
+    <div id={`product-details-gallery-${item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[300px] sm:h-[400px] md:h-full">
       {/* Victory Halo - State Based Animated Border Background */}
       {showHalo && (
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">

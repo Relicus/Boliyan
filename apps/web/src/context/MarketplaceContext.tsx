@@ -3,11 +3,25 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Item, Bid } from "@/types";
 import { useAuth } from "./AuthContext";
-import { useTime } from "./TimeContext";
 import { supabase } from "@/lib/supabase";
-import { transformListingToItem, ListingWithSeller, transformBidToHydratedBid, BidWithProfile } from "@/lib/transform";
+import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { generateCacheKey, getFromCache, setCache } from "@/lib/cache";
 import { useBidRealtime } from "@/hooks/useBidRealtime";
+import type { Database } from "@/types/database.types";
+
+interface MarketplaceFilters {
+  category: string | null;
+  search: string;
+  radius: number;
+  locationMode: 'current' | 'city' | 'country';
+  city: string;
+  currentCoords: { lat: number; lng: number } | null;
+  sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest' | 'watchlist';
+  minPrice: number | null;
+  maxPrice: number | null;
+  condition: 'new' | 'like_new' | 'used' | 'fair' | 'all';
+  listingType: 'all' | 'public' | 'sealed';
+}
 
 interface MarketplaceContextType {
   items: Item[];
@@ -24,24 +38,18 @@ interface MarketplaceContextType {
   watchedItemIds: string[];
   rejectBid: (bidId: string) => void;
   acceptBid: (bidId: string) => Promise<string | undefined>;
-  filters: {
-    category: string | null;
-    search: string;
-    radius: number;
-    locationMode: 'current' | 'city' | 'country';
-    city: string;
-    currentCoords: { lat: number; lng: number } | null;
-    sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest' | 'watchlist';
-    minPrice: number | null;
-    maxPrice: number | null;
-    condition: 'new' | 'like_new' | 'used' | 'fair' | 'all';
-    listingType: 'all' | 'public' | 'sealed';
-  };
-  setFilter: (key: keyof MarketplaceContextType['filters'], value: any) => void;
-  updateFilters: (updates: Partial<MarketplaceContextType['filters']>) => void;
+  filters: MarketplaceFilters;
+  setFilter: <K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => void;
+  updateFilters: (updates: Partial<MarketplaceFilters>) => void;
 }
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
+
+type MarketplaceListingRow = Database['public']['Tables']['marketplace_listings']['Row'];
+type BidInsert = Database['public']['Tables']['bids']['Insert'];
+type BidUpdate = Database['public']['Tables']['bids']['Update'];
+type ListingUpdate = Database['public']['Tables']['listings']['Update'];
+type WatchlistRow = Database['public']['Tables']['watchlist']['Row'];
 
 export function MarketplaceProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -57,7 +65,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const loadingLockRef = React.useRef(false);
   const ITEMS_PER_PAGE = 8;
 
-  const [filters, setFilters] = useState<MarketplaceContextType['filters']>({
+  const [filters, setFilters] = useState<MarketplaceFilters>({
     category: null,
     search: "",
     radius: 500,
@@ -75,7 +83,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   // Note: Geolocation helper functions kept if needed for future hybrid sorting, 
   // though primary filtering is now Server-Side where possible.
   
-  const fetchItems = async (targetPage: number, reset: boolean = false) => {
+  const fetchItems = React.useCallback(async (targetPage: number, reset: boolean = false) => {
       if (loadingLockRef.current) return;
       loadingLockRef.current = true;
       
@@ -115,7 +123,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         try {
             // PHASE 4: Use 'marketplace_listings' Master View for server-side aggregation
             // This replaces the raw 'listings' fetch + 'profiles' join + separate 'bids' fetch
-            let query = (supabase.from('marketplace_listings') as any).select(`
+            let query = supabase.from('marketplace_listings').select(`
                 id,
                 title,
                 description,
@@ -200,9 +208,9 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
            if (listingsError) throw listingsError;
 
            let fetchedItems: Item[] = [];
-           if (listingsData) {
-               fetchedItems = listingsData.map((row: any) => transformListingToItem(row as unknown as ListingWithSeller));
-           }
+            if (listingsData) {
+                fetchedItems = listingsData.map((row: MarketplaceListingRow) => transformListingToItem(row as unknown as ListingWithSeller));
+            }
 
            // --- CLIENT-SIDE SORTING OVERRIDES ---
            // If 'watchlist' sort is selected, we might need to fetch more or re-sort client side 
@@ -233,28 +241,24 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                setHasMore(fetchedItems.length === ITEMS_PER_PAGE);
            }
 
-      } catch (err) {
-          console.error("Fetch Items Error:", err);
-          if (err && typeof err === 'object') {
-             console.error("Fetch Items Error Details:", JSON.stringify(err, null, 2));
-          }
-      } finally {
+       } catch (err: unknown) {
+           console.error("Fetch Items Error:", err);
+           if (err && typeof err === 'object') {
+              console.error("Fetch Items Error Details:", JSON.stringify(err, null, 2));
+           }
+       } finally {
           setIsLoading(false);
           setIsLoadingMore(false);
           loadingLockRef.current = false;
       }
-  };
+  }, [filters, ITEMS_PER_PAGE]);
 
   // --- EFFECT: Trigger Fetch on Filter Change ---
   useEffect(() => {
       setPage(1);
       // Removed 500ms debounce - category/sort changes should be instant
       fetchItems(1, true);
-  }, [
-      filters.category, filters.search, filters.sortBy, filters.minPrice, filters.maxPrice, 
-      filters.listingType, filters.condition
-      // Radius/Location ignored for server-side query as per plan/limitations
-  ]);
+  }, [fetchItems]);
 
   // --- Realtime Subscription (Bids) ---
   const handleRealtimeBid = React.useCallback((newBid: Bid) => {
@@ -286,15 +290,18 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   };
 
   const addItem = (newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => {
-    console.log("addItem - logic pending refactor in selling phase");
+    console.log("addItem - logic pending refactor in selling phase", newItem);
   };
 
   const updateItem = async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => {
-     const dbUpdates: any = {};
+     const dbUpdates: ListingUpdate = {};
      if (updates.status) dbUpdates.status = updates.status;
      if (updates.title) dbUpdates.title = updates.title;
 
-     const { error } = await (supabase.from('listings') as any).update(dbUpdates as any).eq('id', id);
+     const { error } = await (supabase
+       .from('listings') as any)
+       .update(dbUpdates)
+       .eq('id', id);
      
      if (error) {
          console.error("Failed to update item:", error);
@@ -363,15 +370,18 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
     // Use UPSERT to handle the unique constraint on (listing_id, bidder_id)
     // This allows users to update their existing bid instead of creating duplicates
-    const { data, error } = await (supabase.from('bids') as any).upsert({
-        listing_id: itemId,
-        bidder_id: user.id,
-        amount: amount,
-        message: type === 'private' ? 'Private Bid' : 'Public Bid',
-        status: 'pending'
-    } as any, { 
-        onConflict: 'listing_id,bidder_id'
-    }).select();
+    const bidPayload: BidInsert = {
+      listing_id: itemId,
+      bidder_id: user.id,
+      amount: amount,
+      message: type === 'private' ? 'Private Bid' : 'Public Bid',
+      status: 'pending'
+    };
+
+    const { data, error } = await (supabase
+      .from('bids') as any)
+      .upsert(bidPayload, { onConflict: 'listing_id,bidder_id' })
+      .select();
 
     console.log("[placeBid] Supabase response - data:", data, "error:", error);
 
@@ -418,7 +428,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         if (error) {
             console.error("Error fetching watchlist:", error);
         } else if (data) {
-            setWatchedItemIds(data.map((row: any) => row.listing_id));
+            const ids = (data as WatchlistRow[])
+              .map((row) => row.listing_id)
+              .filter((id): id is string => !!id);
+            setWatchedItemIds(ids);
         }
     };
 
@@ -445,8 +458,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
     if (isWatched) {
         // Remove
-        const { error } = await supabase
-            .from('watchlist')
+        const { error } = await (supabase
+            .from('watchlist') as any)
             .delete()
             .match({ user_id: user.id, listing_id: itemId });
         
@@ -469,7 +482,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     }
   };
 
-  const setFilter = (key: keyof MarketplaceContextType['filters'], value: any) => {
+  const setFilter = <K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
   const updateFilters = (updates: Partial<MarketplaceContextType['filters']>) => {
@@ -477,13 +490,21 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   };
 
   const rejectBid = async (bidId: string) => {
-      const { error } = await (supabase.from('bids') as any).update({ status: 'ignored' } as any).eq('id', bidId);
+      const bidUpdates: BidUpdate = { status: 'ignored' };
+      const { error } = await (supabase
+        .from('bids') as any)
+        .update(bidUpdates)
+        .eq('id', bidId);
       if (error) console.error("Failed to reject bid", error);
       else setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: 'ignored' } : b));
   };
 
   const acceptBid = async (bidId: string) => {
-      const { error } = await (supabase.from('bids') as any).update({ status: 'accepted' } as any).eq('id', bidId);
+      const bidUpdates: BidUpdate = { status: 'accepted' };
+      const { error } = await (supabase
+        .from('bids') as any)
+        .update(bidUpdates)
+        .eq('id', bidId);
       if (error) return undefined;
       setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: 'accepted' } : b));
       return bidId;

@@ -5,6 +5,30 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+import { customAlphabet } from 'nanoid';
+
+// ... existing code ...
+
+/**
+ * Generates a SEO-friendly slug: "title-slug-random8"
+ */
+export function generateSlug(title: string): string {
+  // 1. Slugify the title
+  const slugTitle = title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // Remove special chars
+    .replace(/[\s_-]+/g, '-') // Replace spaces/underscores with hyphen
+    .replace(/^-+|-+$/g, ''); // Trim hyphens
+
+  // 2. Generate 8-char random string (numbers + lowercase only for URL safety)
+  const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 8);
+  const randomSuffix = nanoid();
+
+  return `${slugTitle}-${randomSuffix}`;
+}
+
+
 /**
  * Strips precise address details (House #, Street #, Apartment #) 
  * and returns a general area estimate (e.g., "DHA Phase 6, Lahore").

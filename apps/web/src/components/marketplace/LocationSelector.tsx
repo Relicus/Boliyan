@@ -127,12 +127,12 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
       ref={ref}
       id="location-popover-trigger"
       variant="ghost"
-      className={cn("h-8 flex items-center gap-1.5 px-2 rounded-full bg-slate-50 hover:bg-slate-100", className)}
+      className={cn("h-9 flex items-center gap-1.5 px-3 rounded-full hover:bg-slate-100 transition-colors", className)}
       {...props}
       title={getDisplayLabel()}
     >
-      <MapPin className="h-4 w-4 text-slate-700" />
-      <span className="text-[10px] font-bold text-slate-700 max-w-[80px] truncate hidden xl:inline">
+      <MapPin className="h-5 w-5 text-red-600 fill-red-600" />
+      <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate hidden lg:inline">
         {getDisplayLabel().split(' ')[0]}
       </span>
     </Button>
@@ -195,7 +195,6 @@ function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
   };
 
   const displayRadius = filters.radius >= 200 ? 200 : filters.radius;
-  const isWholeCountry = filters.radius >= 200 || filters.locationMode === "country";
 
   return (
     <div className="flex flex-col w-full">

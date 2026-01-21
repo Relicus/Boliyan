@@ -85,7 +85,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   }, [user, refreshNotifications]);
 
   const markAsRead = async (id: string) => {
-    await (supabase.from('notifications') as any).update({ is_read: true }).eq('id', id);
+    await (supabase
+      .from('notifications') as any)
+      .update({ is_read: true })
+      .eq('id', id);
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
@@ -93,7 +96,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const markAllAsRead = async () => {
     if (!user) return;
-    await (supabase.from('notifications') as any).update({ is_read: true }).eq('user_id', user.id);
+    await (supabase
+      .from('notifications') as any)
+      .update({ is_read: true })
+      .eq('user_id', user.id);
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 

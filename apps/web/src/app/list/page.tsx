@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { uploadListingImage } from "@/lib/uploadImage";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/types/database.types";
+import { generateSlug } from "@/lib/utils";
 
 function ListForm() {
   const router = useRouter();
@@ -117,8 +118,8 @@ function ListForm() {
         // Schema doesn't strictly require expiry, transform.ts calculates it.
         // But let's check schema... Assuming DB has default or we omit and let DB handle.
         // Actually, better to insert a known value if we want consistency.
-
-        const listingData: Database['public']['Tables']['listings']['Insert'] = {
+        
+        const listingData: any = {
             title,
             category,
             asked_price: parseFloat(askPrice),
@@ -131,10 +132,15 @@ function ListForm() {
         };
 
         if (editingItem) {
-          // ...
+          // Update logic (Not implemented yet, but safe from slug overwrites)
         } else {
-            // Insert
-            const { error } = await supabase.from('listings').insert(listingData as any);
+            // Insert - Add slug only here
+            const insertPayload = {
+              ...listingData,
+              slug: generateSlug(title)
+            };
+            
+            const { error } = await (supabase.from('listings') as any).insert([insertPayload]);
             
             if (error) throw error;
             router.push("/");
@@ -284,7 +290,7 @@ function ListForm() {
             <Label className="flex items-center gap-1">Item Condition</Label>
             <Select 
               value={condition} 
-              onValueChange={(val: any) => setCondition(val)}
+              onValueChange={(val: 'new' | 'like_new' | 'used' | 'fair') => setCondition(val)}
             >
               <SelectTrigger id="condition-select" className="bg-slate-50 border-slate-100 h-11 w-full">
                 <SelectValue placeholder="Select Condition" />

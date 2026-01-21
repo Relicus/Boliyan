@@ -86,7 +86,9 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     setAnimTrigger(prev => prev + 1);
   }, [bidAmount, item]);
 
-  const executeBid = useCallback((amount: number, e?: React.MouseEvent | React.TouchEvent | any) => {
+  type BidEvent = React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
+
+  const executeBid = useCallback((amount: number, e?: BidEvent) => {
     // IMPORTANT: Capture button position IMMEDIATELY before any state updates
     // React's synthetic event nullifies currentTarget after the handler phase
     let confettiX = 0.5;

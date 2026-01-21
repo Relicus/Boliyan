@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { Bid, User } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { MapPin, MessageSquare, Star, Clock, Check, X } from "lucide-react";
 import { calculatePrivacySafeDistance, getFuzzyLocationString } from "@/lib/utils";
 import { useApp } from "@/lib/store";

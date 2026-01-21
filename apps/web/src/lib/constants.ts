@@ -11,8 +11,6 @@ import {
   Music,
   Camera,
   Activity,
-  Home,
-  Wrench,
   Tv
 } from "lucide-react";
 

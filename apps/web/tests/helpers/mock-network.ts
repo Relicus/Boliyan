@@ -135,7 +135,46 @@ export async function mockSupabaseNetwork(page: Page) {
      }
   });
 
-  // 6. Mock Marketplace Listings (GET)
+  // 7. Mock Categories (GET)
+  await page.route(/\/rest\/v1\/categories.*/, async route => {
+      if (route.request().method() === 'GET') {
+          await route.fulfill({
+              json: [
+                  { id: 'cat-001', name: 'Cameras', slug: 'cameras', sort_order: 1 },
+                  { id: 'cat-002', name: 'Electronics', slug: 'electronics', sort_order: 2 },
+                  { id: 'cat-003', name: 'Vehicles', slug: 'vehicles', sort_order: 3 }
+              ]
+          });
+          return;
+      }
+      await route.fulfill({ json: [] });
+  });
+
+  // 8. Mock Listings (GET category aggregation)
+  await page.route(/\/rest\/v1\/listings.*/, async route => {
+      if (route.request().method() === 'GET') {
+          await route.fulfill({
+              json: [
+                  { category: 'Cameras' },
+                  { category: 'Electronics' },
+                  { category: 'Vehicles' }
+              ]
+          });
+          return;
+      }
+      await route.fulfill({ json: [] });
+  });
+
+  // 9. Mock Notifications (GET/PATCH)
+  await page.route(/\/rest\/v1\/notifications.*/, async route => {
+      if (route.request().method() === 'GET') {
+          await route.fulfill({ json: [] });
+          return;
+      }
+      await route.fulfill({ json: [] });
+  });
+
+  // 10. Mock Marketplace Listings (GET)
   await page.route(/\/rest\/v1\/marketplace_listings.*/, async route => {
       // Return a set of mock items containing the IDs expected by tests
       // ID '...23' is commonly used by ItemCard test? 

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, type Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 
@@ -10,9 +10,23 @@ import path from 'path';
  */
 
 const BASE_URL = 'http://192.168.18.125:3000';
+interface DiscoveredElement {
+  id: string;
+  tagName: string;
+  text?: string;
+  type?: string;
+  placeholder?: string;
+}
+
+interface DiscoveredFeature {
+  route: string;
+  title: string;
+  interactiveElements: DiscoveredElement[];
+}
+
 const discoveredFeatures = {
   routes: new Set<string>(),
-  elements: [] as any[],
+  elements: [] as DiscoveredFeature[],
   errors: [] as string[]
 };
 
@@ -35,8 +49,9 @@ test('Programmatic Feature Discovery', async ({ page }) => {
     try {
       await page.goto(`${BASE_URL}${route}`);
       await scrapePage(page, route);
-    } catch (e: any) {
-      discoveredFeatures.errors.push(`Error on ${route}: ${e.message}`);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      discoveredFeatures.errors.push(`Error on ${route}: ${message}`);
     }
   }
 
@@ -49,9 +64,9 @@ test('Programmatic Feature Discovery', async ({ page }) => {
   }, null, 2));
 });
 
-async function scrapePage(page: any, route: string) {
+async function scrapePage(page: Page, route: string) {
   const title = await page.title();
-  const elementsWithId = await page.locator('[id]').evaluateAll((els: any[]) => 
+  const elementsWithId = await page.locator('[id]').evaluateAll((els: HTMLElement[]) => 
     els.map(el => ({
       id: el.id,
       tagName: el.tagName,

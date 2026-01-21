@@ -74,17 +74,21 @@ const BiddingWidget = memo(({
     animTrigger,
     handleSmartAdjust,
     handleBid,
-    confirmBid,
-    clearWarning,
-    warning,
+    pendingConfirmation,
+    clearPendingConfirmation,
     handleKeyDown,
-    handleInputChange,
-    getSmartStep
+    handleInputChange
   } = useBidding(item, seller, onBidSuccess);
+
+  // Adapter for Legacy Dialog Logic (if we still want the dialog)
+  // The hook now supports "Double Tap" logic internally, but if we show a Dialog,
+  // clicking "Yes" in the dialog calls handleBid again, which executes the bid.
+  const warning = pendingConfirmation;
+  const clearWarning = clearPendingConfirmation;
+  const confirmBid = handleBid;
 
   // Check if user is the seller (can't bid on own item)
   const isOwnListing = user?.id === seller?.id;
-  const isDisabled = disabled || isOwnListing;
   
 
 
@@ -106,6 +110,7 @@ const BiddingWidget = memo(({
           animTrigger={animTrigger}
           viewMode={viewMode}
           disabled={disabled}
+          idPrefix={`bidding-widget-${item.id}`}
           onSmartAdjust={handleSmartAdjust}
           onBid={handleBid}
           onKeyDown={handleKeyDown}

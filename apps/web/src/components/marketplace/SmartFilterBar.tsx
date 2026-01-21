@@ -5,6 +5,7 @@ import { useMarketplace } from "@/context/MarketplaceContext";
 import { useSearch } from "@/context/SearchContext";
 import { cn } from "@/lib/utils";
 import { Flame, MapPin, Timer, Gem, Sparkles, Bookmark } from "lucide-react";
+import type { SearchFilters } from "@/types";
 
 export const FILTERS = [
   { id: 'trending', label: 'Trending', icon: Flame, color: "text-orange-500", fill: "fill-orange-500/10" },
@@ -15,6 +16,8 @@ export const FILTERS = [
   { id: 'watchlist', label: 'Watchlist', icon: Bookmark, color: "text-amber-500", fill: "fill-amber-500/10" },
 ] as const;
 
+type FilterId = typeof FILTERS[number]['id'];
+
 function SmartFilterBar() {
   const { filters: mpFilters, setFilter: setMpFilter } = useMarketplace();
   const { filters: searchFilters, updateFilter: updateSearchFilter } = useSearch();
@@ -23,18 +26,21 @@ function SmartFilterBar() {
   // Category from FilterSheet should use MarketplaceContext
   const isSearchMode = !!searchFilters.query;
 
-  const handleFilterClick = useCallback((id: string) => {
+  const handleFilterClick = useCallback((id: FilterId) => {
     if (isSearchMode) {
        // Map to SearchContext supported sorts
-       let sortVal: any = id; 
-       
+       let sortVal: SearchFilters['sortBy'] = 'newest';
+        
        if (id === 'luxury') sortVal = 'price_high';
        if (id === 'trending') sortVal = 'newest'; // Fallback
+       if (id === 'nearest') sortVal = 'nearest';
+       if (id === 'ending_soon') sortVal = 'ending_soon';
+       if (id === 'newest') sortVal = 'newest';
        if (id === 'watchlist') return; // Not supported in search yet
-       
+        
        updateSearchFilter('sortBy', sortVal);
     } else {
-       setMpFilter('sortBy', id as any);
+       setMpFilter('sortBy', id);
     }
   }, [isSearchMode, setMpFilter, updateSearchFilter]);
 

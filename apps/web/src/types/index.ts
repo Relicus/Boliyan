@@ -33,6 +33,7 @@ export interface User {
 
 export interface Item {
   id: string;
+  slug?: string;
   title: string;
   description: string;
   images: string[];
@@ -57,7 +58,7 @@ export interface Bid {
   bidderId: string;
   bidder?: User; // Hydrated bidder profile
   amount: number;
-  status: 'pending' | 'accepted' | 'rejected' | 'shortlisted';
+  status: 'pending' | 'accepted' | 'rejected' | 'shortlisted' | 'ignored';
   type: 'public' | 'private';
   createdAt: string;
 }

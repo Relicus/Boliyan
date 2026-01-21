@@ -48,7 +48,7 @@ export async function loginUser(page: Page, email?: string, password = 'password
         await expect(page.locator('#navbar-avatar-18')).toBeVisible({ timeout: 15000 });
         console.log(`[loginUser] Signup and Auto-Login successful for ${testEmail}`);
       } catch (signupError) {
-        console.error(`[loginUser] Auth verification failed for ${testEmail}: ${signupError.message}`);
+        console.error(`[loginUser] Auth verification failed for ${testEmail}: ${(signupError as any).message}`);
         // If we are on / and still see Sign In, something is wrong with the mock session persistence
         const signInVisible = await page.locator('#navbar-signin-btn').isVisible();
         const loadingVisible = await page.locator('#navbar-loading-avatar').isVisible();

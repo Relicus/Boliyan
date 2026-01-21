@@ -11,6 +11,7 @@ const CANDIDATES = [
 ];
 
 test.describe('Auth Probe', () => {
+    test.skip(!!process.env.CI, 'Credential probe is local-only.');
     for (const cred of CANDIDATES) {
         test(`Try login: ${cred.email} / ${cred.password}`, async ({ page }) => {
             console.log(`[Probe] Testing ${cred.email} with ${cred.password}`);

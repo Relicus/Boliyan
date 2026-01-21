@@ -4,9 +4,6 @@ import { useMarketplace } from '@/context/MarketplaceContext';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import * as Icons from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
-
 import { CATEGORIES } from '@/lib/constants';
 
 export default function CategoryNav() {

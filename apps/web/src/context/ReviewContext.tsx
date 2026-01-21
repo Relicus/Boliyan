@@ -4,6 +4,7 @@ import { createContext, useContext, useCallback, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import type { Review, UserReputation } from '@/types/review';
+import type { Database } from '@/types/database.types';
 
 interface ReviewContextType {
   submitReview: (data: SubmitReviewData) => Promise<{ success: boolean; error?: string }>;
@@ -26,10 +27,14 @@ const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
 export function ReviewProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
 
+  type ReviewRow = Database['public']['Tables']['reviews']['Row'];
+  type ReviewInsert = Database['public']['Tables']['reviews']['Insert'];
+  type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+
   const submitReview = useCallback(async (data: SubmitReviewData) => {
     if (!user) return { success: false, error: 'Not authenticated' };
 
-    const { error } = await (supabase.from('reviews') as any).insert({
+    const reviewPayload: ReviewInsert = {
       reviewer_id: user.id,
       reviewed_id: data.reviewedId,
       listing_id: data.listingId,
@@ -37,7 +42,9 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
       rating: data.rating,
       content: data.content,
       role: data.role,
-    });
+    };
+
+    const { error } = await (supabase.from('reviews') as any).insert(reviewPayload);
 
     if (error) {
       return { success: false, error: error.message };
@@ -46,8 +53,8 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   const fetchUserReviews = useCallback(async (userId: string): Promise<Review[]> => {
-    const { data, error } = await (supabase
-      .from('reviews') as any)
+    const { data, error } = await supabase
+      .from('reviews')
       .select(`
         *,
         reviewer:profiles!reviewer_id(name, avatar_url),
@@ -61,26 +68,30 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
         return [];
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (data as any[]).map((row) => ({
+    type ReviewWithRelations = ReviewRow & {
+      reviewer?: { name?: string | null; avatar_url?: string | null } | null;
+      listing?: { title?: string | null } | null;
+    };
+
+    return (data as ReviewWithRelations[]).map((row) => ({
       id: row.id,
-      reviewerId: row.reviewer_id,
-      reviewerName: row.reviewer?.name,
-      reviewerAvatar: row.reviewer?.avatar_url, // Adjusted to match profile schema usually avatar_url
-      reviewedId: row.reviewed_id,
-      listingId: row.listing_id,
-      listingTitle: row.listing?.title,
-      conversationId: row.conversation_id,
-      rating: row.rating,
-      content: row.content,
-      role: row.role,
-      createdAt: row.created_at,
+      reviewerId: row.reviewer_id || '',
+      reviewerName: row.reviewer?.name || undefined,
+      reviewerAvatar: row.reviewer?.avatar_url || undefined,
+      reviewedId: row.reviewed_id || '',
+      listingId: row.listing_id || '',
+      listingTitle: row.listing?.title || undefined,
+      conversationId: row.conversation_id || undefined,
+      rating: row.rating || 0,
+      content: row.content || undefined,
+      role: (row.role || 'buyer') as Review['role'],
+      createdAt: row.created_at || new Date().toISOString(),
     }));
   }, []);
 
   const fetchUserReputation = useCallback(async (userId: string): Promise<UserReputation | null> => {
-    const { data, error } = await (supabase
-      .from('profiles') as any)
+    const { data, error } = await supabase
+      .from('profiles')
       .select('avg_rating, review_count')
       .eq('id', userId)
       .single();
@@ -88,23 +99,27 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
     if (error || !data) return null;
 
     // Get breakdown by role
-    const { data: breakdown } = await (supabase
-      .from('reviews') as any)
+    const { data: breakdown } = await supabase
+      .from('reviews')
       .select('role, rating')
       .eq('reviewed_id', userId);
 
-    const asBuyer = (breakdown as any[])?.filter((r: any) => r.role === 'seller') || []; // Reviews they received AS buyer
-    const asSeller = (breakdown as any[])?.filter((r: any) => r.role === 'buyer') || []; // Reviews they received AS seller
+    type ReviewRatingRow = Pick<ReviewRow, 'role' | 'rating'>;
+    const breakdownRows = (breakdown as ReviewRatingRow[]) || [];
+    const asBuyer = breakdownRows.filter((r) => r.role === 'seller'); // Reviews they received AS buyer
+    const asSeller = breakdownRows.filter((r) => r.role === 'buyer'); // Reviews they received AS seller
+
+    const profile = data as ProfileRow & { avg_rating?: number | null; review_count?: number | null };
 
     return {
-      avgRating: data.avg_rating || 0,
-      reviewCount: data.review_count || 0,
+      avgRating: profile.avg_rating || 0,
+      reviewCount: profile.review_count || 0,
       asBuyer: {
-        avgRating: asBuyer.length ? asBuyer.reduce((s, r) => s + r.rating, 0) / asBuyer.length : 0,
+        avgRating: asBuyer.length ? asBuyer.reduce((s, r) => s + (r.rating || 0), 0) / asBuyer.length : 0,
         count: asBuyer.length,
       },
       asSeller: {
-        avgRating: asSeller.length ? asSeller.reduce((s, r) => s + r.rating, 0) / asSeller.length : 0,
+        avgRating: asSeller.length ? asSeller.reduce((s, r) => s + (r.rating || 0), 0) / asSeller.length : 0,
         count: asSeller.length,
       },
     };
@@ -114,8 +129,8 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
     if (!user) return false;
 
     // Check if already reviewed
-    const { data } = await (supabase
-      .from('reviews') as any)
+    const { data } = await supabase
+      .from('reviews')
       .select('id')
       .eq('reviewer_id', user.id)
       .eq('listing_id', listingId)

@@ -21,8 +21,12 @@ CREATE TABLE listings (
   condition TEXT CHECK (condition IN ('new', 'like_new', 'used', 'fair')) DEFAULT 'used',
   auction_mode TEXT CHECK (auction_mode IN ('hidden', 'visible')) DEFAULT 'visible',
   status TEXT CHECK (status IN ('active', 'completed', 'cancelled')) DEFAULT 'active',
+  slug TEXT UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Indexes
+CREATE INDEX idx_listings_slug ON listings(slug);
 
 -- Bids Table
 CREATE TABLE bids (

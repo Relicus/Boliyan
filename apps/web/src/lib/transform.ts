@@ -92,6 +92,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
 
   return {
     id: listing.id,
+    slug: (listing as any).slug || undefined,
     title: listing.title,
     description: listing.description || '',
     images: imageUrls,
@@ -99,7 +100,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     seller: seller,
     askPrice: listing.asked_price,
     category: listing.category || 'Other',
-    condition: (listing as any).condition || 'used',
+    condition: listing.condition || 'used',
     isPublicBid: isPublicBid,
     
     // Server-side stats if available
@@ -110,7 +111,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     createdAt: listing.created_at || new Date().toISOString(),
     expiryAt: expiryAt,
     listingDuration: 72,
-    status: (listing as any).status || 'active'
+    status: listing.status || 'active'
   };
 }
 export type BidWithProfile = Database['public']['Tables']['bids']['Row'] & {
@@ -124,7 +125,7 @@ export function transformBidToHydratedBid(bid: BidWithProfile): Bid {
     bidderId: bid.bidder_id || '',
     bidder: bid.profiles ? transformProfileToUser(bid.profiles) : undefined,
     amount: Number(bid.amount),
-    status: (bid.status as any) || 'pending',
+    status: (bid.status || 'pending') as Bid['status'],
     type: 'public', // Defaulting since bid_type was removed from schema
     createdAt: bid.created_at || new Date().toISOString()
   };
@@ -136,6 +137,7 @@ export type ConversationWithHydration = Database['public']['Tables']['conversati
   bidder_profile: ProfileRow | null;
   last_message?: string;
   updated_at?: string;
+  expires_at?: string | null;
 };
 
 export function transformConversationToHydratedConversation(conv: ConversationWithHydration): Conversation {
@@ -149,6 +151,6 @@ export function transformConversationToHydratedConversation(conv: ConversationWi
     bidder: conv.bidder_profile ? transformProfileToUser(conv.bidder_profile) : undefined,
     lastMessage: conv.last_message,
     updatedAt: conv.updated_at || conv.created_at || new Date().toISOString(),
-    expiresAt: (conv as any).expires_at
+    expiresAt: conv.expires_at || undefined
   };
 }

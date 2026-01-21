@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge } from '@/types';
 import { cn } from '@/lib/utils';
-import { Handshake, ShoppingBag, ShieldCheck, Zap, BadgeCheck, Trophy, Star } from 'lucide-react';
+import { Handshake, ShoppingBag, ShieldCheck, Zap, BadgeCheck, Trophy, Star, type LucideIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface GamificationBadgeProps {
@@ -11,7 +11,7 @@ interface GamificationBadgeProps {
   className?: string;
 }
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, LucideIcon> = {
   Handshake,
   ShoppingBag,
   ShieldCheck,

@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { supabase } from '@/lib/supabase';
 import { useApp } from '@/lib/store';
 import { DashboardState, ManagedListing, SellerMetric } from '@/types/dashboard';
-import { Item } from '@/types';
+import type { Database } from '@/types/database.types';
 
 interface DashboardContextType extends DashboardState {
   refreshDashboard: () => Promise<void>;
@@ -43,14 +43,29 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
       // Transform to ManagedListing
       // Note: view_count might not exist yet in DB, defaulting to mock random for demo if missing
-      const listings: ManagedListing[] = (listingsData || []).map((item: any) => ({
+      type ListingRow = Database['public']['Tables']['listings']['Row'];
+      type ListingWithBidCount = ListingRow & { bids?: { count: number }[] };
+
+      const listings: ManagedListing[] = (listingsData as ListingWithBidCount[] || []).map((item) => ({
         ...item,
+        // Manual mapping from Snake Case (DB) to Camel Case (App)
+        sellerId: item.seller_id || '',
+        askPrice: item.asked_price,
+        isPublicBid: item.auction_mode === 'visible',
+        createdAt: item.created_at || new Date().toISOString(),
+        category: item.category || 'Other',
+        listingDuration: 24, // Default or fetch if available
+        expiryAt: new Date(Date.now() + 86400000).toISOString(), // Mock expiry
+        description: item.description || '', // Ensure string
+        condition: item.condition || 'used',
+        status: item.status || 'active',
+        
         images: item.images || [], // Ensure array
         seller: user, // user is seller
         bidCount: item.bids?.[0]?.count || 0,
-        views: item.view_count || Math.floor(Math.random() * 50) + 10, // Mock if missing
+        views: (item as any).view_count || Math.floor(Math.random() * 50) + 10, // Mock if missing
         unreadBids: 0, // TODO: Implement unread logic with notifications
-        lastActivity: item.created_at, // separate activity field later?
+        lastActivity: item.created_at || new Date().toISOString(), // separate activity field later?
       }));
 
       // 2. Calculate Metrics
@@ -74,9 +89,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         error: null,
       });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading dashboard:', err);
-      setState(prev => ({ ...prev, isLoading: false, error: err.message }));
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setState(prev => ({ ...prev, isLoading: false, error: message }));
     }
   }, [user]);
 
@@ -89,7 +105,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
   const updateListingStatus = async (itemId: string, status: 'active' | 'completed' | 'cancelled') => {
     try {
-      const { error } = await (supabase.from('listings') as any)
+      const { error } = await (supabase
+        .from('listings') as any)
         .update({ status })
         .eq('id', itemId);
 
@@ -104,7 +121,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       // Refresh to confirm and update metrics
       fetchDashboardData();
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to update status:', error);
       // Revert or show toast (for now just log)
     }

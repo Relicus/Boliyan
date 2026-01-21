@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Tag, CircleDollarSign, Compass, RefreshCcw, Search, Sparkles, Globe, Lock, Layers } from "lucide-react";
+import { RefreshCcw, Globe, Lock, Layers } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useApp } from "@/lib/store";

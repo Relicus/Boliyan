@@ -22,7 +22,8 @@ class SafeImageErrorBoundary extends Component<{ children: ReactNode; fallbackSr
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(_: Error): State {
+  static getDerivedStateFromError(error: Error): State {
+    console.warn("SafeImage Error detected:", error);
     return { hasError: true };
   }
 
@@ -56,7 +57,7 @@ class SafeImageErrorBoundary extends Component<{ children: ReactNode; fallbackSr
 export function SafeImage({ fallbackSrc, ...props }: Props) {
   return (
     <SafeImageErrorBoundary fallbackSrc={fallbackSrc}>
-      <Image {...props} />
+      <Image {...props} alt={props.alt ?? ""} />
     </SafeImageErrorBoundary>
   );
 }

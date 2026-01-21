@@ -3,12 +3,13 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './AuthContext';
-import type { Item } from '@/types';
+import type { Item, Bid } from '@/types';
 import type { SearchFilters, Category, SearchSuggestion } from '@/types';
 import { sortByDistance } from '@/lib/searchUtils';
 import { generateCacheKey, getFromCache, setCache } from '@/lib/cache';
 import { useBidRealtime } from '@/hooks/useBidRealtime';
-import { transformListingToItem, ListingWithSeller, transformBidToHydratedBid } from '@/lib/transform';
+import { transformListingToItem, ListingWithSeller } from '@/lib/transform';
+import type { Database } from '@/types/database.types';
 
 interface SearchContextType {
   filters: SearchFilters;
@@ -43,6 +44,11 @@ const defaultFilters: SearchFilters = {
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
+type MarketplaceListingRow = Database['public']['Tables']['marketplace_listings']['Row'];
+type ListingRow = Database['public']['Tables']['listings']['Row'];
+type CategoryRow = Database['public']['Tables']['categories']['Row'];
+type SearchHistoryRow = Database['public']['Tables']['search_history']['Row'];
+
 export function SearchProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   
@@ -67,13 +73,11 @@ export function SearchProvider({ children }: { children: ReactNode }) {
 
   const executeSearch = useCallback(async () => {
     // Generate cache key
-    const cacheKey = generateCacheKey('search', filters as unknown as Record<string, any>);
+    const cacheKey = generateCacheKey('search', filters as Record<string, unknown>);
     
     // --- 1. CHECK CACHE (L1/L2) ---
     // Only use cache if not page 1? Wait, search is always page 1 currently (no pagination in UI yet)
     // SWR pattern
-    let usedCache = false;
-    
     // We can't await easily inside a synchronous-looking start, but we can set state
     // For search, we might want to check cache first before setting isSearching=true?
     // Actually, setting isSearching=true is fine, then we check cache.
@@ -85,17 +89,15 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Note: totalResults might be inaccurate if we don't cache it too, but Item[] is main thing
         setTotalResults(cachedItems.length); // Approximation or store separately
         setIsSearching(false);
-        usedCache = true;
-        
-        if (!isStale) {
-            return;
-        }
+         if (!isStale) {
+             return;
+         }
         console.log(`[Search] Cache stale for ${cacheKey}, revalidating...`);
     }
 
     try {
-      let query = (supabase
-        .from('marketplace_listings') as any)
+      let query = supabase
+        .from('marketplace_listings')
         .select(`
             id,
             title,
@@ -137,12 +139,14 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Save to search history
         if (user) {
           /* Fire and forget history insert */
-          (supabase.from('search_history') as any).insert({
-            user_id: user.id,
-            query: filters.query,
-          }).then(({ error }: { error: any }) => { 
-             if(error) console.warn("Search history save failed", error); 
-          });
+          (supabase.from('search_history') as any)
+            .insert({
+              user_id: user.id,
+              query: filters.query,
+            })
+            .then(({ error }: any) => {
+              if (error) console.warn("Search history save failed", error);
+            });
         }
       }
 
@@ -176,7 +180,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Transform
         // Need to cast to unknown first to match ListingWithSeller interface structure expectations
         // Transform database rows to items
-        let items = data.map((row: any) => transformListingToItem(row as unknown as ListingWithSeller));
+        let items = data.map((row: MarketplaceListingRow) => transformListingToItem(row as unknown as ListingWithSeller));
 
         // --- PHASE 4 OPTIMIZATION: REMOVED SEPARATE BIDS FETCH ---
         // Bid stats are now included in the 'marketplace_listings' view.
@@ -245,6 +249,10 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       .from('categories')
       .select('*')
       .order('sort_order');
+
+    if (error) {
+      console.warn('[Search] Failed to fetch categories:', error);
+    }
     
     if (data) {
       // Get counts per category (active items)
@@ -254,17 +262,19 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         .select('category')
         .eq('status', 'active');
       
-      const countMap = (counts || []).reduce((acc: any, row: any) => {
-        acc[row.category] = (acc[row.category] || 0) + 1;
+      const countMap = (counts || []).reduce<Record<string, number>>((acc, row: ListingRow) => {
+        if (row.category) {
+          acc[row.category] = (acc[row.category] || 0) + 1;
+        }
         return acc;
-      }, {} as Record<string, number>);
+      }, {});
       
-      const newCategories = data.map((cat: any) => ({
+      const newCategories = (data as CategoryRow[]).map((cat) => ({
         id: cat.id,
         name: cat.name,
-        icon: cat.icon,
-        parentId: cat.parent_id,
-        count: countMap[cat.id] || 0,
+        icon: cat.slug || 'tag',
+        parentId: undefined,
+        count: countMap[cat.name] || 0,
       }));
 
       setCategories(newCategories);
@@ -302,8 +312,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
           
           if (recent) {
             const unique = new Set();
-            recent.forEach((r: any) => {
-                if(!unique.has(r.query)) {
+            recent.forEach((r: SearchHistoryRow) => {
+                if (r.query && !unique.has(r.query)) {
                     unique.add(r.query);
                     results.push({ type: 'recent', text: r.query });
                 }
@@ -334,7 +344,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         if (titleData) {
             const uniqueTitles = new Set(results.map(r => r.text.toLowerCase())); // specific dedupe against existing
             
-            (titleData as any[]).forEach((item) => {
+            (titleData as ListingRow[]).forEach((item) => {
+                if (!item.title) return;
                 const t = item.title;
                 if (!uniqueTitles.has(t.toLowerCase())) {
                     uniqueTitles.add(t.toLowerCase());
@@ -363,7 +374,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // --- Realtime Subscription (Bids) ---
-  const handleRealtimeBid = useCallback((newBid: any) => {
+  const handleRealtimeBid = useCallback((newBid: Bid) => {
       // Find if this bid belongs to any of our search results
       setSearchResults(prevItems => prevItems.map(item => {
         if (item.id === newBid.itemId) { // Note: newBid is already transformed/hydrated from hook

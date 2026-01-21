@@ -2,7 +2,6 @@ import React from 'react';
 import { BadgeCheck } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 interface VerifiedBadgeProps {
   size?: 'sm' | 'md' | 'lg';
@@ -15,12 +14,6 @@ export function VerifiedBadge({
   className, 
   showTooltip = true 
 }: VerifiedBadgeProps) {
-  const sizeClasses = {
-    sm: "h-3.5 w-3.5",
-    md: "h-5 w-5",
-    lg: "h-6 w-6"
-  };
-
   const iconSizes = {
     sm: 14,
     md: 20,

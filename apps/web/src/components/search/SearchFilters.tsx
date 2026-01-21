@@ -12,7 +12,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { X, RotateCcw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import type { SearchFilters as SearchFiltersType } from '@/types';
 
 interface SearchFiltersProps {
     isOpen: boolean;
@@ -22,6 +23,9 @@ interface SearchFiltersProps {
 
 export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFiltersProps) {
   const { filters, updateFilter, clearFilters, executeSearch } = useSearch();
+
+  type SearchSort = NonNullable<SearchFiltersType['sortBy']>;
+  type SearchCondition = NonNullable<SearchFiltersType['condition']>;
 
   if (!isOpen) return null;
 
@@ -47,7 +51,7 @@ export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFilte
              <Label className="text-sm font-medium text-slate-700">Sort By</Label>
              <Select 
                 value={filters.sortBy} 
-                onValueChange={(val: any) => updateFilter('sortBy', val)}
+                onValueChange={(val: SearchSort) => updateFilter('sortBy', val)}
              >
                 <SelectTrigger className="w-full">
                     <SelectValue placeholder="Sort order" />
@@ -109,10 +113,10 @@ export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFilte
         {/* Condition Filter */}
         <div className="space-y-3">
              <Label className="text-sm font-medium text-slate-700">Condition</Label>
-             <Select 
-                value={filters.condition || 'all'} 
-                onValueChange={(val: any) => updateFilter('condition', val)}
-             >
+              <Select 
+                 value={filters.condition || 'all'} 
+                 onValueChange={(val: SearchCondition) => updateFilter('condition', val)}
+              >
                 <SelectTrigger className="w-full">
                     <SelectValue placeholder="Any Condition" />
                 </SelectTrigger>

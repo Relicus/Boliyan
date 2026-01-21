@@ -12,6 +12,7 @@ import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
 import ProductDetailsModal from "./ProductDetailsModal";
+import Link from "next/link";
 import {
   Carousel,
   CarouselContent,
@@ -238,8 +239,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                          'bg-[#0ea5e9]'}`}
                   />
                   
-                  {/* Top Layer: The Racing Bar (with less transparency for a fuller look) */}
-                  {item.isPublicBid && (
+                  {/* Top Layer: The Racing Bar - Shows for public bids OR secret bids with prior bid */}
+                  {(item.isPublicBid || hasPriorBid) && (
                     <motion.div 
                       className={`absolute inset-[-150%] 
                         ${haloTheme === 'orange' 
@@ -439,12 +440,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     )}
                   </div>
 
-                  {viewMode === 'spacious' && (
-                    <div className="flex items-center gap-0.5 ml-auto text-[10px] text-slate-500">
-                      <MapPin className="h-2.5 w-2.5 text-red-500" />
-                      <span className="truncate max-w-[80px] leading-none">{seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown'}</span>
-                    </div>
-                  )}
+
                 </div>
               )}
 
@@ -525,6 +521,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
                     viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
+                    idPrefix={`item-card-${item.id}`}
                     onSmartAdjust={handleSmartAdjust}
                     onBid={handleBid}
                     onKeyDown={handleKeyDown}

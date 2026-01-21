@@ -9,13 +9,12 @@ interface BiddingDashboardProps {
   user: User | null;
   seller: User;
   bidAmount: string;
-  timeLeft: string;
-  isUrgent: boolean;
   isHighBidder: boolean;
   hasPriorBid: boolean;
   isSuccess: boolean;
   isSubmitting?: boolean;
   error?: boolean;
+  pendingConfirmation?: { type: 'double_bid' | 'high_bid', message: string } | null;
   animTrigger: number;
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
   onBid: (e: React.MouseEvent) => void;
@@ -29,13 +28,12 @@ export function BiddingDashboard({
   user,
   seller,
   bidAmount,
-  timeLeft,
-  isUrgent,
   isHighBidder,
   hasPriorBid,
   isSuccess,
   isSubmitting = false,
   error = false,
+  pendingConfirmation = null,
   animTrigger,
   onSmartAdjust,
   onBid,
@@ -88,8 +86,10 @@ export function BiddingDashboard({
           isSubmitting={isSubmitting}
           error={error}
           minBid={minNextBid}
+          pendingConfirmation={pendingConfirmation}
           animTrigger={animTrigger}
           viewMode="modal"
+          idPrefix={`modal-item-card-${item.id}`}
           onSmartAdjust={onSmartAdjust}
           onBid={onBid}
           onKeyDown={onKeyDown}

@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { X, Check } from "lucide-react";
+import { Check } from "lucide-react";
+
+type SortFilterId = typeof FILTERS[number]['id'];
+type ConditionFilter = 'all' | 'new' | 'like_new' | 'used' | 'fair';
 
 export default function FilterSheetContent({ onClose }: { onClose?: () => void }) {
   const { filters, setFilter } = useMarketplace();
@@ -46,7 +48,7 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
                 return (
                   <button
                     key={f.id}
-                    onClick={() => setFilter('sortBy', f.id as any)}
+                    onClick={() => setFilter('sortBy', f.id as SortFilterId)}
                     className={cn(
                       "flex items-center gap-2 p-3 rounded-xl border transition-all duration-200",
                       isActive 
@@ -130,17 +132,17 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
           <section id="filter-section-condition">
             <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Condition</Label>
             <div className="grid grid-cols-2 gap-2">
-              {[
+              {([
                 { id: 'all', label: 'All Items' },
                 { id: 'new', label: '🌟 New' },
                 { id: 'like_new', label: '✨ Like New' },
                 { id: 'used', label: '👌 Used' },
                 { id: 'fair', label: '🔨 Fair' }
-              ].map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setFilter('condition', c.id)}
-                  className={cn(
+              ] as const).map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setFilter('condition', c.id as ConditionFilter)}
+                    className={cn(
                     "flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200",
                     filters.condition === c.id 
                       ? "bg-slate-900 border-slate-900 text-white shadow-md" 

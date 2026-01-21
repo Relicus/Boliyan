@@ -30,12 +30,12 @@ interface CacheResult<T> {
 /**
  * L1 Memory Cache (Session only)
  */
-const memoryCache = new Map<string, CacheEntry<any>>();
+const memoryCache = new Map<string, CacheEntry<unknown>>();
 
 /**
  * Generate a consistent cache key from filters/params
  */
-export function generateCacheKey(namespace: string, params: Record<string, any> = {}): string {
+export function generateCacheKey(namespace: string, params: Record<string, unknown> = {}): string {
   // Sort keys to ensure consistent order (e.g. {a:1, b:2} === {b:2, a:1})
   const sortedParams = Object.keys(params)
     .sort()
@@ -46,7 +46,7 @@ export function generateCacheKey(namespace: string, params: Record<string, any> 
         acc[key] = val;
       }
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, unknown>);
 
   return `${CACHE_PREFIX}${namespace}-${JSON.stringify(sortedParams)}`;
 }

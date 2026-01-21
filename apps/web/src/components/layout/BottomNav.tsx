@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, PlusCircle, MessageSquare, Activity, SlidersHorizontal as FilterIcon } from "lucide-react";
+import { LayoutGrid, PlusCircle, MessageSquare, Activity, type LucideIcon } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import FilterSheetContent from "@/components/marketplace/FilterSheetContent";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -25,7 +25,7 @@ export default function BottomNav() {
   
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const navItems: { label: string; icon: any; href: string; isDrawer?: boolean }[] = [
+  const navItems: { label: string; icon: LucideIcon; href: string; isDrawer?: boolean }[] = [
     {
       label: "Post",
       icon: PlusCircle,
@@ -51,7 +51,7 @@ export default function BottomNav() {
   return (
     <div id="bottom-nav-container-01" className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 h-16 safe-area-pb">
       <div id="bottom-nav-wrapper-02" className="flex items-center justify-around h-full px-2">
-        {navItems.map((item, index) => {
+        {navItems.map((item) => {
           const isActive = item.href ? pathname === item.href : false;
           const Icon = item.icon;
 

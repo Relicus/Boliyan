@@ -4,9 +4,9 @@ import { useApp } from "@/lib/store";
 import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, ShoppingBag, TrendingUp, Package, Trophy, Heart, Settings, UserCircle, Gavel, Tag } from "lucide-react";
+import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, Package, Heart, Gavel, Tag } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { calculatePrivacySafeDistance } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 function DashboardContent() {
-  const { items, bids, user, deleteItem, getUser, watchedItemIds } = useApp();
+  const { items, bids, user, deleteItem, watchedItemIds } = useApp();
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialTab = searchParams.get("tab") || "active-bids";

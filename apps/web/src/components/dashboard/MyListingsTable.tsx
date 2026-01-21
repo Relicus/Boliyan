@@ -45,7 +45,6 @@ export function MyListingsTable() {
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 bg-muted rounded overflow-hidden flex-shrink-0">
                       {item.images[0] && (
-                        // eslint-disable-next-line @next/next/no-img-element
                         <img 
                           src={item.images[0]} 
                           alt={item.title} 

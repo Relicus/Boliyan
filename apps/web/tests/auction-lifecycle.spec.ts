@@ -1,7 +1,16 @@
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
 import { loginUser } from './helpers/auth';
 import { mockSupabaseNetwork } from './helpers/mock-network';
+
+const clickBidWithConfirm = async (button: Locator) => {
+  await button.click();
+  const confirmLabel = button.locator('text=Confirm?');
+  const needsConfirm = await confirmLabel.isVisible({ timeout: 1500 }).catch(() => false);
+  if (needsConfirm) {
+    await button.click();
+  }
+};
 
 test.describe('Auction Lifecycle & Engagement', () => {
   test.beforeEach(async ({ page }) => {
@@ -54,27 +63,13 @@ test.describe('Auction Lifecycle & Engagement', () => {
     const incrementedValue = parseFloat(incrementedValueStr.replace(/,/g, ''));
     expect(incrementedValue).toBeGreaterThan(initialValue);
 
-    // Place bid (Component logic might show a warning if already high bidder)
-    await bidBtn.click();
+    // Place bid (handle double-tap confirmation if needed)
+    await clickBidWithConfirm(bidBtn);
 
-    // Handle "Already Winning" Warning safely
-    try {
-        const confirmBtn = page.getByRole('button', { name: 'Confirm Bid' });
-        await confirmBtn.waitFor({ state: 'visible', timeout: 3000 });
-        console.log('[Test] identified "Already Winning" dialog. Confirming...');
-        await confirmBtn.click();
-    } catch (e) {
-        // No warning appeared, proceed normal
-    }
-    // Verify success state
-    const updatedCard = page.locator(`#item-card-${itemId}`);
-    await expect(updatedCard.locator('text=Bid Placed!')).toBeVisible({ timeout: 5000 });
-    console.log('[Test] Success message "Bid Placed!" appeared.');
-
-    // Verify it RESETS after timeout
-    await page.waitForTimeout(2500); // 1500ms in code + buffer
-    await expect(updatedCard.locator('text=Bid Placed!')).not.toBeVisible();
-    console.log('[Test] Success message "Bid Placed!" disappeared (Fixed).');
+    await expect.poll(async () => {
+      const currentValue = await input.inputValue();
+      return parseFloat(currentValue.replace(/,/g, ''));
+    }).toBeGreaterThan(incrementedValue);
   });
 
   test('should handle 70% minimum bid rule on Card', async ({ page }) => {
@@ -103,7 +98,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
 
     // Click bid - should not succeed
     await bidBtn.click();
-    await expect(itemCard.locator(`#item-card-${itemId}-success-msg`)).not.toBeVisible();
+    await expect(itemCard.locator('text=Bid Placed!')).not.toBeVisible();
   });
 
   test('should place bid from Product Modal', async ({ page }) => {
@@ -127,7 +122,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
     await dialog.locator(`#modal-item-card-${itemId}-increment-btn`).click();
     
     // Place bid
-    await modalBidBtn.click();
+    await clickBidWithConfirm(modalBidBtn);
 
     // Verify success state in modal
     await expect(dialog.locator('text=Placed!')).toBeVisible({ timeout: 10000 });
@@ -157,7 +152,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
     
     // Click Watch
     await watchBtn.click();
-    await expect(watchBtn).toContainText('Watching');
+    await expect(watchBtn).toHaveAttribute('title', 'Remove from watchlist');
     
     // Close modal
     await page.locator(`#close-listing-btn-${itemId}`).click();
@@ -178,10 +173,17 @@ test.describe('Auction Lifecycle & Engagement', () => {
     if (!itemId) throw new Error("Could not find item ID");
 
     const bidBtn = itemCard.locator(`#item-card-${itemId}-place-bid-btn`);
+    const input = itemCard.locator(`#item-card-${itemId}-bid-input`);
 
     // 1. Place first bid
-    await bidBtn.click();
-    await expect(itemCard.locator(`#item-card-${itemId}-success-msg`)).toBeVisible();
+    const startingValueStr = await input.inputValue();
+    const startingValue = parseFloat(startingValueStr.replace(/,/g, ''));
+
+    await clickBidWithConfirm(bidBtn);
+    await expect.poll(async () => {
+      const currentValue = await input.inputValue();
+      return parseFloat(currentValue.replace(/,/g, ''));
+    }).toBeGreaterThan(startingValue);
 
     // Wait for success to clear (1500ms in hook)
     await page.waitForTimeout(2000);
@@ -189,13 +191,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
     // 2. Click bid again (we are still high bidder)
     await bidBtn.click();
 
-    // 3. Assert Warning Dialog
-    const warningDialog = page.locator('div[role="dialog"]').last(); // Warning is usually the latest dialog
-    await expect(warningDialog.locator('text=Already Winning')).toBeVisible();
-    await expect(warningDialog.locator('text=Confirm Bid')).toBeVisible();
-
-    // 4. Cancel warning
-    await warningDialog.locator('text=Cancel').click();
-    await expect(warningDialog).not.toBeVisible();
+    // 3. Assert inline confirmation state
+    await expect(bidBtn.locator('text=Confirm?')).toBeVisible();
   });
 });

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { User } from "@/types";
 import { supabase } from "@/lib/supabase";
-import { Session } from "@supabase/supabase-js";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+import type { Database } from "@/types/database.types";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {
@@ -19,13 +20,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   // Fetch full profile data from Supabase 'profiles' table
-    const fetchProfile = async (supabaseUser: any) => {
+    type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+    type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
+    type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
+    type ProfileExtras = { is_verified?: boolean; review_count?: number; phone?: string; name?: string };
+
+    const fetchProfile = useCallback(async (supabaseUser: SupabaseUser) => {
         console.log("[AuthContext] Fetching profile for:", supabaseUser.id);
         try {
             const { data: fetchedData, error } = await supabase
@@ -34,37 +39,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', supabaseUser.id)
                 .single();
 
-            let data = fetchedData;
+            let data = fetchedData as ProfileRow | null;
 
             console.log("[AuthContext] Profile fetch result:", { hasData: !!data, error });
 
       // Handle 'Row not found' (PGRST116) or null data
       if (!data && (error?.code === 'PGRST116' || !error)) {
           console.warn("Profile not found, attempting to create or use fallback...");
-          const metadata = supabaseUser.user_metadata || {};
+          const metadata = (supabaseUser.user_metadata || {}) as Record<string, string | undefined>;
           
-          const newProfile = {
+          const newProfile: ProfileInsert = {
               id: supabaseUser.id,
               full_name: metadata.full_name || metadata.name || supabaseUser.email?.split('@')[0],
-              email: supabaseUser.email, 
               avatar_url: metadata.avatar_url,
-              location: metadata.city, // Map city to location
-              phone: metadata.phone
+              location: metadata.city // Map city to location
           };
 
           // Attempt insertion
-          const { data: inserted, error: insertError } = await (supabase
-              .from('profiles') as any)
+          const { data: inserted, error: insertError } = await supabase
+              .from('profiles')
               .insert([newProfile])
               .select()
               .single();
 
           if (!insertError && inserted) {
-             data = inserted;
+             data = inserted as ProfileRow;
           } else {
              // Fallback to ephemeral data so the app still works
-             console.error("Profile creation failed, using temporary data:", insertError);
-             data = newProfile as any;
+              console.error("Profile creation failed, using temporary data:", insertError);
+              data = newProfile as ProfileRow;
           }
       } else if (error) {
         console.error('Error fetching profile:', error);
@@ -74,7 +77,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data) {
           // Map Supabase profile to App User type
           // Note: Some fields might need default values if not present in DB yet
-          const profile = data as any;
+          const profile = data as ProfileRow & ProfileExtras;
+          const locationValue = profile.location;
+          const parsedLocation = typeof locationValue === 'string' && locationValue.trim().startsWith('{')
+            ? JSON.parse(locationValue)
+            : locationValue;
           const appUser: User = {
               id: profile.id,
               name: profile.full_name || profile.name || supabaseUser.email?.split('@')[0] || 'User',
@@ -83,11 +90,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // Default/Fallback values for fields not yet in DB schema or optional
               phone: profile.phone || undefined,
               rating: profile.rating || 0,
-              reviewCount: profile.review_count || 0,
-              location: profile.location 
-                ? (typeof profile.location === 'string' && profile.location.trim().startsWith('{')
-                    ? JSON.parse(profile.location) 
-                    : { lat: 0, lng: 0, address: profile.location }) 
+              reviewCount: profile.review_count || profile.rating_count || 0,
+              location: parsedLocation
+                ? (typeof parsedLocation === 'string'
+                    ? { lat: 0, lng: 0, address: parsedLocation }
+                    : parsedLocation)
                 : { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan" },
               badges: [], // TODO: Fetch badges from a relation if needed
               stats: {
@@ -102,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // Use a ref to track the last processed user ID to avoid race conditions 
   // and stale closures in the onAuthStateChange listener.
@@ -117,7 +124,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log("[AuthContext] Auth state change:", _event, session?.user?.id);
-      setSession(session);
 
       if (session?.user) {
          // Check against Ref to strictly deduplicate fetches
@@ -139,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchProfile]);
 
   const login = async () => {
     // Redirect to Google OAuth
@@ -155,7 +161,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
-    setSession(null);
     router.push('/');
   };
 
@@ -168,12 +173,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (data: Partial<User>) => {
       if (!user) return;
       
-      const updates: any = {};
+      const updates: ProfileUpdate = {};
       if (data.name) updates.full_name = data.name;
       if (data.avatar) updates.avatar_url = data.avatar;
       
-      const { error } = await supabase
-        .from('profiles')
+      const { error } = await (supabase
+        .from('profiles') as any)
         .update(updates)
         .eq('id', user.id);
         

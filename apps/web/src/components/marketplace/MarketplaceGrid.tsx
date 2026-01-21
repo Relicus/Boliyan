@@ -101,7 +101,6 @@ export default function MarketplaceGrid() {
   }, [entry, hasMore, isLoadingMore, isLoading, loadMore, isSearchActive]);
 
 
-  // Set default view mode based on screen size
 
 
   // Grid class mapping based on view mode
@@ -142,7 +141,7 @@ export default function MarketplaceGrid() {
                 {/* 1. Sort Tab */}
                 <Select 
                   value={searchFilters.sortBy} 
-                  onValueChange={(value) => setSearchFilters({...searchFilters, sortBy: value as any})}
+                  onValueChange={(value) => setSearchFilters({ ...searchFilters, sortBy: value as typeof searchFilters.sortBy })}
                 >
                   <SelectTrigger id="mobile-sort-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
                      {(() => {

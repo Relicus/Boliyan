@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Gavel, TrendingUp, Loader2 } from "lucide-react";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
@@ -26,6 +26,7 @@ interface BiddingControlsProps {
   // Configuration
   viewMode?: BiddingViewMode;
   disabled?: boolean;
+  idPrefix: string;
   
   // Handlers
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
@@ -73,12 +74,15 @@ export const BiddingControls = memo(({
   animTrigger,
   viewMode = 'compact',
   disabled = false,
+  idPrefix,
   onSmartAdjust,
   onBid,
   onKeyDown,
   onInputChange,
   onInputClick
 }: BiddingControlsProps) => {
+
+  const buildId = (suffix: string) => `${idPrefix}-${suffix}`;
 
   // Calculate if current input is below minimum bid
   const currentNumericBid = parseFloat(bidAmount.replace(/,/g, '')) || 0;
@@ -164,13 +168,14 @@ export const BiddingControls = memo(({
   const btnConfig = getButtonConfig();
 
   return (
-    <div className={`flex flex-col gap-2 w-full`}>
+    <div id={buildId('bidding-controls')} className={`flex flex-col gap-2 w-full`}>
       {/* Stepper Input Row */}
       <div className={`flex w-full ${getInputHeight(viewMode)}`}>
         <div className={`flex flex-1 border border-slate-300 rounded-xl shadow-sm overflow-hidden bg-white ${isOwner ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
           
           {/* Decrement Button */}
           <button
+            id={buildId('decrement-btn')}
             onClick={(e) => onSmartAdjust(e, -1)}
             disabled={isDisabled}
             className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
@@ -183,6 +188,7 @@ export const BiddingControls = memo(({
           {/* Input */}
           <div className="relative flex-1">
             <motion.input
+              id={buildId('bid-input')}
               type="text"
               value={bidAmount}
               key={`input-${animTrigger}`}
@@ -207,6 +213,7 @@ export const BiddingControls = memo(({
 
           {/* Increment Button */}
           <button
+            id={buildId('increment-btn')}
             onClick={(e) => onSmartAdjust(e, 1)}
             disabled={isDisabled}
             className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
@@ -220,6 +227,7 @@ export const BiddingControls = memo(({
 
       {/* Action Button */}
       <motion.button
+        id={buildId('place-bid-btn')}
         onClick={onBid}
         disabled={isSuccess || isDisabled}
         initial={false}

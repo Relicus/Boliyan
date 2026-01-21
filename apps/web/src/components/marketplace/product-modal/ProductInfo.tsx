@@ -97,11 +97,11 @@ export function ProductInfo({
                 </button>
                 <Link
                   id={`view-details-btn-${item.id}`}
-                  href={`/product/${item.id}`}
+                  href={`/product/${item.slug || item.id}`}
                   className="flex items-center justify-center gap-2 h-9 px-3 rounded-full border border-slate-900 bg-slate-900 text-white hover:bg-slate-800 transition-all duration-300 font-bold text-[11px] shadow-sm"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Details</span>
+                  <span className="hidden sm:inline">Full Details</span>
                 </Link>
             </div>
           </div>

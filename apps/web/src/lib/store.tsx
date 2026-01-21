@@ -88,6 +88,11 @@ export function useApp() {
     return convId;
   };
 
+  type MarketplaceFilters = typeof marketplace.filters;
+  type MarketplaceFilterKey = keyof MarketplaceFilters;
+  type SearchFilters = typeof search.filters;
+  type SearchFilterKey = keyof SearchFilters;
+
   return {
     ...auth,
     ...marketplace,

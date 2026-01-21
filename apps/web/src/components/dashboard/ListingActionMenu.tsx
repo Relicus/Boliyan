@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Edit, CheckCircle, Trash2 } from 'lucide-react';
 import { useDashboard } from '@/context/DashboardContext';
 import { ManagedListing } from '@/types/dashboard';
-import { useRouter } from 'next/navigation';
 
 interface ListingActionMenuProps {
   listing: ManagedListing;
@@ -20,7 +19,6 @@ interface ListingActionMenuProps {
 
 export function ListingActionMenu({ listing }: ListingActionMenuProps) {
   const { updateListingStatus, deleteListing } = useDashboard();
-  const router = useRouter();
 
   const handleMarkSold = () => {
     updateListingStatus(listing.id, 'completed');

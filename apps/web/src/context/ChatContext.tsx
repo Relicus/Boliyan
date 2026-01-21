@@ -6,6 +6,8 @@ import { Conversation, Message } from "@/types";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/lib/supabase";
 import { transformConversationToHydratedConversation, ConversationWithHydration } from "@/lib/transform";
+import type { Database } from "@/types/database.types";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 interface ChatStore {
     conversations: Conversation[];
@@ -13,6 +15,13 @@ interface ChatStore {
 }
 
 const StoreKeyPrefix = 'chat-store-';
+
+type ConversationRow = Database['public']['Tables']['conversations']['Row'];
+type ConversationInsert = Database['public']['Tables']['conversations']['Insert'];
+type ConversationUpdate = Database['public']['Tables']['conversations']['Update'];
+type MessageRow = Database['public']['Tables']['messages']['Row'];
+type MessageInsert = Database['public']['Tables']['messages']['Insert'];
+type NotificationInsert = Database['public']['Tables']['notifications']['Insert'];
 
 interface ChatContextType {
   conversations: Conversation[];
@@ -68,13 +77,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }, [conversations, messages, user?.id]);
 
 
-  const transformMessage = (row: any): Message => ({
+  const transformMessage = (row: MessageRow): Message => ({
     id: row.id,
-    conversationId: row.conversation_id,
-    senderId: row.sender_id,
+    conversationId: row.conversation_id || "",
+    senderId: row.sender_id || "",
     content: row.content,
-    isRead: row.is_read,
-    createdAt: row.created_at,
+    isRead: row.is_read ?? false,
+    createdAt: row.created_at || new Date().toISOString(),
   });
 
   // 1. Fetch Conversations & Realtime logic (remains mostly same, but essentially "merges" fresh data)
@@ -86,7 +95,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     }
 
     const fetchConversations = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('conversations')
         .select(`
           *,
@@ -104,21 +113,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     fetchConversations();
 
-    // Realtime Updates
-    const channel = supabase
-      .channel('public:conversations')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'conversations', filter: `seller_id=eq.${user.id}` }, 
-        (payload) => handleConvUpdate(payload)
-      )
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'conversations', filter: `bidder_id=eq.${user.id}` }, 
-        (payload) => handleConvUpdate(payload)
-      )
-      .subscribe();
-
-    const handleConvUpdate = async (payload: any) => {
+    const handleConvUpdate = async (payload: RealtimePostgresChangesPayload<ConversationRow>) => {
         const convRow = payload.new;
+        if (!convRow || !('id' in convRow)) return;
         
         // Fetch hydration data
         const { data } = await supabase
@@ -142,6 +139,19 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             setConversations(prev => prev.map(c => c.id === transformed.id ? transformed : c));
         }
     };
+
+    // Realtime Updates
+    const channel = supabase
+      .channel('public:conversations')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'conversations', filter: `seller_id=eq.${user.id}` }, 
+        handleConvUpdate
+      )
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'conversations', filter: `bidder_id=eq.${user.id}` }, 
+        handleConvUpdate
+      )
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -171,9 +181,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           table: 'messages',
           filter: `conversation_id=eq.${conversationId}` // SCALABILITY WIN: Only listen to this chat
         },
-        (payload) => {
-           const newMsg = payload.new as any;
-           const transformed = transformMessage(newMsg);
+        (payload: RealtimePostgresChangesPayload<MessageRow>) => {
+           const newMsg = payload.new;
+           if (!newMsg || !('id' in newMsg)) return;
+           const transformed = transformMessage(newMsg as MessageRow);
            
            setMessages(prev => {
                 if (prev.some(m => m.id === transformed.id)) return prev;
@@ -181,11 +192,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
            });
 
            // Update Conversation Last Message (Global List)
-           setConversations(prev => prev.map(c => 
-             c.id === newMsg.conversation_id 
-               ? { ...c, lastMessage: newMsg.content, updatedAt: newMsg.created_at }
-               : c
-           ));
+            setConversations(prev => prev.map(c => 
+              c.id === (newMsg.conversation_id || "")
+                ? { ...c, lastMessage: newMsg.content, updatedAt: newMsg.created_at || c.updatedAt }
+                : c
+            ));
         }
       )
       .subscribe();
@@ -203,19 +214,24 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   // Cleanup all on unmount
   useEffect(() => {
+      const subscriptions = activeSubscriptions.current;
       return () => {
-          activeSubscriptions.current.forEach(channel => supabase.removeChannel(channel));
-          activeSubscriptions.current.clear();
+          subscriptions.forEach(channel => supabase.removeChannel(channel));
+          subscriptions.clear();
       };
   }, []);
 
   const loadMessages = async (conversationId: string) => {
-      const { data } = await (supabase.from('messages') as any).select('*').eq('conversation_id', conversationId).order('created_at', { ascending: true });
+      const { data } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
       if (data) {
           const newMsgs = data.map(transformMessage);
           setMessages(prev => {
               const ids = new Set(prev.map(m => m.id));
-              const uniqueNew = newMsgs.filter((m: any) => !ids.has(m.id));
+              const uniqueNew = newMsgs.filter((m) => !ids.has(m.id));
               
               // Only keep messages for current active chats to save memory? 
               // For now, simple append is inherently risky for memory if app open long time, 
@@ -236,11 +252,17 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setMessages(prev => [...prev, optimMsg]);
 
     // DB Insert (Messages)
-    const { data, error } = await (supabase.from('messages') as any).insert({
-        conversation_id: conversationId,
-        sender_id: user.id,
-        content
-    } as any).select().single() as any;
+    const insertPayload: MessageInsert = {
+      conversation_id: conversationId,
+      sender_id: user.id,
+      content
+    };
+
+    const { data, error } = await (supabase
+      .from('messages') as any)
+      .insert(insertPayload)
+      .select()
+      .single();
 
     if (error) {
         console.error("Failed to send message", error);
@@ -253,10 +275,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         setMessages(prev => prev.map(m => m.id === tempId ? realMsg : m));
         
         // Explicit conversation update
-        await (supabase.from('conversations') as any).update({ 
-            last_message: content, 
-            updated_at: new Date().toISOString() 
-        } as any).eq('id', conversationId);
+        const conversationUpdates: ConversationUpdate = {
+          last_message: content,
+          updated_at: new Date().toISOString()
+        };
+        await (supabase
+          .from('conversations') as any)
+          .update(conversationUpdates)
+          .eq('id', conversationId);
 
         // SEND NOTIFICATION TO RECIPIENT
         // Find conversation to get recipient ID
@@ -266,15 +292,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             
             // Should strictly check if recipientId exists, but schema guarantees it
             if (recipientId) {
-                await (supabase.from('notifications') as any).insert({
-                    user_id: recipientId,
-                    type: 'new_message',
-                    title: `New message from ${user.name}`,
-                    body: content.length > 50 ? content.substring(0, 50) + '...' : content,
-                    link: `/inbox?id=${conversationId}`,
-                    is_read: false,
-                    metadata: { conversationId }
-                });
+                const notificationPayload: NotificationInsert = {
+                  user_id: recipientId,
+                  type: 'new_message',
+                  title: `New message from ${user.name}`,
+                  body: content.length > 50 ? content.substring(0, 50) + '...' : content,
+                  link: `/inbox?id=${conversationId}`,
+                  is_read: false,
+                  metadata: { conversationId }
+                };
+                await (supabase.from('notifications') as any).insert(notificationPayload);
             }
         }
     }
@@ -291,7 +318,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     ));
 
     // DB Update
-    const { error } = await (supabase.from('messages') as any)
+    const { error } = await (supabase
+      .from('messages') as any)
       .update({ is_read: true })
       .eq('conversation_id', conversationId)
       .neq('sender_id', user.id)
@@ -308,18 +336,29 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     if (existing) return existing.id;
 
     // 2. Insert new conversation
-    const { data, error } = await (supabase.from('conversations') as any).insert({
-        listing_id: itemId,
-        seller_id: sellerId,
-        bidder_id: bidderId,
-        last_message: "Chat started",
-        updated_at: new Date().toISOString()
-    } as any).select().single() as any;
+    const insertPayload: ConversationInsert = {
+      listing_id: itemId,
+      seller_id: sellerId,
+      bidder_id: bidderId,
+      last_message: "Chat started",
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await (supabase
+      .from('conversations') as any)
+      .insert(insertPayload)
+      .select()
+      .single();
 
     if (data) {
         return data.id;
     } else if (error?.code === '23505') { // Unique constraint violation (race condition)
-        const { data: exist } = await (supabase.from('conversations') as any).select('*').eq('listing_id', itemId).eq('bidder_id', bidderId).single() as any;
+        const { data: exist } = await (supabase
+          .from('conversations') as any)
+          .select('*')
+          .eq('listing_id', itemId)
+          .eq('bidder_id', bidderId)
+          .single();
         if (exist) return exist.id;
     }
     return undefined;

@@ -163,6 +163,201 @@ export interface Database {
           created_at?: string | null
         }
       }
+      marketplace_listings: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          images: string[] | null
+          seller_id: string | null
+          asked_price: number
+          category: string | null
+          auction_mode: 'hidden' | 'visible' | 'sealed' | null
+          created_at: string | null
+          status: 'active' | 'completed' | 'cancelled' | 'hidden' | null
+          seller_name: string | null
+          seller_avatar: string | null
+          seller_rating: number | null
+          seller_rating_count: number | null
+          seller_location: string | null
+          bid_count: number | null
+          high_bid: number | null
+          high_bidder_id: string | null
+          condition: 'new' | 'like_new' | 'used' | 'fair' | null
+        }
+        Insert: {
+          id?: string
+          title?: string
+          description?: string | null
+          images?: string[] | null
+          seller_id?: string | null
+          asked_price?: number
+          category?: string | null
+          auction_mode?: 'hidden' | 'visible' | 'sealed' | null
+          created_at?: string | null
+          status?: 'active' | 'completed' | 'cancelled' | 'hidden' | null
+          seller_name?: string | null
+          seller_avatar?: string | null
+          seller_rating?: number | null
+          seller_rating_count?: number | null
+          seller_location?: string | null
+          bid_count?: number | null
+          high_bid?: number | null
+          high_bidder_id?: string | null
+          condition?: 'new' | 'like_new' | 'used' | 'fair' | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          images?: string[] | null
+          seller_id?: string | null
+          asked_price?: number
+          category?: string | null
+          auction_mode?: 'hidden' | 'visible' | 'sealed' | null
+          created_at?: string | null
+          status?: 'active' | 'completed' | 'cancelled' | 'hidden' | null
+          seller_name?: string | null
+          seller_avatar?: string | null
+          seller_rating?: number | null
+          seller_rating_count?: number | null
+          seller_location?: string | null
+          bid_count?: number | null
+          high_bid?: number | null
+          high_bidder_id?: string | null
+          condition?: 'new' | 'like_new' | 'used' | 'fair' | null
+        }
+      }
+      watchlist: {
+        Row: {
+          id: string
+          user_id: string | null
+          listing_id: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          listing_id?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          listing_id?: string | null
+          created_at?: string | null
+        }
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string | null
+          type: string | null
+          title: string | null
+          body: string | null
+          link: string | null
+          is_read: boolean | null
+          metadata: Json | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          type?: string | null
+          title?: string | null
+          body?: string | null
+          link?: string | null
+          is_read?: boolean | null
+          metadata?: Json | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          type?: string | null
+          title?: string | null
+          body?: string | null
+          link?: string | null
+          is_read?: boolean | null
+          metadata?: Json | null
+          created_at?: string | null
+        }
+      }
+      reviews: {
+        Row: {
+          id: string
+          reviewer_id: string | null
+          reviewed_id: string | null
+          listing_id: string | null
+          conversation_id: string | null
+          rating: number | null
+          content: string | null
+          role: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          reviewer_id?: string | null
+          reviewed_id?: string | null
+          listing_id?: string | null
+          conversation_id?: string | null
+          rating?: number | null
+          content?: string | null
+          role?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          reviewer_id?: string | null
+          reviewed_id?: string | null
+          listing_id?: string | null
+          conversation_id?: string | null
+          rating?: number | null
+          content?: string | null
+          role?: string | null
+          created_at?: string | null
+        }
+      }
+      categories: {
+        Row: {
+          id: string
+          name: string
+          slug: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string | null
+          sort_order?: number | null
+        }
+      }
+      search_history: {
+        Row: {
+          id: string
+          user_id: string | null
+          query: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          query?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          query?: string | null
+          created_at?: string | null
+        }
+      }
     }
   }
 }

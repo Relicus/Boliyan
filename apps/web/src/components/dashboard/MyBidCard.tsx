@@ -4,7 +4,7 @@ import { Bid, Item, User } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Trophy, AlertTriangle } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 
 interface MyBidCardProps {

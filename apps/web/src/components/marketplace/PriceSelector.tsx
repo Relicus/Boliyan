@@ -6,8 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Coins, ChevronDown } from "lucide-react";
+import { Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function PriceSelector() {
