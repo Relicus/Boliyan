@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import ScrollToTop from "@/components/layout/ScrollToTop";
+import { AuthDialog } from "@/components/auth/AuthDialog";
 import { AppProvider } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -110,6 +111,7 @@ export default function RootLayout({
             <BottomNav />
             <ScrollToTop />
           </NotificationProvider>
+          <AuthDialog />
         </AppProvider>
         <Toaster />
       </body>

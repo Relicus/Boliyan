@@ -71,7 +71,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   useEffect(() => {
     if (isSuccess) {
       toast.success("Bid placed successfully!", {
-        description: `You placed a bid of Rs. ${bidAmount} on ${item.title}`
+        description: (
+          <span className="block mt-1">
+            You placed a bid of <span className="font-bold text-emerald-600">Rs. {bidAmount}</span> on <span className="font-semibold text-blue-600">{item.title}</span>
+          </span>
+        )
       });
     }
   }, [isSuccess, bidAmount, item.title]);
@@ -140,6 +144,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             haloTheme={haloTheme}
             timeLeft={timeLeft}
             isUrgent={isUrgent}
+            isWatched={isWatched}
+            onToggleWatch={toggleWatch}
           />
 
           {/* Bottom Section: Product Details & Bidding */}
@@ -153,8 +159,6 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                 isOutside={isOutside}
                 duration={duration}
                 distance={distance}
-                isWatched={isWatched}
-                onToggleWatch={toggleWatch}
               />
 
               {/* Right Column: Dashboard */}

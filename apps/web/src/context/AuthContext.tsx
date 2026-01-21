@@ -15,6 +15,9 @@ interface AuthContextType {
   logout: () => Promise<void>;
   getUser: (id: string) => User | undefined; // Keep for compat, though less useful with real auth
   updateProfile: (data: Partial<User>) => Promise<void>;
+  isAuthModalOpen: boolean;
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const router = useRouter();
 
   // Fetch full profile data from Supabase 'profiles' table
@@ -191,6 +195,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(prev => (prev ? { ...prev, ...data } : null));
   };
 
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -199,7 +206,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       login, 
       logout, 
       getUser,
-      updateProfile
+      updateProfile,
+      isAuthModalOpen,
+      openAuthModal,
+      closeAuthModal
     }}>
       {children}
     </AuthContext.Provider>

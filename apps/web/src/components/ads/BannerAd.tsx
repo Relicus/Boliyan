@@ -4,10 +4,36 @@ import { ArrowRight } from "lucide-react";
 interface BannerAdProps {
   variant?: "sidebar" | "header";
   index?: number;
+  // Future-proofing for AdSense
+  adType?: "internal" | "adsense";
+  adSlotId?: string;
 }
 
-export default function BannerAd({ variant = "sidebar", index }: BannerAdProps) {
+export default function BannerAd({ 
+  variant = "sidebar", 
+  index,
+  adType = "internal",
+  adSlotId
+}: BannerAdProps) {
   if (variant === "sidebar") {
+    // AdSense Implementation Skeleton
+    if (adType === "adsense" && adSlotId) {
+       return (
+         <div className="mx-3 mt-4 overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-2 shadow-sm min-h-[250px] flex items-center justify-center">
+            {/* Google AdSense Placeholder Code */}
+            {/* <ins className="adsbygoogle"
+                 style={{ display: 'block' }}
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot={adSlotId}
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> */}
+            <span className="text-xs text-slate-400 font-mono">AdSense Space ({adSlotId})</span>
+         </div>
+       );
+    }
+
+    // Default Internal Placeholder / Mock Ad
     return (
       <div 
         id={`banner-ad-sidebar${index !== undefined ? `-${index}` : ''}`}

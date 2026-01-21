@@ -38,12 +38,14 @@ export default function MarketplaceGrid() {
   const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, hasMore, loadMore } = useMarketplace();
   const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters } = useSearch();
 
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
-      return 'comfortable';
+  const [viewMode, setViewMode] = useState<ViewMode>('compact');
+
+  useEffect(() => {
+    // Client-side only adjustment to avoid hydration mismatch
+    if (window.innerWidth >= 768) {
+        setViewMode('comfortable');
     }
-    return 'compact';
-  });
+  }, []);
   const [isChangingView, setIsChangingView] = useState(false);
   const viewChangeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -235,9 +237,9 @@ export default function MarketplaceGrid() {
                     handleViewModeChange(viewMode === 'compact' ? 'spacious' : 'compact');
                   }}
                 >
-                  {viewMode === 'compact' && <Grid3x3 className="h-5 w-5 text-slate-700" />}
-                  {viewMode === 'comfortable' && <Grid2x2 className="h-5 w-5 text-slate-700" />}
-                  {viewMode === 'spacious' && <LayoutGrid className="h-5 w-5 text-slate-700" />}
+                  {viewMode === 'compact' && <Grid3x3 className="lucide lucide-grid3x3 lucide-grid-3x3 h-5 w-5 text-slate-700" />}
+                  {viewMode === 'comfortable' && <Grid2x2 className="lucide lucide-grid2x2 lucide-grid-2x2 h-5 w-5 text-slate-700" />}
+                  {viewMode === 'spacious' && <LayoutGrid className="lucide lucide-layout-grid h-5 w-5 text-slate-700" />}
                   
                   <span className="text-[10px] font-medium leading-none text-slate-600 truncate w-full text-center">
                      View

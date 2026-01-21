@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Maximize2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { Maximize2, ChevronLeft, ChevronRight, Clock, Bookmark, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { Item } from "@/types";
 
 interface ProductGalleryProps {
@@ -13,6 +14,8 @@ interface ProductGalleryProps {
   haloTheme: 'orange' | 'green' | 'blue';
   timeLeft?: string;
   isUrgent?: boolean;
+  isWatched?: boolean;
+  onToggleWatch?: (id: string) => void;
 }
 
 export function ProductGallery({
@@ -23,7 +26,9 @@ export function ProductGallery({
   showHalo,
   haloTheme,
   timeLeft,
-  isUrgent
+  isUrgent,
+  isWatched,
+  onToggleWatch
 }: ProductGalleryProps) {
   return (
     <div id={`product-details-gallery-${item.slug || item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[300px] sm:h-[400px] md:h-full">
@@ -86,13 +91,44 @@ export function ProductGallery({
         )}
         
         <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
+           {/* Watch Button */}
+           {onToggleWatch && (
+            <button
+              id={`toggle-watch-btn-${item.slug || item.id}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleWatch(item.id);
+              }}
+              className={`h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 border
+                ${isWatched 
+                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 w-9 md:w-auto md:px-3 gap-2' 
+                  : 'bg-white/85 text-slate-700 border-white/20 hover:bg-white w-9 md:w-auto md:px-3 gap-2'
+                }`}
+              title={isWatched ? "Remove from watchlist" : "Add to watchlist"}
+            >
+              <Bookmark className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
+              <span className="hidden md:inline text-xs font-bold">{isWatched ? 'Watched' : 'Watch'}</span>
+            </button>
+           )}
+
+           {/* Full Details Button */}
+           <Link
+              id={`view-details-btn-${item.slug || item.id}`}
+              href={`/product/${item.slug || item.id}`}
+              className="h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 bg-slate-900 text-white hover:bg-black w-9 md:w-auto md:px-3 gap-2 border border-white/20"
+              title="View Full Details"
+            >
+              <ExternalLink className="h-4 w-4" />
+              <span className="hidden md:inline text-xs font-bold">Details</span>
+            </Link>
+
           <button
             id={`expand-gallery-btn-${item.slug || item.id}`}
             onClick={(e) => {
               e.stopPropagation();
               setShowFullscreen(true);
             }}
-            className="p-2 bg-white/85 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90"
+            className="h-9 w-9 flex items-center justify-center bg-white/85 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90"
           >
             <Maximize2 className="h-5 w-5" />
           </button>

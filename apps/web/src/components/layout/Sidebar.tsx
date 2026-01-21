@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import BannerAd from "@/components/ads/BannerAd";
 import { cn } from "@/lib/utils";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { useState, useRef, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -23,6 +25,32 @@ import { usePathname } from "next/navigation";
 export default function Sidebar() {
   const { filters, setFilter } = useApp();
   const pathname = usePathname();
+  
+  // Infinite Scroll Ads State
+  const [adCount, setAdCount] = useState(0);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  
+  // We need to know if there are more items to load in the main feed.
+  // Ideally, the parent should pass this down or we access it from store.
+  // For now, we'll access the marketplace state to check loading status or item count.
+  const { items, isMarketplaceLoading } = useApp();
+
+  const entry = useIntersectionObserver(loadMoreRef, {
+    threshold: 0.1,
+    rootMargin: '100px',
+  });
+  
+  // Logic: Only add ad if we intersect AND we likely have enough content to justify scrolling.
+  // If marketplace is loading or has very few items (end of list), we stop adding ads.
+  // A simple heuristic: if we have fewer than (adCount * 5) items, we might be over-spamming.
+  useEffect(() => {
+    if (entry?.isIntersecting && !isMarketplaceLoading && items.length > (adCount * 4)) {
+      const timer = setTimeout(() => {
+        setAdCount(prev => prev + 1);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [entry?.isIntersecting, adCount, isMarketplaceLoading, items.length]);
 
   // Only show sidebar on home page
   if (pathname !== "/") {
@@ -152,15 +180,6 @@ export default function Sidebar() {
 
 
 
-          <Separator className="bg-slate-100" />
-
-          {/* Banner Ad */}
-          <div className="px-1 pt-1 pb-1">
-             <BannerAd variant="sidebar" />
-          </div>
-
-          <Separator className="bg-slate-100" />
-
           {/* Reset Filters - Integrated */}
           <div className="px-1 pt-2">
             <Button 
@@ -180,6 +199,25 @@ export default function Sidebar() {
               Reset All Filters
             </Button>
           </div>
+
+          <Separator className="bg-slate-100" />
+
+          {/* Banner Ad */}
+          <div className="px-1 pt-1 pb-1">
+             <BannerAd variant="sidebar" />
+          </div>
+
+          <Separator className="bg-slate-100" />
+
+          {/* Infinite Scroll Ads */}
+          {Array.from({ length: adCount }).map((_, i) => (
+             <div key={`infinite-ad-${i}`} className="px-1 pt-1 pb-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <BannerAd variant="sidebar" index={i + 1} />
+             </div>
+          ))}
+
+          {/* Load More Trigger */}
+          <div ref={loadMoreRef} className="h-4 w-full" />
         </div>
       </ScrollArea>
     </aside>

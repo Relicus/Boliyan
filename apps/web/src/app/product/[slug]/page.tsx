@@ -2,11 +2,12 @@
 
 import { use, useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, MapPin, Lock, Clock, Bookmark, Maximize2, Share2, Zap, ArrowLeft } from "lucide-react";
+import { ChevronLeft, MapPin, Lock, Clock, Bookmark, Maximize2, Share2, Zap, ArrowLeft, Star } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { BiddingControls } from "@/components/common/BiddingControls";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
@@ -18,7 +19,7 @@ import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 
 function ProductContent({ item, seller }: { item: Item; seller: User }) {
   const router = useRouter();
-  const { user, toggleWatch, watchedItemIds } = useApp();
+  const { user, toggleWatch, watchedItemIds, bids } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
 
   const {
@@ -26,8 +27,6 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     error,
     isSuccess,
     animTrigger,
-    lastDelta,
-    showDelta,
     handleSmartAdjust,
     handleBid,
     handleKeyDown,
@@ -42,7 +41,11 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
   useEffect(() => {
     if (isSuccess) {
       toast.success("Bid placed successfully!", {
-        description: `You placed a bid of Rs. ${bidAmount} on ${item?.title}`
+        description: (
+          <span className="block mt-1">
+            You placed a bid of <span className="font-bold text-emerald-600">Rs. {bidAmount}</span> on <span className="font-semibold text-blue-600">{item?.title}</span>
+          </span>
+        )
       });
     }
   }, [isSuccess, bidAmount, item?.title]);
@@ -72,6 +75,12 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
 
   const isHighBidder = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isSeller = user?.id === seller.id;
+  const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
+
+  // Calculate min bid for component
+  const minNextBid = item.isPublicBid && item.currentHighBid 
+    ? item.currentHighBid + getSmartStep(item.currentHighBid)
+    : item.askPrice * 0.7;
 
   return (
     <div id={`product-page-${item.slug || item.id}`} className="min-h-screen bg-slate-50/50 pb-20">
@@ -244,124 +253,75 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                      </div>
                   </div>
 
-                {/* Row 3: Stepper Input */}
-                <div className={`flex h-16 w-full border-2 border-slate-200 rounded-2xl shadow-sm overflow-hidden transition-colors focus-within:border-blue-500 ${isSeller ? 'opacity-50 grayscale bg-slate-100' : 'bg-slate-50'}`}>
-                  <button
-                    id="decrement-bid-btn"
-                    onClick={(e) => handleSmartAdjust(e, -1)}
-                    disabled={isSeller}
-                    className="w-16 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-300"
-                  >
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M18 12H6" /></svg>
-                  </button>
-
-                  <div className="relative flex-1 bg-white flex items-center justify-center">
-                    <AnimatePresence>
-                      {showDelta && lastDelta !== null && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.5 }}
-                          animate={{ opacity: 1, y: -40, scale: 1.5 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          className={`absolute font-black text-lg z-50 pointer-events-none drop-shadow-xl
-                            ${lastDelta > 0 ? 'text-amber-600' : 'text-red-600'}`}
-                        >
-                          {lastDelta > 0 ? `+${lastDelta.toLocaleString()}` : lastDelta.toLocaleString()}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    <motion.input
-                      id="bid-input"
-                      type="text"
-                      value={bidAmount}
-                      key={`input-${animTrigger}`}
-                      initial={false}
-                      disabled={isSeller}
-                      animate={{ 
-                        scale: [1, 1.02, 1],
-                        x: (parseFloat(bidAmount.replace(/,/g, '')) < (item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7)) ? [0, -4, 4, -4, 4, 0] : 0
-                      }}
-                      transition={{ duration: 0.2 }}
-                      onKeyDown={handleKeyDown}
-                      onChange={handleInputChange}
-                      className="w-full h-full text-center text-fluid-price-sm font-black text-slate-900 focus:outline-none bg-transparent"
-                    />
-                  </div>
-
-                  <button
-                    id="increment-bid-btn"
-                    onClick={(e) => handleSmartAdjust(e, 1)}
-                    disabled={isSeller}
-                    className="w-16 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-300"
-                  >
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M12 6v12m6-6H6" /></svg>
-                  </button>
+                {/* Row 3 & 4: Bidding Controls Component */}
+                <div className="mt-2">
+                  <BiddingControls
+                    bidAmount={bidAmount}
+                    isSuccess={isSuccess}
+                    isOwner={isSeller}
+                    isHighBidder={!!isHighBidder}
+                    hasPriorBid={!!hasPriorBid}
+                    isSubmitting={false}
+                    error={error}
+                    minBid={minNextBid}
+                    pendingConfirmation={pendingConfirmation}
+                    animTrigger={animTrigger}
+                    viewMode="modal"
+                    idPrefix={`product-page-${item.id}`}
+                    onSmartAdjust={handleSmartAdjust}
+                    onBid={handleBid}
+                    onKeyDown={handleKeyDown}
+                    onInputChange={handleInputChange}
+                  />
                 </div>
-
-                {/* Row 4: Place Bid Button */}
-                <Button
-                  id="place-bid-btn"
-                  onClick={handleBid}
-                  disabled={isSuccess || isSeller}
-                  className={`h-16 w-full rounded-2xl font-black text-xl shadow-lg transition-all active:scale-95
-                    ${isSuccess 
-                      ? 'bg-amber-600 text-white hover:bg-amber-700' 
-                      : isSeller
-                        ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
-                        : pendingConfirmation
-                          ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    }`}
-                >
-                  {isSuccess 
-                    ? "Placed!" 
-                    : isSeller 
-                      ? "Your Item" 
-                      : pendingConfirmation 
-                        ? pendingConfirmation.message 
-                        : "Place Bid"
-                  }
-                </Button>
               </div>
 
               {/* Error Message */}
               {error && <p className="text-red-500 text-sm font-bold text-center mt-2 mb-4">{error}</p>}
 
-              {/* Seller Card */}
-              <div className="bg-slate-50 rounded-2xl p-6 flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="h-14 w-14 rounded-full bg-white p-0.5 shadow-sm overflow-hidden shrink-0 border border-slate-200">
-                    <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover rounded-full" />
+              {/* Seller Card - Ticket Style */}
+              <div className="bg-white rounded-2xl border-2 border-slate-100 shadow-sm mt-6 group hover:border-blue-100 transition-colors overflow-hidden">
+                {/* Top: Identity */}
+                <div className="p-4 flex items-center gap-3">
+                  <div className="relative shrink-0">
+                    <img src={seller.avatar} className="h-12 w-12 rounded-full object-cover bg-slate-100 ring-2 ring-slate-50" />
+                    {seller.isVerified && (
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                         <VerifiedBadge size="sm" showTooltip={false} />
+                      </div>
+                    )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                       <h3 className="font-bold text-slate-900 text-lg truncate">{seller.name}</h3>
-                       {seller.isVerified && <VerifiedBadge size="md" />}
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 font-bold px-2 py-0.5 text-xs">
-                        ⭐ {seller.rating}
-                      </Badge>
-                      <span className="text-xs text-slate-400 font-bold uppercase tracking-tight">({seller.reviewCount} Reviews)</span>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-slate-900 truncate text-base leading-tight">
+                      {seller.name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mt-1">
+                      <span className="flex items-center gap-0.5 text-amber-500 font-bold bg-amber-50 px-1.5 py-0.5 rounded-md">
+                         <Star className="w-3 h-3 fill-current" /> {seller.rating}
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="truncate">{seller.reviewCount} Reviews</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                   <div className="flex items-center gap-2 text-slate-600 text-sm font-medium">
-                      <MapPin className="h-4 w-4 text-red-500" />
-                      <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
-                   </div>
-                   <div className="flex items-center gap-2 text-slate-600 text-sm font-medium">
-                      <Clock className="h-4 w-4 text-blue-500" />
-                      <span>{duration} min drive</span>
-                   </div>
+                {/* Ticket Tear Line (Dashed) */}
+                <div className="relative h-px w-full bg-slate-50">
+                   <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-100 rounded-full border border-slate-200" /> {/* Notch L */}
+                   <div className="border-t-2 border-dashed border-slate-200 w-full h-full opacity-50" />
+                   <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-100 rounded-full border border-slate-200" /> {/* Notch R */}
                 </div>
 
-                <div className="flex gap-2 pt-2">
-                   {seller.badges?.slice(0, 2).map((badge, idx) => (
-                      <GamificationBadge key={idx} badge={badge} size="md" className="flex-1" />
-                   ))}
+                {/* Bottom: Logistics */}
+                <div className="p-3 bg-slate-50/50 flex items-center justify-between text-xs font-bold text-slate-600">
+                   <div className="flex items-center gap-1.5 truncate pr-2">
+                     <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                     <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
+                   </div>
+                   <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
+                     <Clock className="w-3 h-3" />
+                     {duration} min
+                   </div>
                 </div>
               </div>
             </div>

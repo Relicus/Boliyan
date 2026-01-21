@@ -6,10 +6,9 @@ import { useApp } from "@/lib/store";
 import { Item, User } from "@/types";
 import { getSmartStep, getMinimumAllowedBid } from "@/lib/bidding";
 
-import { toast } from "sonner";
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
-  const { placeBid, user, bids } = useApp();
+  const { placeBid, user, bids, openAuthModal } = useApp();
 
   // Pending confirmation for dual-tap pattern (replaces dialog-based warning)
   const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid', message: string } | null>(null);
@@ -178,7 +177,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     }
 
     if (!user) {
-      toast.error("Please login to place a bid");
+      openAuthModal();
       return;
     }
 
@@ -240,7 +239,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     // If no warnings, execute immediately
     executeBid(amount, e);
-  }, [bidAmount, item, user, bids, executeBid, pendingConfirmation]);
+  }, [bidAmount, item, user, bids, executeBid, pendingConfirmation, openAuthModal]);
 
   const clearPendingConfirmation = useCallback(() => {
     if (confirmationTimeoutRef.current) {
