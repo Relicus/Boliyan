@@ -112,14 +112,14 @@ export function ProductGallery({
            )}
 
            {/* Full Details Button */}
-           <Link
+            <Link
               id={`view-details-btn-${item.slug || item.id}`}
               href={`/product/${item.slug || item.id}`}
-              className="h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 bg-slate-900 text-white hover:bg-black w-9 md:w-auto md:px-3 gap-2 border border-white/20"
-              title="View Full Details"
+              className="h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 bg-slate-900 text-white hover:bg-black w-auto px-3 gap-2 border border-white/20"
+              title="Full Page"
             >
               <ExternalLink className="h-4 w-4" />
-              <span className="hidden md:inline text-xs font-bold">Details</span>
+              <span className="text-xs font-bold">Full Page</span>
             </Link>
 
           <button

@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { uploadListingImage } from "@/lib/uploadImage";
 import { supabase } from "@/lib/supabase";
 import { generateSlug } from "@/lib/utils";
+import { Database } from "@/types/database.types";
 
 function ListForm() {
   const router = useRouter();
@@ -112,34 +113,31 @@ function ListForm() {
         const allUrls = [...existingRealUrls, ...uploadedUrls];
 
         const finalDurationNum = parseInt(duration) as 24 | 48 | 72;
-        console.log("Setting duration to:", finalDurationNum);
-        // Expiry handled by DB default (or trigger) or we pass it?
-        // Schema doesn't strictly require expiry, transform.ts calculates it.
-        // But let's check schema... Assuming DB has default or we omit and let DB handle.
-        // Actually, better to insert a known value if we want consistency.
+        const endsAt = new Date(Date.now() + finalDurationNum * 60 * 60 * 1000).toISOString();
         
         const listingData = {
             title,
             category,
             asked_price: parseFloat(askPrice),
             description,
-            auction_mode: isPublic ? 'visible' : 'sealed',
+            auction_mode: (isPublic ? 'visible' : 'sealed') as 'visible' | 'sealed',
             images: allUrls,
             seller_id: user.id,
-            status: 'active',
-            condition: condition
+            status: 'active' as const,
+            condition: condition,
+            ends_at: endsAt
         };
 
         if (editingItem) {
           // Update logic (Not implemented yet, but safe from slug overwrites)
         } else {
             // Insert - Add slug only here
-            const insertPayload = {
+            const insertPayload: Database['public']['Tables']['listings']['Insert'] = {
               ...listingData,
               slug: generateSlug(title)
             };
             
-            const { error } = await supabase.from('listings').insert([insertPayload]);
+            const { error } = await supabase.from('listings').insert([insertPayload] as any);
             
             if (error) throw error;
             router.push("/");

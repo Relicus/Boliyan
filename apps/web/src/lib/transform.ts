@@ -73,9 +73,13 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
       };
   }
 
-  // Calculate expiry (Default to 72 hours after creation)
+  // Calculate expiry
   const createdAt = listing.created_at ? new Date(listing.created_at).getTime() : Date.now();
-  const expiryAt = new Date(createdAt + 72 * 60 * 60 * 1000).toISOString();
+  
+  // Use DB 'ends_at' if available (randomized timers), otherwise fallback to 72h
+  const expiryAt = listing.ends_at 
+    ? listing.ends_at 
+    : new Date(createdAt + 72 * 60 * 60 * 1000).toISOString();
 
   // Basic Auction Mode mapping
   const isPublicBid = listing.auction_mode === 'visible';

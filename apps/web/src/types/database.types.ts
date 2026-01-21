@@ -51,6 +51,7 @@ export interface Database {
           auction_mode: 'hidden' | 'visible' | 'sealed' | null
           status: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at: string | null
+          ends_at: string | null
           slug: string | null
         }
         Insert: {
@@ -65,6 +66,7 @@ export interface Database {
           auction_mode?: 'hidden' | 'visible' | 'sealed' | null
           status?: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at?: string | null
+          ends_at?: string | null
           slug?: string | null
         }
         Update: {
@@ -79,6 +81,7 @@ export interface Database {
           auction_mode?: 'hidden' | 'visible' | 'sealed' | null
           status?: 'active' | 'completed' | 'cancelled' | 'hidden' | null
           created_at?: string | null
+          ends_at?: string | null
           slug?: string | null
         }
       }
@@ -188,6 +191,7 @@ export interface Database {
           high_bidder_id: string | null
           condition: 'new' | 'like_new' | 'used' | 'fair' | null
           slug: string | null
+          ends_at: string | null
         }
         Insert: {
           id?: string
