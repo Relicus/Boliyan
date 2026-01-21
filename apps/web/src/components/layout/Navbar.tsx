@@ -144,7 +144,7 @@ export default function Navbar() {
           </div>
 
           <Button id="navbar-sell-btn-12" asChild variant="outline" className="hidden sm:flex items-center gap-2 border-blue-100 hover:bg-blue-50 text-blue-600 px-3 sm:px-4">
-            <Link href={isLoggedIn ? "/list" : "/signin"}>
+            <Link href={isLoggedIn ? "/list" : `/signin?redirect=${encodeURIComponent("/list")}`}>
               <Plus id="navbar-sell-plus-icon-13" className="h-4 w-4" />
               <span className="hidden lg:inline">Sell Item</span>
             </Link>
@@ -306,7 +306,7 @@ export default function Navbar() {
                 transition={{ duration: 0.2 }}
               >
                 <Button id="navbar-signin-btn" asChild className="h-11 px-6 bg-blue-600 hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-200">
-                  <Link href="/signin">Sign In</Link>
+                  <Link href={`/signin?redirect=${encodeURIComponent(pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : ""))}`}>Sign In</Link>
                 </Button>
               </motion.div>
             )}

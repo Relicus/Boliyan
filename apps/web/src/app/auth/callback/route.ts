@@ -34,5 +34,8 @@ export async function GET(request: Request) {
   }
 
   // URL to redirect to after sign in process completes
-  return NextResponse.redirect(requestUrl.origin);
+  const redirect = requestUrl.searchParams.get('redirect');
+  const target = redirect && redirect.startsWith('/') ? `${requestUrl.origin}${redirect}` : requestUrl.origin;
+
+  return NextResponse.redirect(target);
 }
