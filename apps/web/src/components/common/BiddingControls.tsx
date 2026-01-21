@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gavel, TrendingUp, Loader2, AlertTriangle } from "lucide-react";
+import { Gavel, TrendingUp, Loader2 } from "lucide-react";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -111,19 +111,11 @@ export const BiddingControls = memo(({
       };
     }
 
-    // DUAL-TAP CONFIRMATION STATE - Pulsing button
+    // DUAL-TAP CONFIRMATION STATE - Simple blue "Confirm?"
     if (pendingConfirmation) {
-      const isHighBidWarning = pendingConfirmation.type === 'high_bid';
       return {
-        bgClass: isHighBidWarning 
-          ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-200 animate-pulse'
-          : 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-200 animate-pulse',
-        content: (
-          <span className="flex items-center gap-1.5">
-            <AlertTriangle className="w-4 h-4" />
-            <span className="text-sm font-bold">{pendingConfirmation.message}</span>
-          </span>
-        )
+        bgClass: 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200',
+        content: "Confirm?"
       };
     }
     
@@ -227,9 +219,12 @@ export const BiddingControls = memo(({
       </div>
 
       {/* Action Button */}
-      <button
+      <motion.button
         onClick={onBid}
         disabled={isSuccess || isDisabled}
+        initial={false}
+        animate={pendingConfirmation ? { x: [0, -3, 3, -3, 3, 0] } : {}}
+        transition={{ duration: 0.4 }}
         className={`${getInputHeight(viewMode)} w-full rounded-xl font-bold font-outfit shadow-md transition-all duration-300 active:scale-[0.98] text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center
           ${btnConfig.bgClass}
         `}
@@ -239,7 +234,7 @@ export const BiddingControls = memo(({
         ) : (
           btnConfig.content
         )}
-      </button>
+      </motion.button>
     </div>
   );
 });

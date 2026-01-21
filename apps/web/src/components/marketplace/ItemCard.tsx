@@ -2,8 +2,7 @@ import { motion } from "framer-motion";
 import React, { useState, useMemo, useEffect, memo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Lock, Bookmark, AlertTriangle, ShieldAlert } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { MapPin, Lock, Bookmark } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
@@ -523,6 +522,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     hasPriorBid={!!hasPriorBid}
                     error={!!error}
                     minBid={minBid}
+                    pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
                     viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
                     onSmartAdjust={handleSmartAdjust}
@@ -542,46 +542,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
         isOpen={isDialogOpen} 
         onClose={setIsDialogOpen} 
       />
-        
-      {/* WARNING/CONFIRMATION DIALOG */}
-      <Dialog open={!!warning} onOpenChange={(open) => !open && clearWarning()}>
-        <DialogContent className="sm:max-w-[400px] bg-white border-none shadow-2xl p-6 rounded-2xl z-[150]">
-           <div className="flex flex-col items-center text-center gap-4">
-              <div className={`p-4 rounded-full ${warning?.type === 'double_bid' ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-600'}`}>
-                 {warning?.type === 'double_bid' ? (
-                   <ShieldAlert className="h-8 w-8" /> 
-                 ) : (
-                   <AlertTriangle className="h-8 w-8" />
-                 )}
-              </div>
-              
-              <div className="space-y-2">
-                 <DialogTitle className="text-xl font-black text-slate-900">
-                    {warning?.type === 'double_bid' ? 'Already Winning' : 'High Bid Warning'}
-                 </DialogTitle>
-                 <DialogDescription className="text-slate-600 font-medium text-base">
-                    {warning?.message}
-                 </DialogDescription>
-              </div>
-
-              <div className="flex gap-3 w-full mt-2">
-                <button
-                  onClick={clearWarning}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={(e) => confirmBid(e)}
-                  className={`flex-1 px-4 py-2.5 rounded-xl font-bold text-white shadow-lg shadow-red-200 transition-all active:scale-95
-                    ${warning?.type === 'double_bid' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-red-600 hover:bg-red-700'}`}
-                >
-                  Confirm Bid
-                </button>
-              </div>
-           </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 });
