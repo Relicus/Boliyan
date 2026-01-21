@@ -44,10 +44,12 @@ const defaultFilters: SearchFilters = {
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
-type MarketplaceListingRow = Database['public']['Tables']['marketplace_listings']['Row'];
+type MarketplaceListingRow = Database['public']['Views']['marketplace_listings']['Row'];
 type ListingRow = Database['public']['Tables']['listings']['Row'];
 type CategoryRow = Database['public']['Tables']['categories']['Row'];
 type SearchHistoryRow = Database['public']['Tables']['search_history']['Row'];
+type CategoryCountRow = Pick<ListingRow, 'category'>;
+type SearchHistoryQueryRow = Pick<SearchHistoryRow, 'query'>;
 
 export function SearchProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -108,6 +110,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             category,
             auction_mode,
             created_at,
+            ends_at,
+            search_vector,
             status,
             seller_name,
             seller_avatar,
@@ -117,7 +121,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             bid_count,
             high_bid,
             high_bidder_id,
-            condition
+            condition,
+            slug
         `, { count: 'exact' });
         
       if (filters.status !== 'all') {
@@ -263,7 +268,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         .select('category')
         .eq('status', 'active');
       
-      const countMap = (counts || []).reduce<Record<string, number>>((acc, row: ListingRow) => {
+      const countMap = (counts || []).reduce<Record<string, number>>((acc, row: CategoryCountRow) => {
         if (row.category) {
           acc[row.category] = (acc[row.category] || 0) + 1;
         }
@@ -273,7 +278,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       const newCategories = (data as CategoryRow[]).map((cat) => ({
         id: cat.id,
         name: cat.name,
-        icon: cat.slug || 'tag',
+        icon: cat.icon || 'tag',
         parentId: undefined,
         count: countMap[cat.name] || 0,
       }));
@@ -313,7 +318,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
           
           if (recent) {
             const unique = new Set();
-            recent.forEach((r: SearchHistoryRow) => {
+            recent.forEach((r: SearchHistoryQueryRow) => {
                 if (r.query && !unique.has(r.query)) {
                     unique.add(r.query);
                     results.push({ type: 'recent', text: r.query });

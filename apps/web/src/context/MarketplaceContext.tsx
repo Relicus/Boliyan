@@ -45,7 +45,7 @@ interface MarketplaceContextType {
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
 
-type MarketplaceListingRow = Database['public']['Tables']['marketplace_listings']['Row'];
+type MarketplaceListingRow = Database['public']['Views']['marketplace_listings']['Row'];
 type BidInsert = Database['public']['Tables']['bids']['Insert'];
 type BidUpdate = Database['public']['Tables']['bids']['Update'];
 type ListingUpdate = Database['public']['Tables']['listings']['Update'];
@@ -133,6 +133,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 category,
                 auction_mode,
                 created_at,
+                ends_at,
+                search_vector,
                 status,
                 seller_name,
                 seller_avatar,
@@ -299,10 +301,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
      if (updates.status) dbUpdates.status = updates.status;
      if (updates.title) dbUpdates.title = updates.title;
 
-     const { error } = await supabase
-       .from('listings')
-       .update(dbUpdates)
-       .eq('id', id);
+      const { error } = await supabase
+        .from('listings')
+        .update(dbUpdates)
+        .eq('id', id);
      
      if (error) {
          console.error("Failed to update item:", error);

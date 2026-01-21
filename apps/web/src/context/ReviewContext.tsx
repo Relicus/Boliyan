@@ -57,7 +57,7 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
       .from('reviews')
       .select(`
         *,
-        reviewer:profiles!reviewer_id(name, avatar_url),
+        reviewer:profiles!reviewer_id(full_name, avatar_url),
         listing:listings!listing_id(title)
       `)
       .eq('reviewed_id', userId)
@@ -69,14 +69,14 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
     }
 
     type ReviewWithRelations = ReviewRow & {
-      reviewer?: { name?: string | null; avatar_url?: string | null } | null;
+      reviewer?: { full_name?: string | null; avatar_url?: string | null } | null;
       listing?: { title?: string | null } | null;
     };
 
     return (data as ReviewWithRelations[]).map((row) => ({
       id: row.id,
       reviewerId: row.reviewer_id || '',
-      reviewerName: row.reviewer?.name || undefined,
+      reviewerName: row.reviewer?.full_name || undefined,
       reviewerAvatar: row.reviewer?.avatar_url || undefined,
       reviewedId: row.reviewed_id || '',
       listingId: row.listing_id || '',
@@ -92,7 +92,7 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
   const fetchUserReputation = useCallback(async (userId: string): Promise<UserReputation | null> => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('avg_rating, review_count')
+      .select('rating, rating_count')
       .eq('id', userId)
       .single();
 
@@ -109,11 +109,11 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
     const asBuyer = breakdownRows.filter((r) => r.role === 'seller'); // Reviews they received AS buyer
     const asSeller = breakdownRows.filter((r) => r.role === 'buyer'); // Reviews they received AS seller
 
-    const profile = data as ProfileRow & { avg_rating?: number | null; review_count?: number | null };
+    const profile = data as ProfileRow;
 
     return {
-      avgRating: profile.avg_rating || 0,
-      reviewCount: profile.review_count || 0,
+      avgRating: profile.rating || 0,
+      reviewCount: profile.rating_count || 0,
       asBuyer: {
         avgRating: asBuyer.length ? asBuyer.reduce((s, r) => s + (r.rating || 0), 0) / asBuyer.length : 0,
         count: asBuyer.length,

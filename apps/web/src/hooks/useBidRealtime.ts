@@ -13,6 +13,8 @@ export function useBidRealtime(onBid: (bid: Bid) => void) {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bids' }, async (payload: RealtimePostgresChangesPayload<Database['public']['Tables']['bids']['Row']>) => {
         const newBidRaw = payload.new;
         if (!newBidRaw || !('bidder_id' in newBidRaw)) return;
+        const bidRow = newBidRaw as Database['public']['Tables']['bids']['Row'];
+        if (!bidRow.bidder_id) return;
         
         // Fetch profile to hydrate the bid
         // Note: In high volume, this might be a bottleneck. 
@@ -20,11 +22,11 @@ export function useBidRealtime(onBid: (bid: Bid) => void) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', newBidRaw.bidder_id)
+          .eq('id', bidRow.bidder_id)
           .single();
 
         const newBid = transformBidToHydratedBid({
-          ...newBidRaw,
+          ...bidRow,
           profiles: profile
         } as unknown as BidWithProfile);
 

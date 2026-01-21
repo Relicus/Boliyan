@@ -46,6 +46,12 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       type ListingRow = Database['public']['Tables']['listings']['Row'];
       type ListingWithBidCount = ListingRow & { bids?: { count: number }[]; view_count?: number | null };
 
+      const isValidCondition = (value: string | null | undefined): value is ManagedListing['condition'] =>
+        value === 'new' || value === 'like_new' || value === 'used' || value === 'fair';
+
+      const isValidStatus = (value: string | null | undefined): value is ManagedListing['status'] =>
+        value === 'active' || value === 'completed' || value === 'cancelled' || value === 'hidden';
+
       const listings: ManagedListing[] = (listingsData as ListingWithBidCount[] || []).map((item) => ({
         ...item,
         // Manual mapping from Snake Case (DB) to Camel Case (App)
@@ -57,8 +63,9 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         listingDuration: 24, // Default or fetch if available
         expiryAt: new Date(Date.now() + 86400000).toISOString(), // Mock expiry
         description: item.description || '', // Ensure string
-        condition: item.condition || 'used',
-        status: item.status || 'active',
+        condition: isValidCondition(item.condition) ? item.condition : 'used',
+        status: isValidStatus(item.status) ? item.status : 'active',
+        slug: item.slug ?? undefined,
         
         images: item.images || [], // Ensure array
         seller: user, // user is seller

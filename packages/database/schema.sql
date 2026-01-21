@@ -4,6 +4,9 @@ CREATE TABLE profiles (
   full_name TEXT,
   avatar_url TEXT,
   location TEXT,
+  email TEXT,
+  phone TEXT,
+  is_verified BOOLEAN DEFAULT false,
   rating DECIMAL DEFAULT 0,
   rating_count INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -19,8 +22,10 @@ CREATE TABLE listings (
   category TEXT,
   images TEXT[] DEFAULT '{}',
   condition TEXT CHECK (condition IN ('new', 'like_new', 'used', 'fair')) DEFAULT 'used',
-  auction_mode TEXT CHECK (auction_mode IN ('hidden', 'visible')) DEFAULT 'visible',
-  status TEXT CHECK (status IN ('active', 'completed', 'cancelled')) DEFAULT 'active',
+  auction_mode TEXT CHECK (auction_mode IN ('hidden', 'visible', 'sealed')) DEFAULT 'visible',
+  status TEXT CHECK (status IN ('active', 'completed', 'cancelled', 'hidden')) DEFAULT 'active',
+  ends_at TIMESTAMP WITH TIME ZONE,
+  search_vector TSVECTOR,
   slug TEXT UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -59,4 +64,18 @@ CREATE TABLE messages (
   content TEXT NOT NULL,
   is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Reviews (Post-deal reputation)
+CREATE TABLE reviews (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  reviewer_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  reviewed_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  listing_id UUID REFERENCES listings(id) ON DELETE CASCADE,
+  conversation_id UUID REFERENCES conversations(id) ON DELETE SET NULL,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  content TEXT,
+  role TEXT CHECK (role IN ('buyer', 'seller')) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(reviewer_id, listing_id, role)
 );

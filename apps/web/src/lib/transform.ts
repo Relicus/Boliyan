@@ -84,6 +84,12 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
   // Basic Auction Mode mapping
   const isPublicBid = listing.auction_mode === 'visible';
 
+  const isValidCondition = (value: string | null | undefined): value is Item['condition'] =>
+    value === 'new' || value === 'like_new' || value === 'used' || value === 'fair';
+
+  const isValidStatus = (value: string | null | undefined): value is Item['status'] =>
+    value === 'active' || value === 'completed' || value === 'cancelled' || value === 'hidden';
+
   // Image URL Transformation
   // We assume images in DB are filenames/paths (e.g. "chair.jpg")
   // We prepend the Storage bucket URL: [ProjectURL]/storage/v1/object/public/listings/
@@ -106,7 +112,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     seller: seller,
     askPrice: listing.asked_price,
     category: listing.category || 'Other',
-    condition: listing.condition || 'used',
+    condition: isValidCondition(listing.condition) ? listing.condition : 'used',
     isPublicBid: isPublicBid,
     
     // Server-side stats if available
@@ -117,7 +123,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     createdAt: listing.created_at || new Date().toISOString(),
     expiryAt: expiryAt,
     listingDuration: 72,
-    status: listing.status || 'active'
+    status: isValidStatus(listing.status) ? listing.status : 'active'
   };
 }
 export type BidWithProfile = Database['public']['Tables']['bids']['Row'] & {

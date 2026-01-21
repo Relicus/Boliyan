@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   // 1. Bypass for Localhost / Development
   // This ensures your local development flow is never interrupted
   const hostname = req.headers.get('host') || '';

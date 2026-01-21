@@ -111,7 +111,9 @@ export default function RootLayout({
             <BottomNav />
             <ScrollToTop />
           </NotificationProvider>
-          <AuthDialog />
+          <Suspense fallback={null}>
+            <AuthDialog />
+          </Suspense>
         </AppProvider>
         <Toaster />
       </body>
