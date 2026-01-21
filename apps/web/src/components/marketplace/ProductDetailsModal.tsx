@@ -25,6 +25,7 @@ interface ProductDetailsModalProps {
 export default function ProductDetailsModal({ item, seller, isOpen, onClose }: ProductDetailsModalProps) {
   const { user, bids, toggleWatch, watchedItemIds, now } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
+  const [fallbackNow] = useState(() => Date.now());
 
   // Hook for encapsulated bidding logic
   const {
@@ -77,7 +78,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, isOutside, timeLeft, isUrgent } = useMemo(() => {
     // Timer Logic - Independent of User
-    const currentTime = now || Date.now();
+    const currentTime = now ?? fallbackNow;
     const diff = new Date(item.expiryAt).getTime() - currentTime;
     const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
     const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));

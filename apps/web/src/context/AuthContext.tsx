@@ -28,11 +28,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const fetchProfile = async (supabaseUser: any) => {
         console.log("[AuthContext] Fetching profile for:", supabaseUser.id);
         try {
-            let { data, error } = await supabase
+            const { data: fetchedData, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', supabaseUser.id)
                 .single();
+
+            let data = fetchedData;
 
             console.log("[AuthContext] Profile fetch result:", { hasData: !!data, error });
 

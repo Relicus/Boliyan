@@ -1,8 +1,8 @@
 "use client";
 
 import { memo } from "react";
-import { motion } from "framer-motion";
-import { Gavel, TrendingUp, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Gavel, TrendingUp, Loader2, AlertTriangle } from "lucide-react";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -16,6 +16,9 @@ interface BiddingControlsProps {
   isSubmitting?: boolean;
   error?: boolean;
   minBid?: number;
+  
+  // Dual-tap confirmation state
+  pendingConfirmation?: { type: 'double_bid' | 'high_bid', message: string } | null;
   
   // Animation
   animTrigger: number;
@@ -66,6 +69,7 @@ export const BiddingControls = memo(({
   isSubmitting = false,
   error = false,
   minBid = 0,
+  pendingConfirmation = null,
   animTrigger,
   viewMode = 'compact',
   disabled = false,
@@ -102,6 +106,22 @@ export const BiddingControls = memo(({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
             </motion.svg>
             <span>Bid Placed!</span>
+          </span>
+        )
+      };
+    }
+
+    // DUAL-TAP CONFIRMATION STATE - Pulsing button
+    if (pendingConfirmation) {
+      const isHighBidWarning = pendingConfirmation.type === 'high_bid';
+      return {
+        bgClass: isHighBidWarning 
+          ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-200 animate-pulse'
+          : 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-200 animate-pulse',
+        content: (
+          <span className="flex items-center gap-1.5">
+            <AlertTriangle className="w-4 h-4" />
+            <span className="text-sm font-bold">{pendingConfirmation.message}</span>
           </span>
         )
       };

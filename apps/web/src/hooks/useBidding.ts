@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
 import { Item, User } from "@/types";
@@ -11,7 +11,9 @@ import { toast } from "sonner";
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
   const { placeBid, user, bids } = useApp();
 
-  const [warning, setWarning] = useState<{ type: 'double_bid' | 'high_bid', message: string } | null>(null);
+  // Pending confirmation for dual-tap pattern (replaces dialog-based warning)
+  const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid', message: string } | null>(null);
+  const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize with Ask Price (70% allowed on first bid) or Current High Bid
   const initialBid = item.isPublicBid && item.currentHighBid
@@ -22,6 +24,17 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const [error, setError] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [animTrigger, setAnimTrigger] = useState(0);
+  const [lastDelta, setLastDelta] = useState<number | null>(null);
+  const [showDelta, setShowDelta] = useState<boolean>(false);
+
+  // Clear confirmation timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (confirmationTimeoutRef.current) {
+        clearTimeout(confirmationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Sync bid amount when external minimum bid updates (e.g. someone else bids)
   useEffect(() => {
@@ -30,14 +43,18 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       : getMinimumAllowedBid(item.askPrice);
 
     if (!isSuccess) {
-      setBidAmount(prev => {
-        const currentNumericAmount = parseFloat(prev.replace(/,/g, ''));
-        if (currentNumericAmount < minBid && item.currentHighBid) {
-          return minBid.toLocaleString();
-        }
-        return prev;
-      });
+      const timer = setTimeout(() => {
+        setBidAmount(prev => {
+          const currentNumericAmount = parseFloat(prev.replace(/,/g, ''));
+          if (currentNumericAmount < minBid && item.currentHighBid) {
+            return minBid.toLocaleString();
+          }
+          return prev;
+        });
+      }, 0);
+      return () => clearTimeout(timer);
     }
+    return undefined;
   }, [item.currentHighBid, item.askPrice, item.isPublicBid, isSuccess]); 
 
   const handleSmartAdjust = useCallback((e: React.MouseEvent | React.TouchEvent, direction: 1 | -1) => {
@@ -61,11 +78,39 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     // Otherwise allow update
     const newValue = Math.max(0, current + delta);
     
+    setLastDelta(delta);
+    setShowDelta(true);
+    setTimeout(() => setShowDelta(false), 800);
+
     setBidAmount(newValue.toLocaleString());
     setAnimTrigger(prev => prev + 1);
   }, [bidAmount, item]);
 
   const executeBid = useCallback((amount: number, e?: React.MouseEvent | React.TouchEvent | any) => {
+    // IMPORTANT: Capture button position IMMEDIATELY before any state updates
+    // React's synthetic event nullifies currentTarget after the handler phase
+    let confettiX = 0.5;
+    let confettiY = 0.5;
+
+    if (e) {
+      // Try currentTarget first (the element with the event listener)
+      const targetElement = e.currentTarget instanceof HTMLElement 
+        ? e.currentTarget 
+        : (e.target instanceof HTMLElement ? e.target.closest('button') : null);
+      
+      if (targetElement) {
+        const rect = targetElement.getBoundingClientRect();
+        confettiX = (rect.left + rect.width / 2) / window.innerWidth;
+        // Use BOTTOM of button so confetti bursts UPWARD
+        confettiY = (rect.top + rect.height) / window.innerHeight;
+      } 
+      // Fallback: Use mouse/touch coordinates
+      else if ('clientX' in e && e.clientX !== 0) {
+        confettiX = e.clientX / window.innerWidth;
+        confettiY = e.clientY / window.innerHeight;
+      }
+    }
+
     // Place bid logic via store
     placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
     setIsSuccess(true);
@@ -74,27 +119,9 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     const nextAmount = amount + getSmartStep(amount);
     setBidAmount(nextAmount.toLocaleString());
 
-    // Confetti Effect: Targeted to the source button or touch point
-    let x = 0.5;
-    let y = 0.5;
-
-    if (e) {
-      // If it's a mouse/touch event with coordinates
-      if ('clientX' in e && e.clientX !== 0) {
-        x = e.clientX / window.innerWidth;
-        y = e.clientY / window.innerHeight;
-      } 
-      // Fallback: Use the center of the element that triggered the event
-      else if (e.currentTarget instanceof HTMLElement) {
-        const rect = e.currentTarget.getBoundingClientRect();
-        x = (rect.left + rect.width / 2) / window.innerWidth;
-        y = (rect.top + rect.height / 2) / window.innerHeight;
-      }
-    }
-
     // Two bursts for a more "directional" feel from the button
     const commonConfig = {
-      origin: { x, y },
+      origin: { x: confettiX, y: confettiY },
       particleCount: 80,
       spread: 60,
       gravity: 1.1,
@@ -150,8 +177,18 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     if (!user) {
       toast.error("Please login to place a bid");
-      // Should ideally redirect to login, but for now just return to prevent crash
-      // The UI should handle showing the sign-in state usually
+      return;
+    }
+
+    // DUAL-TAP PATTERN: If already pending confirmation, execute on second tap
+    if (pendingConfirmation) {
+      // Clear any existing timeout
+      if (confirmationTimeoutRef.current) {
+        clearTimeout(confirmationTimeoutRef.current);
+        confirmationTimeoutRef.current = null;
+      }
+      executeBid(amount, e);
+      setPendingConfirmation(null);
       return;
     }
 
@@ -159,54 +196,56 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     if (item.isPublicBid) {
       // For Public auctions, warn if they are already the high bidder
       if (item.currentHighBidderId === user.id) {
-        console.log('[useBidding] attemptBid: user is high bidder. Showing warning.');
-        setWarning({
+        setPendingConfirmation({
           type: 'double_bid',
-          message: "You are already the highest bidder. Do you want to increase your bid?"
+          message: "Already winning - tap to raise"
         });
+        // Auto-clear after 3 seconds
+        confirmationTimeoutRef.current = setTimeout(() => {
+          setPendingConfirmation(null);
+        }, 3000);
         return;
       }
     } else {
       // For Secret/Sealed auctions, warn if they have bid at all
-      // We rely on MarketplaceContext to have loaded the bids for this item
-      // Note: 'bids' is now destructured at top level to avoid hook rule violation
       const hasAlreadyBid = bids.some(b => b.itemId === item.id && b.bidderId === user.id);
       
       if (hasAlreadyBid) {
-        setWarning({
+        setPendingConfirmation({
           type: 'double_bid',
-          message: "You have already placed a bid for this item. Do you want to update it?"
+          message: "Bid exists - tap to update"
         });
+        confirmationTimeoutRef.current = setTimeout(() => {
+          setPendingConfirmation(null);
+        }, 3000);
         return;
       }
     }
 
     // Safety Check 2: High Bid (20% above reference)
-    // We use a 20% buffer. If they bid 20% MORE than the reference price, we warn.
     const safetyThreshold = referencePrice * 1.2;
     if (amount > safetyThreshold) {
       const percentOver = Math.round(((amount - referencePrice) / referencePrice) * 100);
-      setWarning({
+      setPendingConfirmation({
         type: 'high_bid',
-        message: `Your bid is ${percentOver}% higher than required. Are you sure?`
+        message: `${percentOver}% over - tap to confirm`
       });
+      confirmationTimeoutRef.current = setTimeout(() => {
+        setPendingConfirmation(null);
+      }, 3000);
       return;
     }
 
     // If no warnings, execute immediately
     executeBid(amount, e);
-  }, [bidAmount, item, user?.id, executeBid]);
+  }, [bidAmount, item, user, bids, executeBid, pendingConfirmation]);
 
-  const confirmBid = useCallback((e?: React.MouseEvent | React.TouchEvent | any) => {
-    if (!warning) return;
-    const amount = parseFloat(bidAmount.replace(/,/g, ''));
-    executeBid(amount, e); 
-    setWarning(null);
-  }, [warning, bidAmount, executeBid]);
-
-
-  const clearWarning = useCallback(() => {
-    setWarning(null);
+  const clearPendingConfirmation = useCallback(() => {
+    if (confirmationTimeoutRef.current) {
+      clearTimeout(confirmationTimeoutRef.current);
+      confirmationTimeoutRef.current = null;
+    }
+    setPendingConfirmation(null);
   }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -239,12 +278,13 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     isSuccess,
     animTrigger,
     handleSmartAdjust,
-    handleBid: attemptBid, // Renamed exposed Prop for compat
-    confirmBid,
-    clearWarning,
-    warning,
+    handleBid: attemptBid,
+    clearPendingConfirmation,
+    pendingConfirmation,
     handleKeyDown,
     handleInputChange,
-    getSmartStep
+    getSmartStep,
+    lastDelta,
+    showDelta
   };
 }

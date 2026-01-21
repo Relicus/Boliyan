@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Search, Package, ShoppingBag, ArrowRight, Clock } from "lucide-react";
+import React, { useState, useRef, useMemo } from "react";
+import { Search, Package, ArrowRight } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -17,10 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useApp } from "@/lib/store";
 import { useRouter, usePathname } from "next/navigation";
-import { Item, Bid } from "@/types";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 export function SearchDropdown() {
   const { items, filters, setFilter } = useApp();
@@ -29,13 +25,7 @@ export function SearchDropdown() {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Sync internal state with global filter ONLY on mount or when filter is cleared
-  useEffect(() => {
-     if (filters.search !== inputValue && !open) {
-        setInputValue(filters.search);
-     }
-  }, [filters.search]);
+  const effectiveValue = open ? inputValue : filters.search;
 
   const handleInputChange = (val: string) => {
     setInputValue(val);
@@ -56,7 +46,7 @@ export function SearchDropdown() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      commitSearch(inputValue);
+      commitSearch(effectiveValue);
     }
   };
 
@@ -64,9 +54,9 @@ export function SearchDropdown() {
   // In a real app with 100k+ listings, this would be a debounced API call
   // For now, we simulate this by processing the local items sparingly
   const searchResults = useMemo(() => {
-    if (!inputValue || inputValue.length < 1) return { keywords: [], categories: [] };
+    if (!effectiveValue || effectiveValue.length < 1) return { keywords: [], categories: [] };
     
-    const query = inputValue.toLowerCase();
+    const query = effectiveValue.toLowerCase();
     
     // 1. Categories
     const categories = Array.from(new Set(items.map(i => i.category)))
@@ -79,7 +69,7 @@ export function SearchDropdown() {
       .slice(0, 5);
 
     return { keywords, categories };
-  }, [items, inputValue]);
+  }, [items, effectiveValue]);
 
   return (
     <div ref={containerRef} className="relative w-full max-w-md lg:max-w-xl mx-auto px-4">
@@ -91,10 +81,15 @@ export function SearchDropdown() {
               id="navbar-search-input"
               placeholder="Search items or categories..."
               className="w-full pl-10 pr-4 h-11 bg-slate-50 border-transparent focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-50/50 rounded-2xl transition-all font-medium"
-              value={inputValue}
+              value={effectiveValue}
               onChange={(e) => handleInputChange(e.target.value)}
               onKeyDown={handleKeyDown}
-              onFocus={() => inputValue.length > 0 && setOpen(true)}
+              onFocus={() => {
+                setInputValue(filters.search);
+                if (filters.search.length > 0) {
+                  setOpen(true);
+                }
+              }}
             />
           </div>
         </PopoverTrigger>
@@ -109,7 +104,7 @@ export function SearchDropdown() {
               <CommandEmpty className="py-12 flex flex-col items-center justify-center text-slate-500">
                 <Search className="h-10 w-10 mb-4 opacity-20" />
                 <p className="font-bold text-slate-900">No suggestions</p>
-                <p className="text-sm">Press Enter to search for "{inputValue}"</p>
+                <p className="text-sm">Press Enter to search for "{effectiveValue}"</p>
               </CommandEmpty>
 
               {searchResults.categories.length > 0 && (
@@ -159,12 +154,12 @@ export function SearchDropdown() {
 
               <div className="p-2 bg-slate-50 border-t border-slate-100">
                 <button 
-                  onClick={() => commitSearch(inputValue)}
+                  onClick={() => commitSearch(effectiveValue)}
                   className="w-full flex items-center justify-between gap-2 px-4 py-2.5 text-[12px] font-bold text-slate-600 hover:bg-blue-100/50 hover:text-blue-600 rounded-xl transition-all"
                 >
                   <div className="flex items-center gap-2">
                     <Search className="h-3.5 w-3.5" />
-                    <span>Search for "{inputValue}"</span>
+                    <span>Search for "{effectiveValue}"</span>
                   </div>
                   <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-white px-1.5 font-sans text-[10px] font-medium text-slate-400 opacity-100">
                     <span className="text-xs">↵</span>

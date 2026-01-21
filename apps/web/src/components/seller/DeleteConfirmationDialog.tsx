@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { 
   Dialog, 
   DialogContent, 
@@ -31,15 +31,16 @@ export default function DeleteConfirmationDialog({
   const [confirmationText, setConfirmationText] = useState("");
   const isConfirmed = confirmationText === "DELETE";
 
-  // Reset text when dialog opens/closes
-  useEffect(() => {
-    if (!isOpen) {
-      setConfirmationText("");
-    }
-  }, [isOpen]);
-
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          setConfirmationText("");
+          onClose();
+        }
+      }}
+    >
       <DialogContent showCloseButton={false} className="sm:max-w-[425px] border-none shadow-2xl overflow-visible">
         {/* Custom Close Button - Premium Style */}
         <DialogClose asChild>

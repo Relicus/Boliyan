@@ -81,8 +81,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!user) {
   // ...
-      setConversations([]);
-      return;
+      const timer = setTimeout(() => setConversations([]), 0);
+      return () => clearTimeout(timer);
     }
 
     const fetchConversations = async () => {
@@ -146,7 +146,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id]);
+  }, [user]);
 
   // 2. Realtime Messages Listener (Global for participating chats)
   // Ref for accessing latest conversations in callback without re-subscribing

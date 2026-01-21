@@ -5,7 +5,7 @@ import { useApp } from '@/lib/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Star, Circle } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn, formatPrice } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
@@ -24,7 +24,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
   const [timeLeft, setTimeLeft] = useState<string>("");
-  const [isLocked, setIsLocked] = useState(false);
+  const [isLockedState, setIsLockedState] = useState(false);
   const { canReview } = useReviews();
   const [showReviewBtn, setShowReviewBtn] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -46,6 +46,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const isSeller = user && conversation ? conversation.sellerId === user.id : false;
   const otherUser = conversation ? (isSeller ? conversation.bidder : conversation.seller) : undefined;
   const item = conversation?.item;
+
+  const isLocked = !conversation?.expiresAt ? false : isLockedState;
 
   // 3-Slot Visual Indicator Logic (Seller Only)
   // We assume a 'totalChats' prop or similar exists, but since we don't have it on the Conversation object yet,
@@ -81,8 +83,6 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   // Expiration Logic
   useEffect(() => {
     if (!conversation?.expiresAt) {
-      setTimeLeft("");
-      setIsLocked(false);
       return;
     }
 
@@ -93,7 +93,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
       if (diff <= 0) {
         setTimeLeft("0h 0m 0s");
-        setIsLocked(true);
+        setIsLockedState(true);
         clearInterval(timer);
         return;
       }
@@ -108,7 +108,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
         : `${hours}h ${mins}m ${secs}s`;
       
       setTimeLeft(timeStr);
-      setIsLocked(false);
+      setIsLockedState(false);
     }, 1000);
 
     return () => clearInterval(timer);
@@ -118,10 +118,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     if (item?.status === 'completed' && otherUser) {
         canReview(item.id, isSeller ? 'seller' : 'buyer')
             .then(setShowReviewBtn);
-    } else {
-        setShowReviewBtn(false);
     }
-  }, [item?.status, otherUser, canReview, isSeller, conversation?.itemId]);
+  }, [item?.status, item?.id, otherUser, canReview, isSeller]);
 
   // Scroll to bottom on new message
   useEffect(() => {

@@ -1,7 +1,6 @@
 "use client";
 
-import { Search, User, Bell, Plus, LogOut, Activity, Heart, UserCircle, MessageSquare, LayoutGrid, Tag, Gavel } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Plus, LogOut, Activity, Heart, UserCircle, MessageSquare, LayoutGrid, Tag, Gavel } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -15,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useApp } from "@/lib/store";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 // import { SearchDropdown } from "./SearchDropdown";
@@ -26,14 +25,12 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
 
 export default function Navbar() {
-  const { filters, setFilter, user, isLoggedIn, logout, items, bids, messages, isLoading } = useApp();
-  const router = useRouter();
+  const { user, isLoggedIn, logout, items, bids, messages, isLoading } = useApp();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab');
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
-  const [mounted, setMounted] = useState(false);
 
   // Other notifications
   const unreadMsgCount = (messages || []).filter(m => !m.isRead && m.senderId !== user?.id).length;
@@ -45,10 +42,6 @@ export default function Navbar() {
   const currentOutbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
     const controlNavbar = () => {
       if (typeof window !== 'undefined') {
         const currentScrollY = window.scrollY;
@@ -56,6 +49,7 @@ export default function Navbar() {
         // Disable hide effect for Inbox and restricted views
         if (pathname === '/inbox' || pathname === '/signin' || pathname === '/signup') {
           setIsVisible(true);
+          lastScrollY.current = currentScrollY;
           return;
         }
 
@@ -63,7 +57,6 @@ export default function Navbar() {
         // Hide navbar if scrolling down and past 100px
         if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
           setIsVisible(true);
-          return; // Fix: Should just set state, but we need to update lastScrollY
         } else if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
           setIsVisible(false);
         }
@@ -158,7 +151,7 @@ export default function Navbar() {
           </Button>
 
           <AnimatePresence mode="wait">
-            {!mounted || isLoading ? (
+            {isLoading ? (
               <motion.div
                 key="loading"
                 layout="position"

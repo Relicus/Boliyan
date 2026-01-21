@@ -2,7 +2,7 @@
 
 import { use, useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, MapPin, Lock, Clock, Bookmark, Maximize2, Share2, ShieldCheck, Zap, ArrowLeft, Gavel } from "lucide-react";
+import { ChevronLeft, MapPin, Lock, Clock, Bookmark, Maximize2, Share2, Zap, ArrowLeft } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
@@ -24,7 +24,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const {
     bidAmount,
-    setBidAmount,
     error,
     isSuccess,
     animTrigger,
@@ -37,7 +36,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     getSmartStep
   } = useBidding(item!, seller!, () => {});
 
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [currentImg, setCurrentImg] = useState(0);
 
   useEffect(() => {
@@ -45,10 +44,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     return () => clearInterval(timer);
   }, []);
 
-  const { distance, duration, timeLeft, isUrgent } = useMemo(() => {
-    if (!item || !seller) return { distance: 0, duration: 0, timeLeft: "", isUrgent: false };
+  const { duration, timeLeft, isUrgent } = useMemo(() => {
+    if (!item || !seller) return { duration: 0, timeLeft: "", isUrgent: false };
     
-    const { distance: dist, duration: dur } = user ? calculatePrivacySafeDistance(user.location, seller.location) : { distance: 0, duration: 0 };
+    const { duration: dur } = user ? calculatePrivacySafeDistance(user.location, seller.location) : { duration: 0 };
     const diff = new Date(item.expiryAt).getTime() - now;
     const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
     const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
@@ -59,12 +58,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       : `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
 
     return { 
-      distance: dist, 
       duration: dur, 
       timeLeft: timeStr,
       isUrgent: hoursLeft < 2
     };
-  }, [item, seller, now, user?.location]);
+  }, [item, seller, now, user]);
 
   if (!item || !seller) {
     return (
@@ -177,7 +175,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     onClick={() => setCurrentImg(i)}
                     className={`relative h-24 w-24 shrink-0 rounded-2xl overflow-hidden border-2 transition-all ${currentImg === i ? 'border-blue-600 shadow-md ring-4 ring-blue-50' : 'border-transparent opacity-60 hover:opacity-100'}`}
                   >
-                    <img src={src} className="w-full h-full object-cover" />
+                    <img src={src} alt={`${item.title} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>

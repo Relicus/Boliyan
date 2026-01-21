@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useMemo, Suspense } from 'react';
 import { ConversationList } from '@/components/inbox/ConversationList';
 import { ChatWindow } from '@/components/inbox/ChatWindow';
 import { cn } from '@/lib/utils';
@@ -13,28 +13,38 @@ import { MessageSquare, ShoppingBag, Store } from 'lucide-react';
 function InboxContent() {
   const { conversations, user } = useApp();
   const searchParams = useSearchParams();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'offers' | 'bids'>('all');
+  const [selectedId, setSelectedId] = useState<string | null | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<'all' | 'offers' | 'bids' | undefined>(undefined);
 
-  const offerConversations = user ? conversations.filter(c => c.sellerId === user.id) : [];
-  const bidConversations = user ? conversations.filter(c => c.bidderId === user.id) : [];
+  const offerConversations = useMemo(() => {
+    if (!user) return [];
+    return conversations.filter(c => c.sellerId === user.id);
+  }, [conversations, user]);
 
-  // Handle deep-linking from URL
-  useEffect(() => {
-    const idParam = searchParams.get('id');
-    if (idParam) {
-      setSelectedId(idParam);
-      
-      // Auto-switch tab based on which list contains the ID
-      if (offerConversations.some(c => c.id === idParam)) {
-        setActiveTab('offers');
-      } else if (bidConversations.some(c => c.id === idParam)) {
-        setActiveTab('bids');
-      } else {
-        setActiveTab('all');
-      }
+  const bidConversations = useMemo(() => {
+    if (!user) return [];
+    return conversations.filter(c => c.bidderId === user.id);
+  }, [conversations, user]);
+
+  const selectedIdParam = searchParams.get('id');
+  const resolvedSelectedId = selectedId === undefined ? selectedIdParam : selectedId;
+  const derivedTab = useMemo(() => {
+    if (!selectedIdParam) return undefined;
+
+    if (offerConversations.some(c => c.id === selectedIdParam)) {
+      return 'offers';
     }
-  }, [searchParams, offerConversations.length, bidConversations.length]);
+    if (bidConversations.some(c => c.id === selectedIdParam)) {
+      return 'bids';
+    }
+    return 'all';
+  }, [bidConversations, offerConversations, selectedIdParam]);
+  const resolvedTab = activeTab ?? derivedTab ?? 'all';
+  const handleTabChange = (value: string) => {
+    if (value === 'all' || value === 'offers' || value === 'bids') {
+      setActiveTab(value);
+    }
+  };
 
   return (
     <div id="inbox-container" className="flex flex-1 bg-muted/20 w-full h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)]">
@@ -43,12 +53,12 @@ function InboxContent() {
         id="inbox-sidebar"
         className={cn(
           "w-full md:w-[350px] lg:w-[400px] border-r bg-background flex flex-col shrink-0",
-          selectedId ? "hidden md:flex" : "flex"
+          resolvedSelectedId ? "hidden md:flex" : "flex"
         )}
       >
         <div className="p-4 border-b shrink-0">
           <h1 className="font-black text-xl mb-4 text-slate-900">Messages</h1>
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+          <Tabs value={resolvedTab} onValueChange={handleTabChange} className="w-full">
             <TabsList id="inbox-tabs-list" className="grid w-full grid-cols-3 h-10 p-1 bg-slate-100 rounded-xl">
               <TabsTrigger 
                 id="inbox-all-tab"
@@ -93,11 +103,11 @@ function InboxContent() {
           </Tabs>
         </div>
 
-        <Tabs value={activeTab} className="flex-1 overflow-hidden">
+        <Tabs value={resolvedTab} className="flex-1 overflow-hidden">
           <TabsContent value="all" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
             <ConversationList 
               conversations={conversations}
-              selectedId={selectedId} 
+              selectedId={resolvedSelectedId} 
               onSelect={setSelectedId} 
               role="auto"
             />
@@ -106,7 +116,7 @@ function InboxContent() {
           <TabsContent value="offers" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
             <ConversationList 
               conversations={offerConversations}
-              selectedId={selectedId} 
+              selectedId={resolvedSelectedId} 
               onSelect={setSelectedId} 
               role="seller"
             />
@@ -115,7 +125,7 @@ function InboxContent() {
           <TabsContent value="bids" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
             <ConversationList 
               conversations={bidConversations}
-              selectedId={selectedId} 
+              selectedId={resolvedSelectedId} 
               onSelect={setSelectedId} 
               role="buyer"
             />
@@ -128,12 +138,12 @@ function InboxContent() {
         id="chat-window-container"
         className={cn(
           "flex-1 flex flex-col bg-background min-w-0",
-          !selectedId ? "hidden md:flex" : "flex"
+          !resolvedSelectedId ? "hidden md:flex" : "flex"
         )}
       >
-        {selectedId ? (
+        {resolvedSelectedId ? (
           <ChatWindow 
-            conversationId={selectedId} 
+            conversationId={resolvedSelectedId} 
             onBack={() => setSelectedId(null)}
           />
         ) : (

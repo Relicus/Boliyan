@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { useSearch } from '@/context/SearchContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,22 +9,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SearchBar() {
   const { filters, setFilters, suggestions, fetchSuggestions } = useSearch();
-  const [inputValue, setInputValue] = useState(filters.query || '');
+  const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    // Sync external filter changes
-    setInputValue(prev => filters.query !== prev ? filters.query || '' : prev);
-  }, [filters.query]);
+  const effectiveValue = isOpen ? inputValue : (filters.query || '');
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchSuggestions(inputValue);
+      fetchSuggestions(effectiveValue);
     }, 300);
     return () => clearTimeout(timer);
-  }, [inputValue, fetchSuggestions]);
+  }, [effectiveValue, fetchSuggestions]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -46,7 +40,7 @@ export default function SearchBar() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSearch(inputValue);
+      handleSearch(effectiveValue);
     }
   };
 
@@ -61,12 +55,15 @@ export default function SearchBar() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         <Input
           id="navbar-search-input"
-          value={inputValue}
+          value={effectiveValue}
           onChange={(e) => {
             setInputValue(e.target.value);
             setIsOpen(true);
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            setInputValue(filters.query || '');
+            setIsOpen(true);
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Search items, categories..."
           className="pl-9 pr-9 h-10 w-full bg-slate-50 border-slate-200 focus:bg-white transition-colors rounded-xl"

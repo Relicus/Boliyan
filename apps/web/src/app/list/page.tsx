@@ -27,7 +27,7 @@ function ListForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("id");
-  const { updateItem, items, user } = useApp();
+  const { items, user } = useApp();
   
   const editingItem = editId ? items.find(i => i.id === editId) : null;
   
@@ -103,17 +103,6 @@ function ListForm() {
 
     try {
         // 1. Upload Images
-        let finalImageUrls = [...images]; // Start with existing URLs (if editing)
-        
-        // Filter out existing URLs from files (assumes images state mixes URLs and blob:)
-        // Actually, logic needs to be careful.
-        // If we are editing, 'images' has DB URLs. 'imageFiles' has ONLY new files.
-        // If new, 'images' has blob URLs.
-        
-        // Strategy: Upload all files in 'imageFiles'. 
-        // Then assume any 'blob:' in 'images' corresponds to an uploaded file.
-        // OR simpler: Just append uploaded URLs to the ones that are NOT blob/local.
-        
         const uploadedUrls = await Promise.all(
             imageFiles.map(file => uploadListingImage(file, user.id))
         );
@@ -122,7 +111,8 @@ function ListForm() {
         const existingRealUrls = images.filter(url => !url.startsWith('blob:'));
         const allUrls = [...existingRealUrls, ...uploadedUrls];
 
-        const finalDuration = parseInt(duration) as 24 | 48 | 72;
+        const finalDurationNum = parseInt(duration) as 24 | 48 | 72;
+        console.log("Setting duration to:", finalDurationNum);
         // Expiry handled by DB default (or trigger) or we pass it?
         // Schema doesn't strictly require expiry, transform.ts calculates it.
         // But let's check schema... Assuming DB has default or we omit and let DB handle.

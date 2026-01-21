@@ -17,6 +17,8 @@ export function useIntersectionObserver(
 
   const frozen = entry?.isIntersecting && freezeOnceVisible
 
+  const thresholdValue = Array.isArray(threshold) ? threshold.join(',') : threshold
+
   useEffect(() => {
     const node = elementRef?.current // DOM Ref
     const hasIOSupport = !!window.IntersectionObserver
@@ -31,7 +33,7 @@ export function useIntersectionObserver(
     observer.observe(node)
 
     return () => observer.disconnect()
-  }, [elementRef?.current, JSON.stringify(threshold), root, rootMargin, frozen])
+  }, [elementRef, thresholdValue, root, rootMargin, frozen])
 
   return entry
 }

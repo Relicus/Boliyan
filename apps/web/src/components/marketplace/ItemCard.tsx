@@ -1,10 +1,9 @@
-import { motion, AnimatePresence } from "framer-motion";
-import confetti from "canvas-confetti";
+import { motion } from "framer-motion";
 import React, { useState, useMemo, useEffect, memo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Lock, Globe, Clock, X, Bookmark, ChevronLeft, ChevronRight, Maximize2, ExternalLink, Gavel, Banknote, AlertTriangle, ShieldAlert, TrendingUp } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog";
+import { MapPin, Lock, Bookmark, AlertTriangle, ShieldAlert } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
@@ -13,7 +12,6 @@ import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
-import Link from "next/link";
 import ProductDetailsModal from "./ProductDetailsModal";
 import {
   Carousel,
@@ -37,7 +35,7 @@ interface ItemCardProps {
 }
 
 const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) => {
-  const { placeBid, user, bids, toggleWatch, watchedItemIds } = useApp();
+  const { user, bids, watchedItemIds } = useApp();
   const { now } = useTime(); // Use global heartbeat
   const isWatched = watchedItemIds.includes(item.id);
 
@@ -51,11 +49,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [showFullDescription, setShowFullDescription] = useState(false);
   // Removed local 'now' state and useEffect timer
   const [currentImg, setCurrentImg] = useState(0);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [showFullscreen, setShowFullscreen] = useState(false);
 
   useEffect(() => {
     if (!carouselApi) return
@@ -69,7 +65,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   // Hook for encapsulated bidding logic
   const {
     bidAmount,
-    setBidAmount,
     error,
     isSuccess,
     warning, 
@@ -105,15 +100,18 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
       item.currentHighBidderId !== user.id;
 
     if (hasUserBid && someoneElseBidHigher) {
-       setIsOutbidTrigger(true);
-       const timer = setTimeout(() => setIsOutbidTrigger(false), 800);
+       const triggerTimer = setTimeout(() => setIsOutbidTrigger(true), 0);
+       const resetTimer = setTimeout(() => setIsOutbidTrigger(false), 800);
        prevHighBid.current = item.currentHighBid; // Update the ref
-       return () => clearTimeout(timer);
+       return () => {
+         clearTimeout(triggerTimer);
+         clearTimeout(resetTimer);
+       };
     }
 
     // Always keep ref in sync with latest value to detect future changes
     prevHighBid.current = item.currentHighBid;
-  }, [item.currentHighBid, item.currentHighBidderId, user?.id, bids, item.id, item.isPublicBid]);
+  }, [item, user, bids]);
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, isOutside, timeLeft, statusColor, isUrgent } = useMemo(() => {
@@ -169,7 +167,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
       statusColor,
       isUrgent
     };
-  }, [item.id, item.expiryAt, item.createdAt, now, user?.location, seller?.location]); // Added safe navigation for seller
+  }, [item, now, user, seller]); // Added safe navigation for seller
 
   const handleInputClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent dialog from opening when clicking input
@@ -210,12 +208,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
       : 'blue';
 
   // Calculate real-time status for input styling
-  const currentNumericBid = parseFloat(bidAmount.replace(/,/g, '')) || 0;
-  const isWinningAmount = item.isPublicBid 
-    ? (item.currentHighBid 
-        ? currentNumericBid > item.currentHighBid 
-        : currentNumericBid >= item.askPrice)
-    : false;
 
   return (
     <>

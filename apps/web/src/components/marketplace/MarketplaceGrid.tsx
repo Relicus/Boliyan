@@ -36,9 +36,14 @@ type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
 export default function MarketplaceGrid() {
   const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, hasMore, loadMore } = useMarketplace();
-  const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters, executeSearch } = useSearch();
+  const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters } = useSearch();
 
-  const [viewMode, setViewMode] = useState<ViewMode>('compact');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      return 'comfortable';
+    }
+    return 'compact';
+  });
   const [isChangingView, setIsChangingView] = useState(false);
   const viewChangeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -97,11 +102,6 @@ export default function MarketplaceGrid() {
 
 
   // Set default view mode based on screen size
-  useEffect(() => {
-    if (window.innerWidth >= 768) {
-      setViewMode('comfortable');
-    }
-  }, []);
 
 
   // Grid class mapping based on view mode

@@ -19,8 +19,8 @@ interface ConversationListProps {
 }
 
 export function ConversationList({ conversations, selectedId, onSelect, role }: ConversationListProps) {
-  const { user, getUser, items } = useApp();
-  const [now, setNow] = useState(Date.now());
+  const { user } = useApp();
+  const [now, setNow] = useState(() => Date.now());
 
   // Update timestamps every second for live countdown
   useEffect(() => {

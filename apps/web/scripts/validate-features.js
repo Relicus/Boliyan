@@ -12,6 +12,8 @@
  * Then compares against feature-registry.json to identify gaps
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');

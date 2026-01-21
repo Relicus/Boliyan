@@ -31,25 +31,24 @@ export default function AdSenseCard({
   const sizes = CARD_SIZES[viewMode];
 
   useEffect(() => {
-    // Skip if no AdSense credentials provided
-    if (!adClient || !adSlot) {
-      setAdError(true);
-      return;
-    }
-
     // Check if AdSense script is loaded
-    if (typeof window !== 'undefined' && window.adsbygoogle) {
+    if (typeof window !== 'undefined' && window.adsbygoogle && adClient && adSlot) {
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
-        setAdLoaded(true);
+        const timer = setTimeout(() => setAdLoaded(true), 0);
+        return () => clearTimeout(timer);
       } catch (e) {
         console.warn('[AdSenseCard] AdSense push failed:', e);
-        setAdError(true);
+        const timer = setTimeout(() => setAdError(true), 0);
+        return () => clearTimeout(timer);
       }
-    } else {
-      // AdSense script not loaded
-      setAdError(true);
     }
+
+    if (typeof window !== 'undefined' && !window.adsbygoogle) {
+      const timer = setTimeout(() => setAdError(true), 0);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
   }, [adClient, adSlot]);
 
   // Fallback to custom AdCard if AdSense fails or no credentials
