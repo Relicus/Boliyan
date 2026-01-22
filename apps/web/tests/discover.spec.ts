@@ -66,8 +66,8 @@ test('Programmatic Feature Discovery', async ({ page }) => {
 
 async function scrapePage(page: Page, route: string) {
   const title = await page.title();
-  const elementsWithId = await page.locator('[id]').evaluateAll((els: HTMLElement[]) => 
-    els.map(el => ({
+  const elementsWithId = await page.locator('[id]').evaluateAll((els) => 
+    els.map((el: any) => ({
       id: el.id,
       tagName: el.tagName,
       text: el.innerText?.substring(0, 50),
