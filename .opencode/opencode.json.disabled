@@ -1,0 +1,423 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "keybinds": {
+    "app_exit": "ctrl+d,<leader>q",
+    "input_clear": "none",
+    "model_cycle_favorite": "ctrl+e",
+    "model_cycle_favorite_reverse": "ctrl+shift+e",
+    "agent_cycle": "tab",
+    "agent_cycle_reverse": "shift+tab"
+  },
+"plugin": [
+    "opencode-antigravity-auth@latest",
+    "opencode-openai-codex-auth@latest"
+  ],
+  "agent": {
+    "build": {
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true,
+        "grep": true,
+        "glob": true,
+        "tavily_tavily-search": false,
+        "tavily_tavily-extract": false,
+        "tavily_tavily-crawl": false,
+        "tavily_tavily-map": false
+      }
+    },
+    "plan": {
+      "description": "Planning mode",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "write": false,
+        "edit": false,
+        "bash": false,
+        "tavily_tavily-search": false,
+        "tavily_tavily-extract": false,
+        "tavily_tavily-crawl": false,
+        "tavily_tavily-map": false
+      }
+    },
+    "blogwriter": {
+      "description": "Opinionated blog writer: The Sovereign Editorialist. Focuses on 'Delta' and 'Question Kicker'.",
+      "prompt": "{file:C:/Users/ASUS/.config/opencode/prompts/blogwriter.txt}",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "write": true,
+        "edit": true,
+        "bash": true,
+        "webfetch": true,
+        "tavily_tavily-search": true
+      }
+    },
+    "copywrite": {
+      "description": "Dual-Core Copywriting mode (Headline + Body) with baked-in Garfinkel/Bly knowledge. (read-only)",
+      "prompt": "{file:C:/Users/ASUS/.config/opencode/prompts/copywriter.txt}",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "write": false,
+        "edit": false,
+        "bash": false,
+        "webfetch": true
+      }
+    },
+    "researcher": {
+      "description": "The Knowledge Cartographer. Maps territories of knowledge using Berrypicking and Triangulation.",
+      "prompt": "{file:C:/Users/ASUS/.config/opencode/prompts/researcher.txt}",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "write": true,
+        "edit": false,
+        "bash": false,
+        "webfetch": true,
+        "tavily_tavily-search": true,
+        "tavily_tavily-extract": true,
+        "tavily_tavily-crawl": true,
+        "tavily_tavily-map": true,
+        "context7_resolve-library-id": true,
+        "context7_query-docs": true
+      }
+    }
+  },
+  "provider": {
+"google": {
+      "models": {
+        "antigravity-claude-opus-4-5-thinking": {
+          "name": "Claude Opus 4.5 Thinking (Antigravity)",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "thinkingConfig": {
+                "thinkingBudget": 8192
+              }
+            },
+            "max": {
+              "thinkingConfig": {
+                "thinkingBudget": 32768
+              }
+            }
+          }
+        },
+        "antigravity-claude-sonnet-4-5": {
+          "name": "Claude Sonnet 4.5 (no thinking) (Antigravity)",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "antigravity-claude-sonnet-4-5-thinking": {
+          "name": "Claude Sonnet 4.5 Thinking (Antigravity)",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "thinkingConfig": {
+                "thinkingBudget": 8192
+              }
+            },
+            "max": {
+              "thinkingConfig": {
+                "thinkingBudget": 32768
+              }
+            }
+          }
+        },
+        "antigravity-gemini-3-flash": {
+          "name": "Gemini 3 Flash (Antigravity)",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "minimal": {
+              "thinkingLevel": "minimal"
+            },
+            "low": {
+              "thinkingLevel": "low"
+            },
+            "medium": {
+              "thinkingLevel": "medium"
+            },
+            "high": {
+              "thinkingLevel": "high"
+            }
+          }
+        },
+        "antigravity-gemini-3-pro": {
+          "name": "Gemini 3 Pro (Antigravity)",
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "thinkingLevel": "low"
+            },
+            "high": {
+              "thinkingLevel": "high"
+            }
+          }
+        },
+        "gemini-3-flash-preview": {
+          "name": "Gemini 3 Flash Preview (Gemini CLI)",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "minimal": {
+              "thinkingConfig": {
+                "thinkingLevel": "minimal"
+              }
+            },
+            "low": {
+              "thinkingConfig": {
+                "thinkingLevel": "low"
+              }
+            },
+            "medium": {
+              "thinkingConfig": {
+                "thinkingLevel": "medium"
+              }
+            },
+            "high": {
+              "thinkingConfig": {
+                "thinkingLevel": "high"
+              }
+            }
+          }
+        },
+        "gemini-3-pro-preview": {
+          "name": "Gemini 3 Pro Preview (Gemini CLI)",
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "thinkingConfig": {
+                "thinkingLevel": "low"
+              }
+            },
+            "high": {
+              "thinkingConfig": {
+                "thinkingLevel": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "openai": {
+      "options": {
+        "reasoningEffort": "medium",
+        "reasoningSummary": "auto",
+        "textVerbosity": "medium",
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "store": false
+      },
+      "models": {
+        "gpt-5.2-codex": {
+          "name": "GPT 5.2 Codex Pro",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "reasoningSummary": "auto",
+              "textVerbosity": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high",
+              "reasoningSummary": "detailed",
+              "textVerbosity": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+              "reasoningSummary": "detailed",
+              "textVerbosity": "medium"
+            }
+          }
+        }
+      }
+    }
+  },
+  "mcp": {
+    "google-ads": {
+      "type": "local",
+      "command": [
+        "C:\\Users\\ASUS\\AppData\\Roaming\\Python\\Python313\\Scripts\\pipx.exe",
+        "run",
+        "--spec",
+        "git+https://github.com/googleads/google-ads-mcp.git",
+        "google-ads-mcp"
+      ],
+      "environment": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "C:\\Users\\ASUS\\AppData\\Roaming\\gcloud\\application_default_credentials.json",
+        "GOOGLE_PROJECT_ID": "guest-houses-461120",
+        "GOOGLE_ADS_DEVELOPER_TOKEN": "YPzXINRKZN3-cZLTfPofaA"
+      },
+      "enabled": false,
+      "timeout": 30000
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "enabled": true
+    },
+    "pollinations": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@pollinations/model-context-protocol"
+      ],
+      "enabled": false
+    },
+    "shadcn": {
+      "type": "local",
+      "command": [
+        "npx",
+        "shadcn@latest",
+        "mcp"
+      ],
+      "enabled": false
+    },
+    "tavily": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "tavily-mcp"
+      ],
+      "environment": {
+        "TAVILY_API_KEY": "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"
+      },
+      "enabled": false
+    },
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp",
+      "enabled": true
+    }
+  },
+  "lsp": {
+    "pine": {
+      "command": [
+        "node",
+        "D:\\RelicusRoad\\RR_TradingView\\.opencode\\pine-lsp\\dist\\server.js",
+        "--stdio"
+      ],
+      "extensions": [
+        ".pine"
+      ],
+      "enabled": false
+    }
+  }
+}

@@ -10,7 +10,7 @@ import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
-import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
+import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice, getConditionLabel } from "@/lib/utils";
 import ProductDetailsModal from "./ProductDetailsModal";
 import {
   Tooltip,
@@ -239,10 +239,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 {/* Condition Badge */}
                 <div className="bg-white/90 backdrop-blur-md text-slate-900 px-2 py-1 rounded-md flex items-center shadow-lg border border-slate-200 mt-1">
                   <span className="text-[clamp(0.5625rem,2.25cqi,0.6875rem)] font-black uppercase tracking-tighter leading-none">
-                    {item.condition === 'new' && '🌟 New'}
-                    {item.condition === 'like_new' && '✨ Mint'}
-                    {item.condition === 'used' && '👌 Used'}
-                    {item.condition === 'fair' && '🔨 Fair'}
+                    {getConditionLabel(item.condition)}
                   </span>
                 </div>
               </div>

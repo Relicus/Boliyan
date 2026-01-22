@@ -141,3 +141,23 @@ export function formatPrice(price: number, viewMode?: string): string {
   }
   return Math.round(price).toLocaleString();
 }
+
+/**
+ * Maps database condition strings to UI display labels.
+ * 
+ * Mappings:
+ * - new -> "🌟 New"
+ * - like_new -> "✨ Mint"
+ * - used -> "👌 Used"
+ * - fair -> "🔨 Fair"
+ * - default -> "👌 Used"
+ */
+export function getConditionLabel(condition: string): string {
+  switch (condition) {
+    case 'new': return '🌟 New';
+    case 'like_new': return '✨ Mint';
+    case 'used': return '👌 Used';
+    case 'fair': return '🔨 Fair';
+    default: return '👌 Used';
+  }
+}
