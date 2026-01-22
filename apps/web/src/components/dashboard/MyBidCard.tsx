@@ -106,6 +106,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
           </div>
         </div>
       </div>
+      
       <ProductDetailsModal 
         item={item} 
         seller={seller} 

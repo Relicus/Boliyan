@@ -19,8 +19,18 @@ interface WatchedItemCardProps {
 }
 
 export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) {
-  const { toggleWatch } = useApp();
+  const { toggleWatch, now } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const getTimeLeft = (expiryAt: string) => {
+    if (now === 0) return "Loading...";
+    const diff = new Date(expiryAt).getTime() - now;
+    const hours = Math.max(0, Math.floor(diff / 3600000));
+    const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
+    
+    if (hours >= 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
+    return `${hours}h ${mins}m`;
+  };
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
