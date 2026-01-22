@@ -13,7 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Gavel, EyeOff, Camera, X, Save, Check, Loader2 } from "lucide-react";
+import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -23,6 +23,7 @@ import { uploadListingImage } from "@/lib/uploadImage";
 import { supabase } from "@/lib/supabase";
 import { generateSlug } from "@/lib/utils";
 import { Database } from "@/types/database.types";
+import { toast } from "sonner";
 
 function ListForm() {
   const router = useRouter();
@@ -40,8 +41,14 @@ function ListForm() {
   const [duration, setDuration] = useState<"24" | "48" | "72">("24");
   const [condition, setCondition] = useState<'new' | 'like_new' | 'used' | 'fair'>("used");
   
-  const [images, setImages] = useState<string[]>([]);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  type ImageEntry = {
+    id: string;
+    url: string;
+    file?: File;
+    isNew: boolean;
+  };
+
+  const [imageEntries, setImageEntries] = useState<ImageEntry[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   const [errors, setErrors] = useState<{
@@ -58,26 +65,65 @@ function ListForm() {
       setAskPrice(editingItem.askPrice.toString());
       setDescription(editingItem.description || "");
       setIsPublic(editingItem.isPublicBid);
-      setImages(editingItem.images);
+      setImageEntries(
+        editingItem.images.map((url, index) => ({
+          id: `existing-${index}`,
+          url,
+          isNew: false
+        }))
+      );
       setDuration(editingItem.listingDuration.toString() as "24" | "48" | "72");
       setCondition(editingItem.condition || "used");
+      return;
     }
+
+    setImageEntries([]);
   }, [editingItem]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
       const newFiles = Array.from(files);
-      const newImages = newFiles.map(file => URL.createObjectURL(file));
-      
-      setImages(prev => [...prev, ...newImages].slice(0, 5));
-      setImageFiles(prev => [...prev, ...newFiles].slice(0, 5));
+      setImageEntries(prev => {
+        const remainingSlots = Math.max(0, 5 - prev.length);
+        if (remainingSlots === 0) return prev;
+
+        const stamp = Date.now();
+        const newEntries = newFiles.slice(0, remainingSlots).map((file, index) => ({
+          id: `new-${stamp}-${index}`,
+          url: URL.createObjectURL(file),
+          file,
+          isNew: true
+        }));
+
+        return [...prev, ...newEntries];
+      });
     }
   };
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImageEntries(prev => {
+      const entry = prev[index];
+      if (entry?.file && entry.url.startsWith("blob:")) {
+        URL.revokeObjectURL(entry.url);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const moveImage = (from: number, to: number) => {
+    setImageEntries(prev => {
+      if (to < 0 || to >= prev.length) return prev;
+      const updated = [...prev];
+      const [moved] = updated.splice(from, 1);
+      updated.splice(to, 0, moved);
+      return updated;
+    });
+  };
+
+  const makeMainImage = (index: number) => {
+    if (index === 0) return;
+    moveImage(index, 0);
   };
 
   const handleSubmit = async () => {
@@ -103,49 +149,61 @@ function ListForm() {
     setIsUploading(true);
 
     try {
-        // 1. Upload Images
-        const uploadedUrls = await Promise.all(
-            imageFiles.map(file => uploadListingImage(file, user.id))
+        const updatedEntries = await Promise.all(
+          imageEntries.map(async (entry) => {
+            if (!entry.file) return entry;
+            const uploadedUrl = await uploadListingImage(entry.file, user.id);
+            return {
+              ...entry,
+              url: uploadedUrl,
+              file: undefined,
+              isNew: false
+            };
+          })
         );
 
-        // Filter out blob URLs from 'images' and keep existing HTTP/Supabase URLs
-        const existingRealUrls = images.filter(url => !url.startsWith('blob:'));
-        const allUrls = [...existingRealUrls, ...uploadedUrls];
-
+        const orderedUrls = updatedEntries.map(entry => entry.url);
         const finalDurationNum = parseInt(duration) as 24 | 48 | 72;
         const endsAt = new Date(Date.now() + finalDurationNum * 60 * 60 * 1000).toISOString();
-        
-        const listingData = {
-            title,
-            category,
-            asked_price: parseFloat(askPrice),
-            description,
-            auction_mode: (isPublic ? 'visible' : 'sealed') as 'visible' | 'sealed',
-            images: allUrls,
-            seller_id: user.id,
-            status: 'active' as const,
-            condition: condition,
-            ends_at: endsAt
+
+        const listingPayload: Database['public']['Tables']['listings']['Update'] = {
+          title,
+          category,
+          asked_price: parseFloat(askPrice),
+          description,
+          auction_mode: (isPublic ? 'visible' : 'sealed') as 'visible' | 'sealed',
+          images: orderedUrls,
+          condition: condition,
+          ends_at: endsAt
         };
 
         if (editingItem) {
-          // Update logic (Not implemented yet, but safe from slug overwrites)
+          const { error } = await supabase
+            .from('listings')
+            .update(listingPayload)
+            .eq('id', editingItem.id);
+
+          if (error) throw error;
+          router.push("/");
         } else {
-            // Insert - Add slug only here
-            const insertPayload: Database['public']['Tables']['listings']['Insert'] = {
-              ...listingData,
-              slug: generateSlug(title)
-            };
-            
-            const { error } = await supabase.from('listings').insert([insertPayload]);
-            
-            if (error) throw error;
-            router.push("/");
+          const insertPayload: Database['public']['Tables']['listings']['Insert'] = {
+            ...listingPayload,
+            seller_id: user.id,
+            status: 'active',
+            slug: generateSlug(title)
+          };
+
+          const { error } = await supabase.from('listings').insert([insertPayload]);
+
+          if (error) throw error;
+          router.push("/");
         }
 
     } catch (error) {
         console.error("Error creating listing:", error);
-        alert("Failed to create listing. Please try again."); // Simple feedback for now
+        toast.error("Listing not saved", {
+          description: "Please try again in a moment."
+        });
     } finally {
         setIsUploading(false);
     }
@@ -170,9 +228,43 @@ function ListForm() {
           <div className="space-y-4">
             <Label id="images-label" className="text-sm font-semibold text-slate-900">Product Images (Max 5)</Label>
             <div id="images-preview-container" className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-              {images.map((src, index) => (
-                <div key={index} id={`image-preview-${index}`} className="relative h-28 w-28 shrink-0 rounded-xl overflow-hidden border border-slate-100 shadow-sm group">
-                  <img src={src} alt="" className="h-full w-full object-cover" />
+              {imageEntries.map((entry, index) => (
+                <div key={entry.id} id={`image-preview-${index}`} className="relative h-28 w-28 shrink-0 rounded-xl overflow-hidden border border-slate-100 shadow-sm group">
+                  <img src={entry.url} alt="" className="h-full w-full object-cover" />
+                  {index === 0 && (
+                    <div id={`main-image-badge-${index}`} className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[9px] font-bold tracking-wide uppercase shadow-sm">
+                      Main
+                    </div>
+                  )}
+                  <div className="absolute bottom-1.5 left-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      id={`move-image-left-btn-${index}`}
+                      type="button"
+                      onClick={() => moveImage(index, index - 1)}
+                      className="h-6 w-6 flex items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm hover:text-blue-600 hover:bg-blue-50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+                      disabled={index === 0}
+                    >
+                      <ArrowLeft className="h-3 w-3" />
+                    </button>
+                    <button
+                      id={`move-image-right-btn-${index}`}
+                      type="button"
+                      onClick={() => moveImage(index, index + 1)}
+                      className="h-6 w-6 flex items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm hover:text-blue-600 hover:bg-blue-50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+                      disabled={index === imageEntries.length - 1}
+                    >
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                    <button
+                      id={`make-main-image-btn-${index}`}
+                      type="button"
+                      onClick={() => makeMainImage(index)}
+                      className="h-6 w-6 flex items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm hover:text-amber-600 hover:bg-amber-50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+                      disabled={index === 0}
+                    >
+                      <Star className="h-3 w-3" />
+                    </button>
+                  </div>
                   <button 
                     id={`remove-image-btn-${index}`}
                     onClick={() => removeImage(index)}
@@ -182,7 +274,7 @@ function ListForm() {
                   </button>
                 </div>
               ))}
-              {images.length < 5 && (
+              {imageEntries.length < 5 && (
                 <label 
                   id="add-image-label"
                   className="h-28 w-28 shrink-0 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all group"

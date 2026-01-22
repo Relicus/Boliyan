@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Maximize2, ChevronLeft, ChevronRight, Clock, Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
@@ -30,8 +31,14 @@ export function ProductGallery({
   isWatched,
   onToggleWatch
 }: ProductGalleryProps) {
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsImageLoaded(false);
+  }, [currentImg, item.id]);
+
   return (
-    <div id={`product-details-gallery-${item.slug || item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[300px] sm:h-[400px] md:h-full">
+    <div id={`product-details-gallery-${item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[300px] sm:h-[400px] md:h-full">
       {/* Victory Halo - State Based Animated Border Background */}
       {showHalo && (
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -61,9 +68,15 @@ export function ProductGallery({
       )}
 
       <div 
-        id={`product-details-image-${item.slug || item.id}`}
+        id={`product-details-image-${item.id}`}
         className="relative h-full w-full overflow-hidden z-10"
       >
+        <div
+          className={`absolute inset-0 bg-gradient-to-r from-slate-200/70 via-white/80 to-slate-200/70 animate-pulse transition-opacity duration-500 ${
+            isImageLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
+          aria-hidden="true"
+        />
         <AnimatePresence mode="wait">
           <motion.img 
             key={currentImg}
@@ -74,6 +87,8 @@ export function ProductGallery({
             src={item.images[currentImg]} 
             className="h-full w-full object-cover"
             alt={item.title}
+            onLoad={() => setIsImageLoaded(true)}
+            onError={() => setIsImageLoaded(true)}
           />
         </AnimatePresence>
         
@@ -94,7 +109,7 @@ export function ProductGallery({
            {/* Watch Button */}
            {onToggleWatch && (
             <button
-              id={`toggle-watch-btn-${item.slug || item.id}`}
+              id={`toggle-watch-btn-${item.id}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleWatch(item.id);
@@ -113,8 +128,8 @@ export function ProductGallery({
 
            {/* Full Details Button */}
             <Link
-              id={`view-details-btn-${item.slug || item.id}`}
-              href={`/product/${item.slug || item.id}`}
+              id={`view-details-btn-${item.id}`}
+              href={`/product/${item.slug ?? item.id}`}
               className="h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 bg-slate-900 text-white hover:bg-black w-auto px-3 gap-2 border border-white/20"
               title="Full Page"
             >
@@ -123,7 +138,7 @@ export function ProductGallery({
             </Link>
 
           <button
-            id={`expand-gallery-btn-${item.slug || item.id}`}
+            id={`expand-gallery-btn-${item.id}`}
             onClick={(e) => {
               e.stopPropagation();
               setShowFullscreen(true);
@@ -137,7 +152,8 @@ export function ProductGallery({
         {item.images.length > 1 && (
           <>
             <button 
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+              id={`product-gallery-prev-${item.id}`}
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center bg-slate-900/45 hover:bg-slate-900/65 text-white rounded-full backdrop-blur-md border border-white/25 shadow-[0_12px_24px_rgba(0,0,0,0.35)] transition-all active:scale-90 z-20"
               onClick={(e) => {
                 e.stopPropagation();
                 setCurrentImg(prev => (prev > 0 ? prev - 1 : item.images.length - 1));
@@ -146,7 +162,8 @@ export function ProductGallery({
               <ChevronLeft className="h-6 w-6" />
             </button>
             <button 
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+              id={`product-gallery-next-${item.id}`}
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center bg-slate-900/45 hover:bg-slate-900/65 text-white rounded-full backdrop-blur-md border border-white/25 shadow-[0_12px_24px_rgba(0,0,0,0.35)] transition-all active:scale-90 z-20"
               onClick={(e) => {
                 e.stopPropagation();
                 setCurrentImg(prev => (prev < item.images.length - 1 ? prev + 1 : 0));
@@ -160,16 +177,17 @@ export function ProductGallery({
       
       {/* Thumbs Overlay - Only visible if more than 1 image */}
       {item.images.length > 1 && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4 pointer-events-none">
-          <div className="flex gap-2 pointer-events-auto">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex justify-center">
+          <div className="flex gap-2 p-1.5 rounded-2xl bg-black/35 backdrop-blur-md border border-white/20 shadow-[0_12px_24px_rgba(0,0,0,0.35)]">
             {item.images.map((img, i) => (
               <button
                 key={i}
+                id={`product-gallery-thumb-${item.id}-${i}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setCurrentImg(i);
                 }}
-                className={`h-12 w-12 rounded-lg border-2 overflow-hidden transition-all ${i === currentImg ? 'border-blue-500 scale-110 shadow-lg' : 'border-white/50 grayscale-[50%] hover:grayscale-0'}`}
+                className={`h-12 w-12 rounded-lg border-2 overflow-hidden transition-all ${i === currentImg ? 'border-blue-400 scale-110 shadow-lg' : 'border-white/40 grayscale-[40%] hover:grayscale-0 hover:border-white/70'}`}
               >
                 <img src={img} className="h-full w-full object-cover" alt="" />
               </button>

@@ -382,19 +382,19 @@ function DashboardContent() {
               <div className="m-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {myItems.map(item => (
-                    <div key={item.id} id={`listing-card-${item.slug || item.id}`} className="@container p-3 bg-white border rounded-xl flex gap-3 transition-all hover:shadow-md">
+                    <div key={item.id} id={`listing-card-${item.id}`} className="@container p-3 bg-white border rounded-xl flex gap-3 transition-all hover:shadow-md">
                       <div className="relative shrink-0">
-                        <img id={`listing-img-${item.slug || item.id}`} src={item.images[0]} alt="" className="h-16 w-16 md:h-20 md:w-20 rounded-lg object-cover bg-slate-100" />
+                        <img id={`listing-img-${item.id}`} src={item.images[0]} alt="" className="h-16 w-16 md:h-20 md:w-20 rounded-lg object-cover bg-slate-100" />
                         {item.images.length > 1 && (
                           <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-blue-600 text-[10px] font-bold border-2 border-white">
                             {item.images.length}
                           </Badge>
                         )}
                       </div>
-                      <div id={`listing-content-${item.slug || item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
+                      <div id={`listing-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
                         <div>
-                          <h3 id={`listing-title-${item.slug || item.id}`} className="font-bold text-slate-900 truncate mb-0.5 text-[clamp(0.875rem,5cqi,1.125rem)]">{item.title}</h3>
-                          <p id={`listing-price-${item.slug || item.id}`} className="text-[clamp(0.75rem,4cqi,1rem)] text-blue-600 font-bold mb-1.5">Rs. {item.askPrice.toLocaleString()}</p>
+                          <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-0.5 text-[clamp(0.875rem,5cqi,1.125rem)]">{item.title}</h3>
+                          <p id={`listing-price-${item.id}`} className="text-[clamp(0.75rem,4cqi,1rem)] text-blue-600 font-bold mb-1.5">Rs. {item.askPrice.toLocaleString()}</p>
                           <div className="flex items-center gap-2 mb-2">
                              <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
                                {item.listingDuration}h
@@ -405,9 +405,9 @@ function DashboardContent() {
                              </div>
                           </div>
                         </div>
-                        <div id={`listing-actions-${item.slug || item.id}`} className="flex gap-1.5 md:gap-2">
+                        <div id={`listing-actions-${item.id}`} className="flex gap-1.5 md:gap-2">
                           <Button 
-                            id={`listing-view-btn-${item.slug || item.id}`} 
+                            id={`listing-view-btn-${item.id}`} 
                             variant="outline"  
                             size="sm" 
                             className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
@@ -417,7 +417,7 @@ function DashboardContent() {
                             View
                           </Button>
                           <Button 
-                            id={`listing-edit-btn-${item.slug || item.id}`} 
+                            id={`listing-edit-btn-${item.id}`} 
                             variant="outline"  
                             size="sm" 
                             className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
@@ -429,7 +429,7 @@ function DashboardContent() {
                             </Link>
                           </Button>
                           <Button 
-                            id={`listing-delete-btn-${item.slug || item.id}`} 
+                            id={`listing-delete-btn-${item.id}`} 
                             variant="outline"  
                             size="sm" 
                             className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all"

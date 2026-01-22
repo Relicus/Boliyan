@@ -49,7 +49,7 @@ export function BiddingDashboard({
   const isOwner = user?.id === seller.id;
 
   return (
-    <div id={`product-details-dashboard-${item.slug || item.id}`} className="w-full h-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between">
+    <div id={`product-details-dashboard-${item.id}`} className="w-full h-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between">
       {/* Stats Grid */}
       {/* Stats Grid - Fluid Typography */}
       <div className="@container w-full grid grid-cols-2 gap-4 mb-4">
@@ -89,7 +89,7 @@ export function BiddingDashboard({
           pendingConfirmation={pendingConfirmation}
           animTrigger={animTrigger}
           viewMode="modal"
-          idPrefix={`modal-item-card-${item.slug || item.id}`}
+          idPrefix={`modal-item-card-${item.id}`}
           onSmartAdjust={onSmartAdjust}
           onBid={onBid}
           onKeyDown={onKeyDown}

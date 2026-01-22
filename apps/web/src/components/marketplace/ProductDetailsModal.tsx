@@ -124,7 +124,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent showCloseButton={false} className="w-[94vw] max-w-[94vw] max-h-[92vh] overflow-y-auto md:w-[920px] md:max-w-[920px] lg:w-[1000px] lg:max-w-[1000px] md:h-[88vh] md:max-h-[88vh] p-0 pr-0 bg-white border-none shadow-2xl rounded-2xl">
         <DialogClose 
-          id={`close-listing-btn-${item.slug || item.id}`}
+          id={`close-listing-btn-${item.id}`}
           className="absolute right-4 top-4 z-[50] p-2 bg-white/85 hover:bg-white text-slate-700 hover:text-red-500 rounded-full shadow-lg transition-all active:scale-90"
         >
           <X className="h-5 w-5" />
@@ -149,8 +149,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
           />
 
           {/* Bottom Section: Product Details & Bidding */}
-          <div id={`product-details-body-${item.slug || item.id}`} className="flex-none md:flex-1 flex flex-col p-4 sm:p-6 pb-6 sm:pb-8 bg-white relative z-10 md:overflow-y-auto">
-            <div id={`product-details-grid-${item.slug || item.id}`} className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] w-full">
+          <div id={`product-details-body-${item.id}`} className="flex-none md:flex-1 flex flex-col p-4 sm:p-6 pb-6 sm:pb-8 bg-white relative z-10 md:overflow-y-auto">
+            <div id={`product-details-grid-${item.id}`} className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] w-full">
               
               {/* Left Column: Info */}
               <ProductInfo 
@@ -162,7 +162,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
               />
 
               {/* Right Column: Dashboard */}
-              <div id={`product-details-right-${item.slug || item.id}`} className="h-full min-w-0">
+              <div id={`product-details-right-${item.id}`} className="h-full min-w-0">
                   <BiddingDashboard 
                     item={item}
                     user={user}

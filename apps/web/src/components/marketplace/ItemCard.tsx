@@ -13,14 +13,6 @@ import { BiddingControls } from "@/components/common/BiddingControls";
 import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice } from "@/lib/utils";
 import ProductDetailsModal from "./ProductDetailsModal";
 import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi
-} from "@/components/ui/carousel";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -48,17 +40,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // Removed local 'now' state and useEffect timer
-  const [currentImg, setCurrentImg] = useState(0);
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-
-  useEffect(() => {
-    if (!carouselApi) return
-
-    carouselApi.on("select", () => {
-      setCurrentImg(carouselApi.selectedScrollSnap())
-    })
-  }, [carouselApi])
+  const mainImage = item.images[0];
+  const thumbnailImages = item.images.slice(1, 4);
 
 
   // Hook for encapsulated bidding logic
@@ -209,7 +192,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   return (
     <>
       <motion.div
-        id={`item-card-${item.slug || item.id}`}
+        id={`item-card-${item.id}`}
         onClick={() => setIsDialogOpen(true)}
         initial={false}
             animate={{
@@ -257,53 +240,20 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(var(--radius)-3px)]">
             <div
-              id={`item-card-${item.slug || item.id}-image-wrapper`}
-              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 group/gallery`}
+              id={`item-card-${item.id}-image-wrapper`}
+              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0`}
             >
-              <Carousel
-                setApi={setCarouselApi}
-                className="w-full h-full"
-              >
-                <CarouselContent className="-ml-0 h-full">
-                  {item.images.map((src, i) => (
-                    <CarouselItem key={i} className="pl-0 h-full">
-                      <div className="relative w-full h-full flex items-center justify-center">
-                        <img
-                          id={`item-card-${item.slug || item.id}-image-${i}`}
-                          src={src}
-                          alt={`${item.title} - ${i + 1}`}
-                          className="object-cover w-full h-full object-center"
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                {item.images.length > 1 && (
-                  <>
-                    <div className="absolute inset-0 flex items-center justify-between p-2 opacity-0 group-hover/gallery:opacity-100 transition-opacity pointer-events-none">
-                      <CarouselPrevious 
-                        className="pointer-events-auto h-8 w-8 bg-black/50 text-white border-none hover:bg-black/70 translate-y-0 static" 
-                        variant="ghost"
-                      />
-                      <CarouselNext 
-                        className="pointer-events-auto h-8 w-8 bg-black/50 text-white border-none hover:bg-black/70 translate-y-0 static" 
-                        variant="ghost"
-                      />
-                    </div>
-                    <div className="absolute bottom-16 left-0 right-0 flex justify-center gap-1.5 z-30 pointer-events-none">
-                      {item.images.map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-1.5 rounded-full transition-all duration-300 ${i === currentImg ? 'w-6 bg-white shadow-sm' : 'w-1.5 bg-white/40'}`}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
-              </Carousel>
+              <div className="relative w-full h-full flex items-center justify-center">
+                <img
+                  id={`item-card-${item.id}-image-main`}
+                  src={mainImage}
+                  alt={`${item.title} main image`}
+                  className="object-cover w-full h-full object-center"
+                />
+              </div>
 
               {/* Top-Left Location Badge */}
-              <div id={`item-card-${item.slug || item.id}-location-badge-wrapper`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
+              <div id={`item-card-${item.id}-location-badge-wrapper`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
                 <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
                   <MapPin className="h-3 w-3" />
                   <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none truncate max-w-[120px]">
@@ -356,7 +306,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <motion.div
-                            id={`item-card-${item.slug || item.id}-watch-indicator`}
+                            id={`item-card-${item.id}-watch-indicator`}
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             whileHover={{ scale: 1.1 }}
@@ -391,6 +341,50 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   )}
                 </div>
               )}
+
+              {item.images.length > 1 && viewMode === 'spacious' && thumbnailImages.length > 0 && (
+                <div
+                  id={`item-card-${item.id}-thumb-strip`}
+                  className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1.5 rounded-2xl bg-black/30 backdrop-blur-md border border-white/20 shadow-[0_10px_22px_rgba(0,0,0,0.35)] pointer-events-none"
+                >
+                  {thumbnailImages.map((src, i) => (
+                    <div
+                      key={src}
+                      className="h-8 w-8 rounded-md overflow-hidden border border-white/30"
+                    >
+                      <img
+                        src={src}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ))}
+                  {item.images.length > 4 && (
+                    <div className="h-8 min-w-[2rem] rounded-md bg-white/10 border border-white/20 flex items-center justify-center text-[10px] font-bold text-white/80">
+                      +{item.images.length - 4}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {item.images.length > 1 && viewMode !== 'spacious' && (
+                <div
+                  id={`item-card-${item.id}-image-dots`}
+                  className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/35 backdrop-blur-md border border-white/20 shadow-[0_8px_18px_rgba(0,0,0,0.3)] pointer-events-none"
+                >
+                  {Array.from({ length: Math.min(item.images.length, 5) }).map((_, i) => (
+                    <span
+                      key={`dot-${i}`}
+                      className={`rounded-full transition-all ${i === 0 ? 'h-1.5 w-5 bg-white' : 'h-1.5 w-1.5 bg-white/50'}`}
+                    />
+                  ))}
+                  {item.images.length > 5 && (
+                    <span className="text-[9px] font-bold text-white/80">+{item.images.length - 5}</span>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* 
@@ -402,7 +396,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             <CardContent className="p-1.5 flex flex-col gap-1 flex-1 z-10 transition-all">
               {/* Title - Natural height with clamping */}
               <div className="flex items-start">
-                <h3 id={`item-card-${item.slug || item.id}-title`} className={`font-bold ${getTitleClass()} text-slate-900 leading-tight line-clamp-2 transition-all w-full`} title={item.title}>
+                <h3 id={`item-card-${item.id}-title`} className={`font-bold ${getTitleClass()} text-slate-900 leading-tight line-clamp-2 transition-all w-full`} title={item.title}>
                   {item.title}
                 </h3>
               </div>
@@ -447,7 +441,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               <div className="flex items-end justify-between transition-all min-h-[2.25rem]">
                 <div className="flex flex-col">
                   <span className={`${getLabelClass()} text-slate-600 font-bold uppercase tracking-wider transition-all`}>Asking</span>
-                  <span id={`item-card-${item.slug || item.id}-ask-price`} className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all truncate max-w-[100px]`}>
+                  <span id={`item-card-${item.id}-ask-price`} className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all truncate max-w-[100px]`}>
                     {displayPrice(item.askPrice)}
                   </span>
                 </div>
@@ -472,7 +466,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                               damping: 20,
                               duration: 0.6
                             }}
-                            id={`item-card-${item.slug || item.id}-high-bid`} 
+                            id={`item-card-${item.id}-high-bid`} 
                             className={`${getPriceClass()} font-black leading-none inline-block truncate max-w-[100px] font-outfit`}
                           >
                             {displayPrice(item.currentHighBid)}
@@ -491,7 +485,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         )}
                       </div>
                     ) : (
-                      <span id={`item-card-${item.slug || item.id}-bid-count`} className={`${getPriceClass()} font-black text-blue-600 leading-none truncate font-outfit`}>
+                      <span id={`item-card-${item.id}-bid-count`} className={`${getPriceClass()} font-black text-blue-600 leading-none truncate font-outfit`}>
                         {item.bidCount} {item.bidCount === 1 ? 'Bid' : 'Bids'}
                       </span>
                     )}
@@ -520,7 +514,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
                     viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
-                    idPrefix={`item-card-${item.slug || item.id}`}
+                    idPrefix={`item-card-${item.id}`}
                     onSmartAdjust={handleSmartAdjust}
                     onBid={handleBid}
                     onKeyDown={handleKeyDown}

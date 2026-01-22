@@ -5,6 +5,7 @@ import { get, set, del, clear } from 'idb-keyval';
  */
 const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes default TTL
 const CACHE_PREFIX = 'boliyan-cache-v1-';
+const CACHE_DISABLED = process.env.NODE_ENV === 'development';
 
 /**
  * Types
@@ -58,6 +59,10 @@ export async function getFromCache<T>(
   key: string, 
   options: CacheOptions = {}
 ): Promise<CacheResult<T>> {
+  if (CACHE_DISABLED) {
+    return { data: null, isStale: true, from: 'none' };
+  }
+
   const ttl = options.ttl || DEFAULT_TTL;
 
   // 1. Check Memory Cache (L1)
@@ -94,6 +99,8 @@ export async function setCache<T>(
   data: T, 
   options: CacheOptions = {}
 ): Promise<void> {
+  if (CACHE_DISABLED) return;
+
   const entry: CacheEntry<T> = {
     data,
     timestamp: Date.now(),

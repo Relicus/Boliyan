@@ -83,7 +83,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     : item.askPrice * 0.7;
 
   return (
-    <div id={`product-page-${item.slug || item.id}`} className="min-h-screen bg-slate-50/50 pb-20">
+    <div id={`product-page-${item.id}`} className="min-h-screen bg-slate-50/50 pb-20">
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex items-center justify-between">
         <Button 
@@ -98,7 +98,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
 
         <div className="flex gap-2">
           <Button 
-            id={`share-btn-${item.slug || item.id}`}
+            id={`share-btn-${item.id}`}
             variant="outline" 
             size="icon" 
             className="rounded-full h-10 w-10"
@@ -111,7 +111,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
             <Share2 className="h-4 w-4" />
           </Button>
           <Button 
-            id={`watch-btn-${item.slug || item.id}`}
+            id={`watch-btn-${item.id}`}
             variant={isWatched ? "secondary" : "outline"} 
             size="icon" 
             className={`rounded-full h-10 w-10 transition-colors ${isWatched ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}`}

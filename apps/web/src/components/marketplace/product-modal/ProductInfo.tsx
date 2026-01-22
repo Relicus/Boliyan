@@ -23,7 +23,7 @@ export function ProductInfo({
   distance
 }: ProductInfoProps) {
   return (
-    <div id={`product-details-left-${item.slug || item.id}`} className="flex flex-col gap-3 min-w-0 h-full">
+    <div id={`product-details-left-${item.id}`} className="flex flex-col gap-3 min-w-0 h-full">
       <div className="flex justify-between items-start gap-2">
         <div className="min-w-0">
           <DialogTitle className="text-xl sm:text-2xl font-black font-outfit text-slate-900 leading-tight mb-2 line-clamp-2">
@@ -51,7 +51,7 @@ export function ProductInfo({
 
       <div className="mt-2 pt-2">
           {/* Seller Info Compact Card */}
-          <div id={`seller-details-${item.slug || item.id}`} className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5">
+          <div id={`seller-details-${item.id}`} className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5">
             <div className="flex items-center gap-3 min-w-0 w-full">
               <div className="h-9 w-9 rounded-full bg-slate-200 overflow-hidden shrink-0">
                 <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
