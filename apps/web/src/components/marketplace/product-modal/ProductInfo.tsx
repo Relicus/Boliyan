@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Lock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Item, User } from "@/types";
 import { DialogTitle } from "@/components/ui/dialog";
-import { getFuzzyLocationString, getConditionLabel } from "@/lib/utils";
+import { getFuzzyLocationString } from "@/lib/utils";
+import { ListingBadges } from "@/components/marketplace/ListingBadges";
 
 interface ProductInfoProps {
   item: Item;
@@ -29,18 +30,7 @@ export function ProductInfo({
           <DialogTitle className="text-xl sm:text-2xl font-black font-outfit text-slate-900 leading-tight mb-2 line-clamp-2">
             {item.title}
           </DialogTitle>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="font-bold bg-slate-50 text-slate-700 border-slate-200">
-              {getConditionLabel(item.condition)}
-            </Badge>
-            <Badge variant="outline" className="font-bold bg-blue-50 text-blue-700 border-blue-100">Verified Listing</Badge>
-            {!item.isPublicBid && (
-              <Badge variant="secondary" className="font-bold bg-amber-500 text-white border-none shadow-sm">
-                <Lock className="h-3.5 w-3.5 mr-1" />
-                Secret Bidding
-              </Badge>
-            )}
-          </div>
+          <ListingBadges item={item} seller={seller} />
         </div>
       </div>
 
