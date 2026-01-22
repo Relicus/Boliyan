@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, LogOut, Activity, Heart, UserCircle, MessageSquare, LayoutGrid, Tag, Gavel } from "lucide-react";
+import { Plus, LogOut, Activity, Bookmark, UserCircle, MessageSquare, LayoutGrid, Tag, Gavel } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -282,7 +282,7 @@ export default function Navbar() {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
                     <Link href="/dashboard?tab=watchlist" className="flex items-center w-full">
-                      <Heart className="mr-2.5 h-4 w-4 opacity-70" />
+                      <Bookmark className="mr-2.5 h-4 w-4 opacity-70" />
                       Watched Items
                     </Link>
                   </DropdownMenuItem>

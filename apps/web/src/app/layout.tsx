@@ -83,6 +83,7 @@ export const viewport: Viewport = {
 
 import { NotificationProvider } from "@/context/NotificationContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import GlobalSonic from "@/components/common/GlobalSonic";
 
 export default function RootLayout({
   children,
@@ -96,6 +97,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${notoUrdu.variable} antialiased bg-slate-50`}
       >
         <AppProvider>
+          <GlobalSonic />
           <NotificationProvider>
             <TooltipProvider>
               <Suspense fallback={<div className="h-16 border-b bg-white" />}>

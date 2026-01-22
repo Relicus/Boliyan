@@ -9,7 +9,7 @@ import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, Package, Heart, Gavel, Tag } from "lucide-react";
+import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, Package, Bookmark, Gavel, Tag } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,10 +19,15 @@ import { useSearchParams, useRouter } from "next/navigation";
 import DeleteConfirmationDialog from "@/components/seller/DeleteConfirmationDialog";
 import { Item } from "@/types";
 import { calculatePrivacySafeDistance } from "@/lib/utils";
+import { transformListingToItem } from "@/lib/transform";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 function DashboardContent() {
   const { items, bids, user, deleteItem, watchedItemIds } = useApp();
+  const [myItems, setMyItems] = useState<Item[]>([]);
+  const [isMyListingsLoading, setIsMyListingsLoading] = useState(false);
+  
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialTab = searchParams.get("tab") || "active-bids";
@@ -49,19 +54,46 @@ function DashboardContent() {
     return () => clearInterval(timer);
   }, []);
 
+  // Fetch My Listings independently of the discovery feed
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchMyItems = async () => {
+      setIsMyListingsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('marketplace_listings')
+          .select('*')
+          .eq('seller_id', user.id);
+
+        if (error) throw error;
+        if (data) {
+          const transformed = data.map(row => transformListingToItem(row as any));
+          setMyItems(transformed);
+        }
+      } catch (err) {
+        console.error("Error fetching my listings:", err);
+      } finally {
+        setIsMyListingsLoading(false);
+      }
+    };
+
+    fetchMyItems();
+  }, [user]);
+
   const handleDeleteClick = (item: Item) => {
     setItemToDelete(item);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (itemToDelete) {
-      deleteItem(itemToDelete.id);
+      await deleteItem(itemToDelete.id);
+      setMyItems(prev => prev.filter(i => i.id !== itemToDelete.id));
       setItemToDelete(null);
     }
   };
   
   // SELLER DATA: Items created by current user
-  const myItems = user ? items.filter((item: Item) => item.sellerId === user.id) : [];
   const itemsWithBids = myItems.filter(item => bids.some(b => b.itemId === item.id));
 
   // BUYER DATA: Bids placed by current user
@@ -183,7 +215,7 @@ function DashboardContent() {
             className="flex flex-col items-center gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium text-slate-400 data-[state=active]:text-blue-600 transition-all py-2 px-1"
           >
             <div className="relative">
-              <Heart className="h-5 w-5" />
+              <Bookmark className="h-5 w-5" />
               {watchedItems.length > 0 && (
                 <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-pink-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                   {watchedItems.length}
@@ -234,7 +266,7 @@ function DashboardContent() {
             value="watchlist" 
             className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 data-[state=active]:text-blue-600 transition-all py-3 px-1"
           >
-            <Heart className="h-4 w-4 mr-2" />
+            <Bookmark className="h-4 w-4 mr-2" />
             Watchlist
             <Badge id="tab-badge-watchlist" className="ml-2 bg-pink-50 text-pink-600 hover:bg-pink-50 border-none transition-all duration-300">
               {watchedItems.length}
@@ -257,7 +289,7 @@ function DashboardContent() {
                 {watchedItems.length === 0 ? (
                   <div className="p-16 text-center border-2 border-dashed rounded-2xl bg-slate-50/50">
                     <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Heart className="h-8 w-8 text-slate-400" />
+                      <Bookmark className="h-8 w-8 text-slate-400" />
                     </div>
                     <h3 className="font-bold text-slate-900 mb-1">Watchlist Empty</h3>
                     <p className="text-slate-500 text-sm">Items you save will appear here for quick access.</p>
@@ -373,7 +405,7 @@ function DashboardContent() {
                       
                       {bids.filter(b => b.itemId === item.id).length === 0 && (
                         <div className="p-8 text-center border-2 border-dashed rounded-xl bg-slate-50/50">
-                          <p className="text-slate-400 text-xs text-xs">No bids yet for this item.</p>
+                          <p className="text-slate-400 text-xs">No bids yet for this item.</p>
                         </div>
                       )}
                     </div>

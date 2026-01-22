@@ -128,18 +128,21 @@ export function calculatePrivacySafeDistance(
 }
 
 /**
- * Centered Price Formatting Utility
+ * Centered Price Formatting Utility (Hybrid Lakh/Standard)
  * 
  * Rules:
- * 1. Full numeric display by default.
- * 2. ONLY shrink for 'compact' view mode IF digits exceed 8 (100,000,000+).
+ * 1. Below 1M: Standard localized number (e.g., 150,000).
+ * 2. 1,000,000+: "lac" notation (e.g., 10 lac, 100 lac).
  */
 export function formatPrice(price: number, viewMode?: string): string {
-  if (viewMode === 'compact' && price >= 100_000_000) {
-    const m = price / 1_000_000;
-    return `${m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)}M`;
+  const p = Math.round(price);
+  
+  if (p >= 1_000_000) {
+    const lac = p / 100_000;
+    return `${lac % 1 === 0 ? lac.toFixed(0) : lac.toFixed(1)} lac`;
   }
-  return Math.round(price).toLocaleString();
+  
+  return p.toLocaleString();
 }
 
 /**

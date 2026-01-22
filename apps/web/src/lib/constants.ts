@@ -30,3 +30,10 @@ export const CATEGORIES = [
   { label: "Community", icon: Users, description: "Local services and community items" }
 ];
 
+export const LISTING_LIMITS = {
+  TITLE: { MIN: 10, MAX: 80 },
+  PRICE: { MIN: 500, MAX: 10000000 },
+  DESCRIPTION: { MIN: 20, MAX: 2000 }
+};
+
+

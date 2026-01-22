@@ -2,7 +2,7 @@
 
 import { Item, User } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Heart, Gavel, Trash2 } from "lucide-react";
+import { Clock, MapPin, Bookmark, Gavel, Trash2 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useState } from "react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
@@ -50,7 +50,7 @@ export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) 
           <div className="relative shrink-0">
             <img id={`watched-item-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
             <div className="absolute -top-2 -right-2 bg-blue-600 text-white p-1 rounded-full border-2 border-white shadow-sm">
-              <Heart className="h-3 w-3 fill-current" />
+              <Bookmark className="h-3 w-3 fill-current" />
             </div>
           </div>
           

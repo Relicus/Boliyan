@@ -41,7 +41,7 @@ export default function DeleteConfirmationDialog({
         }
       }}
     >
-      <DialogContent showCloseButton={false} className="sm:max-w-[425px] border-none shadow-2xl overflow-visible">
+      <DialogContent showCloseButton={false} className="w-[92vw] max-w-[92vw] sm:max-w-[425px] px-6 sm:px-8 border-none shadow-2xl overflow-visible">
         {/* Custom Close Button - Premium Style */}
         <DialogClose asChild>
           <motion.button

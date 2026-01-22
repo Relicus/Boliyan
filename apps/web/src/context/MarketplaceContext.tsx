@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { generateCacheKey, getFromCache, setCache } from "@/lib/cache";
 import { useBidRealtime } from "@/hooks/useBidRealtime";
+import { sonic } from "@/lib/sonic";
 import type { Database } from "@/types/database.types";
 
 interface MarketplaceFilters {
@@ -265,6 +266,11 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
   // --- Realtime Subscription (Bids) ---
   const handleRealtimeBid = React.useCallback((newBid: Bid) => {
+      // Play sound if someone ELSE bids on an item the user is watching
+      if (user && newBid.bidderId !== user.id && watchedItemIds.includes(newBid.itemId)) {
+          sonic.tick(); // Subtle notification
+      }
+
       setBids(prev => [...prev, newBid]);
 
       setItems(prevItems => prevItems.map(item => {
@@ -280,7 +286,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         }
         return item;
       }));
-  }, []);
+  }, [user, watchedItemIds]);
 
   useBidRealtime(handleRealtimeBid);
 
@@ -313,8 +319,17 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
      }
   };
 
-  const deleteItem = (id: string) => {
-    setItems(prev => prev.filter(i => i.id !== id));
+  const deleteItem = async (id: string) => {
+    const { error } = await supabase
+      .from('listings')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+        console.error("Failed to delete item:", error);
+    } else {
+        setItems(prev => prev.filter(i => i.id !== id));
+    }
   };
 
   const placeBid = async (itemId: string, amount: number, type: 'public' | 'private') => {

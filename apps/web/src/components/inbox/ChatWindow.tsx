@@ -12,6 +12,7 @@ import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReviewForm from '@/components/profile/ReviewForm';
 import { useReviews } from '@/context/ReviewContext';
+import { sonic } from '@/lib/sonic';
 
 interface ChatWindowProps {
   conversationId: string;
@@ -28,6 +29,21 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const { canReview } = useReviews();
   const [showReviewBtn, setShowReviewBtn] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  
+  const currentMessages = messages.filter(m => m.conversationId === conversationId);
+  const prevMessageCountRef = useRef(currentMessages.length);
+
+  // Sound feedback for new messages
+  useEffect(() => {
+    if (currentMessages.length > prevMessageCountRef.current) {
+      const lastMsg = currentMessages[currentMessages.length - 1];
+      // Only play if it's from the OTHER user (outbound sound is handled in handleSend)
+      if (lastMsg && lastMsg.senderId !== user?.id) {
+        sonic.pop();
+      }
+    }
+    prevMessageCountRef.current = currentMessages.length;
+  }, [currentMessages, user?.id]);
 
   // Lazy Subscription Lifecycle
   useEffect(() => {
@@ -41,7 +57,6 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     };
   }, [conversationId, subscribeToConversation, unsubscribeFromConversation]);
 
-  const currentMessages = messages.filter(m => m.conversationId === conversationId);
   const conversation = conversations.find(c => c.id === conversationId);
   const isSeller = user && conversation ? conversation.sellerId === user.id : false;
   const otherUser = conversation ? (isSeller ? conversation.bidder : conversation.seller) : undefined;
@@ -139,6 +154,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     if (!inputValue.trim() || isLocked) return;
     sendMessage(conversationId, inputValue);
     setInputValue("");
+    sonic.pop();
   };
 
   return (

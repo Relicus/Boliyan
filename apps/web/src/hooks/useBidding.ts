@@ -5,6 +5,7 @@ import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
 import { Item, User } from "@/types";
 import { getSmartStep, getMinimumAllowedBid } from "@/lib/bidding";
+import { sonic } from "@/lib/sonic";
 
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
@@ -70,12 +71,14 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     // If attempting to go below minimum, show error and block
     if (current + delta < minBid) {
       setError(true);
+      sonic.thud();
       setTimeout(() => setError(false), 1000);
       return;
     }
     
     // Otherwise allow update
     const newValue = Math.max(0, current + delta);
+    sonic.tick();
     
     setLastDelta(delta);
     setShowDelta(true);
@@ -115,6 +118,8 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     // Place bid logic via store
     placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
     setIsSuccess(true);
+    // sonic.confetti(); // Removed to prevent double sound (overlap with chime)
+    sonic.chime();
 
     // Automatically increase the bid price in input box by 1 step for the "Next Bid"
     const nextAmount = amount + getSmartStep(amount);
@@ -172,6 +177,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     if (isNaN(amount) || amount < minBid) {
       setError(true);
+      sonic.thud();
       setTimeout(() => setError(false), 2000);
       return;
     }
