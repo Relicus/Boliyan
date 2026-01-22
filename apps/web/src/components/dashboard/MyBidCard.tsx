@@ -9,6 +9,7 @@ import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
+import { VictoryHalo } from "@/components/common";
 
 interface MyBidCardProps {
 
@@ -35,24 +36,30 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
     return `${hours}h ${mins}m`;
   };
 
+  const haloTheme = isLeading ? "orange" : isOutbid ? "green" : "none";
+
   return (
     <>
     <div 
       id={`my-bid-card-${item.id}`} 
       onClick={() => setIsModalOpen(true)}
-      className="@container p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm cursor-pointer"
+      className={`group relative overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer ${haloTheme !== 'none' ? 'p-[3px]' : 'p-0'}`}
     >
-      <div className="relative shrink-0">
-        <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
-        <Badge className={`absolute -top-2 -right-2 h-5 flex items-center justify-center px-1.5 text-[10px] font-bold border-2 border-white ${
-          isLeading ? "bg-amber-500" : isOutbid ? "bg-red-500" : "bg-blue-600"
-        }`}>
-          {isLeading ? "Leading" : isOutbid ? "Outbid" : "Pending"}
-        </Badge>
-      </div>
+      <VictoryHalo theme={haloTheme} />
       
-      <div id={`my-bid-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
-        <div>
+      <div className="relative z-10 bg-white rounded-[calc(0.75rem-3px)] p-4 flex gap-4 h-full">
+        <div className="relative shrink-0">
+          <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
+          <Badge className={`absolute -top-2 -right-2 h-5 flex items-center justify-center px-1.5 text-[10px] font-bold border-2 border-white ${
+            isLeading ? "bg-amber-500" : isOutbid ? "bg-red-500" : "bg-blue-600"
+          }`}>
+            {isLeading ? "Leading" : isOutbid ? "Outbid" : "Pending"}
+          </Badge>
+        </div>
+        
+        <div id={`my-bid-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
+          {/* content */}
+
           <div className="flex justify-between items-start">
             <h3 id={`my-bid-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2 text-[clamp(1rem,5cqi,1.25rem)]">{item.title}</h3>
             <div className="flex flex-col items-end">
@@ -102,7 +109,9 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
         </div>
       </div>
     </div>
+    </div>
       <ProductDetailsModal 
+
         item={item} 
         seller={seller} 
         isOpen={isModalOpen} 

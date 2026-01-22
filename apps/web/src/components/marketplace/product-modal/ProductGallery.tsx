@@ -68,7 +68,7 @@ export function ProductGallery({
           {/* 1. Location (Geography First) */}
           <div className="bg-black/60 backdrop-blur-md text-white px-2.5 py-1.5 rounded-md flex items-center gap-2 shadow-lg border border-white/20">
             <MapPin className="h-3.5 w-3.5" />
-            <span className="text-xs font-black tracking-tight leading-none truncate max-w-[150px]">
+            <span className="text-xs font-black tracking-tight leading-none truncate max-w-[100px] sm:max-w-[150px]">
               {seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown Location'}
             </span>
           </div>
@@ -78,6 +78,15 @@ export function ProductGallery({
             variant="glass" 
             className="px-2.5 py-1.5"
           />
+          {/* 3. Full Details Link (Mobile Only) */}
+          <Link
+            id={`view-details-btn-mobile-${item.id}`}
+            href={`/product/${item.slug ?? item.id}`}
+            className="md:hidden h-8 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 bg-slate-900 text-white hover:bg-black w-8 gap-2 border border-white/20"
+            title="Full Page"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Link>
         </div>
 
         {/* Top-Right Stack: Urgency & State */}
@@ -95,9 +104,45 @@ export function ProductGallery({
             variant="glass"
             className="px-2.5 py-1.5"
           />
+
+          {/* 3. Action Buttons Row (Mobile Only) */}
+          <div className="md:hidden flex flex-col items-end gap-1.5">
+            {/* Watch Button */}
+            {onToggleWatch && (
+              <button
+                id={`toggle-watch-btn-mobile-${item.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleWatch(item.id);
+                }}
+                className={`h-8 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 border
+                  ${isWatched 
+                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 w-8 gap-2' 
+                    : 'bg-white/85 text-slate-700 border-white/20 hover:bg-white w-8 gap-2'
+                  }`}
+                title={isWatched ? "Remove from watchlist" : "Add to watchlist"}
+              >
+                <Bookmark className={`h-3.5 w-3.5 ${isWatched ? 'fill-current' : ''}`} />
+              </button>
+            )}
+
+            {/* Expand Gallery Button */}
+            <button
+              id={`expand-gallery-btn-mobile-${item.id}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowFullscreen(true);
+              }}
+              className="h-8 w-8 flex items-center justify-center bg-white/85 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90"
+              title="Expand Gallery"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-        
-        <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
+
+        {/* Bottom-Right Actions (Desktop Only) */}
+        <div className="hidden md:flex absolute bottom-4 right-4 z-20 items-center gap-2">
            {/* Watch Button */}
            {onToggleWatch && (
             <button
@@ -108,13 +153,13 @@ export function ProductGallery({
               }}
               className={`h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 border
                 ${isWatched 
-                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 w-9 md:w-auto md:px-3 gap-2' 
-                  : 'bg-white/85 text-slate-700 border-white/20 hover:bg-white w-9 md:w-auto md:px-3 gap-2'
+                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 w-auto px-3 gap-2' 
+                  : 'bg-white/85 text-slate-700 border-white/20 hover:bg-white w-auto px-3 gap-2'
                 }`}
               title={isWatched ? "Remove from watchlist" : "Add to watchlist"}
             >
               <Bookmark className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
-              <span className="hidden md:inline text-xs font-bold">{isWatched ? 'Watched' : 'Watch'}</span>
+              <span className="text-xs font-bold">{isWatched ? 'Watched' : 'Watch'}</span>
             </button>
            )}
 
@@ -136,6 +181,7 @@ export function ProductGallery({
               setShowFullscreen(true);
             }}
             className="h-9 w-9 flex items-center justify-center bg-white/85 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90"
+            title="Expand Gallery"
           >
             <Maximize2 className="h-5 w-5" />
           </button>

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { TimerBadge } from "@/components/common/TimerBadge";
+import { VictoryHalo } from "@/components/common";
 
 interface WatchedItemCardProps {
 
@@ -42,17 +43,21 @@ export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) 
       <div 
         id={`watched-item-card-${item.id}`} 
         onClick={() => setIsModalOpen(true)}
-        className="@container p-4 bg-white border rounded-xl flex gap-4 transition-all hover:shadow-sm cursor-pointer group relative"
+        className="group relative overflow-hidden rounded-xl p-[3px] transition-all hover:shadow-md cursor-pointer"
       >
-        <div className="relative shrink-0">
-          <img id={`watched-item-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
-          <div className="absolute -top-2 -right-2 bg-blue-600 text-white p-1 rounded-full border-2 border-white shadow-sm">
-            <Heart className="h-3 w-3 fill-current" />
-          </div>
-        </div>
+        <VictoryHalo theme="blue" />
         
-        <div id={`watched-item-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
-          <div>
+        <div className="relative z-10 bg-white rounded-[calc(0.75rem-3px)] p-4 flex gap-4 h-full">
+          <div className="relative shrink-0">
+            <img id={`watched-item-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
+            <div className="absolute -top-2 -right-2 bg-blue-600 text-white p-1 rounded-full border-2 border-white shadow-sm">
+              <Heart className="h-3 w-3 fill-current" />
+            </div>
+          </div>
+          
+          <div id={`watched-item-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
+            {/* ... rest of content remains same ... */}
+
             <div className="flex justify-between items-start">
               <h3 id={`watched-item-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2 text-[clamp(1rem,5cqi,1.25rem)]">{item.title}</h3>
               <div className="flex flex-col items-end">
@@ -107,8 +112,10 @@ export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) 
           </div>
         </div>
       </div>
+    </div>
       
       <ProductDetailsModal 
+
         item={item} 
         seller={seller} 
         isOpen={isModalOpen} 

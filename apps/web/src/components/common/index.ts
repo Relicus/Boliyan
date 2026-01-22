@@ -4,7 +4,15 @@
  * Export all reusable bidding-related components from one location.
  */
 
-export { default as BiddingWidget } from './BiddingWidget';
-export { default as PriceDisplay } from './PriceDisplay';
-export { default as VictoryHalo, getHaloTheme } from './VictoryHalo';
+export { BiddingWidget } from './BiddingWidget';
+export { PriceDisplay } from './PriceDisplay';
+export { VictoryHalo, getHaloTheme } from './VictoryHalo';
 export type { HaloTheme } from './VictoryHalo';
+export { CategoryBadge } from './CategoryBadge';
+export { ConditionBadge } from './ConditionBadge';
+export { RatingBadge } from './RatingBadge';
+export { TimerBadge } from './TimerBadge';
+export { BiddingControls } from './BiddingControls';
+export { VerifiedBadge } from './VerifiedBadge';
+export { GamificationBadge } from './GamificationBadge';
+

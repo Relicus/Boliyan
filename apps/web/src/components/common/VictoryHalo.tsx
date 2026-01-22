@@ -71,24 +71,25 @@ export function getHaloTheme(
 // COMPONENT
 // ============================================
 
-const VictoryHalo = memo(({ theme, className = '' }: VictoryHaloProps) => {
+export const VictoryHalo = memo(({ theme, className = '' }: VictoryHaloProps) => {
+
   if (theme === 'none') return null;
   
   return (
-    <div className={`absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg ${className}`}>
+    <div className={`absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-[inherit] ${className}`}>
       {/* Base Layer: Solid Vibrant Color */}
       <div className={`absolute inset-0 ${BASE_COLORS[theme]}`} />
       
       {/* Top Layer: Racing Bar Animation */}
       <motion.div 
-        className={`absolute inset-[-150%] ${GRADIENT_CLASSES[theme]}`}
+        className={`absolute inset-[-200%] ${GRADIENT_CLASSES[theme]}`}
         animate={{ rotate: 360 }}
-        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
       />
     </div>
   );
 });
 
+
 VictoryHalo.displayName = 'VictoryHalo';
 
-export default VictoryHalo;

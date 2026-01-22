@@ -53,7 +53,7 @@ interface BiddingWidgetProps {
 // COMPONENT
 // ============================================
 
-const BiddingWidget = memo(({ 
+export const BiddingWidget = memo(({ 
   item, 
   seller, 
   viewMode = 'compact',
@@ -149,5 +149,3 @@ const BiddingWidget = memo(({
 });
 
 BiddingWidget.displayName = 'BiddingWidget';
-
-export default BiddingWidget;

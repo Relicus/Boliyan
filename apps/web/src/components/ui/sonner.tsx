@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -10,10 +11,27 @@ import {
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  const [position, setPosition] = useState<ToasterProps["position"]>("bottom-right")
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (window.innerWidth < 768) {
+        setPosition("top-center")
+      } else {
+        setPosition("bottom-right")
+      }
+    }
+
+    updatePosition()
+    window.addEventListener("resize", updatePosition)
+    return () => window.removeEventListener("resize", updatePosition)
+  }, [])
+
   return (
     <Sonner
       theme="light"
       className="toaster group"
+      position={position}
       duration={8000}
       visibleToasts={5}
       closeButton
