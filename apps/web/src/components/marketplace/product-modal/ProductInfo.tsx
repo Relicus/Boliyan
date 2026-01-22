@@ -33,18 +33,9 @@ export function ProductInfo({
         </div>
       </div>
 
-
-      {/* Description - Compact */}
-      <div className="space-y-1">
-        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description</h4>
-        <p className="text-[13px] sm:text-sm text-slate-700 leading-relaxed line-clamp-3 md:line-clamp-4">
-          {item.description}
-        </p>
-      </div>
-
-      <div className="mt-2 pt-2">
+      <div className="mt-1">
           {/* Seller Info Compact Card */}
-          <div id={`seller-details-${item.id}`} className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5">
+          <div id={`seller-details-${item.id}`} className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2">
             <div className="flex items-center gap-3 min-w-0 w-full">
               <div className="h-9 w-9 rounded-full bg-slate-200 overflow-hidden shrink-0">
                 <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
@@ -73,6 +64,15 @@ export function ProductInfo({
               </div>
             </div>
           </div>
+      </div>
+
+
+      {/* Description - Compact */}
+      <div className="space-y-1">
+        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description</h4>
+        <p className="text-[13px] sm:text-sm text-slate-700 leading-relaxed line-clamp-3 md:line-clamp-4">
+          {item.description}
+        </p>
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 |--------|---------|-------|
 | **Dev Server** | `npm run dev` | Runs on localhost:3000 |
 | **Lint** | `npm run lint` | Uses ESLint 9 + eslint-config-next |
+| **Pre-flight Check** | `npx tsc --noEmit -p apps/web/tsconfig.json` | Project-wide TypeScript check |
 | **Build** | `npm run build` | Full production build |
 | **Test (All)** | `npx playwright test` | Runs all E2E tests |
 | **Test (Single)** | `npx playwright test tests/my-test.spec.ts` | Run specific test file |
@@ -111,6 +112,7 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 3.  **Verify Animations**: Ensure Framer Motion transitions are smooth and don't cause layout shifts.
 4.  **Respect The Halo**: The "Victory Halo" is a core mechanic. Do not remove or alter its logic without specific instruction.
 5.  **SQL First**: DDL changes must be reflected in `packages/database/schema.sql`.
+6.  **Pre-flight Requirement**: ALWAYS run the **Pre-flight Check** (`npx tsc --noEmit -p apps/web/tsconfig.json`) before finishing a task to catch cross-file type errors that `next dev` might miss.
 
 ## PROJECT MANIFESTO
 D:\VSCode\Boliyan\MANIFESTO.md

@@ -8,7 +8,6 @@ import Skeleton from "@/components/ui/Skeleton";
 
 interface ProductGalleryProps {
   item: Item;
-  seller: User;
   currentImg: number;
   setCurrentImg: React.Dispatch<React.SetStateAction<number>>;
   setShowFullscreen: (show: boolean) => void;
