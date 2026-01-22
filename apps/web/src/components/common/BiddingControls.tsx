@@ -245,17 +245,6 @@ export const BiddingControls = memo(({
           btnConfig.content
         )}
       </motion.button>
-
-      {isHighBidder && !isSuccess && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-amber-100 text-amber-800 px-4 py-2 rounded-xl text-center font-bold text-sm mt-1 flex items-center justify-center gap-2 border border-amber-200 shadow-sm"
-        >
-          <Zap className="h-4 w-4 fill-current text-amber-500" />
-          You are the high bidder!
-        </motion.div>
-      )}
     </div>
   );
 });

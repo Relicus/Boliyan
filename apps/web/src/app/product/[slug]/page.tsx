@@ -9,6 +9,7 @@ import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/util
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { RatingBadge } from "@/components/common/RatingBadge";
+import { TimerBadge } from "@/components/common/TimerBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ import { Item, User } from "@/types";
 import { supabase } from "@/lib/supabase";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { FullscreenGallery } from "@/components/marketplace/product-modal/FullscreenGallery";
+import { Badge } from "@/components/ui/badge";
 
 function ProductContent({ item, seller }: { item: Item; seller: User }) {
   const router = useRouter();
@@ -59,23 +61,12 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     return () => clearInterval(timer);
   }, []);
 
-  const { duration, timeLeft, isUrgent } = useMemo(() => {
+  const { duration } = useMemo(() => {
     const { duration: dur } = user ? calculatePrivacySafeDistance(user.location, seller.location) : { duration: 0 };
-    const diff = new Date(item.expiryAt).getTime() - now;
-    const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
-    const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
-    
-    const timeStr = hoursLeft >= 24 
-      ? `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`
-      : `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
-
     return { 
-      duration: dur, 
-      timeLeft: timeStr,
-      isUrgent: hoursLeft < 2
+      duration: dur
     };
-  }, [item, seller, now, user]);
+  }, [seller, user]);
 
   const isHighBidder = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isSeller = user?.id === seller.id;
@@ -145,12 +136,36 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                 />
               </AnimatePresence>
 
-              {/* Badges Overlay */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
-                 <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg border border-white/20">
-                   <MapPin className="h-3.5 w-3.5 text-red-500" />
-                   <span className="text-xs font-black tracking-tight">{getFuzzyLocationString(seller.location.address)}</span>
-                 </div>
+              {/* Badges Overlay - Symmetric Stack */}
+              <div id="product-page-left-stack" className="absolute top-6 left-6 flex flex-col gap-2">
+                {/* 1. Location */}
+                <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-md flex items-center gap-2 shadow-lg border border-white/20">
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-sm font-black tracking-tight leading-none truncate max-w-[150px]">
+                    {seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown Location'}
+                  </span>
+                </div>
+                {/* 2. Category */}
+                <CategoryBadge 
+                  category={item.category} 
+                  variant="glass" 
+                  className="px-3 py-1.5"
+                />
+              </div>
+
+              <div id="product-page-right-stack" className="absolute top-6 right-6 flex flex-col items-end gap-2">
+                {/* 1. Timer */}
+                <TimerBadge 
+                  expiryAt={item.expiryAt} 
+                  variant="glass" 
+                  className="px-3 py-1.5"
+                />
+                {/* 2. Condition */}
+                <ConditionBadge 
+                  condition={item.condition} 
+                  variant="glass"
+                  className="px-3 py-1.5"
+                />
               </div>
 
               {/* Navigation Arrows */}
@@ -226,67 +241,86 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
 
                 {/* Unified Bidding Section - Stacked Layout */}
                 <div className="flex flex-col gap-4 py-4 border-y border-slate-50">
-                  {/* Row 1: Price & High Bid */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-28">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Ask Price</span>
-                      <div className="text-[clamp(1.25rem,5cqi,2rem)] font-black text-slate-800 leading-none">
-                        Rs. {Math.round(item.askPrice).toLocaleString()}
-                      </div>
+                  {/* Row 1: Price */}
+                  <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-24">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Ask Price</span>
+                    <div className="text-[clamp(1.25rem,5cqi,2rem)] font-black text-slate-800 leading-none">
+                      Rs. {Math.round(item.askPrice).toLocaleString()}
                     </div>
-                    <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-28">
+                  </div>
+
+                  {/* Row 2: Highest Bid */}
+                    <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-24">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
                         {item.isPublicBid ? "Highest Bid" : "Bids"}
                       </span>
-                      <div className={`text-[clamp(1.25rem,5cqi,2rem)] font-black leading-none ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-500'}`}>
-                         {item.isPublicBid && item.currentHighBid
-                           ? `Rs. ${Math.round(item.currentHighBid).toLocaleString()}`
-                           : `${item.bidCount}`
-                         }
+                      <div className="flex items-center gap-2">
+                        <div className={`text-[clamp(1.25rem,5cqi,2rem)] font-black leading-none ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-500'}`}>
+                            {item.isPublicBid && item.currentHighBid
+                              ? `Rs. ${Math.round(item.currentHighBid).toLocaleString()}`
+                              : `${item.bidCount}`
+                            }
+                        </div>
+                        {isHighBidder && (
+                          <motion.div
+                            initial={{ scale: 0, rotate: -20 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            className="bg-amber-100 text-amber-600 rounded-full flex items-center justify-center w-8 h-8 p-1.5 shrink-0 shadow-sm border border-amber-200"
+                            title="You are the high bidder!"
+                          >
+                            <svg className="w-full h-full" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M18 2H6v2H2v7c0 2.21 1.79 4 4 4h1.09c.45 1.76 1.83 3.14 3.58 3.59V20H8v2h8v-2h-2.67v-1.41c1.75-.45 3.13-1.83 3.58-3.59H18c2.21 0 4-1.79 4-4V4h-4V2zM6 13c-1.1 0-2-.9-2-2V6h2v7zm14-2c0 1.1-.9 2-2 2h-2V6h2v5z"/>
+                            </svg>
+                          </motion.div>
+                        )}
                       </div>
                     </div>
-                  </div>
 
-                  {/* Row 2: Timer (Centered) */}
-                  <div className="flex flex-col items-center justify-center p-3 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm">
-                     <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Ends In</span>
-                     <div className={`text-[clamp(1.25rem,4cqi,2rem)] font-black tabular-nums ${isUrgent ? 'text-red-500 animate-pulse' : 'text-slate-800'}`}>
-                       {timeLeft}
-                     </div>
-                  </div>
 
-                {/* Row 3 & 4: Bidding Controls Component */}
-                <div className="mt-2">
-                  <BiddingControls
-                    bidAmount={bidAmount}
-                    isSuccess={isSuccess}
-                    isOwner={isSeller}
-                    isHighBidder={!!isHighBidder}
-                    hasPriorBid={!!hasPriorBid}
-                    isSubmitting={false}
-                    error={error}
-                    minBid={minNextBid}
-                    pendingConfirmation={pendingConfirmation}
-                    animTrigger={animTrigger}
-                    viewMode="modal"
-                    idPrefix={`product-page-${item.id}`}
-                    onSmartAdjust={handleSmartAdjust}
-                    onBid={handleBid}
-                    onKeyDown={handleKeyDown}
-                    onInputChange={handleInputChange}
-                  />
+                  {/* Row 3: Bidding Controls Component */}
+                  <div className="mt-2 space-y-3">
+                    <BiddingControls
+                      bidAmount={bidAmount}
+                      isSuccess={isSuccess}
+                      isOwner={isSeller}
+                      isHighBidder={!!isHighBidder}
+                      hasPriorBid={!!hasPriorBid}
+                      isSubmitting={false}
+                      error={error}
+                      minBid={minNextBid}
+                      pendingConfirmation={pendingConfirmation}
+                      animTrigger={animTrigger}
+                      viewMode="modal"
+                      idPrefix={`product-page-${item.id}`}
+                      onSmartAdjust={handleSmartAdjust}
+                      onBid={handleBid}
+                      onKeyDown={handleKeyDown}
+                      onInputChange={handleInputChange}
+                    />
+
+                    {isHighBidder && !isSuccess && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-amber-50 text-amber-800 px-4 py-2.5 rounded-xl text-center font-bold text-sm flex items-center justify-center gap-2 border border-amber-200/60 shadow-sm"
+                      >
+                        <Zap className="h-4 w-4 fill-current text-amber-500" />
+                        You are the high bidder!
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Error Message */}
-              {error && <p className="text-red-500 text-sm font-bold text-center mt-2 mb-4">{error}</p>}
+                {/* Error Message */}
+                {error && <p className="text-red-500 text-sm font-bold text-center mt-2 mb-4">{error}</p>}
+              </div>
 
               {/* Seller Card - Ticket Style */}
               <div className="bg-white rounded-2xl border-2 border-slate-100 shadow-sm mt-6 group hover:border-blue-100 transition-colors overflow-hidden">
                 {/* Top: Identity */}
                 <div className="p-4 flex items-center gap-3">
                   <div className="relative shrink-0">
-                    <img src={seller.avatar} className="h-12 w-12 rounded-full object-cover bg-slate-100 ring-2 ring-slate-50" />
+                    <img src={seller.avatar} className="h-12 w-12 rounded-full object-cover bg-slate-100 ring-2 ring-slate-50" alt={seller.name} />
                     {seller.isVerified && (
                       <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
                          <VerifiedBadge size="sm" showTooltip={false} />
@@ -318,13 +352,12 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                      <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
                    </div>
-                   <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
-                     <Clock className="w-3 h-3" />
-                     {duration} min
-                   </div>
-                </div>
+                    <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
+                      <Clock className="w-3 h-3" />
+                      {duration} min
+                    </div>
+                 </div>
               </div>
-            </div>
           </div>
 
           {/* Block 3: Description (Left Col Bottom) */}
@@ -336,7 +369,6 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
               </p>
             </div>
           </div>
-
         </div>
       </main>
 
@@ -351,32 +383,16 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
   );
 }
 
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  // In Next.js App Router dynamic segments, the key matches the folder name [slug]
-  // BUT: The params object passed might still be using the old key if we only renamed the folder 
-  // and didn't restart the dev server or if Next.js caches the route param names.
-  // However, `params` is typed as { id: string } in the prop definition above which might be wrong now.
-  // Let's type it loosely to inspect what we get, or safely assume it maps to [slug] -> params.slug
-  
-  // Actually, wait. The prop definition `params: Promise<{ id: string }>` was from the old code.
-  // Since I renamed the folder to `[slug]`, the param key will be `slug`.
-  // I need to update the type definition and usage.
-  
-  const resolvedParams = use(params) as unknown as { slug?: string; id?: string };
+export default function ProductPage({ params }: { params: Promise<{ id?: string; slug?: string }> }) {
+  const resolvedParams = use(params);
   const slugOrId = resolvedParams.slug || resolvedParams.id || '';
   
   const router = useRouter();
   const { items, getUser } = useApp();
   
-  // 1. Determine if param is UUID (Legacy ID) or Slug
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+  const storeItem = items.find((i) => isUUID ? i.id === slugOrId : i.slug === slugOrId);
   
-  // 2. Try Global Store first (fastest)
-  const storeItem = items.find((i) => 
-    isUUID ? i.id === slugOrId : i.slug === slugOrId
-  );
-  
-  // 3. Local State for direct fetch fallback
   const [fetchedItem, setFetchedItem] = useState<Item | null>(null);
   const [isLoading, setIsLoading] = useState(!storeItem);
   const [fetchError, setFetchError] = useState(false);
@@ -391,7 +407,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       setIsLoading(true);
       try {
         let query = supabase.from('marketplace_listings').select('*');
-        
         if (isUUID) {
             query = query.eq('id', slugOrId);
         } else {
@@ -404,7 +419,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           console.error("Error fetching item:", error);
           setFetchError(true);
         } else {
-          // Transform using the same logic as the grid
           const newItem = transformListingToItem(data as unknown as ListingWithSeller);
           setFetchedItem(newItem);
         }
@@ -419,9 +433,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     fetchItem();
   }, [slugOrId, storeItem, isUUID]);
 
-  // Combined Item
   const item = storeItem || fetchedItem;
-  // Seller is embedded in the item by transformListingToItem, or we try getUser if it's missing (legacy)
   const seller = item?.seller || (item ? getUser(item.sellerId) : null);
 
   if (isLoading) {

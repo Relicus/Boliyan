@@ -105,20 +105,6 @@ export const PriceDisplay = memo(({
               >
                 {formatPrice(config.currentHighBid, viewMode)}
               </motion.span>
-              
-              {/* Trophy for high bidder */}
-              {config.isUserHighBidder && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -20 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  className={`bg-amber-100 text-amber-600 rounded-full flex items-center justify-center ${getTrophySizeClass(viewMode)}`}
-                  title="You are the high bidder!"
-                >
-                  <svg className="w-full h-full" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18 2H6v2H2v7c0 2.21 1.79 4 4 4h1.09c.45 1.76 1.83 3.14 3.58 3.59V20H8v2h8v-2h-2.67v-1.41c1.75-.45 3.13-1.83 3.58-3.59H18c2.21 0 4-1.79 4-4V4h-4V2zM6 13c-1.1 0-2-.9-2-2V6h2v7zm14-2c0 1.1-.9 2-2 2h-2V6h2v5z"/>
-                  </svg>
-                </motion.div>
-              )}
             </div>
           ) : config.variant === 'secret' ? (
             // Secret: Show bid count with lock

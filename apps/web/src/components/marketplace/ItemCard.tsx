@@ -17,6 +17,7 @@ import ProductDetailsModal from "./ProductDetailsModal";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { RatingBadge } from "@/components/common/RatingBadge";
+import { TimerBadge } from "@/components/common/TimerBadge";
 import {
   Tooltip,
   TooltipContent,
@@ -96,44 +97,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   }, [item, user, bids]);
 
   // Safe Privacy-Preserving Distance Calculation
-  const { distance, duration, isOutside, timeLeft, statusColor, isUrgent } = useMemo(() => {
-    // 1. Time Logic - Independent of User
-    // Default values if 'now' is missing (SSR)
-    let timeStr = "--:--:--";
-    let statusColor = "bg-black/60";
-    let isUrgent = false;
-    let type = "72h";
-
-    if (now !== null) {
-      // Time Left calculation
-      const diff = new Date(item.expiryAt).getTime() - now;
-      const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
-      const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
-      const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
-      
-      // Determine listing type (24, 48, 72)
-      const totalDiff = new Date(item.expiryAt).getTime() - new Date(item.createdAt).getTime();
-      const totalHours = Math.round(totalDiff / 3600000);
-      
-      if (totalHours <= 24) type = "24h";
-      else if (totalHours <= 48) type = "48h";
-
-      timeStr = hoursLeft >= 24 
-        ? `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`
-        : `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
-
-      // Ending soon logic
-      if (hoursLeft < 2) {
-        statusColor = "bg-red-600";
-        isUrgent = true;
-      } else if (hoursLeft < 6) {
-        statusColor = "bg-orange-600";
-      } else if (hoursLeft < 12) {
-        statusColor = "bg-amber-600";
-      }
-    }
-
-    // 2. Distance Logic - Dependent on User
+  const { distance, duration, isOutside } = useMemo(() => {
+    // 1. Distance Logic - Dependent on User
     // If user is missing, we default to 0/hidden. This is an unavoidable "pop-in" 
     // when location becomes available, but better than blocking the whole card state.
     const { distance: dist, duration: dur, isOutside: outside } = (user?.location && seller?.location)
@@ -143,13 +108,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     return { 
       distance: dist, 
       duration: dur, 
-      isOutside: outside,
-      timeLeft: timeStr,
-      listingType: type,
-      statusColor,
-      isUrgent
+      isOutside: outside
     };
-  }, [item, now, user, seller]); // Added safe navigation for seller
+  }, [user, seller]); // Added safe navigation for seller
+
 
   const handleInputClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent dialog from opening when clicking input
@@ -226,14 +188,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {/* Top-Right Stack: Urgency & State */}
               <div className="absolute top-2 right-2 z-20 flex flex-col items-end gap-1">
                 {/* 1. Timer (Urgency First) */}
-                <motion.div
-                  initial={false}
-                  animate={isUrgent ? { scale: [1, 1.05] } : {}}
-                  transition={isUrgent ? { repeat: Infinity, duration: 0.75, repeatType: "reverse" } : {}}
-                  className={`${statusColor} backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20`}
-                >
-                  <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none tabular-nums">{timeLeft}</span>
-                </motion.div>
+                <TimerBadge 
+                  expiryAt={item.expiryAt} 
+                  variant="glass" 
+                />
                 
                 {/* 2. Condition State */}
                 <ConditionBadge 

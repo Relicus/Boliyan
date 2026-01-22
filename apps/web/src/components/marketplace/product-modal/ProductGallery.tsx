@@ -1,29 +1,31 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Maximize2, ChevronLeft, ChevronRight, Clock, Bookmark, ExternalLink } from "lucide-react";
+import { Maximize2, ChevronLeft, ChevronRight, Bookmark, ExternalLink, MapPin } from "lucide-react";
 import Link from "next/link";
-import { Item } from "@/types";
+import { Item, User } from "@/types";
 import Skeleton from "@/components/ui/Skeleton";
+import { CategoryBadge } from "@/components/common/CategoryBadge";
+import { ConditionBadge } from "@/components/common/ConditionBadge";
+import { TimerBadge } from "@/components/common/TimerBadge";
+import { getFuzzyLocationString } from "@/lib/utils";
 
 interface ProductGalleryProps {
   item: Item;
+  seller: User;
   currentImg: number;
   setCurrentImg: React.Dispatch<React.SetStateAction<number>>;
   setShowFullscreen: (show: boolean) => void;
-  timeLeft?: string;
-  isUrgent?: boolean;
   isWatched?: boolean;
   onToggleWatch?: (id: string) => void;
 }
 
 export function ProductGallery({
   item,
+  seller,
   currentImg,
   setCurrentImg,
   setShowFullscreen,
-  timeLeft,
-  isUrgent,
   isWatched,
   onToggleWatch
 }: ProductGalleryProps) {
@@ -61,18 +63,39 @@ export function ProductGallery({
           onError={() => setIsImageLoaded(true)}
         />
         
-        {/* Time Remaining Overlay - Top Left */}
-        {timeLeft && (
-          <div className="absolute top-4 left-4 z-20">
-            <div className={`
-              flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md shadow-lg border border-white/20
-              ${isUrgent ? 'bg-red-500/80 text-white' : 'bg-black/60 text-white'}
-            `}>
-              <Clock className="h-4 w-4" />
-              <span className="text-sm font-bold font-outfit tabular-nums tracking-wide">{timeLeft}</span>
-            </div>
+        {/* Top-Left Stack: Geography & Identity */}
+        <div id={`product-gallery-left-stack`} className="absolute top-4 left-4 z-20 flex flex-col items-start gap-1.5">
+          {/* 1. Location (Geography First) */}
+          <div className="bg-black/60 backdrop-blur-md text-white px-2.5 py-1.5 rounded-md flex items-center gap-2 shadow-lg border border-white/20">
+            <MapPin className="h-3.5 w-3.5" />
+            <span className="text-xs font-black tracking-tight leading-none truncate max-w-[150px]">
+              {seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown Location'}
+            </span>
           </div>
-        )}
+          {/* 2. Category Identity */}
+          <CategoryBadge 
+            category={item.category} 
+            variant="glass" 
+            className="px-2.5 py-1.5"
+          />
+        </div>
+
+        {/* Top-Right Stack: Urgency & State */}
+        <div className="absolute top-4 right-12 z-20 flex flex-col items-end gap-1.5">
+          {/* 1. Timer (Urgency First) */}
+          <TimerBadge 
+            expiryAt={item.expiryAt} 
+            variant="glass" 
+            className="px-2.5 py-1.5"
+          />
+          
+          {/* 2. Condition State */}
+          <ConditionBadge 
+            condition={item.condition} 
+            variant="glass"
+            className="px-2.5 py-1.5"
+          />
+        </div>
         
         <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
            {/* Watch Button */}

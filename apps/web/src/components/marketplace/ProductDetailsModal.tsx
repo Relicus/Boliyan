@@ -73,31 +73,13 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   }, [isSuccess, bidAmount, item.title]);
 
   // Safe Privacy-Preserving Distance Calculation
-  const { distance, duration, isOutside, timeLeft, isUrgent } = useMemo(() => {
-    // Timer Logic - Independent of User
-    const currentTime = now ?? fallbackNow;
-    const diff = new Date(item.expiryAt).getTime() - currentTime;
-    const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
-    const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
-    
-    const timeStr = hoursLeft >= 24 
-      ? `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`
-      : `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
-
-    let isUrgent = false;
-    if (hoursLeft < 2) {
-      isUrgent = true;
-    }
-
+  const { distance, duration, isOutside } = useMemo(() => {
     // Distance Logic - Needs User
     if (!user) {
         return { 
             distance: 0, 
             duration: 0, 
-            isOutside: false, 
-            timeLeft: timeStr, 
-            isUrgent 
+            isOutside: false
         };
     }
 
@@ -106,11 +88,10 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     return { 
       distance: dist, 
       duration: dur, 
-      isOutside: outside,
-      timeLeft: timeStr,
-      isUrgent
+      isOutside: outside
     };
-  }, [item.expiryAt, now, fallbackNow, user, seller.location]);
+  }, [user, seller.location]);
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -129,14 +110,14 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
           {/* Top Section: Dynamic Gallery */}
           <ProductGallery 
             item={item}
+            seller={seller}
             currentImg={currentImg}
             setCurrentImg={setCurrentImg}
             setShowFullscreen={setShowFullscreen}
-            timeLeft={timeLeft}
-            isUrgent={isUrgent}
             isWatched={isWatched}
             onToggleWatch={toggleWatch}
           />
+
 
           {/* Bottom Section: Product Details & Bidding */}
           <div id={`product-details-body-${item.id}`} className="flex-none md:flex-1 flex flex-col p-4 sm:p-6 pb-6 sm:pb-8 bg-white relative z-10 md:overflow-y-auto">

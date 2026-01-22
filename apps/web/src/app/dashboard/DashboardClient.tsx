@@ -3,6 +3,7 @@
 import { useApp } from "@/lib/store";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
+import { TimerBadge } from "@/components/common/TimerBadge";
 import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
@@ -330,18 +331,16 @@ function DashboardContent() {
                             </div>
                           </div>
                       </div>
-                      <div className="flex flex-col items-end gap-1 shrink-0">
-                        <Badge variant="secondary" className="bg-white text-slate-600 border border-slate-200 shadow-sm font-bold text-[10px] h-5 px-1.5">
-                          {item.bidCount} Bids
-                        </Badge>
-                        <div className="flex items-center gap-1.5 justify-end w-full">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{item.listingDuration}h</span>
-                          <div className={`text-[10px] font-black flex items-center gap-0.5 ${getTimeLeft(item.expiryAt).color}`}>
-                            <Clock className={`h-2.5 w-2.5 ${getTimeLeft(item.expiryAt).isUrgent ? 'animate-pulse' : ''}`} />
-                            {getTimeLeft(item.expiryAt).text}
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <Badge variant="secondary" className="bg-white text-slate-600 border border-slate-200 shadow-sm font-bold text-[10px] h-5 px-1.5">
+                            {item.bidCount} Bids
+                          </Badge>
+                          <div className="flex items-center gap-1.5 justify-end w-full">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{item.listingDuration}h</span>
+                            <TimerBadge expiryAt={item.expiryAt} variant="outline" className="h-4 py-0 px-1 text-[8px]" />
                           </div>
                         </div>
-                      </div>
+
                     </div>
 
                     <div className="p-4 space-y-3 bg-white">

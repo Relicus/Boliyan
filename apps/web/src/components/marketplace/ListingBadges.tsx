@@ -3,6 +3,7 @@ import { BadgeCheck, Lock } from "lucide-react";
 import { Item, User } from "@/types";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
+import { TimerBadge } from "@/components/common/TimerBadge";
 
 interface ListingBadgesProps {
   item: Item;
@@ -12,9 +13,10 @@ interface ListingBadgesProps {
 export function ListingBadges({ item, seller }: ListingBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      {/* Condition & Category Side-by-Side */}
+      {/* Primary Status Row */}
       <ConditionBadge condition={item.condition} variant="outline" />
       <CategoryBadge category={item.category} variant="outline" />
+      <TimerBadge expiryAt={item.expiryAt} variant="outline" />
 
       {/* Verified Badge */}
 

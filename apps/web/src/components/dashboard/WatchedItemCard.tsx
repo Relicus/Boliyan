@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
+import { TimerBadge } from "@/components/common/TimerBadge";
 
 interface WatchedItemCardProps {
 
@@ -75,9 +76,9 @@ export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) 
                 <span className="truncate">{seller.location.address}</span>
               </div>
               <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                <Clock className="h-3 w-3 text-blue-400" />
-                <span>{getTimeLeft(item.expiryAt)}</span>
+                <TimerBadge expiryAt={item.expiryAt} variant="outline" className="h-4 py-0 px-1 text-[8px]" />
               </div>
+
             </div>
           </div>
 
