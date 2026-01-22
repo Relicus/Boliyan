@@ -12,19 +12,18 @@ import { Toaster as Sonner, type ToasterProps } from "sonner"
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const [position, setPosition] = useState<ToasterProps["position"]>("bottom-right")
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    const updatePosition = () => {
-      if (window.innerWidth < 768) {
-        setPosition("top-center")
-      } else {
-        setPosition("bottom-right")
-      }
+    const updateDimensions = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      setPosition(mobile ? "top-center" : "bottom-right")
     }
 
-    updatePosition()
-    window.addEventListener("resize", updatePosition)
-    return () => window.removeEventListener("resize", updatePosition)
+    updateDimensions()
+    window.addEventListener("resize", updateDimensions)
+    return () => window.removeEventListener("resize", updateDimensions)
   }, [])
 
   return (
@@ -34,15 +33,15 @@ const Toaster = ({ ...props }: ToasterProps) => {
       position={position}
       duration={8000}
       visibleToasts={5}
-      closeButton
+      closeButton={!isMobile}
       toastOptions={{
         classNames: {
-          toast: "group toast !bg-white !text-slate-950 border border-slate-200 shadow-xl",
+          toast: "group toast !bg-white !text-slate-950 border border-slate-200 shadow-xl !rounded-2xl !p-4 md:!pr-12 transition-all duration-300",
           title: "text-slate-950 font-semibold tracking-tight",
           description: "text-slate-700 font-medium",
           actionButton: "bg-slate-900 text-slate-50",
           cancelButton: "bg-slate-100 text-slate-600",
-          closeButton: "text-slate-400 hover:text-slate-700",
+          closeButton: "opacity-0 group-hover:opacity-100 transition-opacity !bg-white !border-slate-100 !text-slate-400 hover:!text-slate-900 !right-3 !top-3 !left-auto !transform-none shadow-sm",
         },
       }}
       icons={{
