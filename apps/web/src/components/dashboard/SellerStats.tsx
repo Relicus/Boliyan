@@ -1,8 +1,9 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useDashboard } from '@/context/DashboardContext';
 import { Package, Gavel, CheckCircle, DollarSign, LucideIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Skeleton from '@/components/ui/Skeleton';
+import { useDashboard } from '@/context/DashboardContext';
 
 const iconMap: Record<string, LucideIcon> = {
   Package,
@@ -18,14 +19,14 @@ export function SellerStats() {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
          {[1, 2, 3, 4].map((i) => (
-           <Card key={i} className="animate-pulse">
-             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-               <div className="h-4 w-24 bg-muted rounded"></div>
-             </CardHeader>
-             <CardContent>
-               <div className="h-8 w-12 bg-muted rounded"></div>
-             </CardContent>
-           </Card>
+           <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Skeleton className="h-4 w-24 bg-muted" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-12 bg-muted" />
+              </CardContent>
+            </Card>
          ))}
       </div>
     );

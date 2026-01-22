@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { Maximize2, ChevronLeft, ChevronRight, Clock, Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { Item } from "@/types";
+import Skeleton from "@/components/ui/Skeleton";
 
 interface ProductGalleryProps {
   item: Item;
   currentImg: number;
   setCurrentImg: React.Dispatch<React.SetStateAction<number>>;
   setShowFullscreen: (show: boolean) => void;
-  showHalo: boolean;
-  haloTheme: 'orange' | 'green' | 'blue';
   timeLeft?: string;
   isUrgent?: boolean;
   isWatched?: boolean;
@@ -24,73 +22,44 @@ export function ProductGallery({
   currentImg,
   setCurrentImg,
   setShowFullscreen,
-  showHalo,
-  haloTheme,
   timeLeft,
   isUrgent,
   isWatched,
   onToggleWatch
 }: ProductGalleryProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const loadedImagesRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    setIsImageLoaded(false);
-  }, [currentImg, item.id]);
+    const currentSrc = item.images[currentImg];
+    if (!currentSrc) return;
+    setIsImageLoaded(loadedImagesRef.current.has(currentSrc));
+  }, [currentImg, item.id, item.images]);
 
   return (
     <div id={`product-details-gallery-${item.id}`} className="relative w-full bg-slate-100 group md:flex-[0_0_60%] md:min-h-0 h-[300px] sm:h-[400px] md:h-full">
-      {/* Victory Halo - State Based Animated Border Background */}
-      {showHalo && (
-        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-          {/* Base Layer: Solid Vibrant Color */}
-          <div 
-            className={`absolute inset-0 opacity-20
-              ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
-                haloTheme === 'green' ? 'bg-[#16a34a]' : 
-                'bg-[#0ea5e9]'}`}
-          />
-          
-          {/* Top Layer: The Racing Bar */}
-          {item.isPublicBid && (
-            <motion.div 
-              className={`absolute inset-[-150%] opacity-30
-                ${haloTheme === 'orange' 
-                    ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
-                    : haloTheme === 'green'
-                      ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
-                      : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
-                }`}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            />
-          )}
-        </div>
-      )}
-
       <div 
         id={`product-details-image-${item.id}`}
         className="relative h-full w-full overflow-hidden z-10"
       >
-        <div
-          className={`absolute inset-0 bg-gradient-to-r from-slate-200/70 via-white/80 to-slate-200/70 animate-pulse transition-opacity duration-500 ${
-            isImageLoaded ? 'opacity-0' : 'opacity-100'
-          }`}
-          aria-hidden="true"
-        />
-        <AnimatePresence mode="wait">
-          <motion.img 
-            key={currentImg}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            src={item.images[currentImg]} 
-            className="h-full w-full object-cover"
-            alt={item.title}
-            onLoad={() => setIsImageLoaded(true)}
-            onError={() => setIsImageLoaded(true)}
+        {!isImageLoaded && (
+          <Skeleton
+            className="absolute inset-0 z-0 rounded-none bg-gradient-to-r from-slate-200/70 via-white/80 to-slate-200/70 pointer-events-none"
           />
-        </AnimatePresence>
+        )}
+        <img
+          key={currentImg}
+          src={item.images[currentImg]}
+          className={`relative z-10 h-full w-full object-cover transition-opacity duration-300 ${
+            isImageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          alt={item.title}
+          onLoad={(event) => {
+            loadedImagesRef.current.add(event.currentTarget.currentSrc);
+            setIsImageLoaded(true);
+          }}
+          onError={() => setIsImageLoaded(true)}
+        />
         
         {/* Time Remaining Overlay - Top Left */}
         {timeLeft && (

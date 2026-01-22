@@ -178,14 +178,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   };
 
   const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
-  const showHalo = isHighBidder || hasPriorBid || isWatched;
-  
-  // Halo Theme Priority: Winning > Participating > Watching
-  const haloTheme = isHighBidder 
-    ? 'orange' 
-    : hasPriorBid 
-      ? 'green' 
-      : 'blue';
 
   // Calculate real-time status for input styling
 
@@ -203,41 +195,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`@container group relative border-none bg-slate-50 rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500
-              ${showHalo ? 'p-[3.5px]' : 'p-0 shadow-sm hover:shadow-md'}
+            className={`@container group relative border-none bg-slate-50 rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500 p-0 shadow-sm hover:shadow-md
               ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
 
             `}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
-              {/* Victory Halo - State Based Animated Border Background */}
-              {showHalo && (
-                <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-lg">
-                  {/* Base Layer: Solid Vibrant Color */}
-                  <div 
-                     className={`absolute inset-0 
-                       ${haloTheme === 'orange' ? 'bg-[#fbbf24]' : 
-                         haloTheme === 'green' ? 'bg-[#16a34a]' : 
-                         'bg-[#0ea5e9]'}`}
-                  />
-                  
-                  {/* Top Layer: The Racing Bar - Shows for public bids OR secret bids with prior bid */}
-                  {(item.isPublicBid || hasPriorBid) && (
-                    <motion.div 
-                      className={`absolute inset-[-150%] 
-                        ${haloTheme === 'orange' 
-                            ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]' 
-                            : haloTheme === 'green'
-                              ? 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]'
-                              : 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]'
-                        }`}
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    />
-                  )}
-                </div>
-              )}
-
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(var(--radius)-3px)]">
             <div
               id={`item-card-${item.id}-image-wrapper`}

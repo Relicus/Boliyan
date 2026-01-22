@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
+import Skeleton from "@/components/ui/Skeleton";
 import AdCard from "./AdCard";
 import { CARD_SIZES, type ViewMode } from "@/lib/cardSizes";
 
@@ -51,6 +52,13 @@ export default function AdSenseCard({
     return undefined;
   }, [adClient, adSlot]);
 
+  useEffect(() => {
+    if (adLoaded || adError) return;
+
+    const timeout = setTimeout(() => setAdError(true), 2500);
+    return () => clearTimeout(timeout);
+  }, [adLoaded, adError]);
+
   // Fallback to custom AdCard if AdSense fails or no credentials
   if (adError || !adClient || !adSlot) {
     return <AdCard id={id} viewMode={viewMode} />;
@@ -74,7 +82,8 @@ export default function AdSenseCard({
       
       {/* Loading State (shown briefly before ad loads) */}
       {!adLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-100 animate-pulse">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Skeleton className="absolute inset-0 rounded-lg" />
           <span className="text-xs text-slate-400">Loading ad...</span>
         </div>
       )}

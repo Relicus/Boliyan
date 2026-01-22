@@ -48,14 +48,6 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
 
   const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
-  
-  // Halo Logic
-  const showHalo = isHighBidder || hasPriorBid || isWatched;
-  const haloTheme = isHighBidder 
-    ? 'orange' 
-    : hasPriorBid 
-      ? 'green' 
-      : 'blue';
 
   useEffect(() => {
     if (isOpen) {
@@ -140,8 +132,6 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             currentImg={currentImg}
             setCurrentImg={setCurrentImg}
             setShowFullscreen={setShowFullscreen}
-            showHalo={showHalo}
-            haloTheme={haloTheme}
             timeLeft={timeLeft}
             isUrgent={isUrgent}
             isWatched={isWatched}

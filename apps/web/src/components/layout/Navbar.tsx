@@ -20,6 +20,7 @@ import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 // import { SearchDropdown } from "./SearchDropdown";
 import SearchBar from "@/components/search/SearchBar";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import Skeleton from "@/components/ui/Skeleton";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
@@ -160,8 +161,10 @@ export default function Navbar() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2 }}
                 id="navbar-loading-avatar"
-                className="h-10 w-10 rounded-full bg-slate-100 animate-pulse ring-1 ring-slate-200"
-              />
+                className="h-10 w-10"
+              >
+                <Skeleton className="h-10 w-10 rounded-full ring-1 ring-slate-200" />
+              </motion.div>
             ) : isLoggedIn && user ? (
               <motion.div
                 key="logged-in"

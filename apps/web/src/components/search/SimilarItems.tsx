@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearch } from '@/context/SearchContext';
 import { Item } from '@/types';
 import ItemCard from '@/components/marketplace/ItemCard';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import Skeleton from '@/components/ui/Skeleton';
+import { useSearch } from '@/context/SearchContext';
 
 interface SimilarItemsProps {
     currentItem: Item;
@@ -46,7 +47,7 @@ export default function SimilarItems({ currentItem }: SimilarItemsProps) {
         <div className="flex space-x-4">
             {loading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="w-[200px] h-[300px] bg-slate-100 rounded-2xl animate-pulse" />
+                    <Skeleton key={i} className="w-[200px] h-[300px] rounded-2xl" />
                 ))
             ) : (
                 items.map(item => (
