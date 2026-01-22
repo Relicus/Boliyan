@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Maximize2, ChevronLeft, ChevronRight, Bookmark, ExternalLink, MapPin } from "lucide-react";
+import { Maximize2, ChevronLeft, ChevronRight, Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { Item, User } from "@/types";
 import Skeleton from "@/components/ui/Skeleton";
-import { CategoryBadge } from "@/components/common/CategoryBadge";
-import { ConditionBadge } from "@/components/common/ConditionBadge";
-import { TimerBadge } from "@/components/common/TimerBadge";
-import { getFuzzyLocationString } from "@/lib/utils";
 
 interface ProductGalleryProps {
   item: Item;
@@ -22,7 +18,6 @@ interface ProductGalleryProps {
 
 export function ProductGallery({
   item,
-  seller,
   currentImg,
   setCurrentImg,
   setShowFullscreen,

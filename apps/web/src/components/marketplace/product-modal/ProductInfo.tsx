@@ -1,9 +1,7 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
+import { MapPin, BadgeCheck } from "lucide-react";
 import { Item, User } from "@/types";
-import { DialogTitle } from "@/components/ui/dialog";
 import { getFuzzyLocationString } from "@/lib/utils";
 import { ListingBadges } from "@/components/marketplace/ListingBadges";
 import { RatingBadge } from "@/components/common/RatingBadge";
@@ -28,12 +26,13 @@ export function ProductInfo({
     <div id={`product-details-left-${item.id}`} className="flex flex-col gap-3 min-w-0 h-full">
       <div className="flex justify-between items-start gap-2">
         <div className="min-w-0">
-          <DialogTitle className="text-xl sm:text-2xl font-black font-outfit text-slate-900 leading-tight mb-2 line-clamp-2">
+          <h3 className="text-xl sm:text-2xl font-black font-outfit text-slate-900 leading-tight mb-2 line-clamp-2">
             {item.title}
-          </DialogTitle>
+          </h3>
           <ListingBadges item={item} seller={seller} />
         </div>
       </div>
+
 
       {/* Description - Compact */}
       <div className="space-y-1">
@@ -54,6 +53,12 @@ export function ProductInfo({
                 <div className="flex items-center gap-2">
                   <div className="font-semibold text-slate-700 text-base truncate leading-none">{seller.name}</div>
                   <RatingBadge rating={seller.rating} count={seller.reviewCount} size="md" />
+                  {seller.isVerified && (
+                    <div className="flex items-center gap-1 text-blue-600 font-bold text-[10px]">
+                      <BadgeCheck className="h-3 w-3 fill-current stroke-white" />
+                      <span>Verified</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="text-[11px] text-slate-500 flex items-center gap-1 leading-none mt-1">

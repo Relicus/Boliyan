@@ -8,20 +8,24 @@ import { TimerBadge } from "@/components/common/TimerBadge";
 interface ListingBadgesProps {
   item: Item;
   seller: User;
+  showTimer?: boolean;
+  className?: string;
 }
 
-export function ListingBadges({ item, seller }: ListingBadgesProps) {
+export function ListingBadges({ item, seller, showTimer = true, className }: ListingBadgesProps) {
+  const badgeStyle = "px-3 py-1.5";
+  
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className={`flex flex-wrap gap-2 ${className}`}>
       {/* Primary Status Row */}
-      <ConditionBadge condition={item.condition} variant="outline" />
-      <CategoryBadge category={item.category} variant="outline" />
-      <TimerBadge expiryAt={item.expiryAt} variant="outline" />
+      <ConditionBadge condition={item.condition} variant="outline" className={badgeStyle} />
+      <CategoryBadge category={item.category} variant="outline" className={badgeStyle} />
+      {showTimer && <TimerBadge expiryAt={item.expiryAt} variant="outline" className={badgeStyle} />}
 
       {/* Verified Badge */}
 
       {seller.isVerified && (
-        <Badge variant="outline" className="font-bold bg-blue-50 text-blue-700 border-blue-100 flex items-center gap-1">
+        <Badge variant="outline" className={`font-bold bg-blue-50 text-blue-700 border-blue-100 flex items-center gap-1.5 ${badgeStyle}`}>
           <BadgeCheck className="h-3.5 w-3.5 fill-current text-blue-700 stroke-white" />
           Verified Listing
         </Badge>
@@ -29,7 +33,7 @@ export function ListingBadges({ item, seller }: ListingBadgesProps) {
 
       {/* Secret Bidding Badge */}
       {!item.isPublicBid && (
-        <Badge variant="secondary" className="font-bold bg-amber-500 text-white border-none shadow-sm flex items-center gap-1">
+        <Badge variant="secondary" className={`font-bold bg-amber-500 text-white border-none shadow-sm flex items-center gap-1.5 ${badgeStyle}`}>
           <Lock className="h-3.5 w-3.5" />
           Secret Bidding
         </Badge>
@@ -37,3 +41,4 @@ export function ListingBadges({ item, seller }: ListingBadgesProps) {
     </div>
   );
 }
+

@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
-import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogClose, DialogTitle } from "@/components/ui/dialog";
 import { X } from "lucide-react";
+
 import { toast } from "sonner";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
@@ -23,9 +24,9 @@ interface ProductDetailsModalProps {
 }
 
 export default function ProductDetailsModal({ item, seller, isOpen, onClose }: ProductDetailsModalProps) {
-  const { user, bids, toggleWatch, watchedItemIds, now } = useApp();
+  const { user, bids, toggleWatch, watchedItemIds } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
-  const [fallbackNow] = useState(() => Date.now());
+
 
   // Hook for encapsulated bidding logic
   const {
@@ -96,8 +97,10 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent showCloseButton={false} className="w-[94vw] max-w-[94vw] max-h-[92vh] overflow-y-auto md:w-[920px] md:max-w-[920px] lg:w-[1000px] lg:max-w-[1000px] md:h-[88vh] md:max-h-[88vh] p-0 pr-0 bg-white border-none shadow-2xl rounded-2xl">
+        <DialogTitle className="sr-only">{item.title}</DialogTitle>
         <DialogClose 
           id={`close-listing-btn-${item.id}`}
+
           className="absolute right-4 top-4 z-[50] p-2 bg-white/85 hover:bg-white text-slate-700 hover:text-red-500 rounded-full shadow-lg transition-all active:scale-90"
         >
           <X className="h-5 w-5" />
@@ -110,7 +113,6 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
           {/* Top Section: Dynamic Gallery */}
           <ProductGallery 
             item={item}
-            seller={seller}
             currentImg={currentImg}
             setCurrentImg={setCurrentImg}
             setShowFullscreen={setShowFullscreen}

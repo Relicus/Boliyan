@@ -2,7 +2,7 @@
 
 import { use, useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, MapPin, Lock, Clock, Bookmark, Maximize2, Share2, Zap, ArrowLeft, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Clock, Bookmark, Maximize2, Share2, Zap, ArrowLeft, BadgeCheck } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
@@ -14,13 +14,12 @@ import { BiddingControls } from "@/components/common/BiddingControls";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
-import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { toast } from "sonner";
 import { Item, User } from "@/types";
 import { supabase } from "@/lib/supabase";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { FullscreenGallery } from "@/components/marketplace/product-modal/FullscreenGallery";
-import { Badge } from "@/components/ui/badge";
+import { ListingBadges } from "@/components/marketplace/ListingBadges";
 
 function ProductContent({ item, seller }: { item: Item; seller: User }) {
   const router = useRouter();
@@ -40,7 +39,6 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     pendingConfirmation
   } = useBidding(item, seller, () => {});
 
-  const [now, setNow] = useState(() => Date.now());
   const [currentImg, setCurrentImg] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
 
@@ -55,11 +53,6 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
       });
     }
   }, [isSuccess, bidAmount, item?.title]);
-
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const { duration } = useMemo(() => {
     const { duration: dur } = user ? calculatePrivacySafeDistance(user.location, seller.location) : { duration: 0 };
@@ -214,6 +207,57 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                 ))}
               </div>
             )}
+
+            {/* Seller Card - Ticket Style (Moved to Left Column) */}
+            <div id={`seller-card-${item.id}`} className="bg-white rounded-2xl border-2 border-slate-100 shadow-sm group hover:border-blue-100 transition-colors overflow-hidden">
+              {/* Top: Identity */}
+              <div className="p-4 flex items-center gap-3">
+                <div className="relative shrink-0">
+                  <img src={seller.avatar} className="h-12 w-12 rounded-full object-cover bg-slate-100 ring-2 ring-slate-50" alt={seller.name} />
+                  {seller.isVerified && (
+                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                        <VerifiedBadge size="sm" showTooltip={false} />
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-slate-700 truncate text-lg leading-tight">
+                    {seller.name}
+                  </h3>
+                  <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mt-1">
+                    <RatingBadge rating={seller.rating} count={seller.reviewCount} size="md" />
+                    {seller.isVerified && (
+                      <>
+                        <span className="text-slate-300">•</span>
+                        <div className="flex items-center gap-1 text-blue-600 font-bold">
+                          <BadgeCheck className="h-3 w-3 fill-current stroke-white" />
+                          <span>Verified</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Ticket Tear Line (Dashed) */}
+              <div className="relative h-px w-full bg-slate-50">
+                  <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-100 rounded-full border border-slate-200" /> {/* Notch L */}
+                  <div className="border-t-2 border-dashed border-slate-200 w-full h-full opacity-50" />
+                  <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-100 rounded-full border border-slate-200" /> {/* Notch R */}
+              </div>
+
+              {/* Bottom: Logistics */}
+              <div className="p-3 bg-slate-50/50 flex items-center justify-between text-xs font-bold text-slate-600">
+                  <div className="flex items-center gap-1.5 truncate pr-2">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
+                    <Clock className="w-3 h-3" />
+                    {duration} min
+                  </div>
+                </div>
+            </div>
           </div>
 
           {/* Block 2: Bidding (Right Col) */}
@@ -224,16 +268,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                 `}
               >
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <ConditionBadge condition={item.condition} variant="outline" className="px-3 py-1" />
-                    <CategoryBadge category={item.category} variant="outline" className="px-3 py-1" />
-                    {!item.isPublicBid && (
-                      <Badge variant="secondary" className="bg-amber-500 text-white font-bold px-3 py-1 flex items-center gap-1.5 border-none">
-                        <Lock className="h-3.5 w-3.5" />
-                        Secret Bids
-                      </Badge>
-                    )}
-                  </div>
+                  <ListingBadges item={item} seller={seller} showTimer={false} />
                   <h1 className="text-[clamp(1.5rem,4cqi,2.2rem)] font-black text-slate-900 leading-tight">
                     {item.title}
                   </h1>
@@ -313,50 +348,6 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
 
                 {/* Error Message */}
                 {error && <p className="text-red-500 text-sm font-bold text-center mt-2 mb-4">{error}</p>}
-              </div>
-
-              {/* Seller Card - Ticket Style */}
-              <div className="bg-white rounded-2xl border-2 border-slate-100 shadow-sm mt-6 group hover:border-blue-100 transition-colors overflow-hidden">
-                {/* Top: Identity */}
-                <div className="p-4 flex items-center gap-3">
-                  <div className="relative shrink-0">
-                    <img src={seller.avatar} className="h-12 w-12 rounded-full object-cover bg-slate-100 ring-2 ring-slate-50" alt={seller.name} />
-                    {seller.isVerified && (
-                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
-                         <VerifiedBadge size="sm" showTooltip={false} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-slate-700 truncate text-lg leading-tight">
-                      {seller.name}
-                    </h3>
-                    <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mt-1">
-                      <RatingBadge rating={seller.rating} count={seller.reviewCount} size="md" />
-                      <span className="text-slate-300">•</span>
-                      <span className="truncate font-bold text-slate-600">Verification Active</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Ticket Tear Line (Dashed) */}
-                <div className="relative h-px w-full bg-slate-50">
-                   <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-100 rounded-full border border-slate-200" /> {/* Notch L */}
-                   <div className="border-t-2 border-dashed border-slate-200 w-full h-full opacity-50" />
-                   <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-100 rounded-full border border-slate-200" /> {/* Notch R */}
-                </div>
-
-                {/* Bottom: Logistics */}
-                <div className="p-3 bg-slate-50/50 flex items-center justify-between text-xs font-bold text-slate-600">
-                   <div className="flex items-center gap-1.5 truncate pr-2">
-                     <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                     <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
-                   </div>
-                    <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
-                      <Clock className="w-3 h-3" />
-                      {duration} min
-                    </div>
-                 </div>
               </div>
           </div>
 
