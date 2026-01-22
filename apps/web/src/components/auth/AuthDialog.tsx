@@ -1,24 +1,20 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { Mail, LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 
 export function AuthDialog() {
   const { isAuthModalOpen, closeAuthModal } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [redirectUrl, setRedirectUrl] = useState("/");
-
-  useEffect(() => {
-    // Construct the full path including search params
+  const redirectUrl = useMemo(() => {
     const fullPath = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
-    // Encode it to be safe in URL
-    setRedirectUrl(encodeURIComponent(fullPath));
+    return encodeURIComponent(fullPath);
   }, [pathname, searchParams]);
 
   return (

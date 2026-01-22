@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useSyncExternalStore } from "react";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useSearch } from "@/context/SearchContext";
 import ItemCard from "./ItemCard";
@@ -34,18 +34,22 @@ const LISTING_TYPES = [
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 
+const subscribeToViewport = (callback: () => void) => {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("resize", callback);
+  return () => window.removeEventListener("resize", callback);
+};
+
+const getViewportSnapshot = () => (typeof window !== "undefined" ? window.innerWidth >= 768 : false);
+const getServerSnapshot = () => false;
+
 export default function MarketplaceGrid() {
   const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, hasMore, loadMore } = useMarketplace();
   const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters } = useSearch();
 
-  const [viewMode, setViewMode] = useState<ViewMode>('compact');
-
-  useEffect(() => {
-    // Client-side only adjustment to avoid hydration mismatch
-    if (window.innerWidth >= 768) {
-        setViewMode('comfortable');
-    }
-  }, []);
+  const isDesktop = useSyncExternalStore(subscribeToViewport, getViewportSnapshot, getServerSnapshot);
+  const [manualViewMode, setManualViewMode] = useState<ViewMode | null>(null);
+  const viewMode = manualViewMode ?? (isDesktop ? 'comfortable' : 'compact');
   const [isChangingView, setIsChangingView] = useState(false);
   const viewChangeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -67,7 +71,7 @@ export default function MarketplaceGrid() {
     if (viewChangeTimerRef.current) clearTimeout(viewChangeTimerRef.current);
     
     setIsChangingView(true);
-    setViewMode(newMode);
+    setManualViewMode(newMode);
     
     // Brief window to show skeletons and allow browser to recalc layout
     viewChangeTimerRef.current = setTimeout(() => {

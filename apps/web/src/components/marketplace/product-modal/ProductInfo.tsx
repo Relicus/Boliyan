@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import { Item, User } from "@/types";

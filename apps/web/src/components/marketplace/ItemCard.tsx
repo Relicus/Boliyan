@@ -307,7 +307,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   id={`item-card-${item.id}-thumb-strip`}
                   className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1.5 rounded-2xl bg-black/30 backdrop-blur-md border border-white/20 shadow-[0_10px_22px_rgba(0,0,0,0.35)] pointer-events-none"
                 >
-                  {thumbnailImages.map((src, i) => (
+                  {thumbnailImages.map((src) => (
                     <div
                       key={src}
                       className="h-8 w-8 rounded-md overflow-hidden border border-white/30"
