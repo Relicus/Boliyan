@@ -208,7 +208,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                 />
               ))}
             </div>
-            <span className="text-[9px] font-black uppercase tracking-tighter text-slate-400">
+            <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-tighter text-slate-400">
               {activeChatCount}/{maxSlots} Slots
             </span>
           </div>
@@ -247,7 +247,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
               ? "bg-red-50 border-red-100 text-red-600" 
               : "bg-white border-slate-100 shadow-sm text-blue-600"
           )}>
-            <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-slate-500">
+            <div className="flex items-center gap-1.5 text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-widest text-slate-500">
               <Clock className="h-2.5 w-2.5" />
               {isLocked ? "Expired" : "Closing"}
             </div>

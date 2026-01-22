@@ -51,11 +51,12 @@ export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) 
             <div className="flex justify-between items-start">
               <h3 id={`watched-item-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2 text-[clamp(1rem,5cqi,1.25rem)]">{item.title}</h3>
               <div className="flex flex-col items-end">
-                <span id={`watched-item-price-${item.id}`} className="text-[clamp(0.875rem,4cqi,1.125rem)] font-black text-slate-900 font-outfit">
+                <span id={`watched-item-price-${item.id}`} className="text-[clamp(0.875rem,4cqi,1.125rem)] font-black text-slate-900 font-outfit leading-none">
                   Rs. {item.askPrice.toLocaleString()}
                 </span>
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Asking</span>
+                <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mt-1">Asking</span>
               </div>
+
             </div>
             
             <div className="flex items-center gap-2 mt-1">

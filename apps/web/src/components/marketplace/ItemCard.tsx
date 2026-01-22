@@ -11,11 +11,12 @@ import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice, getConditionLabel } from "@/lib/utils";
+import { PriceDisplay } from "@/components/common/PriceDisplay";
+import { createBiddingConfig } from "@/types/bidding";
 import ProductDetailsModal from "./ProductDetailsModal";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -30,13 +31,16 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const { now } = useTime(); // Use global heartbeat
   const isWatched = watchedItemIds.includes(item.id);
 
+  // Unified Bidding Configuration
+  const biddingConfig = useMemo(() => 
+    createBiddingConfig(item, user, bids),
+    [item, user, bids]
+  );
+
   useEffect(() => {
     console.log(`[ItemCard] MOUNTED id=${item.id}`);
     return () => console.log(`[ItemCard] UNMOUNTED id=${item.id}`);
   }, [item.id]);
-
-  // Price formatting logic handled by centralized utility
-  const displayPrice = (price: number) => formatPrice(price, viewMode);
 
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -54,14 +58,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     handleSmartAdjust,
     handleBid,
     handleInputChange, 
-    getSmartStep,
     animTrigger
   } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
 
-  const minBid = item.isPublicBid && item.currentHighBid ? item.currentHighBid + getSmartStep(item.currentHighBid) : item.askPrice * 0.7;
-
-  // Check if user has bid on this item before
-  const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
   
   // Watch for outbid events (only if user has an existing bid)
   // Logic: Only trigger if the high bid CHANGED to something higher than before
@@ -165,19 +164,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     return 'text-[clamp(0.875rem,5cqi,1.25rem)]';
   };
 
-  const getPriceClass = () => {
-    return 'font-outfit text-[clamp(1rem,6cqi,1.5rem)]';
-  };
-
-  const getLabelClass = () => {
-    return 'text-[clamp(0.625rem,2.5cqi,0.75rem)]';
-  };
-
-  const getTrophySizeClass = () => {
-    return 'w-[clamp(1.25rem,6cqi,1.75rem)] h-[clamp(1.25rem,6cqi,1.75rem)] p-[clamp(0.25rem,1cqi,0.375rem)]';
-  };
-
-  const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
 
   // Calculate real-time status for input styling
 
@@ -262,7 +248,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {(isWatched || !item.isPublicBid) && (
                 <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1.5">
                   {isWatched && (
-                    <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <motion.div
@@ -279,10 +264,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                           <p>You are watching this item</p>
                         </TooltipContent>
                       </Tooltip>
-                    </TooltipProvider>
                   )}
                   {!item.isPublicBid && (
-                    <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <motion.div 
@@ -297,10 +280,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                           <p>Secret Bidding</p>
                         </TooltipContent>
                       </Tooltip>
-                    </TooltipProvider>
                   )}
                 </div>
               )}
+
 
               {item.images.length > 1 && viewMode === 'spacious' && thumbnailImages.length > 0 && (
                 <div
@@ -397,61 +380,14 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 </div>
               )}
 
-              {/* Price Row - Minimum height to accommodate Trophy icon */}
-              <div className="flex items-end justify-between transition-all min-h-[2.25rem]">
-                <div className="flex flex-col">
-                  <span className={`${getLabelClass()} text-slate-600 font-bold uppercase tracking-wider transition-all`}>Asking</span>
-                  <span id={`item-card-${item.id}-ask-price`} className={`${getPriceClass()} font-black text-slate-800 leading-none transition-all truncate max-w-[100px]`}>
-                    {displayPrice(item.askPrice)}
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-end transition-all">
-                  <span className={`${getLabelClass()} text-slate-600 font-bold uppercase tracking-wider transition-all`}>
-                    {item.isPublicBid ? "High Bid" : "Secret"}
-                  </span>
-                  <div className="flex items-center gap-1.5 transition-all h-6">
-                      {item.isPublicBid && item.currentHighBid ? (
-                        <div className="flex items-center gap-1.5">
-                          <motion.span 
-                            key={item.currentHighBid}
-                            initial={{ scale: 1.4, color: "#3b82f6" }}
-                            animate={{ 
-                              scale: 1, 
-                            color: item.currentHighBidderId === user?.id ? "#d97706" : "#2563eb" 
-                            }}
-                            transition={{ 
-                              type: "spring", 
-                              stiffness: 260, 
-                              damping: 20,
-                              duration: 0.6
-                            }}
-                            id={`item-card-${item.id}-high-bid`} 
-                            className={`${getPriceClass()} font-black leading-none inline-block truncate max-w-[100px] font-outfit`}
-                          >
-                            {displayPrice(item.currentHighBid)}
-                          </motion.span>
-                        {item.currentHighBidderId === user?.id && (
-                          <motion.div
-                            initial={{ scale: 0, rotate: -20 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            className={`bg-amber-100 text-amber-600 rounded-full flex items-center justify-center shrink-0 ${getTrophySizeClass()}`}
-                            title="You are the high bidder!"
-                          >
-                            <svg className="w-full h-full" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M18 2H6v2H2v7c0 2.21 1.79 4 4 4h1.09c.45 1.76 1.83 3.14 3.58 3.59V20H8v2h8v-2h-2.67v-1.41c1.75-.45 3.13-1.83 3.58-3.59H18c2.21 0 4-1.79 4-4V4h-4V2zM6 13c-1.1 0-2-.9-2-2V6h2v7zm14-2c0 1.1-.9 2-2 2h-2V6h2v5z"/>
-                            </svg>
-                          </motion.div>
-                        )}
-                      </div>
-                    ) : (
-                      <span id={`item-card-${item.id}-bid-count`} className={`${getPriceClass()} font-black text-blue-600 leading-none truncate font-outfit`}>
-                        {item.bidCount} {item.bidCount === 1 ? 'Bid' : 'Bids'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
+              {/* Price Row */}
+              <PriceDisplay 
+                config={biddingConfig}
+                askPrice={item.askPrice}
+                bidCount={item.bidCount}
+                viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
+                className="min-h-[2.25rem]"
+              />
 
               {/* Spacious Mode Description */}
               {viewMode === 'spacious' && (
@@ -467,10 +403,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     bidAmount={bidAmount}
                     isSuccess={isSuccess}
                     isOwner={user?.id === seller?.id}
-                    isHighBidder={isHighBidder}
-                    hasPriorBid={!!hasPriorBid}
+                    isHighBidder={biddingConfig.isUserHighBidder}
+                    hasPriorBid={biddingConfig.hasUserBid}
                     error={!!error}
-                    minBid={minBid}
+                    minBid={biddingConfig.minBid}
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
                     viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
@@ -482,6 +418,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     onInputClick={handleInputClick}
                   />
               </div>
+
             </CardContent>
           </Card>
         </motion.div>

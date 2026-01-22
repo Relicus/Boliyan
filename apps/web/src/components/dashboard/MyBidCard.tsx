@@ -51,10 +51,14 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
         <div>
           <div className="flex justify-between items-start">
             <h3 id={`my-bid-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2 text-[clamp(1rem,5cqi,1.25rem)]">{item.title}</h3>
-            <span id={`my-bid-amount-${item.id}`} className="text-[clamp(0.875rem,4cqi,1.125rem)] font-black text-blue-600 shrink-0 font-outfit">
-              Rs. {userBid.amount.toLocaleString()}
-            </span>
+            <div className="flex flex-col items-end">
+              <span id={`my-bid-amount-${item.id}`} className="text-[clamp(0.875rem,4cqi,1.125rem)] font-black text-blue-600 shrink-0 font-outfit leading-none">
+                Rs. {userBid.amount.toLocaleString()}
+              </span>
+              <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mt-1">Your Bid</span>
+            </div>
           </div>
+
           <div className="flex items-center gap-2 mt-1">
             <div className="flex items-center gap-1 text-[10px] text-slate-500">
               <MapPin className="h-3 w-3 text-red-400" />

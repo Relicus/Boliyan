@@ -30,31 +30,26 @@ interface PriceDisplayProps {
 // ============================================
 
 function getLabelClass(viewMode: BiddingViewMode): string {
-  switch (viewMode) {
-    case 'modal': return 'text-xs';
-    case 'spacious': return 'text-xs';
-    case 'comfortable': return 'text-[10px]';
-    default: return 'text-[9px]';
-  }
+  // Unified fluid metadata label style
+  return 'text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1';
 }
 
+
 function getPriceClass(viewMode: BiddingViewMode): string {
+  const base = 'font-outfit font-black leading-none transition-all';
   switch (viewMode) {
-    case 'modal': return 'text-xl';
-    case 'spacious': return 'text-fluid-price-lg';
-    case 'comfortable': return 'text-fluid-h3';
-    default: return 'text-fluid-price-sm';
+    case 'modal': return `${base} text-xl`;
+    default: return `${base} text-[clamp(1rem,6cqi,1.5rem)]`;
   }
 }
 
 function getTrophySizeClass(viewMode: BiddingViewMode): string {
   switch (viewMode) {
     case 'modal': return 'w-8 h-8 p-1.5';
-    case 'spacious': return 'w-7 h-7 p-1.5';
-    case 'comfortable': return 'w-6 h-6 p-1';
-    default: return 'w-5 h-5 p-1';
+    default: return 'w-[clamp(1.25rem,6cqi,1.75rem)] h-[clamp(1.25rem,6cqi,1.75rem)] p-[clamp(0.25rem,1cqi,0.375rem)]';
   }
 }
+
 
 // Price formatting logic handled by centralized utility
 
@@ -62,7 +57,7 @@ function getTrophySizeClass(viewMode: BiddingViewMode): string {
 // COMPONENT
 // ============================================
 
-const PriceDisplay = memo(({ 
+export const PriceDisplay = memo(({ 
   config, 
   askPrice, 
   bidCount,
@@ -74,19 +69,20 @@ const PriceDisplay = memo(({
     <div className={`flex items-end justify-between transition-all ${className}`}>
       {/* Asking Price */}
       <div className="flex flex-col">
-        <span className={`${getLabelClass(viewMode)} text-slate-600 font-bold uppercase tracking-wider transition-all`}>
+        <span className={getLabelClass(viewMode)}>
           Asking
         </span>
-        <span className={`${getPriceClass(viewMode)} font-black text-slate-800 leading-none transition-all`}>
+        <span className={`${getPriceClass(viewMode)} text-slate-800`}>
           {formatPrice(askPrice, viewMode)}
         </span>
       </div>
 
       {/* High Bid / Secret Status */}
       <div className="flex flex-col items-end transition-all">
-        <span className={`${getLabelClass(viewMode)} text-slate-600 font-bold uppercase tracking-wider transition-all`}>
+        <span className={getLabelClass(viewMode)}>
           {config.variant === 'public' ? "High Bid" : "Secret"}
         </span>
+
         
         <div className="flex items-center gap-1.5 transition-all">
           {config.variant === 'public' && config.showHighBid && config.currentHighBid ? (
@@ -105,7 +101,7 @@ const PriceDisplay = memo(({
                   damping: 20,
                   duration: 0.6
                 }}
-                className={`${getPriceClass(viewMode)} font-black leading-none inline-block`}
+                className={`${getPriceClass(viewMode)} inline-block`}
               >
                 {formatPrice(config.currentHighBid, viewMode)}
               </motion.span>
@@ -127,7 +123,7 @@ const PriceDisplay = memo(({
           ) : config.variant === 'secret' ? (
             // Secret: Show bid count with lock
             <div className="flex items-center gap-1.5">
-              <span className={`${getPriceClass(viewMode)} font-black text-amber-600 leading-none`}>
+              <span className={`${getPriceClass(viewMode)} text-amber-600`}>
                 {bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}
               </span>
               <div className="bg-amber-100 text-amber-600 p-1 rounded" title="Secret Bidding">
@@ -136,10 +132,11 @@ const PriceDisplay = memo(({
             </div>
           ) : (
             // Public with no bids yet
-            <span className={`${getPriceClass(viewMode)} font-black text-blue-600 leading-none`}>
+            <span className={`${getPriceClass(viewMode)} text-blue-600`}>
               {bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}
             </span>
           )}
+
         </div>
       </div>
     </div>
@@ -148,4 +145,3 @@ const PriceDisplay = memo(({
 
 PriceDisplay.displayName = 'PriceDisplay';
 
-export default PriceDisplay;
