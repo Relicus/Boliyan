@@ -166,7 +166,7 @@ function ListForm() {
         const finalDurationNum = parseInt(duration) as 24 | 48 | 72;
         const endsAt = new Date(Date.now() + finalDurationNum * 60 * 60 * 1000).toISOString();
 
-        const listingPayload: Database['public']['Tables']['listings']['Update'] = {
+        const listingPayload = {
           title,
           category,
           asked_price: parseFloat(askPrice),

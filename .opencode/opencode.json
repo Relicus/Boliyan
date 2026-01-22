@@ -10,11 +10,6 @@
     "agent_cycle_reverse": "shift+tab"
   },
 
-  "plugin": [
-    "opencode-antigravity-auth@latest",
-    "opencode-openai-codex-auth"
-  ],
-
 
   "provider": {
     "google": {
