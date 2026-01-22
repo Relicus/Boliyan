@@ -145,6 +145,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     error={error}
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
+                    isWatched={isWatched}
+                    onToggleWatch={toggleWatch}
                     onSmartAdjust={handleSmartAdjust}
                     onBid={handleBid}
                     onKeyDown={handleKeyDown}
@@ -152,6 +154,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     getSmartStep={getSmartStep}
                   />
               </div>
+
             </div>
           </div>
         </motion.div>

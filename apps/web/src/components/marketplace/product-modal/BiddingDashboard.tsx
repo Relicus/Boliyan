@@ -3,6 +3,8 @@
 import { Item, User } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { BiddingControls } from "@/components/common/BiddingControls";
+import { Bookmark, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 interface BiddingDashboardProps {
   item: Item;
@@ -16,6 +18,8 @@ interface BiddingDashboardProps {
   error?: boolean;
   pendingConfirmation?: { type: 'double_bid' | 'high_bid', message: string } | null;
   animTrigger: number;
+  isWatched?: boolean;
+  onToggleWatch?: (id: string) => void;
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
   onBid: (e: React.MouseEvent) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -35,6 +39,8 @@ export function BiddingDashboard({
   error = false,
   pendingConfirmation = null,
   animTrigger,
+  isWatched,
+  onToggleWatch,
   onSmartAdjust,
   onBid,
   onKeyDown,
@@ -95,6 +101,33 @@ export function BiddingDashboard({
           onKeyDown={onKeyDown}
           onInputChange={onInputChange}
         />
+      </div>
+
+      {/* Mobile-only Action Row: Full Page & Watch */}
+      <div className="md:hidden grid grid-cols-2 gap-3 mt-4">
+        <Link
+          id={`view-details-btn-mobile-${item.id}`}
+          href={`/product/${item.slug ?? item.id}`}
+          className="h-11 flex items-center justify-center rounded-xl bg-slate-900 text-white font-bold text-sm gap-2 active:scale-95 transition-all shadow-sm"
+        >
+          <ExternalLink className="h-4 w-4" />
+          <span>Full Page</span>
+        </Link>
+        
+        {onToggleWatch && (
+          <button
+            id={`toggle-watch-btn-mobile-${item.id}`}
+            onClick={() => onToggleWatch(item.id)}
+            className={`h-11 flex items-center justify-center rounded-xl font-bold text-sm gap-2 active:scale-95 transition-all border shadow-sm
+              ${isWatched 
+                ? 'bg-blue-50 text-blue-600 border-blue-200' 
+                : 'bg-white text-slate-700 border-slate-200'
+              }`}
+          >
+            <Bookmark className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
+            <span>{isWatched ? 'Watched' : 'Watch'}</span>
+          </button>
+        )}
       </div>
     </div>
   );
