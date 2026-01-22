@@ -7,7 +7,11 @@ import { useApp } from "@/lib/store";
 import { useState } from "react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 
+import { CategoryBadge } from "@/components/common/CategoryBadge";
+import { ConditionBadge } from "@/components/common/ConditionBadge";
+
 interface MyBidCardProps {
+
   item: Item;
   userBid: Bid;
   seller: User;
@@ -60,6 +64,12 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
           </div>
 
           <div className="flex items-center gap-2 mt-1">
+            <ConditionBadge condition={item.condition} variant="outline" className="h-5 py-0 px-1.5" />
+            <CategoryBadge category={item.category} variant="outline" className="h-5 py-0 px-1.5" />
+          </div>
+
+          <div className="flex items-center gap-2 mt-1.5">
+
             <div className="flex items-center gap-1 text-[10px] text-slate-500">
               <MapPin className="h-3 w-3 text-red-400" />
               <span className="truncate">{seller.location.address}</span>

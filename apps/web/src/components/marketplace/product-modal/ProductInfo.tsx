@@ -6,6 +6,8 @@ import { Item, User } from "@/types";
 import { DialogTitle } from "@/components/ui/dialog";
 import { getFuzzyLocationString } from "@/lib/utils";
 import { ListingBadges } from "@/components/marketplace/ListingBadges";
+import { RatingBadge } from "@/components/common/RatingBadge";
+
 
 interface ProductInfoProps {
   item: Item;
@@ -50,11 +52,10 @@ export function ProductInfo({
               </div>
               <div className="min-w-0 flex flex-col justify-center flex-1">
                 <div className="flex items-center gap-2">
-                  <div className="font-bold text-slate-900 text-sm truncate">{seller.name}</div>
-                  <Badge variant="outline" className="font-bold bg-white text-yellow-700 border-yellow-200 py-0 px-1.5 text-[10px] shrink-0 shadow-sm h-5">
-                    ⭐ {seller.rating} <span className="text-yellow-600/70 ml-0.5">({seller.reviewCount})</span>
-                  </Badge>
+                  <div className="font-semibold text-slate-700 text-base truncate leading-none">{seller.name}</div>
+                  <RatingBadge rating={seller.rating} count={seller.reviewCount} size="md" />
                 </div>
+
                 <div className="text-[11px] text-slate-500 flex items-center gap-1 leading-none mt-1">
                   <MapPin className="h-3 w-3 text-red-500" />
                   <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>

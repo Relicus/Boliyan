@@ -77,10 +77,10 @@ export const PriceDisplay = memo(({
         </span>
       </div>
 
-      {/* High Bid / Secret Status */}
+      {/* Highest Bid / Secret Status */}
       <div className="flex flex-col items-end transition-all">
         <span className={getLabelClass(viewMode)}>
-          {config.variant === 'public' ? "High Bid" : "Secret"}
+          {config.variant === 'public' ? "Highest Bid" : "Secret"}
         </span>
 
         

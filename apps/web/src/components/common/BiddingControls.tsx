@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Gavel, TrendingUp, Loader2 } from "lucide-react";
+import { Gavel, TrendingUp, Loader2, Zap } from "lucide-react";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -195,11 +195,13 @@ export const BiddingControls = memo(({
               initial={false}
               disabled={isDisabled}
               animate={{ 
-                scale: [1, 1.15, 1],
+                scale: [1, 1.1, 1],
+                y: [0, -2, 0],
                 x: isErrorState ? [0, -4, 4, -4, 4, 0] : 0
               }}
               transition={{ 
-                scale: { duration: 0.2 },
+                scale: { duration: 0.2, ease: "easeOut" },
+                y: { duration: 0.15, ease: "easeOut" },
                 x: { duration: 0.2 } // Shake duration
               }}
               onKeyDown={onKeyDown}
@@ -243,6 +245,17 @@ export const BiddingControls = memo(({
           btnConfig.content
         )}
       </motion.button>
+
+      {isHighBidder && !isSuccess && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-amber-100 text-amber-800 px-4 py-2 rounded-xl text-center font-bold text-sm mt-1 flex items-center justify-center gap-2 border border-amber-200 shadow-sm"
+        >
+          <Zap className="h-4 w-4 fill-current text-amber-500" />
+          You are the high bidder!
+        </motion.div>
+      )}
     </div>
   );
 });

@@ -2,11 +2,13 @@
 
 import { use, useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, MapPin, Lock, Clock, Bookmark, Maximize2, Share2, Zap, ArrowLeft, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Lock, Clock, Bookmark, Maximize2, Share2, Zap, ArrowLeft, Star } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { CategoryBadge } from "@/components/common/CategoryBadge";
+import { ConditionBadge } from "@/components/common/ConditionBadge";
+import { RatingBadge } from "@/components/common/RatingBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -16,6 +18,7 @@ import { toast } from "sonner";
 import { Item, User } from "@/types";
 import { supabase } from "@/lib/supabase";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
+import { FullscreenGallery } from "@/components/marketplace/product-modal/FullscreenGallery";
 
 function ProductContent({ item, seller }: { item: Item; seller: User }) {
   const router = useRouter();
@@ -37,6 +40,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
 
   const [now, setNow] = useState(() => Date.now());
   const [currentImg, setCurrentImg] = useState(0);
+  const [showFullscreen, setShowFullscreen] = useState(false);
 
   useEffect(() => {
     if (isSuccess) {
@@ -153,19 +157,31 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
               {item.images.length > 1 && (
                 <>
                   <button 
+                    id="prev-image-btn"
                     onClick={() => setCurrentImg(prev => (prev > 0 ? prev - 1 : item.images.length - 1))}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20"
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
                   <button 
+                    id="next-image-btn"
                     onClick={() => setCurrentImg(prev => (prev < item.images.length - 1 ? prev + 1 : 0))}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20"
                   >
-                    <Maximize2 className="h-6 w-6" />
+                    <ChevronRight className="h-6 w-6" />
                   </button>
                 </>
               )}
+
+              {/* Zoom Button - Always visible on hover */}
+              <button
+                id="zoom-image-btn"
+                onClick={() => setShowFullscreen(true)}
+                className="absolute bottom-4 right-4 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20"
+                title="Zoom image"
+              >
+                <Maximize2 className="h-6 w-6" />
+              </button>
             </div>
 
             {/* Thumbnails */}
@@ -192,24 +208,10 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                   ${isHighBidder ? 'ring-4 ring-amber-400' : ''}
                 `}
               >
-                {isHighBidder && (
-                  <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-center font-bold text-sm mb-2 animate-pulse flex items-center justify-center gap-2">
-                    <Zap className="h-4 w-4 fill-current" />
-                    You are the high bidder!
-                  </div>
-                )}
-
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100 font-bold px-3 py-1">
-                      {item.category}
-                    </Badge>
-                    <Badge variant="outline" className="bg-white text-slate-700 border-slate-200 font-bold px-3 py-1 uppercase tracking-wider text-xs">
-                      {item.condition === 'new' && '🌟 New'}
-                      {item.condition === 'like_new' && '✨ Mint'}
-                      {item.condition === 'used' && '👌 Used'}
-                      {item.condition === 'fair' && '🔨 Fair'}
-                    </Badge>
+                    <ConditionBadge condition={item.condition} variant="outline" className="px-3 py-1" />
+                    <CategoryBadge category={item.category} variant="outline" className="px-3 py-1" />
                     {!item.isPublicBid && (
                       <Badge variant="secondary" className="bg-amber-500 text-white font-bold px-3 py-1 flex items-center gap-1.5 border-none">
                         <Lock className="h-3.5 w-3.5" />
@@ -234,7 +236,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                     </div>
                     <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-28">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
-                        {item.isPublicBid ? "High Bid" : "Bids"}
+                        {item.isPublicBid ? "Highest Bid" : "Bids"}
                       </span>
                       <div className={`text-[clamp(1.25rem,5cqi,2rem)] font-black leading-none ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-500'}`}>
                          {item.isPublicBid && item.currentHighBid
@@ -292,15 +294,13 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-bold text-slate-900 truncate text-base leading-tight">
+                    <h3 className="font-semibold text-slate-700 truncate text-lg leading-tight">
                       {seller.name}
                     </h3>
                     <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mt-1">
-                      <span className="flex items-center gap-0.5 text-amber-500 font-bold bg-amber-50 px-1.5 py-0.5 rounded-md">
-                         <Star className="w-3 h-3 fill-current" /> {seller.rating}
-                      </span>
+                      <RatingBadge rating={seller.rating} count={seller.reviewCount} size="md" />
                       <span className="text-slate-300">•</span>
-                      <span className="truncate">{seller.reviewCount} Reviews</span>
+                      <span className="truncate font-bold text-slate-600">Verification Active</span>
                     </div>
                   </div>
                 </div>
@@ -339,6 +339,14 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
 
         </div>
       </main>
+
+      <FullscreenGallery 
+        isOpen={showFullscreen}
+        onOpenChange={setShowFullscreen}
+        item={item}
+        currentImg={currentImg}
+        setCurrentImg={setCurrentImg}
+      />
     </div>
   );
 }

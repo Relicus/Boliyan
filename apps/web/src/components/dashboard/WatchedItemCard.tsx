@@ -8,7 +8,11 @@ import { useState } from "react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import { Button } from "@/components/ui/button";
 
+import { CategoryBadge } from "@/components/common/CategoryBadge";
+import { ConditionBadge } from "@/components/common/ConditionBadge";
+
 interface WatchedItemCardProps {
+
   item: Item;
   seller: User;
 }
@@ -60,6 +64,12 @@ export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) 
             </div>
             
             <div className="flex items-center gap-2 mt-1">
+              <ConditionBadge condition={item.condition} variant="outline" className="h-5 py-0 px-1.5" />
+              <CategoryBadge category={item.category} variant="outline" className="h-5 py-0 px-1.5" />
+            </div>
+
+            <div className="flex items-center gap-2 mt-1.5">
+
               <div className="flex items-center gap-1 text-[10px] text-slate-500">
                 <MapPin className="h-3 w-3 text-red-400" />
                 <span className="truncate">{seller.location.address}</span>
@@ -79,9 +89,10 @@ export default function WatchedItemCard({ item, seller }: WatchedItemCardProps) 
               {item.isPublicBid && item.currentHighBid && (
                 <div className="flex items-center gap-1 text-[10px] font-bold text-blue-600">
                   <Gavel className="h-3 w-3" />
-                  High: Rs. {item.currentHighBid.toLocaleString()}
+                  Highest: Rs. {item.currentHighBid.toLocaleString()}
                 </div>
               )}
+
             </div>
             <Button 
               size="sm" 

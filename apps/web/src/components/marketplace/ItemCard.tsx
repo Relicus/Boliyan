@@ -14,6 +14,9 @@ import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice, getC
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
 import ProductDetailsModal from "./ProductDetailsModal";
+import { CategoryBadge } from "@/components/common/CategoryBadge";
+import { ConditionBadge } from "@/components/common/ConditionBadge";
+import { RatingBadge } from "@/components/common/RatingBadge";
 import {
   Tooltip,
   TooltipContent,
@@ -181,13 +184,15 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`@container group relative border-none bg-slate-50 rounded-lg overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500 p-0 shadow-sm hover:shadow-md
+            className={`@container group relative border-none bg-slate-50 rounded-xl overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring] duration-500 p-0 shadow-sm hover:shadow-md
+
               ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
 
             `}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
-            <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(var(--radius)-3px)]">
+            <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(0.75rem-2px)]">
+
             <div
               id={`item-card-${item.id}-image-wrapper`}
               className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0`}
@@ -201,18 +206,26 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 />
               </div>
 
-              {/* Top-Left Location Badge */}
-              <div id={`item-card-${item.id}-location-badge-wrapper`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
+              {/* Top-Left Stack: Geography & Identity */}
+              <div id={`item-card-${item.id}-left-stack`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
+                {/* 1. Location (Geography First) */}
                 <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
                   <MapPin className="h-3 w-3" />
                   <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none truncate max-w-[120px]">
                     {seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown Location'}
                   </span>
                 </div>
+                {/* 2. Category Identity */}
+                <CategoryBadge 
+                  category={item.category} 
+                  variant="glass" 
+                  className="mt-0.5"
+                />
               </div>
 
-              {/* Top-Right Timer Badge */}
+              {/* Top-Right Stack: Urgency & State */}
               <div className="absolute top-2 right-2 z-20 flex flex-col items-end gap-1">
+                {/* 1. Timer (Urgency First) */}
                 <motion.div
                   initial={false}
                   animate={isUrgent ? { scale: [1, 1.05] } : {}}
@@ -222,13 +235,14 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none tabular-nums">{timeLeft}</span>
                 </motion.div>
                 
-                {/* Condition Badge */}
-                <div className="bg-white/90 backdrop-blur-md text-slate-900 px-2 py-1 rounded-md flex items-center shadow-lg border border-slate-200 mt-1">
-                  <span className="text-[clamp(0.5625rem,2.25cqi,0.6875rem)] font-black uppercase tracking-tighter leading-none">
-                    {getConditionLabel(item.condition)}
-                  </span>
-                </div>
+                {/* 2. Condition State */}
+                <ConditionBadge 
+                  condition={item.condition} 
+                  variant="glass"
+                  className="mt-0.5"
+                />
               </div>
+
 
               {/* Bottom Floating Badges - Replaces old full-width bar */}
               
@@ -346,24 +360,27 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
               {/* Seller Info - Between Title and Price */}
               {(viewMode === 'spacious' || viewMode === 'comfortable') && (
-                <div className={`flex items-center gap-2 mb-0.5 animate-in fade-in duration-300 ${viewMode === 'comfortable' ? 'mt-0' : 'mt-0.5'}`}>
-                  {viewMode === 'spacious' && seller?.avatar && (
-                    <div className="h-5 w-5 rounded-full bg-slate-200 overflow-hidden shrink-0">
+                <div className={`flex items-center gap-2 mb-1 animate-in fade-in duration-300 ${viewMode === 'comfortable' ? 'mt-0.5' : 'mt-1'}`}>
+                  {seller?.avatar && (
+                    <div className={`${viewMode === 'comfortable' ? 'h-5 w-5' : 'h-6 w-6'} rounded-full bg-slate-200 overflow-hidden shrink-0 shadow-sm border border-white`}>
                       <img src={seller.avatar} alt={seller.name} className="h-full w-full object-cover" />
                     </div>
                   )}
                   
-                  <span className={`text-[clamp(0.625rem,2.5cqi,0.75rem)] font-bold text-slate-700 truncate leading-none ${viewMode === 'comfortable' ? 'text-slate-500 max-w-[80px]' : ''}`}>
+                  <span className={`text-[clamp(0.8125rem,3.5cqi,0.9375rem)] ${viewMode === 'comfortable' ? 'font-medium text-slate-500' : 'font-semibold text-slate-600'} truncate leading-none ${viewMode === 'comfortable' ? 'max-w-[120px]' : ''}`}>
                     {seller?.name || 'Unknown Seller'}
                   </span>
+
                   {seller?.isVerified && <VerifiedBadge size="sm" />}
 
-                  <div className="flex items-center gap-1">
-                    <Badge variant="outline" className="font-bold bg-yellow-50 text-yellow-700 border-yellow-200 py-0 px-1 text-[clamp(0.5625rem,2.25cqi,0.6875rem)] shrink-0 h-3.5 flex items-center leading-none">
-                      ⭐ <span className="ml-0.5 leading-none">{seller?.rating || 0}</span>
-                      <span className="ml-0.5 text-yellow-600/80 font-normal leading-none">({seller?.reviewCount || 0})</span>
-                    </Badge>
+                  <div className="flex items-center gap-1 ml-0.5">
+                    <RatingBadge 
+                      rating={seller?.rating || 0} 
+                      count={seller?.reviewCount || 0}
+                      size={viewMode === 'spacious' ? 'md' : 'sm'}
+                    />
                     {seller?.badges && seller.badges.some(b => b.category === 'seller') && (
+
                       <GamificationBadge 
                         badge={seller.badges.filter(b => b.category === 'seller').sort((a,b) => {
                           const tiers: Record<string, number> = { diamond: 3, gold: 2, silver: 1, bronze: 0 };

@@ -1,6 +1,8 @@
 "use client";
 
 import { useApp } from "@/lib/store";
+import { CategoryBadge } from "@/components/common/CategoryBadge";
+import { ConditionBadge } from "@/components/common/ConditionBadge";
 import SellerBidCard from "@/components/seller/SellerBidCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
@@ -397,7 +399,11 @@ function DashboardContent() {
                       <div id={`listing-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
                         <div>
                           <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-1 text-[clamp(0.875rem,5cqi,1.125rem)] leading-none">{item.title}</h3>
-                          <div className="flex flex-col mb-2">
+                          <div id={`listing-title-row-${item.id}`} className="flex flex-col mb-2">
+                             <div className="flex items-center gap-1.5 mb-1.5">
+                               <ConditionBadge condition={item.condition} variant="outline" className="h-4 py-0 px-1 text-[8px]" />
+                               <CategoryBadge category={item.category} variant="outline" className="h-4 py-0 px-1 text-[8px]" />
+                             </div>
                              <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-0.5">Asking Price</span>
                              <p id={`listing-price-${item.id}`} className="text-[clamp(0.75rem,4cqi,1rem)] text-blue-600 font-black font-outfit leading-none">Rs. {item.askPrice.toLocaleString()}</p>
                           </div>

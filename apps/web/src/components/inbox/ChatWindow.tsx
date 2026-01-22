@@ -50,11 +50,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const isLocked = !conversation?.expiresAt ? false : isLockedState;
 
   // 3-Slot Visual Indicator Logic (Seller Only)
-  // We assume a 'totalChats' prop or similar exists, but since we don't have it on the Conversation object yet,
-  // we'll mock the visual logic for now based on the "3-Chat Rule" mentioned in instructions.
-  // In a real implementation, we'd fetch the count of active chats for this item.
-  // Mocking: We assume this is slot 1/3 if we don't have data.
-  const activeChatCount = 1; // Placeholder until count is available in context
+  // Calculate real active chat count for this item
+  const activeChatCount = item ? conversations.filter(c => c.itemId === item.id).length : 0;
   const maxSlots = 3;
   const slots = Array.from({ length: maxSlots }).map((_, i) => i < activeChatCount);
 

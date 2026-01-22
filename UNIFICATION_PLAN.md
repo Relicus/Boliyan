@@ -12,7 +12,7 @@ This document outlines the architectural and UI unification strategy for Boliyan
 *   **Price Unification**: Refactor `ItemCard.tsx` to use the `PriceDisplay.tsx` component.
 *   **Label Standardization**: Standardize the "Metadata Label" style across the app:
     *   **Class**: `text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80`
-    *   **Usage**: "Asking", "High Bid", "Secret", "Closing", "Slots".
+    *   **Usage**: "Asking", "Highest Bid", "Secret", "Closing", "Slots".
 
 ## 2. UI & INTERACTION POLISH
 
