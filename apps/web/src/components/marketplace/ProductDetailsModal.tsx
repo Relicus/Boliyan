@@ -33,6 +33,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     bidAmount,
     setBidAmount,
     error,
+    errorMessage,
     isSuccess,
     pendingConfirmation,
     // isSubmitting removed as it is not returned by useBidding
@@ -41,8 +42,9 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     handleBid,
     handleKeyDown,
     handleInputChange,
-    getSmartStep
-  } = useBidding(item, seller, () => onClose(false));
+    getSmartStep,
+    remainingAttempts
+  } = useBidding(item, seller); // Removed auto-close callback
 
   const [currentImg, setCurrentImg] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
@@ -145,6 +147,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     hasPriorBid={!!hasPriorBid}
                     isSuccess={isSuccess}
                     error={error}
+                    errorMessage={errorMessage}
+                    remainingAttempts={remainingAttempts}
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
                     isWatched={isWatched}

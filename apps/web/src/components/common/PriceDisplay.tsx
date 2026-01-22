@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
 import { formatPrice } from "@/lib/utils";
+import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 
 // ============================================
 // PROPS
@@ -23,7 +24,10 @@ interface PriceDisplayProps {
   bidCount: number;
   viewMode?: BiddingViewMode;
   className?: string;
+  remainingAttempts?: number;
+  showAttempts?: boolean;
 }
+
 
 // ============================================
 // SIZE HELPERS
@@ -62,13 +66,15 @@ export const PriceDisplay = memo(({
   askPrice, 
   bidCount,
   viewMode = 'compact',
-  className = ''
+  className = '',
+  remainingAttempts = MAX_BID_ATTEMPTS,
+  showAttempts = false
 }: PriceDisplayProps) => {
   
   return (
-    <div className={`flex items-end justify-between transition-all ${className}`}>
+    <div className={`grid grid-cols-[1fr_auto_1fr] items-end ${className}`}>
       {/* Asking Price */}
-      <div className="flex flex-col">
+      <div className="flex flex-col justify-self-start">
         <span className={getLabelClass(viewMode)}>
           Asking
         </span>
@@ -77,8 +83,22 @@ export const PriceDisplay = memo(({
         </span>
       </div>
 
+      {/* Attempt Dots (Centered) */}
+      <div className="flex flex-col items-center justify-end pb-1.5 px-2 w-[40px]">
+        {showAttempts && (
+           <div className="flex gap-1.5 justify-center w-full">
+            {Array.from({ length: Math.max(0, remainingAttempts) }).map((_, i) => (
+              <div 
+                key={i} 
+                className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Highest Bid / Secret Status */}
-      <div className="flex flex-col items-end transition-all">
+      <div className="flex flex-col items-end justify-self-end transition-all">
         <span className={getLabelClass(viewMode)}>
           {config.variant === 'public' ? "Highest Bid" : "Secret"}
         </span>

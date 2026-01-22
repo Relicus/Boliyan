@@ -61,6 +61,7 @@ export interface Bid {
   status: 'pending' | 'accepted' | 'rejected' | 'shortlisted' | 'ignored';
   type: 'public' | 'private';
   createdAt: string;
+  update_count?: number; // Added for 70/150/3 protocol
 }
 
 export interface LocationInfo {

@@ -2,7 +2,8 @@
 
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Gavel, TrendingUp, Loader2, Zap } from "lucide-react";
+import { Gavel, TrendingUp, Loader2, AlertCircle } from "lucide-react";
+import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -15,10 +16,12 @@ interface BiddingControlsProps {
   hasPriorBid: boolean;
   isSubmitting?: boolean;
   error?: boolean;
+  errorMessage?: string | null;
   minBid?: number;
+  remainingAttempts?: number;
   
   // Dual-tap confirmation state
-  pendingConfirmation?: { type: 'double_bid' | 'high_bid', message: string } | null;
+  pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids', message: string } | null;
   
   // Animation
   animTrigger: number;
@@ -27,6 +30,7 @@ interface BiddingControlsProps {
   viewMode?: BiddingViewMode;
   disabled?: boolean;
   idPrefix: string;
+  showAttemptsDots?: boolean;
   
   // Handlers
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
@@ -69,12 +73,15 @@ export const BiddingControls = memo(({
   hasPriorBid,
   isSubmitting = false,
   error = false,
+  errorMessage = null,
   minBid = 0,
+  remainingAttempts = MAX_BID_ATTEMPTS,
   pendingConfirmation = null,
   animTrigger,
   viewMode = 'compact',
   disabled = false,
   idPrefix,
+  showAttemptsDots = true,
   onSmartAdjust,
   onBid,
   onKeyDown,
@@ -83,17 +90,30 @@ export const BiddingControls = memo(({
 }: BiddingControlsProps) => {
 
   const buildId = (suffix: string) => `${idPrefix}-${suffix}`;
-
-  // Calculate if current input is below minimum bid
-  const currentNumericBid = parseFloat(bidAmount.replace(/,/g, '')) || 0;
-  const isBelowMinimum = currentNumericBid < minBid;
-  const isErrorState = isBelowMinimum || error;
+  const isBelowMinimum = parseFloat(bidAmount.replace(/,/g, '')) < minBid;
+  const isQuotaReached = remainingAttempts === 0;
   
   // Disabled state logic
   const isDisabled = disabled || isOwner || isSubmitting;
   
   // Determine Button Styling based on state
   const getButtonConfig = () => {
+    // 1. Critical Errors
+    if (errorMessage === "Out of Bids" || isQuotaReached) {
+      return {
+        bgClass: 'bg-red-50 text-red-600 border border-red-200 cursor-not-allowed shadow-none',
+        content: "Out of Bids"
+      };
+    }
+
+    if (errorMessage === "Already Bid This Amount") {
+      return {
+        bgClass: 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none',
+        content: "Already Offered"
+      };
+    }
+
+    // 2. Success State
     if (isSuccess) {
       return { 
         bgClass: 'bg-amber-600 text-white scale-100 ring-4 ring-amber-100',
@@ -115,14 +135,15 @@ export const BiddingControls = memo(({
       };
     }
 
-    // DUAL-TAP CONFIRMATION STATE - Simple blue "Confirm?"
+    // 3. Confirmation State
     if (pendingConfirmation) {
       return {
         bgClass: 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200',
-        content: "Confirm?"
+        content: pendingConfirmation.message
       };
     }
     
+    // 4. Owner State
     if (isOwner) {
       return {
         bgClass: 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100',
@@ -130,25 +151,15 @@ export const BiddingControls = memo(({
       };
     }
 
-    if (isHighBidder) {
-      return {
-        bgClass: 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200 hover:shadow-orange-300',
-        content: (
-          <span className="flex items-center gap-1.5">
-            <TrendingUp className="w-5 h-5" />
-            Raise Bid
-          </span>
-        )
-      };
-    }
-
+    // 5. Standard States
     if (hasPriorBid) {
+      // If they have bids left, encourage update
       return {
         bgClass: 'bg-green-600 hover:bg-green-700 text-white shadow-green-200 hover:shadow-green-300',
         content: (
           <span className="flex items-center gap-1.5">
-            <Gavel className="w-5 h-5" />
-            Bid Again
+            <TrendingUp className="w-5 h-5" />
+            Update Offer
           </span>
         )
       };
@@ -169,15 +180,39 @@ export const BiddingControls = memo(({
 
   return (
     <div id={buildId('bidding-controls')} className={`flex flex-col gap-2 w-full`}>
+      
+      {/* Error Message Indicator (Top Right) */}
+      {!isOwner && !isSuccess && errorMessage && (
+        <div className="flex justify-end px-1 mb-0.5">
+             <span className="text-[10px] font-bold text-red-500 uppercase tracking-wide animate-pulse">
+               {errorMessage}
+             </span>
+        </div>
+      )}
+
+      {/* Attempts Dots (Optional - for ItemCard) */}
+      {showAttemptsDots && !isOwner && !isSuccess && (
+        <div className="flex justify-center mb-1">
+           <div className="flex gap-1.5">
+            {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
+              <div 
+                key={i} 
+                className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Stepper Input Row */}
       <div className={`flex w-full ${getInputHeight(viewMode)}`}>
-        <div className={`flex flex-1 border border-slate-300 rounded-xl shadow-sm overflow-hidden bg-white ${isOwner ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
+        <div className={`flex flex-1 border border-slate-300 rounded-xl shadow-sm overflow-hidden bg-white ${isOwner || isQuotaReached ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
           
           {/* Decrement Button */}
           <button
             id={buildId('decrement-btn')}
             onClick={(e) => onSmartAdjust(e, -1)}
-            disabled={isDisabled}
+            disabled={isDisabled || isQuotaReached}
             className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
           >
             <svg className="h-5 w-5 transition-transform group-active:scale-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,11 +228,11 @@ export const BiddingControls = memo(({
               value={bidAmount}
               key={`input-${animTrigger}`}
               initial={false}
-              disabled={isDisabled}
+              disabled={isDisabled || isQuotaReached}
               animate={{ 
                 scale: [1, 1.1, 1],
                 y: [0, -2, 0],
-                x: isErrorState ? [0, -4, 4, -4, 4, 0] : 0
+                x: (error || pendingConfirmation) ? [0, -4, 4, -4, 4, 0] : 0
               }}
               transition={{ 
                 scale: { duration: 0.2, ease: "easeOut" },
@@ -208,7 +243,7 @@ export const BiddingControls = memo(({
               onChange={onInputChange}
               onClick={onInputClick}
               className={`w-full h-full text-center ${getTextSize(viewMode)} font-black font-outfit text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300
-                ${isErrorState ? 'bg-red-50 text-red-900' : 'bg-transparent'}
+                ${error ? 'bg-red-50 text-red-900' : 'bg-transparent'}
               `}
             />
           </div>
@@ -217,7 +252,7 @@ export const BiddingControls = memo(({
           <button
             id={buildId('increment-btn')}
             onClick={(e) => onSmartAdjust(e, 1)}
-            disabled={isDisabled}
+            disabled={isDisabled || isQuotaReached}
             className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
           >
             <svg className="h-5 w-5 transition-transform group-active:scale-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -231,7 +266,7 @@ export const BiddingControls = memo(({
       <motion.button
         id={buildId('place-bid-btn')}
         onClick={onBid}
-        disabled={isSuccess || isDisabled}
+        disabled={isSuccess || isDisabled || isQuotaReached || errorMessage === "Already Bid This Amount"}
         initial={false}
         animate={pendingConfirmation ? { x: [0, -3, 3, -3, 3, 0] } : {}}
         transition={{ duration: 0.4 }}

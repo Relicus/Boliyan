@@ -87,16 +87,18 @@ export function createBiddingConfig(
   
   // Base values
   const baseMinBid = getMinimumAllowedBid(item.askPrice);
-  const publicMinBid = item.currentHighBid 
-    ? item.currentHighBid + getSmartStep(item.currentHighBid)
-    : baseMinBid;
+  
+  // NOTE: Boliyn 70/150/3 Protocol:
+  // Public auctions NO LONGER require bids to be higher than current high bid.
+  // The minimum allowed bid is ALWAYS the 70% floor.
+  const effectiveMinBid = baseMinBid;
   
   if (isPublic) {
     return {
       variant: 'public',
       itemId: item.id,
       askPrice: item.askPrice,
-      minBid: publicMinBid,
+      minBid: effectiveMinBid,
       smartStep: getSmartStep(item.currentHighBid || item.askPrice),
       isUserHighBidder,
       hasUserBid,

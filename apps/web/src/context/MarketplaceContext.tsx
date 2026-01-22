@@ -34,7 +34,7 @@ interface MarketplaceContextType {
   addItem: (item: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => void;
   updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => void;
   deleteItem: (id: string) => void;
-  placeBid: (itemId: string, amount: number, type: 'public' | 'private') => void;
+  placeBid: (itemId: string, amount: number, type: 'public' | 'private') => Promise<boolean>;
   toggleWatch: (itemId: string) => void;
   watchedItemIds: string[];
   rejectBid: (bidId: string) => void;
@@ -332,10 +332,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     }
   };
 
-  const placeBid = async (itemId: string, amount: number, type: 'public' | 'private') => {
+  const placeBid = async (itemId: string, amount: number, type: 'public' | 'private'): Promise<boolean> => {
     if (!user) {
         console.error("Must be logged in to bid");
-        return;
+        return false;
     }
     
     // Note: Validation (70% minimum, etc.) is already done in useBidding hook
@@ -343,22 +343,29 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     
     // Find item if available (may not be in current filtered view)
     const item = items.find(i => i.id === itemId);
+    const existingBid = bids.find(b => b.itemId === itemId && b.bidderId === user.id);
     
     // --- OPTIMISTIC UPDATE START ---
     // 1. Create a temporary bid object
     const optimisticBid: Bid = {
-        id: `temp-${Date.now()}`,
+        id: existingBid ? existingBid.id : `temp-${Date.now()}`,
         itemId: itemId,
         bidderId: user.id,
         amount: amount,
         status: 'pending',
         message: type === 'private' ? 'Private Bid' : 'Public Bid',
         createdAt: new Date().toISOString(),
-        bidder: user
+        bidder: user,
+        update_count: existingBid ? (existingBid.update_count || 0) + 1 : 0
     } as unknown as Bid;
 
-    // 2. Update local Bids state
-    setBids(prev => [...prev, optimisticBid]);
+    // 2. Update local Bids state (Replace if exists, append if new)
+    setBids(prev => {
+        if (existingBid) {
+            return prev.map(b => b.id === existingBid.id ? optimisticBid : b);
+        }
+        return [...prev, optimisticBid];
+    });
 
     // 3. Update local Items state (only if item is in current view)
     if (item) {
@@ -407,7 +414,12 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     if (error || !data || data.length === 0) {
         console.error("Failed to place bid:", { error, data, userId: user.id, itemId });
         // Rollback optimistic bids update
-        setBids(prev => prev.filter(b => b.id !== optimisticBid.id));
+        setBids(prev => {
+             if (existingBid) {
+                 return prev.map(b => b.id === existingBid.id ? existingBid : b);
+             }
+             return prev.filter(b => b.id !== optimisticBid.id);
+        });
         // Rollback items update if we modified it
         if (item) {
             setItems(prevItems => prevItems.map(i => {
@@ -421,14 +433,40 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 return i;
             }));
         }
-        return;
+        return false;
     }
     
     // Add to watchlist on success
     if (!watchedItemIds.includes(itemId)) {
          setWatchedItemIds(prev => [...prev, itemId]);
     }
+    return true;
   };
+
+  // --- EFFECT: Fetch User Bids on Mount/User Change ---
+  useEffect(() => {
+    if (!user) {
+        setBids([]);
+        return;
+    }
+
+    const fetchUserBids = async () => {
+        const { data, error } = await supabase
+            .from('bids')
+            .select('*')
+            .eq('bidder_id', user.id);
+        
+        if (error) {
+            console.error("Error fetching user bids:", error);
+        } else if (data) {
+            // We replace bids state with user's historical bids
+            // Note: Realtime subscription will append new ones
+            setBids(data as Bid[]);
+        }
+    };
+
+    fetchUserBids();
+  }, [user]);
 
   // --- EFFECT: Fetch Watchlist on Mount/User Change ---
   useEffect(() => {

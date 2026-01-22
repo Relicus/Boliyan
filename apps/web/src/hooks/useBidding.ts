@@ -1,31 +1,47 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
-import { Item, User } from "@/types";
-import { getSmartStep, getMinimumAllowedBid } from "@/lib/bidding";
+import { Item, User, Bid } from "@/types";
+import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, WARNING_PERCENTAGE, MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import { sonic } from "@/lib/sonic";
-
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
   const { placeBid, user, bids, openAuthModal } = useApp();
 
-  // Pending confirmation for dual-tap pattern (replaces dialog-based warning)
-  const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid', message: string } | null>(null);
+  // Pending confirmation for dual-tap pattern
+  const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid' | 'out_of_bids', message: string } | null>(null);
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize with Ask Price (70% allowed on first bid) or Current High Bid
-  const initialBid = item.isPublicBid && item.currentHighBid
-    ? item.currentHighBid + getSmartStep(item.currentHighBid)
-    : Math.ceil(getMinimumAllowedBid(item.askPrice) / 100) * 100; // Round up to nearest 100
+  // Initialize with 70% Floor (Rounded up)
+  const initialBid = useMemo(() => {
+    return Math.ceil(getMinimumAllowedBid(item.askPrice) / 100) * 100;
+  }, [item.askPrice]);
 
   const [bidAmount, setBidAmount] = useState<string>(initialBid.toLocaleString());
   const [error, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [animTrigger, setAnimTrigger] = useState(0);
   const [lastDelta, setLastDelta] = useState<number | null>(null);
   const [showDelta, setShowDelta] = useState<boolean>(false);
+
+  // Get current user's active bid on this item
+  const userBid = useMemo(() => {
+    return user ? bids.find(b => b.itemId === item.id && b.bidderId === user.id) : null;
+  }, [user, bids, item.id]);
+
+  // Calculate Remaining Attempts
+  const remainingAttempts = useMemo(() => {
+    if (!userBid) return MAX_BID_ATTEMPTS; // 3
+    const updatesUsed = userBid.update_count || 0;
+    // 1 initial + 2 updates = 3 total. 
+    // If update_count is 0, they used 1 attempt (the insert). Remaining: 2.
+    return Math.max(0, (MAX_BID_ATTEMPTS - 1) - updatesUsed);
+  }, [userBid]);
+
+  const isQuotaReached = remainingAttempts === 0;
 
   // Clear confirmation timeout on unmount
   useEffect(() => {
@@ -36,47 +52,44 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     };
   }, []);
 
-  // Sync bid amount when external minimum bid updates (e.g. someone else bids)
-  useEffect(() => {
-    const minBid = item.isPublicBid && item.currentHighBid
-      ? item.currentHighBid + getSmartStep(item.currentHighBid)
-      : getMinimumAllowedBid(item.askPrice);
-
-    if (!isSuccess) {
-      const timer = setTimeout(() => {
-        setBidAmount(prev => {
-          const currentNumericAmount = parseFloat(prev.replace(/,/g, ''));
-          if (currentNumericAmount < minBid && item.currentHighBid) {
-            return minBid.toLocaleString();
-          }
-          return prev;
-        });
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [item.currentHighBid, item.askPrice, item.isPublicBid, isSuccess]); 
+  // Sync logic removed: We no longer auto-update bid amount to match high bid. 
+  // User is free to bid anywhere in range [70%, 150%].
 
   const handleSmartAdjust = useCallback((e: React.MouseEvent | React.TouchEvent, direction: 1 | -1) => {
     e.stopPropagation();
+    if (isQuotaReached) {
+        setError(true);
+        setErrorMessage("Out of Bids");
+        sonic.thud();
+        return;
+    }
+
     const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
     const step = getSmartStep(current);
     const delta = step * direction;
     
-    // Calculate minimum allowed bid based on item state
-    const minBid = item.isPublicBid && item.currentHighBid
-      ? item.currentHighBid + getSmartStep(item.currentHighBid)
-      : getMinimumAllowedBid(item.askPrice);
+    const minBid = getMinimumAllowedBid(item.askPrice);
+    const maxBid = getMaximumAllowedBid(item.askPrice);
 
-    // If attempting to go below minimum, show error and block
+    // Check Floor
     if (current + delta < minBid) {
       setError(true);
+      setErrorMessage("Minimum Bid Reached");
       sonic.thud();
-      setTimeout(() => setError(false), 1000);
+      setTimeout(() => { setError(false); setErrorMessage(null); }, 1000);
       return;
     }
+
+    // Check Ceiling
+    if (current + delta > maxBid) {
+       setError(true);
+       setErrorMessage("Maximum Limit Reached");
+       sonic.thud(); // Haptic feedback for ceiling
+       setTimeout(() => { setError(false); setErrorMessage(null); }, 1000);
+       return;
+    }
     
-    // Otherwise allow update
+    // Allow update
     const newValue = Math.max(0, current + delta);
     sonic.tick();
     
@@ -86,18 +99,15 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     setBidAmount(newValue.toLocaleString());
     setAnimTrigger(prev => prev + 1);
-  }, [bidAmount, item]);
+  }, [bidAmount, item.askPrice, isQuotaReached]);
 
   type BidEvent = React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
 
-  const executeBid = useCallback((amount: number, e?: BidEvent) => {
-    // IMPORTANT: Capture button position IMMEDIATELY before any state updates
-    // React's synthetic event nullifies currentTarget after the handler phase
+  const executeBid = useCallback(async (amount: number, e?: BidEvent) => {
     let confettiX = 0.5;
     let confettiY = 0.5;
 
     if (e) {
-      // Try currentTarget first (the element with the event listener)
       const targetElement = e.currentTarget instanceof HTMLElement 
         ? e.currentTarget 
         : (e.target instanceof HTMLElement ? e.target.closest('button') : null);
@@ -105,27 +115,35 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       if (targetElement) {
         const rect = targetElement.getBoundingClientRect();
         confettiX = (rect.left + rect.width / 2) / window.innerWidth;
-        // Use BOTTOM of button so confetti bursts UPWARD
         confettiY = (rect.top + rect.height) / window.innerHeight;
       } 
-      // Fallback: Use mouse/touch coordinates
       else if ('clientX' in e && e.clientX !== 0) {
         confettiX = e.clientX / window.innerWidth;
         confettiY = e.clientY / window.innerHeight;
       }
     }
 
-    // Place bid logic via store
-    placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
+    // Place/Update bid logic via store
+    // Await the result to ensure we don't show false success
+    const success = await placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
+    
+    if (!success) {
+        setError(true);
+        setErrorMessage("Bid Failed");
+        sonic.thud();
+        setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
+        return;
+    }
+    
     setIsSuccess(true);
-    // sonic.confetti(); // Removed to prevent double sound (overlap with chime)
     sonic.chime();
 
-    // Automatically increase the bid price in input box by 1 step for the "Next Bid"
     const nextAmount = amount + getSmartStep(amount);
-    setBidAmount(nextAmount.toLocaleString());
+    // Don't auto-increment if it exceeds max
+    if (nextAmount <= getMaximumAllowedBid(item.askPrice)) {
+        setBidAmount(nextAmount.toLocaleString());
+    }
 
-    // Two bursts for a more "directional" feel from the button
     const commonConfig = {
       origin: { x: confettiX, y: confettiY },
       particleCount: 80,
@@ -137,28 +155,19 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     };
 
     try {
-      // Shoot slightly left and right UPWARDS
-      confetti({
-        ...commonConfig,
-        angle: 60,
-      });
-      confetti({
-        ...commonConfig,
-        angle: 120,
-      });
+      confetti({ ...commonConfig, angle: 60 });
+      confetti({ ...commonConfig, angle: 120 });
     } catch (err) {
-      console.warn('[useBidding] Confetti failed (likely headless env):', err);
+      console.warn('[useBidding] Confetti failed:', err);
     }
 
-
-    // Handle success transition
     if (onBidSuccess) {
       setTimeout(() => {
         onBidSuccess();
-        setIsSuccess(false); // RESTORED
+        setIsSuccess(false);
       }, 1500);
     } else {
-      setTimeout(() => setIsSuccess(false), 1500); // RESTORED
+      setTimeout(() => setIsSuccess(false), 1500);
     }
   }, [item, placeBid, onBidSuccess]);
 
@@ -166,30 +175,44 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     e?.stopPropagation();
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
     
-    // Minimum bid logic
-    let minBid = getMinimumAllowedBid(item.askPrice);
-    let referencePrice = item.askPrice;
-
-    if (item.isPublicBid && item.currentHighBid) {
-      minBid = item.currentHighBid + getSmartStep(item.currentHighBid);
-      referencePrice = item.currentHighBid;
+    // 1. Quota Check (Client Side)
+    if (isQuotaReached) {
+        setError(true);
+        setErrorMessage("Out of Bids");
+        sonic.thud();
+        setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
+        return;
     }
 
-    if (isNaN(amount) || amount < minBid) {
+    // 2. Range Check
+    const minBid = getMinimumAllowedBid(item.askPrice);
+    const maxBid = getMaximumAllowedBid(item.askPrice);
+
+    if (isNaN(amount) || amount < minBid || amount > maxBid) {
       setError(true);
+      setErrorMessage(amount < minBid ? "Below Minimum" : "Above Maximum");
       sonic.thud();
-      setTimeout(() => setError(false), 2000);
+      setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
       return;
     }
 
+    // 3. Auth Check
     if (!user) {
       openAuthModal();
       return;
     }
 
-    // DUAL-TAP PATTERN: If already pending confirmation, execute on second tap
+    // 4. Duplicate Amount Check
+    if (userBid && userBid.amount === amount) {
+        setError(true);
+        setErrorMessage("Already Bid This Amount");
+        sonic.thud();
+        setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
+        return;
+    }
+
+    // 5. Dual-Tap Confirmation Logic
     if (pendingConfirmation) {
-      // Clear any existing timeout
       if (confirmationTimeoutRef.current) {
         clearTimeout(confirmationTimeoutRef.current);
         confirmationTimeoutRef.current = null;
@@ -199,43 +222,15 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
 
-    // Safety Check 1: Previous Bid Check
-    if (item.isPublicBid) {
-      // For Public auctions, warn if they are already the high bidder
-      if (item.currentHighBidderId === user.id) {
-        setPendingConfirmation({
-          type: 'double_bid',
-          message: "Already winning - tap to raise"
-        });
-        // Auto-clear after 3 seconds
-        confirmationTimeoutRef.current = setTimeout(() => {
-          setPendingConfirmation(null);
-        }, 3000);
-        return;
-      }
-    } else {
-      // For Secret/Sealed auctions, warn if they have bid at all
-      const hasAlreadyBid = bids.some(b => b.itemId === item.id && b.bidderId === user.id);
-      
-      if (hasAlreadyBid) {
-        setPendingConfirmation({
-          type: 'double_bid',
-          message: "Bid exists - tap to update"
-        });
-        confirmationTimeoutRef.current = setTimeout(() => {
-          setPendingConfirmation(null);
-        }, 3000);
-        return;
-      }
-    }
-
-    // Safety Check 2: High Bid (20% above reference)
-    const safetyThreshold = referencePrice * 1.2;
-    if (amount > safetyThreshold) {
-      const percentOver = Math.round(((amount - referencePrice) / referencePrice) * 100);
+    // Safety Warning: High Bid (140% of ask price)
+    // Using WARNING_PERCENTAGE (1.4)
+    const safetyThreshold = item.askPrice * WARNING_PERCENTAGE;
+    
+    if (amount >= safetyThreshold) {
+      const percentOver = Math.round(((amount - item.askPrice) / item.askPrice) * 100);
       setPendingConfirmation({
         type: 'high_bid',
-        message: `${percentOver}% over - tap to confirm`
+        message: `High Bid (+${percentOver}%) - Tap to Confirm`
       });
       confirmationTimeoutRef.current = setTimeout(() => {
         setPendingConfirmation(null);
@@ -245,7 +240,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     // If no warnings, execute immediately
     executeBid(amount, e);
-  }, [bidAmount, item, user, bids, executeBid, pendingConfirmation, openAuthModal]);
+  }, [bidAmount, item.askPrice, user, userBid, executeBid, pendingConfirmation, openAuthModal, isQuotaReached]);
 
   const clearPendingConfirmation = useCallback(() => {
     if (confirmationTimeoutRef.current) {
@@ -256,7 +251,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Prevent 'e', 'E', '+', '-'
     if (['e', 'E', '+', '-'].includes(e.key)) {
       e.preventDefault();
     }
@@ -282,6 +276,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     bidAmount,
     setBidAmount,
     error,
+    errorMessage,
     isSuccess,
     animTrigger,
     handleSmartAdjust,
@@ -292,6 +287,9 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     handleInputChange,
     getSmartStep,
     lastDelta,
-    showDelta
+    showDelta,
+    remainingAttempts,
+    isQuotaReached,
+    userBid
   };
 }
