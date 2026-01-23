@@ -112,7 +112,7 @@ export const PriceDisplay = memo(({
       {/* Highest Bid / Secret Status */}
       <div className="flex flex-col items-end justify-self-end transition-all">
         <span className={getLabelClass(viewMode)}>
-          {config.variant === 'public' ? "Highest Bid" : "Secret"}
+          {config.variant === 'public' ? "Highest" : "Secret"}
         </span>
 
         
@@ -139,14 +139,16 @@ export const PriceDisplay = memo(({
               </motion.span>
             </div>
           ) : config.variant === 'secret' ? (
-            // Secret: Show bid count with lock
+            // Secret: Show bid count with lock (lock only on spacious/modal)
             <div className="flex items-center gap-1.5">
               <span className={`${getPriceClass(viewMode)} text-amber-600`}>
                 {bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}
               </span>
-              <div className="bg-amber-100 text-amber-600 p-1 rounded" title="Secret Bidding">
-                <Lock className="h-3.5 w-3.5" />
-              </div>
+              {(viewMode === 'spacious' || viewMode === 'modal') && (
+                <div className="bg-amber-100 text-amber-600 p-1 rounded" title="Secret Bidding">
+                  <Lock className="h-3.5 w-3.5" />
+                </div>
+              )}
             </div>
           ) : (
             // Public with no bids yet

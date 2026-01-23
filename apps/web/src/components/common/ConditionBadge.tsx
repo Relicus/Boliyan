@@ -17,7 +17,7 @@ export const ConditionBadge = memo(({
   const label = getConditionLabel(condition);
 
   const variants = {
-    glass: "bg-white/90 backdrop-blur-md text-slate-900 border border-slate-200 shadow-lg",
+    glass: "bg-black/60 backdrop-blur-md text-white border-white/20 shadow-lg",
     outline: "bg-white text-slate-700 border-slate-200 border",
     solid: "bg-slate-800 text-white border-none shadow-sm"
   };

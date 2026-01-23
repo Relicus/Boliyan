@@ -289,7 +289,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                   {/* Row 2: Highest Bid */}
                     <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
-                        {item.isPublicBid ? "Highest Bid" : "Bids"}
+                        {item.isPublicBid ? "Highest" : "Bids"}
                       </span>
                       <div className="flex items-center gap-2">
                         <div className={`text-[clamp(1.25rem,5cqi,2rem)] font-black leading-none ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-500'}`}>

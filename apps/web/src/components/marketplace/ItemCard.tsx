@@ -364,7 +364,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 config={biddingConfig}
                 askPrice={item.askPrice}
                 bidCount={item.bidCount}
-                viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
+                viewMode={viewMode}
                 className="min-h-[2.25rem]"
                 remainingAttempts={remainingAttempts}
                 showAttempts={user?.id !== seller.id}
@@ -393,7 +393,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     minBid={biddingConfig.minBid}
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
-                    viewMode={viewMode === 'compact' ? 'compact' : 'spacious'}
+                    viewMode={viewMode}
                     idPrefix={`item-card-${item.id}`}
                     onSmartAdjust={handleSmartAdjust}
                     onBid={handleBid}

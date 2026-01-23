@@ -27,7 +27,7 @@ export const CategoryBadge = memo(({
   const Icon = categoryConfig.icon;
 
   const variants = {
-    glass: "bg-white/90 backdrop-blur-md text-slate-900 border border-slate-200 shadow-lg",
+    glass: "bg-black/60 backdrop-blur-md text-white border-white/20 shadow-lg",
     outline: "bg-white text-blue-700 border-blue-100 border",
     solid: "bg-blue-600 text-white border-none shadow-sm"
   };
