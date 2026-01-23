@@ -70,7 +70,7 @@ export const VictoryHalo = memo(({ theme, className = '' }: VictoryHaloProps) =>
   if (theme === 'none') return null;
   
   return (
-    <div className={`absolute inset-0 pointer-events-none z-30 rounded-[inherit] border-[3px] bg-transparent ${BASE_COLORS[theme]} ${className}`} />
+    <div className={`absolute inset-0 pointer-events-none z-0 rounded-[inherit] border-[3px] bg-transparent ${BASE_COLORS[theme]} ${className}`} />
   );
 });
 

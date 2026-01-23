@@ -9,8 +9,8 @@ import path from 'path';
  * 2. Interactive Elements (Buttons, Inputs) with IDs
  */
 
-const BASE_URL = 'http://192.168.18.125:3000';
 interface DiscoveredElement {
+
   id: string;
   tagName: string;
   text?: string;
@@ -30,8 +30,9 @@ const discoveredFeatures = {
   errors: [] as string[]
 };
 
-test('Programmatic Feature Discovery', async ({ page }) => {
-  await page.goto(BASE_URL);
+test('Programmatic Feature Discovery', async ({ page, baseURL }) => {
+  const targetUrl = baseURL || 'http://localhost:3000';
+  await page.goto(targetUrl);
   discoveredFeatures.routes.add('/');
   
   await scrapePage(page, '/');
@@ -47,13 +48,14 @@ test('Programmatic Feature Discovery', async ({ page }) => {
   for (const route of Array.from(discoveredFeatures.routes)) {
     if (route === '/') continue;
     try {
-      await page.goto(`${BASE_URL}${route}`);
+      await page.goto(`${targetUrl}${route}`);
       await scrapePage(page, route);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Unknown error';
       discoveredFeatures.errors.push(`Error on ${route}: ${message}`);
     }
   }
+
 
   const reportPath = path.join(process.cwd(), 'feature_discovery_report.json');
   fs.writeFileSync(reportPath, JSON.stringify({

@@ -162,7 +162,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`@container group relative border-none bg-slate-50 rounded-xl flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring,padding] duration-500 shadow-sm hover:shadow-md
+            className={`@container group relative isolation-isolate border-none bg-slate-50 rounded-xl flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring,padding] duration-500 shadow-sm hover:shadow-md
               ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
             `}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}

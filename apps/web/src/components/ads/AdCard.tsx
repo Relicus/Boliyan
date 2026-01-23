@@ -91,7 +91,7 @@ export default function AdCard({ id, viewMode = 'compact' }: AdCardProps) {
             href="#" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-95 font-bold font-outfit text-[clamp(0.75rem,4cqi,1rem)] tracking-wide bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white gap-1.5"
+            className="w-full h-9 rounded-md flex items-center justify-center shadow-sm transition-all duration-300 active:scale-y-95 active:opacity-90 font-bold font-outfit text-[clamp(0.75rem,4cqi,1rem)] tracking-wide bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white gap-1.5"
           >
             Learn More
             <ExternalLink className="h-3.5 w-3.5" />

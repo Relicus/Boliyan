@@ -76,7 +76,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
       <div 
         id={`my-bid-card-${item.id}`} 
         onClick={() => setIsModalOpen(true)}
-        className={`group relative overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer ${haloTheme !== 'none' ? 'p-[3px]' : 'p-0'}`}
+        className={`group relative isolation-isolate overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer ${haloTheme !== 'none' ? 'p-[3px]' : 'p-0'}`}
       >
         <VictoryHalo theme={haloTheme} />
         

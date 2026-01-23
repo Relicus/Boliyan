@@ -149,7 +149,7 @@ export default function MarketplaceGrid() {
                   value={searchFilters.sortBy} 
                   onValueChange={(value) => setSearchFilters({ ...searchFilters, sortBy: value as typeof searchFilters.sortBy })}
                 >
-                  <SelectTrigger id="mobile-sort-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
+                  <SelectTrigger id="mobile-sort-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-y-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
                      {(() => {
                         const activeFilter = FILTERS.find(f => f.id === searchFilters.sortBy) || FILTERS[0];
                         const Icon = activeFilter.icon;
@@ -180,7 +180,7 @@ export default function MarketplaceGrid() {
                   value={mpFilters.category || 'All Items'} 
                   onValueChange={(value) => handleCategoryChange(value === 'All Items' ? null : value)}
                 >
-                  <SelectTrigger id="mobile-category-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
+                  <SelectTrigger id="mobile-category-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-y-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
                      {(() => {
                         const activeCat = CATEGORIES.find(c => c.label === mpFilters.category) || CATEGORIES[0];
                         const Icon = activeCat.icon;
@@ -211,7 +211,7 @@ export default function MarketplaceGrid() {
                   value={mpFilters.listingType} 
                   onValueChange={(value) => setMpFilter('listingType', value as typeof mpFilters.listingType)}
                 >
-                  <SelectTrigger id="mobile-type-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
+                  <SelectTrigger id="mobile-type-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-y-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
                      {(() => {
                         return (
                           <>
@@ -236,7 +236,7 @@ export default function MarketplaceGrid() {
                 <Button
                   id="mobile-view-toggle"
                   variant="outline"
-                  className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
+                  className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-y-95 active:bg-slate-200 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
                   onClick={() => {
                     handleViewModeChange(viewMode === 'compact' ? 'spacious' : 'compact');
                   }}

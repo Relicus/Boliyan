@@ -430,7 +430,7 @@ export const BiddingControls = memo(({
             disabled={isDisabled || isQuotaReached}
             className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
           >
-            <svg className="h-5 w-5 transition-transform group-active:scale-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M18 12H6" />
             </svg>
           </button>
@@ -465,7 +465,7 @@ export const BiddingControls = memo(({
             disabled={isDisabled || isQuotaReached}
             className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
           >
-            <svg className="h-5 w-5 transition-transform group-active:scale-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6v12m6-6H6" />
             </svg>
           </button>
@@ -484,12 +484,11 @@ export const BiddingControls = memo(({
           backgroundColor: isCoolingDown ? '#FFFFFF' : activeTheme.bgHex,
         }}
         whileHover={(!isDisabled && !isQuotaReached && !isCoolingDown && !isSuccess && activeTheme.hoverHex) ? {
-          scale: 1.02,
           backgroundColor: activeTheme.hoverHex,
           transition: { duration: 0.2 }
         } : {}}
         whileTap={(!isDisabled && !isQuotaReached && !isCoolingDown && !isSuccess) ? { 
-          scale: 0.97,
+          scaleY: 0.96,
           transition: { duration: 0.1 }
         } : {}}
         transition={{ 

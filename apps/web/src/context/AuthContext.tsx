@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const fetchProfile = useCallback(async (supabaseUser: SupabaseUser) => {
         console.log("[AuthContext] Fetching profile for:", supabaseUser.id);
+        setIsLoading(true); // Ensure loading is true while fetching
         try {
             const { data: fetchedData, error } = await supabase
                 .from('profiles')

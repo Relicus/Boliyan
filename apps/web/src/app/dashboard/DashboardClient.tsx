@@ -156,7 +156,7 @@ function DashboardContent() {
               Messages
             </Link>
           </Button>
-          <Button id="dashboard-new-listing-btn" asChild className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 h-11 px-6 font-bold shadow-lg shadow-blue-100 transition-all hover:scale-105 active:scale-95">
+          <Button id="dashboard-new-listing-btn" asChild className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 h-11 px-6 font-bold shadow-lg shadow-blue-100 transition-all active:bg-blue-800 active:scale-y-95">
             <Link href="/list" className="flex items-center">
               <Plus id="dashboard-new-listing-plus" className="h-5 w-5 mr-2" />
               Post New

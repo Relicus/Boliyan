@@ -108,7 +108,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
         <DialogClose 
           id={`close-listing-btn-${item.id}`}
 
-          className="absolute right-4 top-4 z-[50] p-2 bg-white/85 hover:bg-white text-slate-700 hover:text-red-500 rounded-full shadow-lg transition-all active:scale-90"
+          className="absolute right-4 top-4 z-[50] p-2 bg-white/85 hover:bg-white text-slate-700 hover:text-red-500 rounded-full shadow-lg transition-all active:scale-y-95 active:bg-slate-50"
         >
           <X className="h-5 w-5" />
         </DialogClose>

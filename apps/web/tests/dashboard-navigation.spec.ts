@@ -66,6 +66,22 @@ test.describe('Dashboard Navigation', () => {
       await page.locator('#tab-trigger-watchlist-mobile').click();
       await expect(page.locator('#tab-trigger-watchlist-mobile')).toHaveAttribute('data-state', 'active');
     });
+
+    test('should persist data after reload', async ({ page }) => {
+      // Navigate to a tab
+      await page.locator('#tab-trigger-watchlist-mobile').click();
+      await expect(page.locator('#tab-trigger-watchlist-mobile')).toHaveAttribute('data-state', 'active');
+      
+      // Reload page
+      await page.reload();
+      
+      // Verify tab is still active (via URL param check usually handled by state)
+      // and ensure dashboard root is visible
+      await expect(page.locator('#dashboard-root')).toBeVisible();
+      // Since we use search params for tabs, it should persist
+      await expect(page).toHaveURL(/.*tab=watchlist/);
+    });
+
   });
 
   test.describe('Dashboard Actions', () => {

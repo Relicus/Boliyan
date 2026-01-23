@@ -46,7 +46,7 @@ export default function CategoriesPage() {
               href="/"
               onClick={() => handleCategoryClick(item.label)}
               className={cn(
-                "flex flex-col items-center justify-center p-6 rounded-xl border text-center transition-all active:scale-95",
+                "flex flex-col items-center justify-center p-6 rounded-xl border text-center transition-all active:scale-y-95 active:bg-slate-50",
                 isActive
                   ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"
                   : "bg-white border-slate-200 text-slate-600 hover:border-blue-200 hover:bg-slate-50"

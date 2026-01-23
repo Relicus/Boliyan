@@ -47,7 +47,7 @@ export default function PriceSelector() {
           id="price-selector-trigger"
           variant="outline"
           className={cn(
-            "h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md",
+            "h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-y-95 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md",
             hasActivePriceFilter && "bg-blue-50 border-blue-200 ring-1 ring-blue-100"
           )}
         >

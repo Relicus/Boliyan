@@ -77,10 +77,10 @@ export const ProductGallery = memo(function ProductGallery({
                 e.stopPropagation();
                 onToggleWatch(item.id);
               }}
-              className={`h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 border
+              className={`h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-y-95 border
                 ${isWatched 
-                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 w-auto px-3 gap-2' 
-                  : 'bg-white/85 text-slate-700 border-white/20 hover:bg-white w-auto px-3 gap-2'
+                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 w-auto px-3 gap-2 active:bg-blue-800' 
+                  : 'bg-white/85 text-slate-700 border-white/20 hover:bg-white w-auto px-3 gap-2 active:bg-slate-50'
                 }`}
               title={isWatched ? "Remove from watchlist" : "Add to watchlist"}
             >
@@ -93,7 +93,7 @@ export const ProductGallery = memo(function ProductGallery({
             <Link
               id={`view-details-btn-${item.id}`}
               href={`/product/${item.slug ?? item.id}`}
-              className="h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-90 bg-slate-900 text-white hover:bg-black w-auto px-3 gap-2 border border-white/20"
+              className="h-9 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 active:scale-y-95 bg-slate-900 text-white hover:bg-black w-auto px-3 gap-2 border border-white/20 active:bg-black"
               title="Full Page"
             >
               <ExternalLink className="h-4 w-4" />
@@ -106,7 +106,7 @@ export const ProductGallery = memo(function ProductGallery({
               e.stopPropagation();
               setShowFullscreen(true);
             }}
-            className="h-9 w-9 flex items-center justify-center bg-white/85 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90"
+            className="h-9 w-9 flex items-center justify-center bg-white/85 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-y-95 active:bg-slate-50"
             title="Expand Gallery"
           >
             <Maximize2 className="h-5 w-5" />
@@ -117,7 +117,7 @@ export const ProductGallery = memo(function ProductGallery({
           <>
             <button 
               id={`product-gallery-prev-${item.id}`}
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center bg-slate-900/45 hover:bg-slate-900/65 text-white rounded-full backdrop-blur-md border border-white/25 shadow-[0_12px_24px_rgba(0,0,0,0.35)] transition-all active:scale-90 z-20"
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center bg-slate-900/45 hover:bg-slate-900/65 text-white rounded-full backdrop-blur-md border border-white/25 shadow-[0_12px_24px_rgba(0,0,0,0.35)] transition-all active:scale-y-95 z-20 active:bg-slate-900/80"
               onClick={(e) => {
                 e.stopPropagation();
                 setCurrentImg(prev => (prev > 0 ? prev - 1 : item.images.length - 1));
@@ -127,7 +127,7 @@ export const ProductGallery = memo(function ProductGallery({
             </button>
             <button 
               id={`product-gallery-next-${item.id}`}
-              className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center bg-slate-900/45 hover:bg-slate-900/65 text-white rounded-full backdrop-blur-md border border-white/25 shadow-[0_12px_24px_rgba(0,0,0,0.35)] transition-all active:scale-90 z-20"
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center bg-slate-900/45 hover:bg-slate-900/65 text-white rounded-full backdrop-blur-md border border-white/25 shadow-[0_12px_24px_rgba(0,0,0,0.35)] transition-all active:scale-y-95 z-20 active:bg-slate-900/80"
               onClick={(e) => {
                 e.stopPropagation();
                 setCurrentImg(prev => (prev < item.images.length - 1 ? prev + 1 : 0));

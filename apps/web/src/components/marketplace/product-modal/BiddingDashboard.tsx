@@ -142,7 +142,7 @@ export const BiddingDashboard = memo(function BiddingDashboard({
         <Link
           id={`view-details-btn-mobile-${item.id}`}
           href={`/product/${item.slug ?? item.id}`}
-          className="h-11 flex items-center justify-center rounded-xl bg-slate-900 text-white font-bold text-sm gap-2 active:scale-95 transition-all shadow-sm"
+          className="h-11 flex items-center justify-center rounded-xl bg-slate-900 text-white font-bold text-sm gap-2 active:bg-black active:scale-y-95 transition-all shadow-sm"
         >
           <ExternalLink className="h-4 w-4" />
           <span>Full Page</span>
@@ -152,10 +152,10 @@ export const BiddingDashboard = memo(function BiddingDashboard({
           <button
             id={`toggle-watch-btn-mobile-${item.id}`}
             onClick={() => onToggleWatch(item.id)}
-            className={`h-11 flex items-center justify-center rounded-xl font-bold text-sm gap-2 active:scale-95 transition-all border shadow-sm
+            className={`h-11 flex items-center justify-center rounded-xl font-bold text-sm gap-2 active:scale-y-95 transition-all border shadow-sm
               ${isWatched 
-                ? 'bg-blue-50 text-blue-600 border-blue-200' 
-                : 'bg-white text-slate-700 border-slate-200'
+                ? 'bg-blue-50 text-blue-600 border-blue-200 active:bg-blue-100' 
+                : 'bg-white text-slate-700 border-slate-200 active:bg-slate-50'
               }`}
           >
             <Bookmark className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />

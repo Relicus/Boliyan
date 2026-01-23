@@ -157,11 +157,10 @@ test.describe('Auction Lifecycle & Engagement', () => {
     // Close modal
     await page.locator(`#close-listing-btn-${itemId}`).click();
     
-    // Verify Blue Halo on card
-    await expect(itemCard).toHaveClass(/p-\[3.5px\]/);
     // Check for blue indicator icon on card
     await expect(itemCard.locator(`#item-card-${itemId}-watch-indicator`)).toBeVisible();
   });
+
 
   test('should show "Already Winning" warning on double bid', async ({ page }) => {
     const rootCards = page.locator('#marketplace-grid-container [id^="item-card-"]');

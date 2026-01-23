@@ -49,7 +49,7 @@ export default function DeleteConfirmationDialog({
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             whileHover={{ scale: 1.1, rotate: 90 }}
-            whileTap={{ scale: 0.9 }}
+            whileTap={{ scaleY: 0.95 }}
           >
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>

@@ -1,12 +1,16 @@
-
 import { test, expect } from '@playwright/test';
+import { loginUser } from './helpers/auth';
 
 test('Smart Bidding Logic & UX Verification', async ({ page }) => {
-  // 1. Navigate to Home
+  // 1. Login first (Required by new RLS policies)
+  await loginUser(page);
+  
+  // 2. Navigate to Home (should already be there after loginUser)
   await page.goto('/');
   
   // Wait for items to load
   await page.waitForSelector('img[alt]');
+
 
   // Locate the first Item Card that actually has a bidding input
   // (Avoids selecting other 'group' elements like categories or banners)

@@ -534,7 +534,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                 size="icon" 
                 disabled={!inputValue.trim() || isLocked} 
                 className={cn(
-                "h-12 w-12 rounded-[20px] shadow-lg transition-all active:scale-95",
+                "h-12 w-12 rounded-[20px] shadow-lg transition-all active:scale-y-95",
                 inputValue.trim() && !isLocked ? "bg-blue-600 shadow-blue-200" : "bg-slate-100"
                 )}
             >

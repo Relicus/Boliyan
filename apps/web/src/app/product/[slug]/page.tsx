@@ -171,14 +171,14 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                   <button 
                     id="prev-image-btn"
                     onClick={() => setCurrentImg(prev => (prev > 0 ? prev - 1 : item.images.length - 1))}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-y-95 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20 active:bg-slate-50"
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
                   <button 
                     id="next-image-btn"
                     onClick={() => setCurrentImg(prev => (prev < item.images.length - 1 ? prev + 1 : 0))}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-y-95 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20 active:bg-slate-50"
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
@@ -189,7 +189,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
               <button
                 id="zoom-image-btn"
                 onClick={() => setShowFullscreen(true)}
-                className="absolute bottom-4 right-4 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-90 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20"
+                className="absolute bottom-4 right-4 p-3 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg transition-all active:scale-y-95 border border-slate-100 backdrop-blur-sm opacity-0 group-hover:opacity-100 z-20 active:bg-slate-50"
                 title="Zoom image"
               >
                 <Maximize2 className="h-6 w-6" />

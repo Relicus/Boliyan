@@ -74,7 +74,7 @@ export function NotificationItem({ notification, onClick, onDismiss }: Notificat
           e.stopPropagation();
           onDismiss?.();
         }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-white border border-slate-200 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hidden md:flex hover:bg-slate-50 hover:text-red-500 hover:border-red-100 active:scale-90"
+        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-white border border-slate-200 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hidden md:flex hover:bg-slate-50 hover:text-red-500 hover:border-red-100 active:scale-y-95 active:bg-slate-50"
         title="Dismiss"
       >
         <X className="h-4 w-4" />

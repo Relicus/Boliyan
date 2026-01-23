@@ -83,7 +83,7 @@ export default function CategoryBar() {
       {showLeftArrow && (
         <button
           onClick={() => scroll("left")}
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-md text-slate-600 hover:text-slate-900 transition-all active:scale-95"
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-md text-slate-600 hover:text-slate-900 transition-all active:scale-y-95 active:bg-slate-100"
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -136,7 +136,7 @@ export default function CategoryBar() {
       {showRightArrow && (
         <button
           onClick={() => scroll("right")}
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-md text-slate-600 hover:text-slate-900 transition-all active:scale-95"
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-md text-slate-600 hover:text-slate-900 transition-all active:scale-y-95 active:bg-slate-100"
           aria-label="Scroll right"
         >
           <ChevronRight className="h-6 w-6" />

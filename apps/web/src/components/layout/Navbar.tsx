@@ -88,7 +88,7 @@ export default function Navbar() {
 
         <div id="navbar-left-section-03" className="flex items-center gap-4 shrink-0">
           <div className="flex items-center gap-3">
-            <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-2 select-none transition-transform duration-200 active:scale-95">
+            <Link id="navbar-logo-link-04" href="/" className="group flex items-center gap-2 select-none transition-transform duration-200 active:scale-y-95 active:opacity-80">
               {/* Geometric 'Ba' (ب) Logomark */}
               <svg id="navbar-logo-svg-05" viewBox="0 0 40 40" className="h-[clamp(32px,4vw,40px)] w-[clamp(32px,4vw,40px)] shrink-0 transition-all duration-300 group-hover:drop-shadow-md">
                 {/* Ba Curve */}
