@@ -50,7 +50,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     cooldownRemaining,
     cooldownProgress,
     showDelta,
-    lastDelta
+    lastDelta,
+    derivedStatus
   } = useBidding(item, seller); // Removed auto-close callback
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -168,6 +169,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     getSmartStep={getSmartStep}
                     showDelta={showDelta}
                     lastDelta={lastDelta}
+                    derivedStatus={derivedStatus}
                   />
               </div>
 

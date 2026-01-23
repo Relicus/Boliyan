@@ -21,6 +21,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const { now, lastBidTimestamp } = useApp(); // Need global heartbeat and cooldown
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const deltaTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const cooldownRemaining = useMemo(() => {
     if (!lastBidTimestamp) return 0;
@@ -78,6 +79,32 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
   const isQuotaReached = remainingAttempts === 0;
 
+  // Calculate derived sticky status
+  const derivedStatus = useMemo(() => {
+    // 1. Quota Check (Indefinite)
+    if (remainingAttempts === 0) {
+      return { type: 'error', message: "Out of Bids" } as const;
+    }
+    
+    // Parse current input
+    const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
+    const maxBid = getMaximumAllowedBid(item.askPrice);
+    
+    // 2. Max Limit Reached (Indefinite)
+    // If input is at or above max, OR user's existing bid is already maxed out
+    if (current >= maxBid || (userBid && userBid.amount >= maxBid)) {
+       return { type: 'error', message: "Max Reached" } as const;
+    }
+
+    // 3. Bid Higher (Indefinite)
+    // If we have a bid, and the input is less than or equal to it
+    if (userBid && current <= userBid.amount) {
+      return { type: 'error', message: "Bid Higher" } as const;
+    }
+
+    return null;
+  }, [remainingAttempts, bidAmount, userBid, item.askPrice]);
+
   // Auto-Step Up Logic: If input matches current bid exactly, push it up.
   useEffect(() => {
     if (!userBid) return;
@@ -92,14 +119,32 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
             setAnimTrigger(prev => prev + 1);
         }
     }
-  }, [bidAmount, userBid, item.askPrice]);
+    // Clear confirmation if we enter a blocking state
+    if (derivedStatus && pendingConfirmation) {
+        setPendingConfirmation(null);
+    }
+  }, [bidAmount, userBid, item.askPrice, derivedStatus, pendingConfirmation]);
 
-  // Clear confirmation timeout on unmount
+  // Clear timeouts on unmount
+  const setTemporaryError = useCallback((msg: string, duration: number = 2000) => {
+    if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+    
+    setError(true);
+    setErrorMessage(msg);
+    sonic.thud();
+    
+    errorTimeoutRef.current = setTimeout(() => {
+      setError(false);
+      setErrorMessage(null);
+    }, duration);
+  }, []);
+
+  // Clear timeouts on unmount
   useEffect(() => {
     return () => {
-      if (confirmationTimeoutRef.current) {
-        clearTimeout(confirmationTimeoutRef.current);
-      }
+      if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
+      if (deltaTimeoutRef.current) clearTimeout(deltaTimeoutRef.current);
+      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
     };
   }, []);
 
@@ -108,12 +153,9 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
   const handleSmartAdjust = useCallback((e: React.MouseEvent | React.TouchEvent, direction: 1 | -1) => {
     e.stopPropagation();
-    if (isQuotaReached) {
-        setError(true);
-        setErrorMessage("Out of Bids");
-        sonic.thud();
-        return;
-    }
+    
+    // Allow adjustment even if "Out of Bids" so user can see what they *could* have bid
+    // But block if already at absolute limits logic handles below
 
     const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
     const step = getSmartStep(current);
@@ -124,19 +166,13 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     // Check Floor
     if (current + delta < minBid) {
-      setError(true);
-      setErrorMessage("Minimum Bid Reached");
-      sonic.thud();
-      setTimeout(() => { setError(false); setErrorMessage(null); }, 1000);
+      setTemporaryError("Below Min", 1000);
       return;
     }
 
     // Check Ceiling
     if (current + delta > maxBid) {
-       setError(true);
-       setErrorMessage("Maximum Limit Reached");
-       sonic.thud(); // Haptic feedback for ceiling
-       setTimeout(() => { setError(false); setErrorMessage(null); }, 1000);
+       setTemporaryError("Max Reached", 1000);
        return;
     }
     
@@ -184,10 +220,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       const success = await placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
       
       if (!success) {
-          setError(true);
-          setErrorMessage("Bid Failed");
-          sonic.thud();
-          setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
+          setTemporaryError("Bid Failed");
           return;
       }
       
@@ -237,35 +270,27 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     
     if (isSubmitting) return;
     
-    // 0. Cooldown Check
+    // 0. Cooldown Check (Transient)
     if (cooldownRemaining > 0) {
-        setError(true);
-        setErrorMessage(`Wait ${cooldownRemaining}s`);
-        sonic.thud();
-        setTimeout(() => { setError(false); setErrorMessage(null); }, 1000);
+        setTemporaryError(`Wait ${cooldownRemaining}s`, 2000);
         return;
+    }
+
+    // 1. Sticky Status Blocking (Immediate Derived Check)
+    if (derivedStatus) {
+        // Pulse the error but don't set a transient one
+        sonic.thud();
+        return; 
     }
 
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
     
-    // 1. Quota Check (Client Side)
-    if (isQuotaReached) {
-        setError(true);
-        setErrorMessage("Out of Bids");
-        sonic.thud();
-        setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
-        return;
-    }
-
-    // 2. Range Check
+    // 2. Range Check (Transient Logic)
     const minBid = getMinimumAllowedBid(item.askPrice);
     const maxBid = getMaximumAllowedBid(item.askPrice);
 
     if (isNaN(amount) || amount < minBid || amount > maxBid) {
-      setError(true);
-      setErrorMessage(amount < minBid ? "Below Minimum" : "Above Maximum");
-      sonic.thud();
-      setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
+      setTemporaryError(amount < minBid ? "Below Min" : "Above Max", 2000);
       return;
     }
 
@@ -275,12 +300,10 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
 
-    // 4. Duplicate/Lower Amount Check
+    // 4. Duplicate/Lower Amount Check (Redundant due to derivedStatus but kept for safety)
     if (userBid && amount <= userBid.amount) {
-        setError(true);
-        setErrorMessage("Higher Bid Required");
+        // Should be caught by derivedStatus, but just in case
         sonic.thud();
-        setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
         return;
     }
 
@@ -359,6 +382,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     remainingAttempts,
     isQuotaReached,
     userBid,
-    initialBid
+    initialBid,
+    derivedStatus // Export new sticky status
   };
 }

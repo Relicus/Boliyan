@@ -27,6 +27,9 @@ interface BiddingControlsProps {
   cooldownRemaining?: number;
   cooldownProgress?: number;
   
+  // New derived sticky status
+  derivedStatus?: { type: 'error', message: string } | null;
+
   // Delta Animation
   showDelta?: boolean;
   lastDelta?: number | null;
@@ -92,7 +95,7 @@ const FloatingDeltaPortal = ({
   animTrigger, 
   viewMode 
 }: { 
-  anchorRef: React.RefObject<HTMLDivElement>;
+  anchorRef: React.RefObject<HTMLDivElement | null>;
   lastDelta: number | null;
   showDelta: boolean;
   animTrigger: number;
@@ -177,6 +180,7 @@ export const BiddingControls = memo(({
   cooldownProgress = 0,
   showDelta = false,
   lastDelta = null,
+  derivedStatus = null,
   pendingConfirmation = null,
   animTrigger,
   viewMode = 'compact',
@@ -242,20 +246,45 @@ export const BiddingControls = memo(({
       };
     }
 
-    // 3. Critical Errors
-    if (errorMessage === "Out of Bids" || isQuotaReached) {
+    // 3. Critical Errors - SHOW INSIDE BUTTON NOW
+    // Sticky Derived Status (Indefinite) has priority over general messages
+    if (derivedStatus) {
       return {
-        bgClass: 'bg-red-50',
-        textClass: 'text-red-800',
-        content: "Out of Bids"
+        bgClass: 'bg-slate-100 cursor-not-allowed shadow-none border border-slate-200',
+        textClass: 'text-slate-400 font-medium',
+        content: (
+          <span className="flex items-center gap-1.5">
+            <AlertCircle className="w-4 h-4 opacity-70" />
+            {derivedStatus.message}
+          </span>
+        )
       };
     }
 
-    if (errorMessage === "Already Bid This Amount" || errorMessage === "Already Offered") {
+    if (errorMessage) {
+      // Mapping for specific error messages to ensure max 2-3 words
+      const shortError = (() => {
+        if (errorMessage === "Out of Bids" || isQuotaReached) return "Out of Bids";
+        if (errorMessage === "Already Bid This Amount") return "Already Bid";
+        if (errorMessage === "Already Offered") return "Already Offered";
+        if (errorMessage === "Higher Bid Required") return "Bid Higher";
+        if (errorMessage === "Minimum Bid Reached") return "Min Bid Reached";
+        if (errorMessage === "Maximum Limit Reached") return "Max Reached";
+        if (errorMessage === "Below Minimum") return "Below Min";
+        if (errorMessage === "Above Maximum") return "Above Max";
+        if (errorMessage.includes("Wait")) return "Cooldown Active";
+        return errorMessage; // Fallback (assume mostly short)
+      })();
+
       return {
-        bgClass: 'bg-slate-100',
-        textClass: 'text-slate-900',
-        content: "Already Offered"
+        bgClass: 'bg-slate-100 cursor-not-allowed shadow-none border border-slate-200',
+        textClass: 'text-slate-400 font-medium',
+        content: (
+          <span className="flex items-center gap-1.5">
+            <AlertCircle className="w-4 h-4 opacity-70" />
+            {shortError}
+          </span>
+        )
       };
     }
 
@@ -264,7 +293,7 @@ export const BiddingControls = memo(({
       return {
         bgClass: 'bg-red-600 hover:bg-red-500 hover:brightness-110',
         textClass: 'text-white',
-        content: pendingConfirmation.message
+        content: pendingConfirmation.message // "Confirm?" is already short
       };
     }
     
@@ -306,15 +335,15 @@ export const BiddingControls = memo(({
   // Hex color mapping for beautiful Framer Motion interpolation
   const getTargetHex = () => {
     if (isSuccess) return '#d97706'; // bg-amber-600
-    if (pendingConfirmation) return '#dc2626'; // bg-red-600
-    if (isQuotaReached) return '#fef2f2'; // bg-red-50 (Out of Bids)
-    if (isOwner || errorMessage === "Already Offered") return '#f1f5f9'; // bg-slate-100
+    if (derivedStatus || errorMessage) return '#f1f5f9'; // bg-slate-100 (Disabled/Error)
+    if (pendingConfirmation) return '#dc2626'; // bg-red-600 (Confirm is action)
+    if (isOwner) return '#f1f5f9'; // bg-slate-100
     if (hasPriorBid) return '#f97316'; // bg-orange-500
     return '#2563eb'; // bg-blue-600
   };
 
   return (
-    <div id={buildId('bidding-controls')} className={`flex flex-col ${showStatus ? 'gap-1.5' : 'gap-2'} w-full relative`}>
+    <div id={buildId('bidding-controls')} className={cn("flex flex-col w-full relative", showStatus ? 'gap-1.5' : 'gap-1.5')}>
       
       {/* Status Row (Modal/Product Page) */}
       {showStatus && !isOwner && (
@@ -334,22 +363,6 @@ export const BiddingControls = memo(({
               </span>
             )}
           </div>
-          {errorMessage && (
-            <div className="absolute right-1 top-1/2 -translate-y-1/2">
-              <span className="text-[10px] font-bold text-red-500 uppercase tracking-wide animate-pulse">
-                {errorMessage}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Error Message Indicator (Top Right - for ItemCard only) */}
-      {!showStatus && !isOwner && !isSuccess && errorMessage && (
-        <div className="flex justify-end px-1 mb-0.5">
-             <span className="text-[10px] font-bold text-red-500 uppercase tracking-wide animate-pulse">
-               {errorMessage}
-             </span>
         </div>
       )}
 
@@ -464,7 +477,7 @@ export const BiddingControls = memo(({
               initial={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.05 }}
-              className="absolute inset-0 z-10 pointer-events-none"
+              className="absolute inset-0 z-50 pointer-events-none"
             >
                {/* Under-Layer (White Base) */}
                <div className="absolute inset-0 bg-white">
@@ -480,7 +493,7 @@ export const BiddingControls = memo(({
                   initial={{ clipPath: `inset(0 ${100 - (cooldownProgress * 100)}% 0 0)` }}
                   animate={{ clipPath: 'inset(0 0% 0 0)' }}
                   transition={{ duration: preciseRemaining, ease: "linear" }}
-               >
+                >
                   <BiddingButtonLabel 
                     content={btnConfig.content} 
                     className="text-white" 

@@ -25,6 +25,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { cn } from "@/lib/utils";
+
 interface ItemCardProps {
   item: Item;
   seller: User;
@@ -66,7 +68,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     cooldownRemaining,
     cooldownProgress,
     showDelta,
-    lastDelta
+    lastDelta,
+    derivedStatus
   } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
 
   
@@ -315,8 +318,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               - Removed mt-auto from input row to eliminate variable gap
               - Reduced gap-2 to gap-1.5 for tighter fit
               - Removed pt-1
+              - Added conditional pb-3 to compensate for halo visual overlap
             */}
-            <CardContent className="p-1.5 flex flex-col gap-1 flex-1 z-10 transition-all">
+            <CardContent className={cn(
+              "p-1.5 flex flex-col gap-1 flex-1 z-10 transition-all",
+              haloTheme !== 'none' ? "pb-3" : "pb-2"
+            )}>
               {/* Title - Natural height with clamping */}
               <div className="flex items-start">
                 <h3 id={`item-card-${item.id}-title`} className={`font-bold ${getTitleClass()} text-slate-900 leading-tight line-clamp-2 transition-all w-full`} title={item.title}>
@@ -399,6 +406,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     cooldownProgress={cooldownProgress}
                     showDelta={showDelta}
                     lastDelta={lastDelta}
+                    derivedStatus={derivedStatus}
                     minBid={biddingConfig.minBid}
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}

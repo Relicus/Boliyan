@@ -35,6 +35,7 @@ interface BiddingDashboardProps {
   getSmartStep: (currentBid: number) => number;
   showDelta?: boolean;
   lastDelta?: number | null;
+  derivedStatus?: { type: 'error', message: string } | null;
 }
 
 export const BiddingDashboard = memo(function BiddingDashboard({
@@ -62,7 +63,8 @@ export const BiddingDashboard = memo(function BiddingDashboard({
   onInputChange,
   getSmartStep,
   showDelta = false,
-  lastDelta = null
+  lastDelta = null,
+  derivedStatus = null
 }: BiddingDashboardProps) {
 
   const minNextBid = getMinimumAllowedBid(item.askPrice);
@@ -123,6 +125,7 @@ export const BiddingDashboard = memo(function BiddingDashboard({
           animTrigger={animTrigger}
           showDelta={showDelta}
           lastDelta={lastDelta}
+          derivedStatus={derivedStatus}
           viewMode="modal"
           idPrefix={`modal-item-card-${item.id}`}
           onSmartAdjust={onSmartAdjust}
