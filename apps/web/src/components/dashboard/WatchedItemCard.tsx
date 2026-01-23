@@ -115,7 +115,7 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                 {item.isPublicBid && item.currentHighBid && (
                   <div className="flex items-center gap-1 text-[10px] font-bold text-blue-600">
                     <Gavel className="h-3 w-3" />
-                    Highest: Rs. {item.currentHighBid.toLocaleString()}
+                     Highest: {item.currentHighBid.toLocaleString()}
                   </div>
                 )}
               </div>

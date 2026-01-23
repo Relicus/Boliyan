@@ -49,7 +49,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
       toast.success("Bid placed successfully!", {
         description: (
           <span className="block mt-1">
-            You placed a bid of <span className="font-bold text-emerald-600">Rs. {bidAmount}</span> on <span className="font-semibold text-blue-600">{item?.title}</span>
+            You placed a bid of <span className="font-bold text-emerald-600">{bidAmount}</span> on <span className="font-semibold text-blue-600">{item?.title}</span>
           </span>
         )
       });

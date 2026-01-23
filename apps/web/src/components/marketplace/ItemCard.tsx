@@ -42,11 +42,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     [item, user, bids]
   );
 
-  useEffect(() => {
-    console.log(`[ItemCard] MOUNTED id=${item.id}`);
-    return () => console.log(`[ItemCard] UNMOUNTED id=${item.id}`);
-  }, [item.id]);
-
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const mainImage = item.images[0];

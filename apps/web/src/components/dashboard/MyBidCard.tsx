@@ -114,7 +114,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                  {isOutbid && (
                    <div className="flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-100">
                      <AlertTriangle className="h-3 w-3 stroke-[3]" />
-                     Current: Rs. {item.currentHighBid?.toLocaleString()}
+                      Current: {item.currentHighBid?.toLocaleString()}
                    </div>
                  )}
               </div>

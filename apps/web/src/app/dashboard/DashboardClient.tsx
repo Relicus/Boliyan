@@ -359,7 +359,7 @@ function DashboardContent() {
                             <h3 className="font-bold text-slate-900 text-[clamp(0.875rem,4cqi,1.125rem)] truncate leading-none">{item.title}</h3>
                             <div className="flex items-center gap-1.5 mt-1">
                               <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80">Asking</span>
-                              <span className="text-[clamp(0.625rem,3cqi,0.875rem)] font-bold text-slate-700">Rs. {item.askPrice.toLocaleString()}</span>
+                              <span className="text-[clamp(0.625rem,3cqi,0.875rem)] font-bold text-slate-700">{item.askPrice.toLocaleString()}</span>
                             </div>
                           </div>
                       </div>

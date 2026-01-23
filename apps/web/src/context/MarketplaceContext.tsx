@@ -385,14 +385,6 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     }
     // --- OPTIMISTIC UPDATE END ---
 
-    // Debug logging
-    console.log("[placeBid] Attempting upsert with:", {
-        listing_id: itemId,
-        bidder_id: user.id,
-        amount: amount,
-        type: type
-    });
-
     // Use UPSERT to handle the unique constraint on (listing_id, bidder_id)
     // This allows users to update their existing bid instead of creating duplicates
     const bidPayload: BidInsert = {
@@ -407,8 +399,6 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       .from('bids')
       .upsert(bidPayload, { onConflict: 'listing_id,bidder_id' })
       .select();
-
-    console.log("[placeBid] Supabase response - data:", data, "error:", error);
 
     // Check for error (Supabase returns null for no error, not empty object)
     if (error || !data || data.length === 0) {

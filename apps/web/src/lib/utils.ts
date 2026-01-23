@@ -134,7 +134,8 @@ export function calculatePrivacySafeDistance(
  * 1. Below 1M: Standard localized number (e.g., 150,000).
  * 2. 1,000,000+: "lac" notation (e.g., 10 lac, 100 lac).
  */
-export function formatPrice(price: number, viewMode?: string): string {
+export function formatPrice(price: number | undefined | null, viewMode?: string): string {
+  if (price === undefined || price === null) return "0";
   const p = Math.round(price);
   
   if (p >= 1_000_000) {
