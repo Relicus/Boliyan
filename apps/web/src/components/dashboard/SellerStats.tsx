@@ -1,6 +1,6 @@
 'use client';
 
-import { Package, Gavel, CheckCircle, DollarSign, LucideIcon } from 'lucide-react';
+import { Package, Gavel, CheckCircle, DollarSign, ShieldCheck, LucideIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Skeleton from '@/components/ui/Skeleton';
 import { useDashboard } from '@/context/DashboardContext';
@@ -9,7 +9,8 @@ const iconMap: Record<string, LucideIcon> = {
   Package,
   Gavel,
   CheckCircle,
-  DollarSign
+  DollarSign,
+  ShieldCheck
 };
 
 export function SellerStats() {
@@ -45,7 +46,10 @@ export function SellerStats() {
               <Icon className={`h-4 w-4 ${metric.color || 'text-muted-foreground'}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{metric.value.toLocaleString()}</div>
+              <div className="text-2xl font-bold">
+                {metric.value.toLocaleString()}
+                {metric.label.includes('Rate') && '%'}
+              </div>
               {metric.trend && (
                 <p className="text-xs text-muted-foreground">
                   {metric.trend > 0 ? '+' : ''}{metric.trend}% from last month

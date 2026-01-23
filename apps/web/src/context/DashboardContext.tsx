@@ -81,12 +81,14 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       
       const totalBids = listings.reduce((acc, curr) => acc + (curr.bidCount || 0), 0);
       const totalRevenue = soldListings.reduce((acc, curr) => acc + (curr.currentHighBid || curr.askPrice), 0); // Simplified revenue
+      
+      const successRate = user.sellerSuccessRate ?? 100;
 
       const metrics: SellerMetric[] = [
+        { label: 'Success Rate', value: successRate, icon: 'ShieldCheck', color: successRate >= 90 ? 'text-emerald-500' : 'text-amber-500' },
         { label: 'Active Listings', value: activeListings.length, icon: 'Package', color: 'text-blue-500' },
         { label: 'Total Bids', value: totalBids, icon: 'Gavel', color: 'text-orange-500' },
         { label: 'Items Sold', value: soldListings.length, icon: 'CheckCircle', color: 'text-green-500' },
-        { label: 'Est. Revenue', value: totalRevenue, icon: 'DollarSign', color: 'text-emerald-400' },
       ];
 
       setState({

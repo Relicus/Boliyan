@@ -162,13 +162,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
             <VictoryHalo theme={haloTheme} className="z-50" />
-            <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(0.75rem-3px)]">
+            <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)]">
 
 
 
             <div
               id={`item-card-${item.id}-image-wrapper`}
-              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0`}
+              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 rounded-t-[inherit]`}
             >
               <div className="relative w-full h-full flex items-center justify-center">
                 <img
@@ -352,6 +352,18 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       count={seller?.reviewCount || 0}
                       size={viewMode === 'spacious' ? 'md' : 'sm'}
                     />
+                    {seller?.sellerSuccessRate !== undefined && (
+                      <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-slate-100 rounded-md border border-slate-200 shadow-sm">
+                         <span className={cn(
+                           "text-[10px] font-black tracking-tight tabular-nums",
+                           seller.sellerSuccessRate >= 95 ? "text-emerald-600" : 
+                           seller.sellerSuccessRate >= 80 ? "text-amber-600" : "text-slate-600"
+                         )}>
+                           {seller.sellerSuccessRate}%
+                         </span>
+                         <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Success</span>
+                      </div>
+                    )}
                     {seller?.badges && seller.badges.some(b => b.category === 'seller') && (
 
                       <GamificationBadge 
@@ -418,6 +430,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     onInputChange={handleInputChange}
                     onInputClick={handleInputClick}
                     showAttemptsDots={false}
+                    itemId={item.id}
                   />
               </div>
 

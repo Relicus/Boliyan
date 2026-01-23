@@ -29,6 +29,8 @@ export interface User {
   badges: Badge[];
   stats: UserStats;
   isVerified?: boolean;
+  sellerSuccessRate?: number;
+  buyerSuccessRate?: number;
 }
 
 export interface Item {
@@ -80,6 +82,9 @@ export interface Conversation {
   lastMessage?: string;
   updatedAt: string;
   expiresAt?: string;
+  sellerConfirmedAt?: string;
+  buyerConfirmedAt?: string;
+  isSealed: boolean;
 }
 
 export interface Message {

@@ -5,9 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { useApp } from "@/lib/store";
-import { Gavel, TrendingUp, Loader2, AlertCircle, Timer } from "lucide-react";
+import { Gavel, TrendingUp, Loader2, AlertCircle, Timer, Edit } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import { formatPrice } from "@/lib/utils";
+
+import { useRouter } from "next/navigation";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -46,6 +48,7 @@ interface BiddingControlsProps {
   idPrefix: string;
   showAttemptsDots?: boolean;
   showStatus?: boolean;
+  itemId?: string; // Need Item ID for edit navigation
   
   // Handlers
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
@@ -58,15 +61,17 @@ interface BiddingControlsProps {
 // Centralized Theme Configuration
 type ButtonTheme = 'active' | 'success' | 'inactive' | 'danger' | 'warning' | 'neutral';
 
-const BUTTON_THEMES: Record<ButtonTheme, { classes: string; bgHex: string; textClass: string }> = {
+const BUTTON_THEMES: Record<ButtonTheme, { classes: string; bgHex: string; hoverHex?: string; textClass: string }> = {
   active: {
-    classes: 'bg-blue-600 hover:bg-blue-700 text-white',
+    classes: 'text-white', // Removed hover:bg class to use Framer Motion gesture
     bgHex: '#2563eb', // bg-blue-600
+    hoverHex: '#1d4ed8', // bg-blue-700
     textClass: 'text-white'
   },
   success: {
-    classes: 'bg-amber-600 text-white',
+    classes: 'text-white',
     bgHex: '#d97706', // bg-amber-600
+    hoverHex: '#b45309', // bg-amber-700
     textClass: 'text-white'
   },
   inactive: {
@@ -75,13 +80,15 @@ const BUTTON_THEMES: Record<ButtonTheme, { classes: string; bgHex: string; textC
     textClass: 'text-slate-400 font-medium'
   },
   danger: {
-    classes: 'bg-red-600 text-white',
+    classes: 'text-white',
     bgHex: '#dc2626', // bg-red-600
+    hoverHex: '#b91c1c', // bg-red-700
     textClass: 'text-white'
   },
   warning: {
-    classes: 'bg-orange-500 hover:bg-orange-600 text-white',
+    classes: 'text-white',
     bgHex: '#f97316', // bg-orange-500
+    hoverHex: '#ea580c', // bg-orange-600
     textClass: 'text-white'
   },
   neutral: {
@@ -244,17 +251,26 @@ export const BiddingControls = memo(({
   onBid,
   onKeyDown,
   onInputChange,
-  onInputClick
+  onInputClick,
+  itemId
 }: BiddingControlsProps) => {
 
+  const router = useRouter();
   const buildId = (suffix: string) => `${idPrefix}-${suffix}`;
   const isQuotaReached = remainingAttempts === 0;
   
   // Disabled state logic
-  const isDisabled = disabled || isOwner || isSubmitting;
+  const isDisabled = disabled || (isOwner && !itemId) || isSubmitting;
 
   const isCoolingDown = cooldownRemaining > 0 && !isQuotaReached && !isSuccess;
   
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (itemId) {
+      router.push(`/list?id=${itemId}`);
+    }
+  };
+
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
   // High-precision remaining seconds for the animation duration
@@ -336,7 +352,7 @@ export const BiddingControls = memo(({
     if (isOwner) {
       return {
         theme: 'neutral' as ButtonTheme,
-        content: "Your Listing"
+        content: <BiddingButtonContent icon={Edit} text="Edit Listing" />
       };
     }
 
@@ -459,7 +475,7 @@ export const BiddingControls = memo(({
       {/* Action Button Foundation (L0) */}
       <motion.button
         id={buildId('place-bid-btn')}
-        onClick={onBid}
+        onClick={isOwner ? handleEditClick : onBid}
         disabled={isDisabled || isQuotaReached || isCoolingDown || isSuccess}
         initial={false}
         animate={{
@@ -467,6 +483,15 @@ export const BiddingControls = memo(({
           scale: !isCoolingDown && preciseRemaining <= 0.05 && preciseRemaining > -0.5 ? [1, 1.18, 1] : 1,
           backgroundColor: isCoolingDown ? '#FFFFFF' : activeTheme.bgHex,
         }}
+        whileHover={(!isDisabled && !isQuotaReached && !isCoolingDown && !isSuccess && activeTheme.hoverHex) ? {
+          scale: 1.02,
+          backgroundColor: activeTheme.hoverHex,
+          transition: { duration: 0.2 }
+        } : {}}
+        whileTap={(!isDisabled && !isQuotaReached && !isCoolingDown && !isSuccess) ? { 
+          scale: 0.97,
+          transition: { duration: 0.1 }
+        } : {}}
         transition={{ 
           x: { duration: 0.4 },
           scale: { duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] },
@@ -474,7 +499,7 @@ export const BiddingControls = memo(({
         }}
         className={cn(
           getInputHeight(viewMode),
-          "w-full rounded-xl font-bold font-outfit shadow-md active:scale-[0.98] text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center relative overflow-hidden transition-colors duration-200",
+          "w-full rounded-xl font-bold font-outfit shadow-md text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center relative transition-colors duration-200 z-[70]",
           activeTheme.classes,
           isCoolingDown ? "shadow-none border border-slate-200" : ""
         )}

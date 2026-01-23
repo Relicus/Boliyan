@@ -43,7 +43,9 @@ export function transformProfileToUser(profile: ProfileRow): User {
     stats: {
       bidsAcceptedByMe: 0,
       myBidsAccepted: 0
-    }
+    },
+    sellerSuccessRate: (profile as any).seller_success_rate ?? 100,
+    buyerSuccessRate: (profile as any).buyer_success_rate ?? 100
   };
 }
 
@@ -164,6 +166,9 @@ export function transformConversationToHydratedConversation(conv: ConversationWi
     bidder: conv.bidder_profile ? transformProfileToUser(conv.bidder_profile) : undefined,
     lastMessage: conv.last_message,
     updatedAt: conv.updated_at || conv.created_at || new Date().toISOString(),
-    expiresAt: conv.expires_at || undefined
+    expiresAt: conv.expires_at || undefined,
+    sellerConfirmedAt: (conv as any).seller_confirmed_at,
+    buyerConfirmedAt: (conv as any).buyer_confirmed_at,
+    isSealed: (conv as any).is_sealed || false
   };
 }

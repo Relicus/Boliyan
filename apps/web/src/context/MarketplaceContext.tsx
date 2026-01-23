@@ -39,6 +39,7 @@ interface MarketplaceContextType {
   watchedItemIds: string[];
   rejectBid: (bidId: string) => void;
   acceptBid: (bidId: string) => Promise<string | undefined>;
+  confirmExchange: (conversationId: string, role: 'buyer' | 'seller') => Promise<boolean>;
   filters: MarketplaceFilters;
   setFilter: <K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => void;
   updateFilters: (updates: Partial<MarketplaceFilters>) => void;
@@ -588,8 +589,28 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       return bidId;
   };
 
+  const confirmExchange = async (conversationId: string, role: 'buyer' | 'seller') => {
+    if (!user) return false;
+
+    const timestamp = new Date().toISOString();
+    const update: Database['public']['Tables']['conversations']['Update'] = role === 'seller' 
+        ? { seller_confirmed_at: timestamp } 
+        : { buyer_confirmed_at: timestamp };
+
+    const { error } = await supabase
+        .from('conversations')
+        .update(update)
+        .eq('id', conversationId);
+        
+    if (error) {
+        console.error("Failed to confirm exchange:", error);
+        return false;
+    }
+    return true;
+  };
+
   return (
-    <MarketplaceContext.Provider value={{ items, bids, isLoading, isLoadingMore, hasMore, loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, rejectBid, acceptBid, filters, setFilter, updateFilters, lastBidTimestamp, setLastBidTimestamp }}>
+    <MarketplaceContext.Provider value={{ items, bids, isLoading, isLoadingMore, hasMore, loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, rejectBid, acceptBid, confirmExchange, filters, setFilter, updateFilters, lastBidTimestamp, setLastBidTimestamp }}>
       {children}
     </MarketplaceContext.Provider>
   );

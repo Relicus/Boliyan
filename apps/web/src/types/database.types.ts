@@ -111,6 +111,8 @@ export type Database = {
           listing_id: string | null
           seller_id: string | null
           updated_at: string | null
+          seller_confirmed_at?: string | null
+          buyer_confirmed_at?: string | null
         }
         Insert: {
           bidder_id?: string | null
@@ -121,6 +123,8 @@ export type Database = {
           listing_id?: string | null
           seller_id?: string | null
           updated_at?: string | null
+          seller_confirmed_at?: string | null
+          buyer_confirmed_at?: string | null
         }
         Update: {
           bidder_id?: string | null
@@ -131,6 +135,8 @@ export type Database = {
           listing_id?: string | null
           seller_id?: string | null
           updated_at?: string | null
+          seller_confirmed_at?: string | null
+          buyer_confirmed_at?: string | null
         }
         Relationships: [
           {
