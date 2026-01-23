@@ -31,6 +31,29 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
     toggleWatch(item.id);
   };
 
+  const activeBid = useMemo(() => {
+    if (userBid) return userBid;
+    if (!user) return undefined;
+    return bids.find(b => b.itemId === item.id && b.bidderId === user.id);
+  }, [bids, item.id, user, userBid]);
+
+  const remainingAttempts = useMemo(() => {
+    if (!activeBid) return MAX_BID_ATTEMPTS;
+    const updatesUsed = activeBid.update_count || 0;
+    return Math.max(0, (MAX_BID_ATTEMPTS - 1) - updatesUsed);
+  }, [activeBid]);
+
+  const acceptedConversation = useMemo(() => {
+    if (!user) return undefined;
+    return conversations.find(conversation =>
+      conversation.itemId === item.id && conversation.bidderId === user.id
+    );
+  }, [conversations, item.id, user]);
+
+  const biddingConfig = createBiddingConfig(item, user, bids);
+  const canChat = activeBid?.status === 'accepted' && !!acceptedConversation;
+  const canCall = canChat && !!seller.phone;
+
   const handleChat = (event: React.MouseEvent) => {
     event.stopPropagation();
     if (!acceptedConversation) return;
