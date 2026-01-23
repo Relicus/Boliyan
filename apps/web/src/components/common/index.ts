@@ -6,8 +6,6 @@
 
 export { BiddingWidget } from './BiddingWidget';
 export { PriceDisplay } from './PriceDisplay';
-export { VictoryHalo, getHaloTheme } from './VictoryHalo';
-export type { HaloTheme } from './VictoryHalo';
 export { CategoryBadge } from './CategoryBadge';
 export { ConditionBadge } from './ConditionBadge';
 export { RatingBadge } from './RatingBadge';

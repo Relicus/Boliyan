@@ -3,13 +3,12 @@
 import { memo, useMemo, useState, useRef, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
-import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { cn, formatPrice } from "@/lib/utils";
 import { useApp } from "@/lib/store";
 import { Gavel, TrendingUp, Loader2, AlertCircle, Timer, Edit } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
-import { formatPrice } from "@/lib/utils";
-
-import { useRouter } from "next/navigation";
+import RollingPrice from "./RollingPrice";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -146,80 +145,72 @@ function getTextSize(viewMode: BiddingViewMode): string {
   }
 }
 
-// Separate portal component for floating deltas
-const FloatingDeltaPortal = ({ 
-  anchorRef, 
-  lastDelta, 
-  showDelta, 
-  animTrigger, 
-  viewMode 
-}: { 
-  anchorRef: React.RefObject<HTMLDivElement | null>;
-  lastDelta: number | null;
-  showDelta: boolean;
-  animTrigger: number;
-  viewMode: BiddingViewMode;
-}) => {
-  const [position, setPosition] = useState<{ top: number, left: number, width: number } | null>(null);
+// Separate portal component for floating deltas - REMOVED
 
-  useLayoutEffect(() => {
-    if (showDelta && anchorRef.current) {
-      const rect = anchorRef.current.getBoundingClientRect();
-      setPosition({
-        top: rect.top + window.scrollY,
-        left: rect.left + window.scrollX,
-        width: rect.width
-      });
-    }
-  }, [showDelta, animTrigger, anchorRef]);
 
-  if (!showDelta || lastDelta === null || !position) return null;
+// Optimized GPU-Accelerated ASCII Energy Bar
+const AsciiCooldown = ({ endTime, totalMs }: { endTime: number, totalMs: number }) => {
+  // 1. Pick a random word once on mount
+  const label = useMemo(() => {
+    const words = [
+      "COUNTING", "RELOADING", "HOLD UP", "BREATHE", 
+      "COOLDOWN", "BUFFERING", "COOLING", "OVERHEAT", 
+      "WASUP?", "SENDING", "HEY", "YES"
+    ];
+    return words[Math.floor(Math.random() * words.length)];
+  }, []);
 
-  return createPortal(
-    <div 
-      className="absolute pointer-events-none z-[9999] flex items-center justify-center"
-      style={{
-        top: position.top - 48, // Start slightly above input
-        left: position.left,
-        width: position.width,
-        height: 40
-      }}
-    >
-      <AnimatePresence mode="popLayout">
-        <motion.div
-          key={animTrigger}
-          initial={{ opacity: 0, y: 20, scale: 0.8, rotate: lastDelta > 0 ? -10 : 10 }}
-          animate={{ 
-            opacity: 1, 
-            y: -5, 
-            scale: 1, 
-            rotate: 0,
-            transition: {
-              type: "spring",
-              stiffness: 600,
-              damping: 20,
-              mass: 0.8
-            }
-          }}
-          exit={{ 
-            opacity: 0, 
-            y: -40, 
-            scale: 0.9,
-            rotate: lastDelta > 0 ? 5 : -5,
-            transition: { duration: 0.3, ease: "easeOut" }
-          }}
-          className={cn(
-            "font-black font-outfit tracking-tight",
-            lastDelta > 0 ? "text-emerald-600" : "text-rose-600",
-            viewMode === 'modal' ? "text-xl" : "text-lg"
-          )}
-          style={{ willChange: "transform, opacity" }}
-        >
-          {lastDelta > 0 ? "+" : ""}{lastDelta.toLocaleString()}
-        </motion.div>
-      </AnimatePresence>
-    </div>,
-    document.body
+  // 2. Determine Bar Length based on word length to stabilize button width
+  // Target total chars ~28.
+  // Formula: BarChars = Target (28) - LabelLength - Spacing (2)
+  const targetTotal = 28;
+  const barLength = Math.max(5, targetTotal - label.length - 2);
+  const fullBar = "|".repeat(barLength);
+  const emptyBar = ".".repeat(barLength);
+
+  // 3. Calculate Animation Parameters
+  // If the component mounts halfway through the cooldown, we need to skip ahead.
+  // CSS animation-delay accepts negative values to start "mid-way".
+  const now = Date.now();
+  const alreadyElapsed = Math.max(0, totalMs - (endTime - now));
+  const animationDelay = -alreadyElapsed / 1000; // seconds
+
+  return (
+    <div className="flex items-center justify-center font-mono font-bold text-xs sm:text-sm tracking-tighter text-slate-900 overflow-hidden relative animate-pulse">
+      <style jsx>{`
+        @keyframes revealBar {
+          from { width: 0%; }
+          to { width: 100%; }
+        }
+      `}</style>
+      
+      {/* Container for the text */}
+      <div className="flex items-center gap-1 whitespace-nowrap">
+        <span>{label}</span>
+        <span>[</span>
+        
+        {/* The Bar Stack */}
+        <div className="relative inline-flex items-center">
+          {/* Layer 1: The "Empty" Dots (Background) */}
+          <span className="text-slate-300 select-none">{emptyBar}</span>
+          
+          {/* Layer 2: The "Full" Pipes (Foreground) - GPU Animated Reveal */}
+          {/* We use steps() to ensure characters appear one-by-one, mimicking the mechanical feel of the JS loop */}
+          <div 
+            className="absolute inset-0 overflow-hidden whitespace-nowrap text-slate-900"
+            style={{
+              animation: `revealBar ${totalMs}ms steps(${barLength}, end) forwards`,
+              animationDelay: `${animationDelay}s`,
+              width: '0%' 
+            }}
+          >
+            {fullBar}
+          </div>
+        </div>
+        
+        <span>]</span>
+      </div>
+    </div>
   );
 };
 
@@ -256,6 +247,8 @@ export const BiddingControls = memo(({
 }: BiddingControlsProps) => {
 
   const router = useRouter();
+  const [isFocused, setIsFocused] = useState(false);
+  const numericBid = parseFloat(bidAmount.replace(/[^0-9.-]+/g, '')) || 0;
   const buildId = (suffix: string) => `${idPrefix}-${suffix}`;
   const isQuotaReached = remainingAttempts === 0;
   
@@ -277,7 +270,7 @@ export const BiddingControls = memo(({
   const { lastBidTimestamp, now } = useApp();
   const preciseRemaining = useMemo(() => {
     if (!lastBidTimestamp) return 0;
-    return Math.max(0, (lastBidTimestamp + 15000 - now) / 1000);
+    return Math.max(0, (lastBidTimestamp + 3000 - now) / 1000);
   }, [lastBidTimestamp, now]);
   
   const { theme, content } = useMemo(() => {
@@ -413,14 +406,6 @@ export const BiddingControls = memo(({
 
       {/* Stepper Input Row */}
       <div className={`flex w-full ${getInputHeight(viewMode)} relative`} ref={inputContainerRef}>
-        <FloatingDeltaPortal 
-          anchorRef={inputContainerRef}
-          lastDelta={lastDelta}
-          showDelta={!!showDelta}
-          animTrigger={animTrigger}
-          viewMode={viewMode}
-        />
-
         <div className={`flex flex-1 border border-slate-300 rounded-xl shadow-sm overflow-hidden bg-white ${isOwner || isQuotaReached ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
           
           {/* Decrement Button */}
@@ -449,13 +434,21 @@ export const BiddingControls = memo(({
               transition={{ 
                 x: { duration: 0.2 } // Shake duration
               }}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
               onKeyDown={onKeyDown}
               onChange={onInputChange}
               onClick={onInputClick}
               className={`w-full h-full text-center ${getTextSize(viewMode)} font-black font-outfit text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300
                 ${error ? 'bg-red-50 text-red-900' : 'bg-transparent'}
+                ${isFocused ? 'opacity-100' : 'opacity-0'}
               `}
             />
+             {!isFocused && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                 <RollingPrice price={numericBid} className={getTextSize(viewMode) + " font-black font-outfit text-slate-900"} />
+              </div>
+            )}
           </div>
 
           {/* Increment Button */}
@@ -500,48 +493,17 @@ export const BiddingControls = memo(({
           getInputHeight(viewMode),
           "w-full rounded-xl font-bold font-outfit shadow-md text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center relative transition-colors duration-200 z-20",
           activeTheme.classes,
-          isCoolingDown ? "shadow-none border border-slate-200" : ""
+          isCoolingDown ? "shadow-none border border-slate-200 cursor-not-allowed" : ""
         )}
       >
-        {/* Active State Label (Revealed after handoff) */}
-        <BiddingButtonLabel 
-          content={content}
-          className={cn(activeTheme.textClass, "transition-colors duration-200")}
-        />
-
-        {/* COOLDOWN LAYERS (Sliding Window Handoff) */}
-        <AnimatePresence>
-          {isCoolingDown && (
-            <motion.div 
-              key="cooldown-overlay-container"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.05 }}
-              className="absolute inset-0 z-50 pointer-events-none"
-            >
-               {/* Under-Layer (White Base) */}
-               <div className="absolute inset-0 bg-white">
-                  <BiddingButtonLabel 
-                    content={content} 
-                    className="text-black" 
-                  />
-               </div>
-
-               {/* Over-Layer (Black Fill Window - using clip-path to prevent distortion) */}
-               <motion.div 
-                  className="absolute inset-0 bg-black"
-                  initial={{ clipPath: `inset(0 ${100 - (cooldownProgress * 100)}% 0 0)` }}
-                  animate={{ clipPath: 'inset(0 0% 0 0)' }}
-                  transition={{ duration: preciseRemaining, ease: "linear" }}
-                >
-                  <BiddingButtonLabel 
-                    content={content} 
-                    className="text-white" 
-                  />
-               </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isCoolingDown ? (
+          <AsciiCooldown endTime={(lastBidTimestamp || 0) + 3000} totalMs={3000} />
+        ) : (
+          <BiddingButtonLabel 
+            content={content}
+            className={cn(activeTheme.textClass, "transition-colors duration-200")}
+          />
+        )}
       </motion.button>
     </div>
   );

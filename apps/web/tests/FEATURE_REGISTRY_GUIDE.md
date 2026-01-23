@@ -438,7 +438,7 @@ apps/web/
    - Generate coverage reports
 
 5. **Visual Regression Testing**
-   - Victory Halo states
+   - Bidding states
    - Gated Messaging UI
    - Responsive layouts
 

@@ -137,7 +137,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
     console.log("Modal closed successfully");
   });
 
-  test('should toggle watchlist and show Blue Halo', async ({ page }) => {
+  test('should toggle watchlist and show Indicator', async ({ page }) => {
     // Pick first item
     const rootCards = page.locator('#marketplace-grid-container [id^="item-card-"]');
     const itemCard = rootCards.first();

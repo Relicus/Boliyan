@@ -10,7 +10,6 @@ All notable changes to the Boliyan project will be documented in this file.
     - **Watchlist Filter**: Dedicated sort/filter mode to view saved items.
 - **Bidding UI 2.0 (Victory Experience)**:
     - **Smart Stepper**: Context-aware increment/decrement (100, 500, 1000) based on item price.
-    - **Victory Halo**: Dynamic animated border glow (Orange for winning high bidder, Blue for watched/secret items).
     - **Celebration**: Gold/Amber confetti burst on successful bid placement.
     - **Feedback Loops**: Outbid shake animation, price deltas (+/- popups), and "You own this" disabled states.
 - **Product Details & Gallery**:
@@ -22,7 +21,7 @@ All notable changes to the Boliyan project will be documented in this file.
 ### Fixed
 - **Accessibility**: Added `DialogTitle` to fullscreen galleries for ARIA compliance.
 - **Validation**: Strict enforcement preventing users from bidding on their own listings.
-- **Consistency**: Unified color palette (Orange for high bidder, Blue for watchlist) across all components.
+- **Consistency**: Unified color palette across all components.
 
 ## [0.1.0] - 2026-01-12
 ### Added

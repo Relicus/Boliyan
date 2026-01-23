@@ -8,7 +8,7 @@
 ## DIRECTORY MAP
 - **`ItemCard.tsx`**: The **Hero Component**.
   - **Responsibilities**: Display item info, handle "Watch" toggle, trigger Modal.
-  - **Key Feature**: **The Victory Halo**. A conic gradient border that lights up when interesting things happen (Winning/Watching).
+  - **Key Feature**: **Bidding Intelligence**. Smart steps and outbid alerts.
 - **`MarketplaceGrid.tsx`**: The main layout container.
   - **Responsive**: Adapts from 1 column (Mobile) to 4 columns (Desktop).
   - Handles **Infinite Scroll** triggers.

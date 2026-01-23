@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
-import { VictoryHalo } from "@/components/common";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
@@ -48,7 +47,6 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
     return `${hours}h ${mins}m`;
   };
 
-  const haloTheme = isLeading ? "orange" : isOutbid ? "green" : "none";
   const acceptedConversation = useMemo(() => {
     if (!user) return undefined;
     return conversations.find(conversation =>
@@ -76,9 +74,8 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
       <div 
         id={`my-bid-card-${item.id}`} 
         onClick={() => setIsModalOpen(true)}
-        className={`group relative isolation-isolate overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer ${haloTheme !== 'none' ? 'p-[3px]' : 'p-0'}`}
+        className="group relative overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer p-0"
       >
-        <VictoryHalo theme={haloTheme} />
         
         <div className="relative z-10 bg-white rounded-[calc(0.75rem-3px)] p-4 flex gap-4 h-full">
           <div className="relative shrink-0">

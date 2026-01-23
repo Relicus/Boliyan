@@ -46,7 +46,6 @@ export interface PublicBiddingConfig extends BiddingConfigBase {
   currentHighBidderId: string | undefined;
   
   // Visual states
-  showVictoryHalo: boolean;  // True when user is high bidder
   showOutbidWarning: boolean; // True when user was outbid
 }
 
@@ -108,7 +107,6 @@ export function createBiddingConfig(
       showHighBidder: true,
       currentHighBid: item.currentHighBid,
       currentHighBidderId: item.currentHighBidderId,
-      showVictoryHalo: isUserHighBidder,
       showOutbidWarning: hasUserBid && !isUserHighBidder,
     };
   } else {

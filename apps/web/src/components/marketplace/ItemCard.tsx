@@ -12,7 +12,6 @@ import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice, getConditionLabel } from "@/lib/utils";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
-import { VictoryHalo, getHaloTheme } from "@/components/common";
 import { createBiddingConfig } from "@/types/bidding";
 import ProductDetailsModal from "./ProductDetailsModal";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
@@ -143,9 +142,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
   // Calculate real-time status for input styling
 
-  // Calculate halo theme
-  const haloTheme = getHaloTheme(biddingConfig, isWatched);
-
   return (
     <>
       <motion.div
@@ -162,12 +158,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`@container group relative isolation-isolate border-none bg-slate-50 rounded-xl flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring,padding] duration-500 shadow-sm hover:shadow-md
+            className={`@container group relative border-none bg-slate-50 rounded-xl flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring,padding] duration-500 shadow-sm hover:shadow-md
               ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
             `}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
-            <VictoryHalo theme={haloTheme} />
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)]">
 
 
@@ -327,8 +322,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               - Added conditional pb-3 to compensate for halo visual overlap
             */}
             <CardContent className={cn(
-              "p-1.5 flex flex-col gap-1 flex-1 z-10 transition-all",
-              haloTheme !== 'none' ? "pb-3" : "pb-2"
+              "p-1.5 flex flex-col gap-1 flex-1 z-10 transition-all pb-2",
             )}>
               {/* Title - Natural height with clamping */}
               <div className="flex items-start">

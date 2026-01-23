@@ -293,7 +293,22 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           sonic.tick(); // Subtle notification
       }
 
-      setBidsById(prev => upsertEntity(prev, newBid));
+      setBidsById(prev => {
+          // Regression Guard: Protect optimistic state
+          // If our local optimistic update is ahead of the server echo (due to latency/cache),
+          // preserve the higher local count so beads don't flicker/reset.
+          const existing = prev[newBid.id];
+          if (existing) {
+              const localCount = existing.update_count || 0;
+              const serverCount = newBid.update_count || 0;
+              
+              if (localCount > serverCount) {
+                  // Keep our local optimistic count
+                  newBid.update_count = localCount;
+              }
+          }
+          return upsertEntity(prev, newBid);
+      });
 
       setItemsById(prevItems => {
         const item = prevItems[newBid.itemId];

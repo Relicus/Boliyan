@@ -8,6 +8,7 @@ import Link from "next/link";
 import { getMinimumAllowedBid, MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import { motion, AnimatePresence } from "framer-motion";
 import { memo } from "react";
+import RollingPrice from "@/components/common/RollingPrice";
 
 interface BiddingDashboardProps {
   item: Item;
@@ -79,11 +80,10 @@ export const BiddingDashboard = memo(function BiddingDashboard({
         <div className="flex flex-col items-center text-center min-w-0 bg-white border border-slate-200 shadow-sm rounded-xl p-3 h-full justify-center">
           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Ask Price</span>
           <motion.span 
-            key={item.askPrice}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit text-slate-900 leading-tight tracking-tight truncate w-full pb-1" title={formatPrice(item.askPrice)}>
-            {formatPrice(item.askPrice)}
+            <RollingPrice price={item.askPrice} />
           </motion.span>
         </div>
 
@@ -93,13 +93,12 @@ export const BiddingDashboard = memo(function BiddingDashboard({
              {item.isPublicBid ? "Highest" : "Bids"}
           </span>
           <motion.span 
-            key={`${item.currentHighBid}-${item.bidCount}`}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className={`text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit leading-tight tracking-tight truncate w-full pb-1 ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-900'}`}>
             {item.isPublicBid && item.currentHighBid
-              ? formatPrice(item.currentHighBid)
-              : `${item.bidCount}`
+              ? <RollingPrice price={item.currentHighBid} />
+              : <RollingPrice price={item.bidCount} />
             }
           </motion.span>
         </div>

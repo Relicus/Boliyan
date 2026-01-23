@@ -13,6 +13,7 @@ import { Lock } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
 import { formatPrice } from "@/lib/utils";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
+import RollingPrice from "./RollingPrice";
 
 // ============================================
 // PROPS
@@ -81,7 +82,7 @@ export const PriceDisplay = memo(({
           Asking
         </span>
         <span className={`${getPriceClass(viewMode)} text-slate-800`}>
-          {formatPrice(askPrice, viewMode)}
+          <RollingPrice price={askPrice} />
         </span>
       </div>
 
@@ -121,8 +122,6 @@ export const PriceDisplay = memo(({
             // Public: Show current high bid with animation
             <div className="flex items-center gap-1.5">
               <motion.span 
-                key={config.currentHighBid}
-                initial={{ scale: 1.4, color: "#3b82f6" }}
                 animate={{ 
                   scale: 1, 
                   color: config.isUserHighBidder ? "#d97706" : "#2563eb" 
@@ -135,7 +134,7 @@ export const PriceDisplay = memo(({
                 }}
                 className={`${getPriceClass(viewMode)} inline-block`}
               >
-                {formatPrice(config.currentHighBid, viewMode)}
+                <RollingPrice price={config.currentHighBid} />
               </motion.span>
             </div>
           ) : config.variant === 'secret' ? (

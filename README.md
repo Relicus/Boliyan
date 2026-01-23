@@ -27,7 +27,7 @@ To build the most **efficient, transparent, and safe** peer-to-peer marketplace 
 **Apple-Style Minimalism**: "Subtract before you add. If a visual cue works, delete the text."
 
 ## 🌟 Key Features
-*   **Smart Bidding 2.0**: Real-time feedback with **Victory Halos** and outbid alerts.
+*   **Smart Bidding 2.0**: Real-time feedback and outbid alerts.
 *   **Strict Messaging**: Chat unlocks ONLY after a deal is accepted.
 *   **Watchlist System**: Save items; automatically tracked when you place a bid.
 *   **Immersive Gallery**: High-performance, fullscreen multi-image viewing.

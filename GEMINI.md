@@ -62,7 +62,6 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 - **Engine**: Tailwind CSS v4. No config file needed for standard usage.
 - **Animations**: Use `framer-motion` (`motion.div`, `AnimatePresence`) for ALL state changes.
 - **Patterns**:
-  - **Victory Halo**: Conic gradients (`bg-[conic-gradient(...)]`) for winning states (Orange) or watchlist (Blue).
   - **Glassmorphism**: `backdrop-blur-md bg-black/60` for overlays.
   - **Fluid Typography**: Use custom classes like `text-fluid-h3` (if defined) or standard tailwind responsive prefixes.
 
@@ -108,5 +107,4 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 1.  **Minimalist Check**: Before implementing, ask "Can this be done with FEWER elements?"
 2.  **Always Check IDs**: Before interacting with elements, verify the `id` exists or add it.
 3.  **Verify Animations**: Ensure Framer Motion transitions are smooth and don't cause layout shifts.
-4.  **Respect The Halo**: The "Victory Halo" is a core mechanic. Do not remove or alter its logic without specific instruction.
-5.  **SQL First**: DDL changes must be reflected in `packages/database/schema.sql`.
+4.  **SQL First**: DDL changes must be reflected in `packages/database/schema.sql`.

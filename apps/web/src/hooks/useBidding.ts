@@ -25,14 +25,14 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
   const cooldownRemaining = useMemo(() => {
     if (!lastBidTimestamp) return 0;
-    const diff = Math.ceil((lastBidTimestamp + 15000 - now) / 1000);
+    const diff = Math.ceil((lastBidTimestamp + 3000 - now) / 1000);
     return Math.max(0, diff);
   }, [lastBidTimestamp, now]);
 
   const cooldownProgress = useMemo(() => {
     if (!lastBidTimestamp) return 0;
     const elapsed = now - lastBidTimestamp;
-    const progress = Math.min(1, elapsed / 15000);
+    const progress = Math.min(1, elapsed / 3000);
     return progress;
   }, [lastBidTimestamp, now]);
 

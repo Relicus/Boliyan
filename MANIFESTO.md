@@ -64,8 +64,8 @@ To become the **Default Operating System** for the secondary economy. Whether yo
 - ✅ **Real-time bidding** with 70% minimum bid validation.
 - ✅ **"No Chat Before Deal"** — Messaging unlocks only after bid acceptance.
 - ✅ **"3-Chat Rule"**: Listing is auto-hidden once 3 bidders have been accepted (Strict Intent).
-- ✅ **Watchlist** with visual "Blue Halo" indicator.
-- ✅ **"Victory Halo"** for winning the highest bid.
+- ✅ **Watchlist** with visual indicator.
+- ✅ **Winning State** for winning the highest bid.
 - ✅ **Verified seller badges** (is_verified flag).
 - ✅ **Immersive Gallery** with full-screen view.
 - ✅ **Apple-style minimalist UI** with Framer Motion animations.

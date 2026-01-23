@@ -23,7 +23,6 @@ src/
 - **AI Referencing**: (STRICT) Assign unique `id` attributes to main containers and actionable elements (buttons, inputs).
 - **State Management**: Use specific context hooks (`useMarketplace`, `useAuth`, etc.) or the legacy `useApp()` wrapper.
 - **UI Patterns**:
-    - **Victory Halo**: Implement using `motion.div` with conic-gradients for status feedback.
     - **Celebration**: `canvas-confetti` should be triggered for all high-intent successes.
 - **Data Flow**: Use Supabase real-time subscriptions for dynamic updates.
 
