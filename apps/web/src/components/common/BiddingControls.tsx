@@ -9,6 +9,7 @@ import { useApp } from "@/lib/store";
 import { Gavel, TrendingUp, Loader2, AlertCircle, Timer, Edit } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import RollingPrice from "./RollingPrice";
+import { BoliyanUrduMark } from "@/components/branding/BoliyanLogo";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -144,75 +145,6 @@ function getTextSize(viewMode: BiddingViewMode): string {
     default: return 'text-[clamp(0.875rem,5cqi,1.125rem)]';
   }
 }
-
-// Separate portal component for floating deltas - REMOVED
-
-
-// Optimized GPU-Accelerated ASCII Energy Bar
-const AsciiCooldown = ({ endTime, totalMs }: { endTime: number, totalMs: number }) => {
-  // 1. Pick a random word once on mount
-  const label = useMemo(() => {
-    const words = [
-      "COUNTING", "RELOADING", "HOLD UP", "BREATHE", 
-      "COOLDOWN", "BUFFERING", "COOLING", "OVERHEAT", 
-      "WASUP?", "SENDING", "HEY", "YES"
-    ];
-    return words[Math.floor(Math.random() * words.length)];
-  }, []);
-
-  // 2. Determine Bar Length based on word length to stabilize button width
-  // Target total chars ~28.
-  // Formula: BarChars = Target (28) - LabelLength - Spacing (2)
-  const targetTotal = 28;
-  const barLength = Math.max(5, targetTotal - label.length - 2);
-  const fullBar = "|".repeat(barLength);
-  const emptyBar = ".".repeat(barLength);
-
-  // 3. Calculate Animation Parameters
-  // If the component mounts halfway through the cooldown, we need to skip ahead.
-  // CSS animation-delay accepts negative values to start "mid-way".
-  const now = Date.now();
-  const alreadyElapsed = Math.max(0, totalMs - (endTime - now));
-  const animationDelay = -alreadyElapsed / 1000; // seconds
-
-  return (
-    <div className="flex items-center justify-center font-mono font-bold text-xs sm:text-sm tracking-tighter text-slate-900 overflow-hidden relative animate-pulse">
-      <style jsx>{`
-        @keyframes revealBar {
-          from { width: 0%; }
-          to { width: 100%; }
-        }
-      `}</style>
-      
-      {/* Container for the text */}
-      <div className="flex items-center gap-1 whitespace-nowrap">
-        <span>{label}</span>
-        <span>[</span>
-        
-        {/* The Bar Stack */}
-        <div className="relative inline-flex items-center">
-          {/* Layer 1: The "Empty" Dots (Background) */}
-          <span className="text-slate-300 select-none">{emptyBar}</span>
-          
-          {/* Layer 2: The "Full" Pipes (Foreground) - GPU Animated Reveal */}
-          {/* We use steps() to ensure characters appear one-by-one, mimicking the mechanical feel of the JS loop */}
-          <div 
-            className="absolute inset-0 overflow-hidden whitespace-nowrap text-slate-900"
-            style={{
-              animation: `revealBar ${totalMs}ms steps(${barLength}, end) forwards`,
-              animationDelay: `${animationDelay}s`,
-              width: '0%' 
-            }}
-          >
-            {fullBar}
-          </div>
-        </div>
-        
-        <span>]</span>
-      </div>
-    </div>
-  );
-};
 
 export const BiddingControls = memo(({
   bidAmount,
@@ -474,7 +406,7 @@ export const BiddingControls = memo(({
         animate={{
           x: pendingConfirmation ? [0, -3, 3, -3, 3, 0] : 0,
           scale: !isCoolingDown && preciseRemaining <= 0.05 && preciseRemaining > -0.5 ? [1, 1.18, 1] : 1,
-          backgroundColor: isCoolingDown ? '#FFFFFF' : activeTheme.bgHex,
+          backgroundColor: isCoolingDown ? '#f8fafc' : activeTheme.bgHex, // Use slate-50 when cooling down
         }}
         whileHover={(!isDisabled && !isQuotaReached && !isCoolingDown && !isSuccess && activeTheme.hoverHex) ? {
           backgroundColor: activeTheme.hoverHex,
@@ -497,7 +429,9 @@ export const BiddingControls = memo(({
         )}
       >
         {isCoolingDown ? (
-          <AsciiCooldown endTime={(lastBidTimestamp || 0) + 3000} totalMs={3000} />
+          <div className="flex items-center justify-center opacity-60">
+             <BoliyanUrduMark className="text-xl text-slate-400" />
+          </div>
         ) : (
           <BiddingButtonLabel 
             content={content}

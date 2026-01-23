@@ -7,9 +7,9 @@
  * Adapts styling based on bidding variant (public vs secret).
  */
 
-import { memo } from "react";
-import { motion } from "framer-motion";
-import { Lock } from "lucide-react";
+import { memo, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Lock, User as UserIcon } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
 import { formatPrice } from "@/lib/utils";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
@@ -73,6 +73,34 @@ export const PriceDisplay = memo(({
   showAttempts = false,
   userCurrentBid
 }: PriceDisplayProps) => {
+
+  const [showUserBid, setShowUserBid] = useState(false);
+
+  // Rotation Logic
+  useEffect(() => {
+    // Stop if no user bid
+    if (userCurrentBid === undefined || userCurrentBid === null) {
+      setShowUserBid(false);
+      return;
+    }
+
+    // Start rotation
+    let timer: NodeJS.Timeout;
+
+    const runRotation = () => {
+       // If currently showing User Bid (true), we want to switch to Market Bid after 1s
+       // If currently showing Market Bid (false), we want to switch to User Bid after 2s
+       const nextDuration = showUserBid ? 1000 : 2000;
+       
+       timer = setTimeout(() => {
+           setShowUserBid(prev => !prev);
+       }, nextDuration);
+    };
+
+    runRotation();
+
+    return () => clearTimeout(timer);
+  }, [showUserBid, userCurrentBid, config.variant, config.isUserHighBidder]);
   
   return (
     <div className={`grid grid-cols-[1fr_auto_1fr] items-end ${className}`}>
@@ -99,64 +127,82 @@ export const PriceDisplay = memo(({
                 />
               ))}
             </div>
-            
-            {/* User Bid - Only if exists */}
-            {userCurrentBid !== undefined && userCurrentBid !== null && (
-                <span className="text-[10px] font-black font-outfit text-slate-700 leading-none animate-in fade-in zoom-in duration-300">
-                    {formatPrice(userCurrentBid)}
-                </span>
-            )}
+            {/* User Bid removed from here - moved to rotation */}
           </div>
         )}
       </div>
 
-      {/* Highest Bid / Secret Status */}
-      <div className="flex flex-col items-end justify-self-end transition-all">
-        <span className={getLabelClass(viewMode)}>
-          {config.variant === 'public' ? "Highest" : "Secret"}
-        </span>
+      {/* Highest Bid / Secret Status / Your Bid (Rotating) */}
+      <div className="flex flex-col items-end justify-self-end transition-all relative h-[2.5em] justify-end">
+        <AnimatePresence mode="wait">
+           {showUserBid ? (
+             <motion.div
+               key="user-bid"
+               initial={{ opacity: 0, y: 5 }}
+               animate={{ opacity: 1, y: 0 }}
+               exit={{ opacity: 0, y: -5 }}
+               transition={{ duration: 0.2 }}
+               className="flex flex-col items-end absolute bottom-0 right-0 w-max"
+             >
+                <span className={`${getLabelClass(viewMode)} text-purple-600/80`}>
+                  Your Bid
+                </span>
+                <span className={`${getPriceClass(viewMode)} text-purple-700 flex items-center gap-1`}>
+                   <RollingPrice price={userCurrentBid || 0} />
+                   {(viewMode === 'spacious' || viewMode === 'modal') && (
+                     <UserIcon className="h-3 w-3 ml-0.5 opacity-50" />
+                   )}
+                </span>
+             </motion.div>
+           ) : (
+             <motion.div
+               key="market-bid"
+               initial={{ opacity: 0, y: 5 }}
+               animate={{ opacity: 1, y: 0 }}
+               exit={{ opacity: 0, y: -5 }}
+               transition={{ duration: 0.2 }}
+               className="flex flex-col items-end absolute bottom-0 right-0 w-max"
+             >
+                <span className={getLabelClass(viewMode)}>
+                  {config.variant === 'public' ? "Highest" : "Secret"}
+                </span>
 
-        
-        <div className="flex items-center gap-1.5 transition-all">
-          {config.variant === 'public' && config.showHighBid && config.currentHighBid ? (
-            // Public: Show current high bid with animation
-            <div className="flex items-center gap-1.5">
-              <motion.span 
-                animate={{ 
-                  scale: 1, 
-                  color: config.isUserHighBidder ? "#d97706" : "#2563eb" 
-                }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 260, 
-                  damping: 20,
-                  duration: 0.6
-                }}
-                className={`${getPriceClass(viewMode)} inline-block`}
-              >
-                <RollingPrice price={config.currentHighBid} />
-              </motion.span>
-            </div>
-          ) : config.variant === 'secret' ? (
-            // Secret: Show bid count with lock (lock only on spacious/modal)
-            <div className="flex items-center gap-1.5">
-              <span className={`${getPriceClass(viewMode)} text-amber-600`}>
-                {bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}
-              </span>
-              {(viewMode === 'spacious' || viewMode === 'modal') && (
-                <div className="bg-amber-100 text-amber-600 p-1 rounded" title="Secret Bidding">
-                  <Lock className="h-3.5 w-3.5" />
+                <div className="flex items-center gap-1.5 transition-all">
+                  {config.variant === 'public' && config.showHighBid && config.currentHighBid ? (
+                    // Public: Show current high bid with animation
+                    <div className="flex items-center gap-1.5">
+                      <motion.span 
+                        animate={{ 
+                          scale: 1, 
+                          color: config.isUserHighBidder ? "#d97706" : "#2563eb" 
+                        }}
+                        className={`${getPriceClass(viewMode)} inline-block`}
+                      >
+                        <RollingPrice price={config.currentHighBid} />
+                      </motion.span>
+                    </div>
+                  ) : config.variant === 'secret' ? (
+                    // Secret: Show bid count with lock
+                    <div className="flex items-center gap-1.5">
+                      <span className={`${getPriceClass(viewMode)} text-amber-600`}>
+                        {bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}
+                      </span>
+                      {(viewMode === 'spacious' || viewMode === 'modal') && (
+                        <div className="bg-amber-100 text-amber-600 p-1 rounded" title="Secret Bidding">
+                          <Lock className="h-3.5 w-3.5" />
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    // Public with no bids yet
+                    <span className={`${getPriceClass(viewMode)} text-blue-600`}>
+                      {bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}
+                    </span>
+                  )}
                 </div>
-              )}
-            </div>
-          ) : (
-            // Public with no bids yet
-            <span className={`${getPriceClass(viewMode)} text-blue-600`}>
-              {bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}
-            </span>
-          )}
-
-        </div>
+             </motion.div>
+           )}
+        </AnimatePresence>
       </div>
     </div>
   );

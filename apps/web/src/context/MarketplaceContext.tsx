@@ -519,6 +519,14 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
             // Transform and hydrate
             const hydratedBids = uniqueBids.map(b => transformBidToHydratedBid(b as unknown as BidWithProfile));
             setBidsById(normalize(hydratedBids));
+
+            // Sync lastBidTimestamp from server history for accurate cooldowns
+            const myBids = hydratedBids.filter(b => b.bidderId === user.id);
+            if (myBids.length > 0) {
+                // Find the most recent bid timestamp
+                const latestBidTime = Math.max(...myBids.map(b => new Date(b.createdAt).getTime()));
+                setLastBidTimestamp(latestBidTime);
+            }
         } catch (err: any) {
             console.error("Error fetching user bids:", err.message || err);
         }
