@@ -236,14 +236,14 @@ export default function MarketplaceGrid() {
                 <Button
                   id="mobile-view-toggle"
                   variant="outline"
-                  className="h-auto flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out border-0 shadow-sm hover:shadow-md ring-1 ring-slate-200"
+                  className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-95 active:bg-slate-200 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
                   onClick={() => {
                     handleViewModeChange(viewMode === 'compact' ? 'spacious' : 'compact');
                   }}
                 >
-                  {viewMode === 'compact' && <Grid3x3 className="lucide lucide-grid3x3 lucide-grid-3x3 h-5 w-5 text-slate-700" />}
-                  {viewMode === 'comfortable' && <Grid2x2 className="lucide lucide-grid2x2 lucide-grid-2x2 h-5 w-5 text-slate-700" />}
-                  {viewMode === 'spacious' && <LayoutGrid className="lucide lucide-layout-grid h-5 w-5 text-slate-700" />}
+                  {viewMode === 'compact' && <Grid3x3 className="h-5 w-5 text-slate-700" />}
+                  {viewMode === 'comfortable' && <Grid2x2 className="h-5 w-5 text-slate-700" />}
+                  {viewMode === 'spacious' && <LayoutGrid className="h-5 w-5 text-slate-700" />}
                   
                   <span className="text-[10px] font-medium leading-none text-slate-600 truncate w-full text-center">
                      View
@@ -308,26 +308,26 @@ export default function MarketplaceGrid() {
               type="single" 
               value={viewMode} 
               onValueChange={(val) => val && handleViewModeChange(val as ViewMode)}
-              className="bg-slate-50 p-1 rounded-xl border border-slate-200 shadow-sm shrink-0"
+              className="bg-slate-50 h-9 rounded-xl border border-slate-200 shadow-sm shrink-0 overflow-hidden"
             >
               <ToggleGroupItem 
                 value="compact" 
                 aria-label="Compact View" 
-                className="h-8 w-8 rounded-lg data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
+                className="h-full w-10 data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
               >
                 <Grid3x3 className="h-4 w-4" />
               </ToggleGroupItem>
               <ToggleGroupItem 
                 value="comfortable" 
                 aria-label="Comfortable View"
-                className="h-8 w-8 rounded-lg data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
+                className="h-full w-10 data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
               >
                 <Grid2x2 className="h-4 w-4" />
               </ToggleGroupItem>
               <ToggleGroupItem 
                 value="spacious" 
                 aria-label="Spacious View"
-                className="h-8 w-8 rounded-lg data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
+                className="h-full w-10 data-[state=on]:bg-slate-900 data-[state=on]:text-white data-[state=on]:shadow-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100 p-0"
               >
                 <LayoutGrid className="h-4 w-4" />
               </ToggleGroupItem>
