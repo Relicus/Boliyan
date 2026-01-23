@@ -1,18 +1,19 @@
 "use client";
 
+import { useState, useMemo } from "react";
+import { Clock, MapPin, Trophy, AlertTriangle, MessageSquare, Phone } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Bid, Item, User } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Trophy, AlertTriangle } from "lucide-react";
-import { useApp } from "@/lib/store";
-import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
-
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { VictoryHalo } from "@/components/common";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
+import { useApp } from "@/lib/store";
 
 interface MyBidCardProps {
   item: Item;
@@ -21,11 +22,12 @@ interface MyBidCardProps {
 }
 
 export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
-  const { user, now, bids } = useApp();
+  const { user, now, bids, conversations } = useApp();
   
   const isLeading = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isOutbid = user && item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   // Remaining Attempts
   const remainingAttempts = useMemo(() => {
@@ -47,6 +49,27 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   };
 
   const haloTheme = isLeading ? "orange" : isOutbid ? "green" : "none";
+  const acceptedConversation = useMemo(() => {
+    if (!user) return undefined;
+    return conversations.find(conversation =>
+      conversation.itemId === item.id && conversation.bidderId === user.id
+    );
+  }, [conversations, item.id, user]);
+  const isAccepted = userBid.status === 'accepted';
+  const canChat = isAccepted && !!acceptedConversation;
+  const canCall = canChat && !!seller.phone;
+
+  const handleChat = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!acceptedConversation) return;
+    router.push(`/inbox?id=${acceptedConversation.id}`);
+  };
+
+  const handleCall = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!seller.phone) return;
+    window.location.href = `tel:${seller.phone}`;
+  };
 
   return (
     <>
@@ -118,9 +141,35 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                    </div>
                  )}
               </div>
-              <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
-                {item.isPublicBid ? "Public" : "Secret"}
-              </Badge>
+              <div className="flex items-center gap-2">
+                {canChat && (
+                  <div className="flex items-center gap-1">
+                    {canCall && (
+                      <Button
+                        id={`my-bid-call-btn-${item.id}`}
+                        size="icon"
+                        variant="outline"
+                        className="h-7 w-7 border-slate-200 text-slate-500 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50"
+                        onClick={handleCall}
+                      >
+                        <Phone className="h-3 w-3" />
+                      </Button>
+                    )}
+                    <Button
+                      id={`my-bid-chat-btn-${item.id}`}
+                      size="icon"
+                      variant="outline"
+                      className="h-7 w-7 border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
+                      onClick={handleChat}
+                    >
+                      <MessageSquare className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
+                  {item.isPublicBid ? "Public" : "Secret"}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>

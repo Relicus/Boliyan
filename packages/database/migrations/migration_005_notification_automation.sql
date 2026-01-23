@@ -24,7 +24,7 @@ BEGIN
             'bid_received',
             'New Bid Received',
             'You received a bid of ' || NEW.amount || ' on ' || v_listing_title,
-            '/item/' || NEW.listing_id,
+            '/dashboard?tab=active-bids',
             jsonb_build_object('itemId', NEW.listing_id, 'bidId', NEW.id, 'amount', NEW.amount)
         );
     END IF;
@@ -50,7 +50,7 @@ BEGIN
             'outbid',
             'You''ve been outbid!',
             'Someone placed a higher bid on ' || v_listing_title,
-            '/item/' || NEW.listing_id,
+            '/product/' || NEW.listing_id,
             jsonb_build_object('itemId', NEW.listing_id, 'newAmount', NEW.amount)
         );
     END IF;
@@ -77,7 +77,7 @@ BEGIN
             'bid_accepted',
             'Bid Accepted!',
             'Your bid on ' || v_listing_title || ' has been accepted.',
-            '/item/' || NEW.listing_id, -- Could link to chat/checkout later
+            '/dashboard?tab=my-bids',
             jsonb_build_object('itemId', NEW.listing_id, 'bidId', NEW.id)
         );
     END IF;
@@ -122,7 +122,7 @@ BEGIN
         'new_message',
         'New Message',
         COALESCE(v_sender_name, 'Someone') || ' sent you a message about ' || v_listing_title,
-        '/inbox?conversation=' || NEW.conversation_id,
+        '/inbox?id=' || NEW.conversation_id,
         jsonb_build_object('conversationId', NEW.conversation_id, 'senderId', NEW.sender_id)
     );
 

@@ -499,7 +499,7 @@ export const BiddingControls = memo(({
         }}
         className={cn(
           getInputHeight(viewMode),
-          "w-full rounded-xl font-bold font-outfit shadow-md text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center relative transition-colors duration-200 z-[70]",
+          "w-full rounded-xl font-bold font-outfit shadow-md text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center relative transition-colors duration-200 z-20",
           activeTheme.classes,
           isCoolingDown ? "shadow-none border border-slate-200" : ""
         )}

@@ -19,8 +19,10 @@ import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { RatingBadge } from "@/components/common/RatingBadge";
 import { TimerBadge } from "@/components/common/TimerBadge";
+import { useTrackVisibility } from "@/hooks/useTrackVisibility";
 import {
   Tooltip,
+
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -37,8 +39,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const { user, bids, watchedItemIds } = useApp();
   const { now } = useTime(); // Use global heartbeat
   const isWatched = watchedItemIds.includes(item.id);
+  const visibilityRef = useTrackVisibility(item.id);
 
   // Unified Bidding Configuration
+
   const biddingConfig = useMemo(() => 
     createBiddingConfig(item, user, bids),
     [item, user, bids]
@@ -145,8 +149,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   return (
     <>
       <motion.div
+        ref={visibilityRef}
         id={`item-card-${item.id}`}
         onClick={() => setIsDialogOpen(true)}
+
         initial={false}
             animate={{
               scale: isSuccess ? 1.05 : 1,
@@ -161,7 +167,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             `}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
-            <VictoryHalo theme={haloTheme} className="z-50" />
+            <VictoryHalo theme={haloTheme} />
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)]">
 
 

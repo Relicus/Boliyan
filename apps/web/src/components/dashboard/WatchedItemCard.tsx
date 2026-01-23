@@ -1,13 +1,12 @@
 "use client";
 
+import { useState, useMemo } from "react";
+import { MapPin, Bookmark, Gavel, Trash2, MessageSquare, Phone } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Item, User, Bid } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Bookmark, Gavel, Trash2 } from "lucide-react";
-import { useApp } from "@/lib/store";
-import { useState } from "react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import { Button } from "@/components/ui/button";
-
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { TimerBadge } from "@/components/common/TimerBadge";
@@ -15,7 +14,7 @@ import { VictoryHalo } from "@/components/common";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
-import { useMemo } from "react";
+import { useApp } from "@/lib/store";
 
 interface WatchedItemCardProps {
   item: Item;
@@ -24,11 +23,21 @@ interface WatchedItemCardProps {
 }
 
 export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCardProps) {
-  const { toggleWatch, now, user, bids } = useApp();
+  const { toggleWatch, now, user, bids, conversations } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   // If userBid not passed, try to find it in store
   const activeBid = userBid || (user ? bids.find(b => b.itemId === item.id && b.bidderId === user.id) : undefined);
+  const acceptedConversation = useMemo(() => {
+    if (!user) return undefined;
+    return conversations.find(conversation =>
+      conversation.itemId === item.id && conversation.bidderId === user.id
+    );
+  }, [conversations, item.id, user]);
+  const isAccepted = activeBid?.status === 'accepted';
+  const canChat = isAccepted && !!acceptedConversation;
+  const canCall = canChat && !!seller.phone;
 
   // Remaining Attempts
   const remainingAttempts = useMemo(() => {
@@ -53,6 +62,18 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleWatch(item.id);
+  };
+
+  const handleChat = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!acceptedConversation) return;
+    router.push(`/inbox?id=${acceptedConversation.id}`);
+  };
+
+  const handleCall = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!seller.phone) return;
+    window.location.href = `tel:${seller.phone}`;
   };
 
   return (
@@ -119,15 +140,42 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                   </div>
                 )}
               </div>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="h-7 px-2 text-slate-400 hover:text-red-500 hover:bg-red-50 -mr-1"
-                onClick={handleRemove}
-              >
-                <Trash2 className="h-3.5 w-3.5 mr-1" />
-                <span className="text-[10px] font-bold">Remove</span>
-              </Button>
+              <div className="flex items-center gap-1.5">
+                {canChat && (
+                  <div className="flex items-center gap-1">
+                    {canCall && (
+                      <Button
+                        id={`watched-item-call-btn-${item.id}`}
+                        size="icon"
+                        variant="outline"
+                        className="h-7 w-7 border-slate-200 text-slate-500 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50"
+                        onClick={handleCall}
+                      >
+                        <Phone className="h-3 w-3" />
+                      </Button>
+                    )}
+                    <Button
+                      id={`watched-item-chat-btn-${item.id}`}
+                      size="icon"
+                      variant="outline"
+                      className="h-7 w-7 border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
+                      onClick={handleChat}
+                    >
+                      <MessageSquare className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                <Button 
+                  id={`watched-item-remove-btn-${item.id}`}
+                  size="sm" 
+                  variant="ghost" 
+                  className="h-7 px-2 text-slate-400 hover:text-red-500 hover:bg-red-50 -mr-1"
+                  onClick={handleRemove}
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-1" />
+                  <span className="text-[10px] font-bold">Remove</span>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

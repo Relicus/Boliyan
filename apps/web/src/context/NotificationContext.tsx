@@ -1,10 +1,11 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
-import type { Notification } from '@/types/notification';
 import { toast } from 'sonner';
+import type { Notification } from '@/types/notification';
+import { useAuth } from '@/context/AuthContext';
+import { resolveNotificationLink } from '@/lib/notifications';
+import { supabase } from '@/lib/supabase';
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -65,13 +66,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         (payload) => {
           const newNotification = transformNotification(payload.new as Record<string, unknown>);
           setNotifications((prev) => [newNotification, ...prev]);
-          
-          // Show toast
+
+          const resolvedLink = resolveNotificationLink(newNotification);
           toast(newNotification.title, {
             description: newNotification.body,
-            action: newNotification.link ? {
+            action: resolvedLink ? {
               label: 'View',
-              onClick: () => window.location.href = newNotification.link!
+              onClick: () => window.location.href = resolvedLink
             } : undefined,
           });
         }

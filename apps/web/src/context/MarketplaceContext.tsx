@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { Item, Bid } from "@/types";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -9,8 +9,11 @@ import { generateCacheKey, getFromCache, setCache } from "@/lib/cache";
 import { useBidRealtime } from "@/hooks/useBidRealtime";
 import { sonic } from "@/lib/sonic";
 import type { Database } from "@/types/database.types";
+import { normalize, upsertEntities, upsertEntity, removeEntity } from "@/lib/store-helpers";
+import { useViewport } from "./ViewportContext";
 
 interface MarketplaceFilters {
+
   category: string | null;
   search: string;
   radius: number;
@@ -27,6 +30,10 @@ interface MarketplaceFilters {
 interface MarketplaceContextType {
   items: Item[];
   bids: Bid[];
+  itemsById: Record<string, Item>;
+  bidsById: Record<string, Bid>;
+  feedIds: string[];
+  involvedIds: string[];
   isLoading: boolean;
   isLoadingMore: boolean;
   hasMore: boolean;
@@ -45,6 +52,7 @@ interface MarketplaceContextType {
   updateFilters: (updates: Partial<MarketplaceFilters>) => void;
   lastBidTimestamp: number | null;
   setLastBidTimestamp: (ts: number | null) => void;
+  refreshInvolvedItems: () => Promise<void>;
 }
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
@@ -57,10 +65,25 @@ type WatchlistRow = Database['public']['Tables']['watchlist']['Row'];
 
 export function MarketplaceProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const { visibleIds } = useViewport();
 
-  const [items, setItems] = useState<Item[]>([]);
-  const [bids, setBids] = useState<Bid[]>([]);
+  const [itemsById, setItemsById] = useState<Record<string, Item>>({});
+  const [bidsById, setBidsById] = useState<Record<string, Bid>>({});
+  const [feedIds, setFeedIds] = useState<string[]>([]);
+  const [involvedIds, setInvolvedIds] = useState<string[]>([]);
   const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
+
+  // Derived arrays for backward compatibility
+  const items = useMemo(() => feedIds.map(id => itemsById[id]).filter(Boolean), [feedIds, itemsById]);
+  const bids = useMemo(() => Object.values(bidsById), [bidsById]);
+
+  // Combined IDs for realtime subscription (Participation + Viewport)
+  const activeIds = useMemo(() => {
+    const combined = new Set(visibleIds);
+    involvedIds.forEach(id => combined.add(id));
+    return combined;
+  }, [visibleIds, involvedIds]);
+
 
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -97,25 +120,22 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
       // --- 1. CHECK CACHE (L1/L2) ---
       if (reset) {
-          // Only check cache on reset (initial load or filter change). 
-          // LoadMore usually needs fresh data or sequential cache logic which is complex.
           const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey);
           
           if (cachedItems) {
-              setItems(cachedItems);
+              setItemsById(prev => upsertEntities(prev, cachedItems));
+              setFeedIds(cachedItems.map(i => i.id));
               setHasMore(cachedItems.length === ITEMS_PER_PAGE);
               setIsLoading(false);
               usedCache = true;
               
               if (!isStale) {
-                  // Fresh cache! No need to fetch.
                   loadingLockRef.current = false;
                   return;
               }
-              // If stale, we continue to fetch in background (SWR)
-              console.log(`[Marketplace] Cache stale for ${cacheKey}, revalidating...`);
           }
       }
+
 
       if (!usedCache) {
           if (reset) {
@@ -224,23 +244,21 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
            // If 'watchlist' sort is selected, we might need to fetch more or re-sort client side 
            // since we can't easily join user specific watchlist state in simple query.
 
-           // --- UPDATE STATE ---
-           if (reset) {
-               setItems(fetchedItems);
-               // Cache the fresh page
-               setCache(cacheKey, fetchedItems);
-           } else {
-               setItems(prev => {
-                   const existingIds = new Set(prev.map(i => i.id));
-                   const trulyNew = fetchedItems.filter(i => !existingIds.has(i.id));
-                   return [...prev, ...trulyNew];
-               });
-               // We only cache individual pages for 'reset' scenarios currently to keep it simple.
-               // Complex pagination caching (merging pages) is error prone.
-               // But we SHOULD cache this new page so if user refreshes on page 3, they might get page 3 fast?
-               // Actually, 'fetchItems' is called with specific page.
-               setCache(cacheKey, fetchedItems);
-           }
+            // --- UPDATE STATE ---
+            if (reset) {
+                setItemsById(prev => upsertEntities(prev, fetchedItems));
+                setFeedIds(fetchedItems.map(i => i.id));
+                setCache(cacheKey, fetchedItems);
+            } else {
+                setItemsById(prev => upsertEntities(prev, fetchedItems));
+                setFeedIds(prev => {
+                    const existingIds = new Set(prev);
+                    const trulyNewIds = fetchedItems.map(i => i.id).filter(id => !existingIds.has(id));
+                    return [...prev, ...trulyNewIds];
+                });
+                setCache(cacheKey, fetchedItems);
+            }
+
            
            if (count !== null) {
                setHasMore((targetPage * ITEMS_PER_PAGE) < count);
@@ -275,42 +293,28 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           sonic.tick(); // Subtle notification
       }
 
-      setBids(prev => {
-          // Check if we already have this bid (from the same user on the same item)
-          const index = prev.findIndex(b => b.itemId === newBid.itemId && b.bidderId === newBid.bidderId);
-          if (index !== -1) {
-              const updated = [...prev];
-              updated[index] = newBid;
-              return updated;
-          }
-          return [...prev, newBid];
+      setBidsById(prev => upsertEntity(prev, newBid));
+
+      setItemsById(prevItems => {
+        const item = prevItems[newBid.itemId];
+        if (!item) return prevItems;
+
+        const currentMax = item.currentHighBid || 0;
+        const isNewHigh = newBid.amount > currentMax;
+        const isSameHighBidder = item.currentHighBidderId === newBid.bidderId;
+
+        const updatedItem = {
+           ...item,
+           bidCount: isSameHighBidder ? item.bidCount : item.bidCount + 1,
+           currentHighBid: (isNewHigh || isSameHighBidder) ? newBid.amount : currentMax,
+           currentHighBidderId: (isNewHigh || isSameHighBidder) ? newBid.bidderId : item.currentHighBidderId
+        };
+
+        return upsertEntity(prevItems, updatedItem);
       });
-
-      setItems(prevItems => prevItems.map(item => {
-        if (item.id === newBid.itemId) {
-            // For updates, we need to recalculate high bid if this was the high bid or is now the high bid
-            // However, the simple logic of "max of current and new" works if it's an increase.
-            // If it's a decrease (unlikely in our business rules but possible), we'd need more logic.
-            const currentMax = item.currentHighBid || 0;
-            const isNewHigh = newBid.amount > currentMax;
-            
-            // If it's an update from the SAME bidder who was previously high, 
-            // we update the amount even if it's not "higher" than the previous max 
-            // (though our rules enforce higher).
-            const isSameHighBidder = item.currentHighBidderId === newBid.bidderId;
-
-            return {
-               ...item,
-               bidCount: isSameHighBidder ? item.bidCount : item.bidCount + 1,
-               currentHighBid: (isNewHigh || isSameHighBidder) ? newBid.amount : currentMax,
-               currentHighBidderId: (isNewHigh || isSameHighBidder) ? newBid.bidderId : item.currentHighBidderId
-            };
-        }
-        return item;
-      }));
   }, [user, watchedItemIds]);
 
-  useBidRealtime(handleRealtimeBid);
+  useBidRealtime(handleRealtimeBid, activeIds);
 
   const loadMore = () => {
       // Prevent loading more if initial load is processing (isLoading)
@@ -337,7 +341,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
      if (error) {
          console.error("Failed to update item:", error);
      } else {
-         setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
+         setItemsById(prev => {
+            if (!prev[id]) return prev;
+            return upsertEntity(prev, { ...prev[id], ...updates });
+         });
      }
   };
 
@@ -350,9 +357,12 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     if (error) {
         console.error("Failed to delete item:", error);
     } else {
-        setItems(prev => prev.filter(i => i.id !== id));
+        setItemsById(prev => removeEntity(prev, id));
+        setFeedIds(prev => prev.filter(fid => fid !== id));
+        setInvolvedIds(prev => prev.filter(iid => iid !== id));
     }
   };
+
 
   const placeBid = async (itemId: string, amount: number, type: 'public' | 'private'): Promise<boolean> => {
     if (!user) {
@@ -364,8 +374,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     // We just need to insert into database and update local state
     
     // Find item if available (may not be in current filtered view)
-    const item = items.find(i => i.id === itemId);
-    const existingBid = bids.find(b => b.itemId === itemId && b.bidderId === user.id);
+    const originalItem = itemsById[itemId];
+    const existingBid = bidsById[`${itemId}-${user.id}`] || Object.values(bidsById).find(b => b.itemId === itemId && b.bidderId === user.id);
     
     // --- OPTIMISTIC UPDATE START ---
     // 1. Create a temporary bid object
@@ -381,31 +391,23 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         update_count: existingBid ? (existingBid.update_count || 0) + 1 : 0
     } as unknown as Bid;
 
-    // 2. Update local Bids state (Replace if exists, append if new)
-    setBids(prev => {
-        if (existingBid) {
-            return prev.map(b => b.id === existingBid.id ? optimisticBid : b);
-        }
-        return [...prev, optimisticBid];
-    });
+    // 2. Update local Bids state
+    setBidsById(prev => upsertEntity(prev, optimisticBid));
 
-    // 3. Update local Items state (only if item is in current view)
-    if (item) {
-        setItems(prevItems => prevItems.map(i => {
-           if (i.id === itemId) {
-               const currentMax = i.currentHighBid || 0;
-               const isNewHigh = amount > currentMax;
-               return {
-                   ...i,
-                   bidCount: i.bidCount + 1,
-                   currentHighBid: isNewHigh ? amount : currentMax,
-                   currentHighBidderId: isNewHigh ? user.id : i.currentHighBidderId
-               };
-           }
-           return i;
-        }));
+    // 3. Update local Items state
+    if (originalItem) {
+        const currentMax = originalItem.currentHighBid || 0;
+        const isNewHigh = amount > currentMax;
+        const updatedItem = {
+            ...originalItem,
+            bidCount: originalItem.bidCount + 1,
+            currentHighBid: isNewHigh ? amount : currentMax,
+            currentHighBidderId: isNewHigh ? user.id : originalItem.currentHighBidderId
+        };
+        setItemsById(prev => upsertEntity(prev, updatedItem));
     }
     // --- OPTIMISTIC UPDATE END ---
+
 
     // Use UPSERT to handle the unique constraint on (listing_id, bidder_id)
     // This allows users to update their existing bid instead of creating duplicates
@@ -422,9 +424,14 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       .upsert(bidPayload, { onConflict: 'listing_id,bidder_id' })
       .select();
 
-    // Check for error (Supabase returns null for no error, not empty object)
+    // Check for error (Supabase returns null for no error)
     if (error || !data || data.length === 0) {
-        console.error("Failed to place bid:", { error, data, userId: user.id, itemId });
+        console.error("Failed to place bid:", { 
+            message: error?.message, 
+            details: error?.details, 
+            hint: error?.hint,
+            dataLength: data?.length 
+        });
         
         // Handle Server-Level Cooldown Error
         if (error?.message?.includes('COOLDOWN_ACTIVE')) {
@@ -432,29 +439,22 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         }
 
         // Rollback optimistic bids update
-        setBids(prev => {
+        setBidsById(prev => {
              if (existingBid) {
-                 return prev.map(b => b.id === existingBid.id ? existingBid : b);
+                 return upsertEntity(prev, existingBid);
              }
-             return prev.filter(b => b.id !== optimisticBid.id);
+             return removeEntity(prev, optimisticBid.id);
         });
         // Rollback items update if we modified it
-        if (item) {
-            setItems(prevItems => prevItems.map(i => {
-                if (i.id === itemId) {
-                    return {
-                        ...i,
-                        bidCount: Math.max(0, i.bidCount - 1),
-                        // Note: We can't perfectly rollback high bid, but this is better than nothing
-                    };
-                }
-                return i;
-            }));
+        if (originalItem) {
+            setItemsById(prev => upsertEntity(prev, originalItem));
         }
+
         return false;
     }
     
-    // Add to watchlist on success
+    // Add to involved and watchlist on success
+    setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
     if (!watchedItemIds.includes(itemId)) {
          setWatchedItemIds(prev => [...prev, itemId]);
     }
@@ -468,23 +468,44 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   // --- EFFECT: Fetch User Bids on Mount/User Change ---
   useEffect(() => {
     if (!user) {
-        setBids([]);
+        setBidsById({});
         return;
     }
 
     const fetchUserBids = async () => {
-        const { data, error } = await supabase
-            .from('bids')
-            .select('*, profiles(*)')
-            .eq('bidder_id', user.id);
-        
-        if (error) {
-            console.error("Error fetching user bids:", error);
-        } else if (data) {
-            // We replace bids state with user's historical bids, transformed to match UI Model
-            // This fixes the mismatch between snake_case DB fields and camelCase UI fields
-            const hydratedBids = data.map(b => transformBidToHydratedBid(b as unknown as BidWithProfile));
-            setBids(hydratedBids);
+        // Fetch bids relevant to the user:
+        // 1. Bids the user has placed (as a buyer)
+        // 2. Bids placed on the user's listings (as a seller)
+        // We split these into two queries for maximum reliability and better performance
+        try {
+            const [myBidsRes, incomingBidsRes] = await Promise.all([
+                // Bids I made
+                supabase
+                    .from('bids')
+                    .select('*, profiles(*)')
+                    .eq('bidder_id', user.id),
+                // Bids on my items
+                supabase
+                    .from('bids')
+                    .select('*, profiles(*), listings!inner(seller_id)')
+                    .eq('listings.seller_id', user.id)
+            ]);
+
+            if (myBidsRes.error) throw myBidsRes.error;
+            if (incomingBidsRes.error) throw incomingBidsRes.error;
+
+            const allBidsRaw = [...(myBidsRes.data || []), ...(incomingBidsRes.data || [])];
+            
+            // Deduplicate by ID
+            const uniqueBidsMap = new Map();
+            allBidsRaw.forEach(bid => uniqueBidsMap.set(bid.id, bid));
+            const uniqueBids = Array.from(uniqueBidsMap.values());
+
+            // Transform and hydrate
+            const hydratedBids = uniqueBids.map(b => transformBidToHydratedBid(b as unknown as BidWithProfile));
+            setBidsById(normalize(hydratedBids));
+        } catch (err: any) {
+            console.error("Error fetching user bids:", err.message || err);
         }
     };
 
@@ -546,6 +567,12 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
             console.error("Failed to remove from watchlist:", error);
             // Rollback
             setWatchedItemIds(prev => [...prev, itemId]);
+        } else {
+            // Check if we should remove from involvedIds (only if no bid)
+            const hasBid = Object.values(bidsById).some(b => b.itemId === itemId && b.bidderId === user.id);
+            if (!hasBid) {
+                setInvolvedIds(prev => prev.filter(id => id !== itemId));
+            }
         }
     } else {
         // Add
@@ -557,8 +584,11 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
             console.error("Failed to add to watchlist:", error);
              // Rollback
              setWatchedItemIds(prev => prev.filter(id => id !== itemId));
+        } else {
+            setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
         }
     }
+
   };
 
   const setFilter = <K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => {
@@ -575,7 +605,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         .update(bidUpdates)
         .eq('id', bidId);
       if (error) console.error("Failed to reject bid", error);
-      else setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: 'ignored' } : b));
+      else setBidsById(prev => {
+          if (!prev[bidId]) return prev;
+          return upsertEntity(prev, { ...prev[bidId], status: 'ignored' });
+      });
   };
 
   const acceptBid = async (bidId: string) => {
@@ -585,9 +618,13 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         .update(bidUpdates)
         .eq('id', bidId);
       if (error) return undefined;
-      setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: 'accepted' } : b));
+      setBidsById(prev => {
+          if (!prev[bidId]) return prev;
+          return upsertEntity(prev, { ...prev[bidId], status: 'accepted' });
+      });
       return bidId;
   };
+
 
   const confirmExchange = async (conversationId: string, role: 'buyer' | 'seller') => {
     if (!user) return false;
@@ -609,12 +646,56 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     return true;
   };
 
+  const refreshInvolvedItems = React.useCallback(async () => {
+    if (!user) return;
+
+    try {
+      // Fetch item IDs from bids and watchlist
+      const [bidsRes, watchlistRes] = await Promise.all([
+        supabase.from('bids').select('listing_id').eq('bidder_id', user.id),
+        supabase.from('watchlist').select('listing_id').eq('user_id', user.id)
+      ]);
+
+      const bidItemIds = (bidsRes.data || []).map(b => b.listing_id).filter((id): id is string => !!id);
+      const watchlistIds = (watchlistRes.data || []).map(w => w.listing_id).filter((id): id is string => !!id);
+      
+      const allInvolvedIds = Array.from(new Set([...bidItemIds, ...watchlistIds]));
+      
+      if (allInvolvedIds.length === 0) {
+        setInvolvedIds([]);
+        return;
+      }
+
+      // Fetch full item details for these IDs
+      const { data, error } = await supabase
+        .from('marketplace_listings')
+        .select('*')
+        .in('id', allInvolvedIds);
+
+      if (error) throw error;
+
+      if (data) {
+        const transformedItems = data.map(row => transformListingToItem(row as any));
+        setItemsById(prev => upsertEntities(prev, transformedItems));
+        setInvolvedIds(allInvolvedIds);
+      }
+    } catch (err) {
+      console.error("Error refreshing involved items:", err);
+    }
+  }, [user]);
+
+  // Initial fetch of involved items
+  useEffect(() => {
+    refreshInvolvedItems();
+  }, [refreshInvolvedItems]);
+
   return (
-    <MarketplaceContext.Provider value={{ items, bids, isLoading, isLoadingMore, hasMore, loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, rejectBid, acceptBid, confirmExchange, filters, setFilter, updateFilters, lastBidTimestamp, setLastBidTimestamp }}>
+    <MarketplaceContext.Provider value={{ items, bids, itemsById, bidsById, feedIds, involvedIds, isLoading, isLoadingMore, hasMore, loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, rejectBid, acceptBid, confirmExchange, filters, setFilter, updateFilters, lastBidTimestamp, setLastBidTimestamp, refreshInvolvedItems }}>
       {children}
     </MarketplaceContext.Provider>
   );
 }
+
 
 export function useMarketplace() {
   const context = useContext(MarketplaceContext);

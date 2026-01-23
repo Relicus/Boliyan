@@ -7,6 +7,7 @@ import { useChat, ChatProvider } from '@/context/ChatContext';
 import { TimeProvider, useTime } from '@/context/TimeContext';
 import { useSearch, SearchProvider } from '@/context/SearchContext';
 import { useReviews, ReviewProvider } from '@/context/ReviewContext';
+import { ViewportProvider } from '@/context/ViewportContext';
 
 /* 
   LEGACY COMPATIBILITY LAYER
@@ -27,17 +28,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   
   return (
     <TimeProvider>
-      <AuthProvider>
-        <SearchProvider>
-          <MarketplaceProvider>
-            <ChatProvider>
-              <ReviewProvider>
-                {children}
-              </ReviewProvider>
-            </ChatProvider>
-          </MarketplaceProvider>
-        </SearchProvider>
-      </AuthProvider>
+      <ViewportProvider>
+        <AuthProvider>
+          <SearchProvider>
+            <MarketplaceProvider>
+              <ChatProvider>
+                <ReviewProvider>
+                  {children}
+                </ReviewProvider>
+              </ChatProvider>
+            </MarketplaceProvider>
+          </SearchProvider>
+        </AuthProvider>
+      </ViewportProvider>
     </TimeProvider>
   );
 }
@@ -116,6 +119,11 @@ export function useApp() {
   return {
     ...auth,
     ...marketplace,
+    items: marketplace.items,
+    bids: marketplace.bids,
+    itemsById: marketplace.itemsById,
+    bidsById: marketplace.bidsById,
+    involvedIds: marketplace.involvedIds,
     ...chat,
     ...reviews,
     searchState: search, // Avoid name collision if any, or just spread?

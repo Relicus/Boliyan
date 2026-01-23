@@ -1,10 +1,12 @@
 'use client';
 
-import { Notification } from '@/types/notification';
 import { Gavel, MessageSquare, Check, Bell, X } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
+import { Notification } from '@/types/notification';
+import { cn } from '@/lib/utils';
+import { resolveNotificationLink } from '@/lib/notifications';
+import { useApp } from '@/lib/store';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -13,6 +15,12 @@ interface NotificationItemProps {
 }
 
 export function NotificationItem({ notification, onClick, onDismiss }: NotificationItemProps) {
+  const { conversations, user } = useApp();
+  const resolvedLink = resolveNotificationLink(notification, {
+    conversations,
+    userId: user?.id
+  });
+
   const getIcon = () => {
     switch (notification.type) {
       case 'outbid':
@@ -31,7 +39,8 @@ export function NotificationItem({ notification, onClick, onDismiss }: Notificat
   return (
     <div className="relative group overflow-hidden bg-white">
       <Link
-        href={notification.link || '#'}
+        id={`notification-link-${notification.id}`}
+        href={resolvedLink || '#'}
         onClick={onClick}
         className={cn(
           'flex items-start gap-3 p-4 transition-colors border-b border-slate-100 last:border-0 relative hover:bg-slate-50/50 active:bg-slate-100/50'
@@ -59,6 +68,7 @@ export function NotificationItem({ notification, onClick, onDismiss }: Notificat
 
       {/* Desktop Only Dismiss Button */}
       <button
+        id={`notification-dismiss-btn-${notification.id}`}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Bid } from '@/types';
 import { transformBidToHydratedBid, BidWithProfile } from '@/lib/transform';
 import type { Database } from '@/types/database.types';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
-export function useBidRealtime(onBid: (bid: Bid) => void) {
+export function useBidRealtime(onBid: (bid: Bid) => void, activeIds: Set<string>) {
   useEffect(() => {
     // Use a shared channel name so Supabase client can potentially multiplex
     const channel = supabase
@@ -16,7 +16,14 @@ export function useBidRealtime(onBid: (bid: Bid) => void) {
         table: 'bids' 
       }, async (payload: RealtimePostgresChangesPayload<Database['public']['Tables']['bids']['Row']>) => {
         const newBidRaw = payload.new;
-        if (!newBidRaw || !('bidder_id' in newBidRaw)) return;
+        if (!newBidRaw || !('listing_id' in newBidRaw)) return;
+        
+        const listingId = newBidRaw.listing_id;
+        if (!listingId || !activeIds.has(listingId)) {
+           // Skip updates for items we aren't tracking (not in viewport and not involved)
+           return;
+        }
+
         const bidRow = newBidRaw as Database['public']['Tables']['bids']['Row'];
         if (!bidRow.bidder_id) return;
         
@@ -39,5 +46,5 @@ export function useBidRealtime(onBid: (bid: Bid) => void) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [onBid]);
+  }, [onBid, activeIds]);
 }

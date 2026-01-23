@@ -33,6 +33,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const [showReviewBtn, setShowReviewBtn] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [showSealAnim, setShowSealAnim] = useState(false);
+  const [showMissing, setShowMissing] = useState(false);
   
   // Vouch State
   const [vouchRating, setVouchRating] = useState(0);
@@ -186,6 +187,16 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   }, [conversation?.expiresAt]);
 
   useEffect(() => {
+    if (!user || conversation) {
+      setShowMissing(false);
+      return;
+    }
+
+    const timer = setTimeout(() => setShowMissing(true), 1500);
+    return () => clearTimeout(timer);
+  }, [conversation, conversationId, user]);
+
+  useEffect(() => {
     if (item?.status === 'completed' && otherUser) {
         canReview(item.id, isSeller ? 'seller' : 'buyer')
             .then(setShowReviewBtn);
@@ -205,8 +216,12 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     }
   }, [currentMessages, conversationId, user?.id, markAsRead]);
 
-  if (!conversation) return <div className="p-10 text-center">Conversation not found</div>;
   if (!user) return <div className="p-10 text-center">Please sign in to view chats.</div>;
+  if (!conversation) {
+    return showMissing
+      ? <div className="p-10 text-center">Conversation not found</div>
+      : <div className="p-10 text-center">Loading chat...</div>;
+  }
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -531,6 +546,23 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
         <div className="h-[env(safe-area-inset-bottom)]" />
       </div>
 
+      <AnimatePresence>
+        {showMissing && (
+           <motion.div 
+             initial={{ opacity: 0, y: 10 }}
+             animate={{ opacity: 1, y: 0 }}
+             className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-white z-20"
+           >
+             <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+               <Clock className="h-8 w-8 text-slate-300" />
+             </div>
+             <h3 className="text-lg font-bold text-slate-900 mb-2">Connecting...</h3>
+             <p className="text-sm text-slate-500 max-w-[240px]">
+               We're looking for this conversation. If it doesn't appear soon, it may have expired.
+             </p>
+           </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

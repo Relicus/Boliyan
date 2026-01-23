@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 
 function DashboardContent() {
-  const { items, bids, user, deleteItem, watchedItemIds } = useApp();
+  const { itemsById, bids, user, deleteItem, watchedItemIds, involvedIds } = useApp();
   const [myItems, setMyItems] = useState<Item[]>([]);
   const [isMyListingsLoading, setIsMyListingsLoading] = useState(false);
   
@@ -98,10 +98,14 @@ function DashboardContent() {
 
   // BUYER DATA: Bids placed by current user
   const bidsIMade = user ? bids.filter(b => b.bidderId === user.id) : [];
-  const itemsIMadeBidsOn = items.filter(item => bidsIMade.some(b => b.itemId === item.id));
+  const itemsIMadeBidsOn = involvedIds
+    .map(id => itemsById[id])
+    .filter((item): item is Item => !!item && bidsIMade.some(b => b.itemId === item.id));
   
   // WATCHLIST DATA
-  const watchedItems = items.filter(item => watchedItemIds.includes(item.id));
+  const watchedItems = involvedIds
+    .map(id => itemsById[id])
+    .filter((item): item is Item => !!item && watchedItemIds.includes(item.id));
 
   const getUserBidForItem = (itemId: string) => {
     return bidsIMade

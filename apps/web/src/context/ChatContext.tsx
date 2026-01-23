@@ -86,6 +86,22 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     createdAt: row.created_at || new Date().toISOString(),
   });
 
+  const fetchHydratedConversation = async (conversationId: string) => {
+    const { data } = await supabase
+      .from('conversations')
+      .select(`
+        *,
+        listings:listing_id(*, profiles(*)),
+        seller_profile:seller_id(*),
+        bidder_profile:bidder_id(*)
+      `)
+      .eq('id', conversationId)
+      .single();
+
+    if (!data) return undefined;
+    return transformConversationToHydratedConversation(data as unknown as ConversationWithHydration);
+  };
+
   // 1. Fetch Conversations & Realtime logic (remains mostly same, but essentially "merges" fresh data)
   useEffect(() => {
     if (!user) {
@@ -116,22 +132,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     const handleConvUpdate = async (payload: RealtimePostgresChangesPayload<ConversationRow>) => {
         const convRow = payload.new;
         if (!convRow || !('id' in convRow)) return;
-        
-        // Fetch hydration data
-        const { data } = await supabase
-          .from('conversations')
-          .select(`
-            *,
-            listings:listing_id(*, profiles(*)),
-            seller_profile:seller_id(*),
-            bidder_profile:bidder_id(*)
-          `)
-          .eq('id', convRow.id)
-          .single();
 
-        if (!data) return;
-
-        const transformed = transformConversationToHydratedConversation(data as unknown as ConversationWithHydration);
+        const transformed = await fetchHydratedConversation(convRow.id);
+        if (!transformed) return;
 
         if (payload.eventType === 'INSERT') {
             setConversations(prev => [transformed, ...prev]);
@@ -351,6 +354,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       .single();
 
     if (data) {
+        const hydrated = await fetchHydratedConversation(data.id);
+        if (hydrated) {
+          setConversations(prev => prev.some(c => c.id === hydrated.id) ? prev : [hydrated, ...prev]);
+        }
         return data.id;
     } else if (error?.code === '23505') { // Unique constraint violation (race condition)
         const { data: exist } = await supabase
@@ -359,7 +366,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           .eq('listing_id', itemId)
           .eq('bidder_id', bidderId)
           .single();
-        if (exist) return exist.id;
+        if (exist) {
+          const hydrated = await fetchHydratedConversation(exist.id);
+          if (hydrated) {
+            setConversations(prev => prev.some(c => c.id === hydrated.id) ? prev : [hydrated, ...prev]);
+          }
+          return exist.id;
+        }
     }
     return undefined;
   };

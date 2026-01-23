@@ -8,10 +8,12 @@ import type { SearchFilters, Category, SearchSuggestion } from '@/types';
 import { sortByDistance } from '@/lib/searchUtils';
 import { generateCacheKey, getFromCache, setCache } from '@/lib/cache';
 import { useBidRealtime } from '@/hooks/useBidRealtime';
-import { transformListingToItem, ListingWithSeller } from '@/lib/transform';
+import { useViewport } from './ViewportContext';
 import type { Database } from '@/types/database.types';
+import { transformListingToItem, ListingWithSeller } from '@/lib/transform';
 
 interface SearchContextType {
+
   filters: SearchFilters;
   setFilters: (filters: SearchFilters) => void;
   updateFilter: <K extends keyof SearchFilters>(key: K, value: SearchFilters[K]) => void;
@@ -53,8 +55,10 @@ type SearchHistoryQueryRow = Pick<SearchHistoryRow, 'query'>;
 
 export function SearchProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const { visibleIds } = useViewport();
   
   const [filters, setFiltersState] = useState<SearchFilters>(defaultFilters);
+
   const [searchResults, setSearchResults] = useState<Item[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [totalResults, setTotalResults] = useState(0);
@@ -398,7 +402,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       }));
   }, []);
 
-  useBidRealtime(handleRealtimeBid);
+  useBidRealtime(handleRealtimeBid, visibleIds);
+
   
   // Initial category fetch
   useEffect(() => {
