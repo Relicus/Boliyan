@@ -18,15 +18,21 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   // Pending confirmation for dual-tap pattern
   const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid' | 'out_of_bids' | 'confirm_bid', message: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cooldownEnd, setCooldownEnd] = useState<number | null>(null);
-  const { now } = useApp(); // Need global heartbeat for cooldown
+  const { now, lastBidTimestamp } = useApp(); // Need global heartbeat and cooldown
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const cooldownRemaining = useMemo(() => {
-    if (!cooldownEnd) return 0;
-    const diff = Math.ceil((cooldownEnd - now) / 1000);
+    if (!lastBidTimestamp) return 0;
+    const diff = Math.ceil((lastBidTimestamp + 15000 - now) / 1000);
     return Math.max(0, diff);
-  }, [cooldownEnd, now]);
+  }, [lastBidTimestamp, now]);
+
+  const cooldownProgress = useMemo(() => {
+    if (!lastBidTimestamp) return 0;
+    const elapsed = now - lastBidTimestamp;
+    const progress = Math.min(1, elapsed / 15000);
+    return progress;
+  }, [lastBidTimestamp, now]);
 
   // Initialize with Smart Anchor Logic:
   // 1. Existing Bid -> Bid + Step (Encourage update)
@@ -70,6 +76,22 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   }, [userBid]);
 
   const isQuotaReached = remainingAttempts === 0;
+
+  // Auto-Step Up Logic: If input matches current bid exactly, push it up.
+  useEffect(() => {
+    if (!userBid) return;
+    
+    const amount = parseFloat(bidAmount.replace(/,/g, ''));
+    if (amount === userBid.amount) {
+        const step = getSmartStep(amount);
+        const maxBid = getMaximumAllowedBid(item.askPrice);
+        
+        if (amount + step <= maxBid) {
+            setBidAmount((amount + step).toLocaleString());
+            setAnimTrigger(prev => prev + 1);
+        }
+    }
+  }, [bidAmount, userBid, item.askPrice]);
 
   // Clear confirmation timeout on unmount
   useEffect(() => {
@@ -166,8 +188,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
           return;
       }
       
-      // Set Cooldown (15 seconds)
-      setCooldownEnd(Date.now() + 15000);
+      // Cooldown is now handled globally via MarketplaceContext.placeBid
       
       setIsSuccess(true);
       sonic.chime();
@@ -251,10 +272,10 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
 
-    // 4. Duplicate Amount Check
-    if (userBid && userBid.amount === amount) {
+    // 4. Duplicate/Lower Amount Check
+    if (userBid && amount <= userBid.amount) {
         setError(true);
-        setErrorMessage("Already Bid This Amount");
+        setErrorMessage("Higher Bid Required");
         sonic.thud();
         setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
         return;
@@ -274,7 +295,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     // MANDATORY Confirmation for every bid
     setPendingConfirmation({
       type: 'confirm_bid',
-      message: 'Confirm Bid? Tap Again'
+      message: 'Confirm?'
     });
     
     confirmationTimeoutRef.current = setTimeout(() => {
@@ -326,6 +347,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     pendingConfirmation,
     isSubmitting,
     cooldownRemaining,
+    cooldownProgress,
     handleKeyDown,
     handleInputChange,
     getSmartStep,

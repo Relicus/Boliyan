@@ -38,7 +38,9 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     getSmartStep,
     pendingConfirmation,
     remainingAttempts,
-    userBid
+    userBid,
+    showDelta,
+    lastDelta
   } = useBidding(item, seller, () => {});
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -337,6 +339,8 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       onInputChange={handleInputChange}
                       showAttemptsDots={false}
                       showStatus={true}
+                      showDelta={showDelta}
+                      lastDelta={lastDelta}
                     />
 
                     {isHighBidder && !isSuccess && (

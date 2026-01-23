@@ -107,7 +107,7 @@ export default function BottomNav() {
                   </span>
                 )}
                 {item.label === "Dash" && totalDashboardCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white">
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white">
                     {totalDashboardCount}
                   </span>
                 )}

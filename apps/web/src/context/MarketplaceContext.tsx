@@ -42,6 +42,8 @@ interface MarketplaceContextType {
   filters: MarketplaceFilters;
   setFilter: <K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => void;
   updateFilters: (updates: Partial<MarketplaceFilters>) => void;
+  lastBidTimestamp: number | null;
+  setLastBidTimestamp: (ts: number | null) => void;
 }
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
@@ -63,6 +65,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [lastBidTimestamp, setLastBidTimestamp] = useState<number | null>(null);
   const loadingLockRef = React.useRef(false);
   const ITEMS_PER_PAGE = 8;
 
@@ -403,6 +406,12 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     // Check for error (Supabase returns null for no error, not empty object)
     if (error || !data || data.length === 0) {
         console.error("Failed to place bid:", { error, data, userId: user.id, itemId });
+        
+        // Handle Server-Level Cooldown Error
+        if (error?.message?.includes('COOLDOWN_ACTIVE')) {
+           setLastBidTimestamp(Date.now());
+        }
+
         // Rollback optimistic bids update
         setBids(prev => {
              if (existingBid) {
@@ -430,6 +439,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     if (!watchedItemIds.includes(itemId)) {
          setWatchedItemIds(prev => [...prev, itemId]);
     }
+    
+    // Set global cooldown timestamp
+    setLastBidTimestamp(Date.now());
+    
     return true;
   };
 
@@ -558,7 +571,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   };
 
   return (
-    <MarketplaceContext.Provider value={{ items, bids, isLoading, isLoadingMore, hasMore, loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, rejectBid, acceptBid, filters, setFilter, updateFilters }}>
+    <MarketplaceContext.Provider value={{ items, bids, isLoading, isLoadingMore, hasMore, loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, rejectBid, acceptBid, filters, setFilter, updateFilters, lastBidTimestamp, setLastBidTimestamp }}>
       {children}
     </MarketplaceContext.Provider>
   );

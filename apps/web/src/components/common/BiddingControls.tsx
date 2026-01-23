@@ -1,7 +1,8 @@
 "use client";
 
 import { memo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { Gavel, TrendingUp, Loader2, AlertCircle, Timer } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import { formatPrice } from "@/lib/utils";
@@ -22,6 +23,11 @@ interface BiddingControlsProps {
   remainingAttempts?: number;
   userCurrentBid?: number;
   cooldownRemaining?: number;
+  cooldownProgress?: number;
+  
+  // Delta Animation
+  showDelta?: boolean;
+  lastDelta?: number | null;
   
   // Dual-tap confirmation state
   pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids' | 'confirm_bid', message: string } | null;
@@ -82,6 +88,9 @@ export const BiddingControls = memo(({
   remainingAttempts = MAX_BID_ATTEMPTS,
   userCurrentBid,
   cooldownRemaining = 0,
+  cooldownProgress = 0,
+  showDelta = false,
+  lastDelta = null,
   pendingConfirmation = null,
   animTrigger,
   viewMode = 'compact',
@@ -105,30 +114,7 @@ export const BiddingControls = memo(({
   
   // Determine Button Styling based on state
   const getButtonConfig = () => {
-    // 1. Cooldown State (Highest Priority)
-    if (cooldownRemaining && cooldownRemaining > 0) {
-      return {
-        bgClass: 'bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed shadow-none',
-        content: `Wait ${cooldownRemaining}s`
-      };
-    }
-
-    // 2. Critical Errors
-    if (errorMessage === "Out of Bids" || isQuotaReached) {
-      return {
-        bgClass: 'bg-red-50 text-red-600 border border-red-200 cursor-not-allowed shadow-none',
-        content: "Out of Bids"
-      };
-    }
-
-    if (errorMessage === "Already Bid This Amount") {
-      return {
-        bgClass: 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none',
-        content: "Already Offered"
-      };
-    }
-
-    // 3. Success State
+    // 1. Success State
     if (isSuccess) {
       return { 
         bgClass: 'bg-amber-600 text-white scale-100 ring-4 ring-amber-100',
@@ -150,7 +136,7 @@ export const BiddingControls = memo(({
       };
     }
 
-    // 4. Submission Loader
+    // 2. Submission Loader
     if (isSubmitting) {
       return {
         bgClass: 'bg-blue-600/80 text-white shadow-none cursor-wait',
@@ -158,15 +144,30 @@ export const BiddingControls = memo(({
       };
     }
 
-    // 5. Confirmation State
+    // 3. Critical Errors
+    if (errorMessage === "Out of Bids" || isQuotaReached) {
+      return {
+        bgClass: 'bg-red-50 text-red-600 border border-red-200 cursor-not-allowed shadow-none',
+        content: "Out of Bids"
+      };
+    }
+
+    if (errorMessage === "Already Bid This Amount") {
+      return {
+        bgClass: 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none',
+        content: "Already Offered"
+      };
+    }
+
+    // 4. Confirmation State
     if (pendingConfirmation) {
       return {
-        bgClass: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200',
+        bgClass: 'bg-red-600 hover:bg-red-500 hover:brightness-110 text-white shadow-red-200 hover:shadow-red-300',
         content: pendingConfirmation.message
       };
     }
     
-    // 6. Owner State
+    // 5. Owner State
     if (isOwner) {
       return {
         bgClass: 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100',
@@ -174,27 +175,14 @@ export const BiddingControls = memo(({
       };
     }
 
-    // 7. Standard States
+    // 6. Standard States (Used even during cooldown)
     if (hasPriorBid) {
-      // If they have bids left, encourage update
-      if (isHighBidder) {
-        return {
-          bgClass: 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200 hover:shadow-orange-300',
-          content: (
-            <span className="flex items-center gap-1.5">
-              <TrendingUp className="w-5 h-5" />
-              Raise Bid
-            </span>
-          )
-        };
-      }
-      
       return {
-        bgClass: 'bg-green-600 hover:bg-green-700 text-white shadow-green-200 hover:shadow-green-300',
+        bgClass: 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200 hover:shadow-orange-300',
         content: (
           <span className="flex items-center gap-1.5">
-            <TrendingUp className="w-5 h-5" />
-            Update Offer
+            <Gavel className="w-5 h-5" />
+            Update Bid
           </span>
         )
       };
@@ -212,27 +200,11 @@ export const BiddingControls = memo(({
   };
 
   const btnConfig = getButtonConfig();
+  const isCoolingDown = cooldownRemaining > 0;
 
   return (
     <div id={buildId('bidding-controls')} className={`flex flex-col ${showStatus ? 'gap-1.5' : 'gap-2'} w-full relative`}>
       
-      {/* Sticky Cooldown Timer */}
-      <AnimatePresence>
-        {cooldownRemaining > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-            animate={{ opacity: 1, y: -20, scale: 1 }}
-            exit={{ opacity: 0, y: 0, scale: 0.9 }}
-            className="absolute left-1/2 -translate-x-1/2 -top-4 z-30 bg-indigo-600 text-white px-3 py-1 rounded-full shadow-lg border border-indigo-400 flex items-center gap-2 pointer-events-none"
-          >
-            <Timer className="h-3 w-3 animate-pulse" />
-            <span className="text-[10px] font-black font-outfit uppercase tracking-wider whitespace-nowrap">
-              Cooldown: {cooldownRemaining}s
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Status Row (Modal/Product Page) */}
       {showStatus && !isOwner && (
         <div className="relative flex items-center justify-center px-1 min-h-[0.75rem]">
@@ -302,6 +274,23 @@ export const BiddingControls = memo(({
 
           {/* Input */}
           <div className="relative flex-1">
+            <AnimatePresence mode="popLayout">
+              {showDelta && lastDelta !== null && (
+                <motion.div
+                  initial={{ opacity: 0, y: lastDelta > 0 ? 10 : -10, scale: 0.8 }}
+                  animate={{ opacity: 1, y: lastDelta > 0 ? -25 : 25, scale: 1.1 }}
+                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  className={cn(
+                    "absolute left-0 right-0 text-center font-black font-outfit pointer-events-none z-50",
+                    lastDelta > 0 ? "text-emerald-500" : "text-rose-500",
+                    viewMode === 'modal' ? "text-xl" : "text-base"
+                  )}
+                >
+                  {lastDelta > 0 ? "+" : ""}{lastDelta.toLocaleString()}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <motion.input
               id={buildId('bid-input')}
               type="text"
@@ -310,13 +299,11 @@ export const BiddingControls = memo(({
               initial={false}
               disabled={isDisabled || isQuotaReached}
               animate={{ 
-                scale: [1, 1.1, 1],
-                y: [0, -2, 0],
+                scale: [1, 1.05, 1],
                 x: (error || pendingConfirmation) ? [0, -4, 4, -4, 4, 0] : 0
               }}
               transition={{ 
                 scale: { duration: 0.2, ease: "easeOut" },
-                y: { duration: 0.15, ease: "easeOut" },
                 x: { duration: 0.2 } // Shake duration
               }}
               onKeyDown={onKeyDown}
@@ -346,19 +333,46 @@ export const BiddingControls = memo(({
       <motion.button
         id={buildId('place-bid-btn')}
         onClick={onBid}
-        disabled={isSuccess || isDisabled || isQuotaReached || errorMessage === "Already Bid This Amount"}
+        disabled={isSuccess || isDisabled || isQuotaReached || errorMessage === "Already Bid This Amount" || isCoolingDown}
         initial={false}
-        animate={pendingConfirmation ? { x: [0, -3, 3, -3, 3, 0] } : {}}
-        transition={{ duration: 0.4 }}
-        className={`${getInputHeight(viewMode)} w-full rounded-xl font-bold font-outfit shadow-md transition-all duration-300 active:scale-[0.98] text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center
-          ${btnConfig.bgClass}
+        animate={{
+          x: pendingConfirmation ? [0, -3, 3, -3, 3, 0] : 0,
+          scale: !isCoolingDown && cooldownRemaining === 0 ? [1, 1.05, 1] : 1
+        }}
+        transition={{ 
+          x: { duration: 0.4 },
+          scale: { duration: 0.4, ease: "easeOut" }
+        }}
+        className={`${getInputHeight(viewMode)} w-full rounded-xl font-bold font-outfit shadow-md transition-all duration-300 active:scale-[0.98] text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center relative overflow-hidden
+          ${isCoolingDown ? 'bg-slate-100 shadow-none' : btnConfig.bgClass}
         `}
       >
-        {isSubmitting ? (
-           <Loader2 className="w-6 h-6 animate-spin text-white/80" />
-        ) : (
-          btnConfig.content
+        {/* Aero Liquid Filling Layer */}
+        {isCoolingDown && (
+          <motion.div
+            className={cn(
+              "absolute inset-0 origin-left opacity-100",
+              btnConfig.bgClass.split(' ').find(c => c.startsWith('bg-')) || 'bg-blue-600'
+            )}
+            initial={{ scaleX: cooldownProgress }}
+            animate={{ scaleX: 1 }}
+            transition={{ 
+              duration: cooldownRemaining, 
+              ease: "linear"
+            }}
+          />
         )}
+
+        <span className={cn(
+          "relative z-20 transition-colors duration-300",
+          isCoolingDown && "text-slate-600 drop-shadow-[0_1px_0_rgba(255,255,255,0.8)]"
+        )}>
+          {isSubmitting ? (
+             <Loader2 className="w-6 h-6 animate-spin text-white/80" />
+          ) : (
+            btnConfig.content
+          )}
+        </span>
       </motion.button>
     </div>
   );

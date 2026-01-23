@@ -172,7 +172,7 @@ function DashboardContent() {
             <div className="relative">
               <Tag className="h-5 w-5" />
               {bids.filter(b => myItems.some(i => i.id === b.itemId)).length > 0 && (
-                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-indigo-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1.5 h-3.5 w-3.5 bg-rose-600 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                   {bids.filter(b => myItems.some(i => i.id === b.itemId)).length}
                 </span>
               )}
@@ -235,7 +235,7 @@ function DashboardContent() {
           >
             <Tag className="h-4 w-4 mr-2" />
             Offers
-            <Badge id="tab-badge-active-bids" className="ml-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-50 border-none transition-all duration-300">
+            <Badge id="tab-badge-active-bids" className="ml-2 bg-rose-50 text-rose-600 hover:bg-rose-50 border-none transition-all duration-300">
               {bids.filter(b => myItems.some(i => i.id === b.itemId)).length}
             </Badge>
           </TabsTrigger>

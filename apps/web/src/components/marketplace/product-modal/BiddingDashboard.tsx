@@ -6,6 +6,7 @@ import { BiddingControls } from "@/components/common/BiddingControls";
 import { Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { getMinimumAllowedBid, MAX_BID_ATTEMPTS } from "@/lib/bidding";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BiddingDashboardProps {
   item: Item;
@@ -18,6 +19,7 @@ interface BiddingDashboardProps {
   isSuccess: boolean;
   isSubmitting: boolean;
   cooldownRemaining: number;
+  cooldownProgress: number;
   error?: boolean;
   errorMessage?: string | null;
   remainingAttempts?: number;
@@ -30,6 +32,8 @@ interface BiddingDashboardProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   getSmartStep: (currentBid: number) => number;
+  showDelta?: boolean;
+  lastDelta?: number | null;
 }
 
 export function BiddingDashboard({
@@ -43,6 +47,7 @@ export function BiddingDashboard({
   isSuccess,
   isSubmitting,
   cooldownRemaining,
+  cooldownProgress,
   error = false,
   errorMessage = null,
   remainingAttempts = MAX_BID_ATTEMPTS,
@@ -54,7 +59,9 @@ export function BiddingDashboard({
   onBid,
   onKeyDown,
   onInputChange,
-  getSmartStep
+  getSmartStep,
+  showDelta = false,
+  lastDelta = null
 }: BiddingDashboardProps) {
 
   const minNextBid = getMinimumAllowedBid(item.askPrice);
@@ -68,9 +75,13 @@ export function BiddingDashboard({
         {/* Ask Price Card */}
         <div className="flex flex-col items-center text-center min-w-0 bg-white border border-slate-200 shadow-sm rounded-xl p-3 h-full justify-center">
           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Ask Price</span>
-          <span className="text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit text-slate-900 leading-tight tracking-tight truncate w-full pb-1" title={formatPrice(item.askPrice)}>
+          <motion.span 
+            key={item.askPrice}
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit text-slate-900 leading-tight tracking-tight truncate w-full pb-1" title={formatPrice(item.askPrice)}>
             {formatPrice(item.askPrice)}
-          </span>
+          </motion.span>
         </div>
 
         {/* Highest Bid / Bids Card */}
@@ -78,12 +89,16 @@ export function BiddingDashboard({
           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">
              {item.isPublicBid ? "Highest" : "Bids"}
           </span>
-          <span className={`text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit leading-tight tracking-tight truncate w-full pb-1 ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-900'}`}>
+          <motion.span 
+            key={`${item.currentHighBid}-${item.bidCount}`}
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className={`text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit leading-tight tracking-tight truncate w-full pb-1 ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-900'}`}>
             {item.isPublicBid && item.currentHighBid
               ? formatPrice(item.currentHighBid)
               : `${item.bidCount}`
             }
-          </span>
+          </motion.span>
         </div>
       </div>
 
@@ -97,6 +112,7 @@ export function BiddingDashboard({
           hasPriorBid={hasPriorBid}
           isSubmitting={isSubmitting}
           cooldownRemaining={cooldownRemaining}
+          cooldownProgress={cooldownProgress}
           error={error}
           errorMessage={errorMessage}
           remainingAttempts={remainingAttempts}
@@ -104,6 +120,8 @@ export function BiddingDashboard({
           minBid={minNextBid}
           pendingConfirmation={pendingConfirmation}
           animTrigger={animTrigger}
+          showDelta={showDelta}
+          lastDelta={lastDelta}
           viewMode="modal"
           idPrefix={`modal-item-card-${item.id}`}
           onSmartAdjust={onSmartAdjust}

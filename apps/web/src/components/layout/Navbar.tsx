@@ -112,7 +112,7 @@ export default function Navbar() {
               </svg>
               
               <div id="navbar-brand-name-08" className="flex flex-col items-center justify-center gap-0 py-0.5">
-                <span id="navbar-brand-urdu-09" className="text-[clamp(1.25rem,3vw,1.75rem)] font-black mb-[-2px] transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600">
+                <span id="navbar-brand-urdu-09" className="text-[clamp(1.25rem,3vw,1.75rem)] font-black mb-[-2px] transition-all duration-300 font-[family-name:var(--font-noto-urdu)] bg-clip-text text-transparent bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700">
                   بولیاں
                 </span>
                 {/* English: Much smaller, wide spacing */}
@@ -195,7 +195,7 @@ export default function Navbar() {
                     <Tag id="navbar-offers-icon" className={cn("h-5 w-5", pathname === '/dashboard' && currentTab === 'active-bids' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && currentTab === 'active-bids' ? 2.5 : 1.5} />
                     <span>Offers</span>
                     {receivedBidsCount > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white">
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white">
                         {receivedBidsCount}
                       </span>
                     )}

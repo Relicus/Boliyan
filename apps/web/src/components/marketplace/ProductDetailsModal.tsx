@@ -47,7 +47,10 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     userBid,
     initialBid,
     isSubmitting,
-    cooldownRemaining
+    cooldownRemaining,
+    cooldownProgress,
+    showDelta,
+    lastDelta
   } = useBidding(item, seller); // Removed auto-close callback
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -150,6 +153,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     isSuccess={isSuccess}
                     isSubmitting={isSubmitting}
                     cooldownRemaining={cooldownRemaining}
+                    cooldownProgress={cooldownProgress}
                     error={error}
                     errorMessage={errorMessage}
                     remainingAttempts={remainingAttempts}
@@ -162,6 +166,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     onKeyDown={handleKeyDown}
                     onInputChange={handleInputChange}
                     getSmartStep={getSmartStep}
+                    showDelta={showDelta}
+                    lastDelta={lastDelta}
                   />
               </div>
 

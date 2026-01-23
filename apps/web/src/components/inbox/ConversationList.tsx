@@ -108,7 +108,7 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
                 <div className="relative shrink-0">
                   <div className={cn(
                     "absolute -inset-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-md",
-                    activeRole === 'seller' ? "bg-indigo-400/20" : "bg-blue-400/20"
+                    activeRole === 'seller' ? "bg-slate-400/20" : "bg-blue-400/20"
                   )} />
                   <Avatar className="h-12 w-12 border-2 border-white shadow-sm relative z-10 transition-transform group-hover:scale-105">
                     <AvatarImage src={otherUser?.avatar} />
@@ -121,7 +121,7 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
                     <div className={cn(
                       "text-[9px] px-1.5 py-0.5 rounded-full shadow-sm font-black uppercase tracking-tighter border-2 border-white",
                       activeRole === 'seller' 
-                        ? "bg-indigo-600 text-white" 
+                        ? "bg-slate-900 text-white" 
                         : "bg-blue-600 text-white"
                     )}>
                       {activeRole === 'seller' ? 'Offer' : 'Bid'}

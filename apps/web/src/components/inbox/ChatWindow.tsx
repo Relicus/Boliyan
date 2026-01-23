@@ -184,7 +184,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
             {otherUser?.isVerified && <VerifiedBadge size="sm" />}
             <span className={cn(
               "text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter shadow-sm",
-              isSeller ? "bg-indigo-600 text-white" : "bg-blue-600 text-white"
+              isSeller ? "bg-slate-900 text-white" : "bg-blue-600 text-white"
             )}>
               {isSeller ? "Buyer" : "Seller"}
             </span>
