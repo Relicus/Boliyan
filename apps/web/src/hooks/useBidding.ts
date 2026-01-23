@@ -20,13 +20,15 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize with Smart Anchor Logic:
-  // 1. Existing Bid (Persistence)
-  // 2. Market Peak (Competition) -> MAX(Ask, High)
+  // 1. Existing Bid -> Bid + Step (Encourage update)
+  // 2. Market Peak -> MAX(Ask, High)
   // 3. Ask Price (Default/Secret)
   const initialBid = useMemo(() => {
-    // Priority 1: User's existing bid
+    // Priority 1: User's existing bid + Step (Aggressive Anchor)
     if (userBid) {
-        return userBid.amount;
+        const nextStep = getSmartStep(userBid.amount);
+        const aggressiveAnchor = userBid.amount + nextStep;
+        return Math.min(aggressiveAnchor, getMaximumAllowedBid(item.askPrice));
     }
 
     // Priority 2: Public Market Peak

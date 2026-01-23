@@ -109,7 +109,9 @@ export default function RootLayout({
                   {children}
                 </main>
               </div>
-              <BottomNav />
+              <Suspense fallback={null}>
+                <BottomNav />
+              </Suspense>
               <ScrollToTop />
             </TooltipProvider>
           </NotificationProvider>

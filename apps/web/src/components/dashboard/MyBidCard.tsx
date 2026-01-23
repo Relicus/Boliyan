@@ -4,12 +4,15 @@ import { Bid, Item, User } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Trophy, AlertTriangle } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { VictoryHalo } from "@/components/common";
+import { PriceDisplay } from "@/components/common/PriceDisplay";
+import { createBiddingConfig } from "@/types/bidding";
+import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 
 interface MyBidCardProps {
   item: Item;
@@ -18,11 +21,20 @@ interface MyBidCardProps {
 }
 
 export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
-  const { user, now } = useApp();
+  const { user, now, bids } = useApp();
   
   const isLeading = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isOutbid = user && item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Remaining Attempts
+  const remainingAttempts = useMemo(() => {
+    const updatesUsed = userBid.update_count || 0;
+    return Math.max(0, (MAX_BID_ATTEMPTS - 1) - updatesUsed);
+  }, [userBid]);
+
+  // Unified Bidding Config
+  const biddingConfig = createBiddingConfig(item, user, bids);
 
   const getTimeLeft = (expiryAt: string) => {
     if (now === 0) return "Loading...";
@@ -59,12 +71,19 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
             <div>
               <div className="flex justify-between items-start">
                 <h3 id={`my-bid-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2 text-[clamp(1rem,5cqi,1.25rem)]">{item.title}</h3>
-                <div className="flex flex-col items-end">
-                  <span id={`my-bid-amount-${item.id}`} className="text-[clamp(0.875rem,4cqi,1.125rem)] font-black text-blue-600 shrink-0 font-outfit leading-none">
-                    Rs. {userBid.amount.toLocaleString()}
-                  </span>
-                  <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mt-1">Your Bid</span>
-                </div>
+              </div>
+
+              {/* Centralized Price Row */}
+              <div className="mt-1 mb-2">
+                <PriceDisplay 
+                    config={biddingConfig}
+                    askPrice={item.askPrice}
+                    bidCount={item.bidCount}
+                    viewMode="compact"
+                    remainingAttempts={remainingAttempts}
+                    showAttempts={true}
+                    userCurrentBid={userBid.amount}
+                />
               </div>
 
               <div className="flex items-center gap-2 mt-1">
