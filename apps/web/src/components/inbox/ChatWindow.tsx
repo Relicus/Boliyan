@@ -89,11 +89,14 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
          : 0;
        
        if (Date.now() - sealedAt < 5000) { // Only animate if it happened in last 5s
-          setShowSealAnim(true);
-          sonic.thud();
+          // Use setTimeout to avoid sync state update warning
+          setTimeout(() => {
+             setShowSealAnim(true);
+             sonic.thud();
+          }, 0);
        }
     }
-  }, [isSealed, conversation]);
+  }, [isSealed, conversation, showSealAnim]);
 
   const handleConfirmExchange = async () => {
     if (!conversation) return;
@@ -188,13 +191,16 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
   useEffect(() => {
     if (!user || conversation) {
-      setShowMissing(false);
+      if (showMissing) {
+        // Avoid sync state update
+        setTimeout(() => setShowMissing(false), 0);
+      }
       return;
     }
 
     const timer = setTimeout(() => setShowMissing(true), 1500);
     return () => clearTimeout(timer);
-  }, [conversation, conversationId, user]);
+  }, [conversation, conversationId, user, showMissing]);
 
   useEffect(() => {
     if (item?.status === 'completed' && otherUser) {

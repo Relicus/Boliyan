@@ -4,13 +4,13 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
 import { Item, User, Bid } from "@/types";
-import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, WARNING_PERCENTAGE, MAX_BID_ATTEMPTS } from "@/lib/bidding";
+import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import { sonic } from "@/lib/sonic";
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
-  const { placeBid, user, bids, openAuthModal } = useApp();
+  const { placeBid, user, bids, openAuthModal, lastBidTimestamp } = useApp();
 
-  // Get current user's active bid on this item - MOVED UP for initialization use
+  // Get current user's active bid on this item
   const userBid = useMemo(() => {
     return user ? bids.find(b => b.itemId === item.id && b.bidderId === user.id) : null;
   }, [user, bids, item.id]);
@@ -18,45 +18,57 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   // Pending confirmation for dual-tap pattern
   const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid' | 'out_of_bids' | 'confirm_bid', message: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { now, lastBidTimestamp } = useApp(); // Need global heartbeat and cooldown
+  
+  // Local cooldown state to avoid global heartbeat re-renders
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  useEffect(() => {
+    if (!lastBidTimestamp) {
+      setCooldownRemaining(0);
+      return;
+    }
+
+    const updateCooldown = () => {
+      const now = Date.now();
+      const diff = Math.ceil((lastBidTimestamp + 3000 - now) / 1000);
+      const remaining = Math.max(0, diff);
+      setCooldownRemaining(remaining);
+      return remaining;
+    };
+
+    const remaining = updateCooldown();
+    if (remaining > 0) {
+      const interval = setInterval(() => {
+        const current = updateCooldown();
+        if (current <= 0) clearInterval(interval);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [lastBidTimestamp]);
+
+  const cooldownProgress = useMemo(() => {
+    if (!lastBidTimestamp || cooldownRemaining === 0) return 0;
+    const elapsed = Date.now() - lastBidTimestamp;
+    return Math.min(1, elapsed / 3000);
+  }, [lastBidTimestamp, cooldownRemaining]);
+
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const deltaTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const cooldownRemaining = useMemo(() => {
-    if (!lastBidTimestamp) return 0;
-    const diff = Math.ceil((lastBidTimestamp + 3000 - now) / 1000);
-    return Math.max(0, diff);
-  }, [lastBidTimestamp, now]);
-
-  const cooldownProgress = useMemo(() => {
-    if (!lastBidTimestamp) return 0;
-    const elapsed = now - lastBidTimestamp;
-    const progress = Math.min(1, elapsed / 3000);
-    return progress;
-  }, [lastBidTimestamp, now]);
-
-  // Initialize with Smart Anchor Logic:
-  // 1. Existing Bid -> Bid + Step (Encourage update)
-  // 2. Market Peak -> MAX(Ask, High)
-  // 3. Ask Price (Default/Secret)
+  // Initialize with Smart Anchor Logic
   const initialBid = useMemo(() => {
-    // Priority 1: User's existing bid + Step (Aggressive Anchor)
     if (userBid) {
         const nextStep = getSmartStep(userBid.amount);
         const aggressiveAnchor = userBid.amount + nextStep;
         return Math.min(aggressiveAnchor, getMaximumAllowedBid(item.askPrice));
     }
 
-    // Priority 2: Public Market Peak
     if (item.isPublicBid) {
-        // Start at higher of Ask or High Bid to be competitive immediately
         const anchor = Math.max(item.askPrice, item.currentHighBid || 0);
-        // Clamp to Max Allowed
         return Math.min(anchor, getMaximumAllowedBid(item.askPrice));
     }
 
-    // Priority 3: Secret / Default -> Ask Price
     return item.askPrice;
   }, [item.askPrice, item.isPublicBid, item.currentHighBid, userBid]);
 
@@ -70,10 +82,8 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
   // Calculate Remaining Attempts
   const remainingAttempts = useMemo(() => {
-    if (!userBid) return MAX_BID_ATTEMPTS; // 3
+    if (!userBid) return MAX_BID_ATTEMPTS;
     const updatesUsed = userBid.update_count || 0;
-    // 1 initial + 2 updates = 3 total. 
-    // If update_count is 0, they used 1 attempt (the insert). Remaining: 2.
     return Math.max(0, (MAX_BID_ATTEMPTS - 1) - updatesUsed);
   }, [userBid]);
 
@@ -81,23 +91,17 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
   // Calculate derived sticky status
   const derivedStatus = useMemo(() => {
-    // 1. Quota Check (Indefinite)
     if (remainingAttempts === 0) {
       return { type: 'error', message: "Out of Bids" } as const;
     }
     
-    // Parse current input
     const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
     const maxBid = getMaximumAllowedBid(item.askPrice);
     
-    // 2. Max Limit Reached (Indefinite)
-    // If input is at or above max, OR user's existing bid is already maxed out
     if (current >= maxBid || (userBid && userBid.amount >= maxBid)) {
        return { type: 'error', message: "Max Reached" } as const;
     }
 
-    // 3. Bid Higher (Indefinite)
-    // If we have a bid, and the input is less than or equal to it
     if (userBid && current <= userBid.amount) {
       return { type: 'error', message: "Bid Higher" } as const;
     }
@@ -105,27 +109,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     return null;
   }, [remainingAttempts, bidAmount, userBid, item.askPrice]);
 
-  // Auto-Step Up Logic: If input matches current bid exactly, push it up.
-  useEffect(() => {
-    if (!userBid) return;
-    
-    const amount = parseFloat(bidAmount.replace(/,/g, ''));
-    if (amount === userBid.amount) {
-        const step = getSmartStep(amount);
-        const maxBid = getMaximumAllowedBid(item.askPrice);
-        
-        if (amount + step <= maxBid) {
-            setBidAmount((amount + step).toLocaleString());
-            setAnimTrigger(prev => prev + 1);
-        }
-    }
-    // Clear confirmation if we enter a blocking state
-    if (derivedStatus && pendingConfirmation) {
-        setPendingConfirmation(null);
-    }
-  }, [bidAmount, userBid, item.askPrice, derivedStatus, pendingConfirmation]);
-
-  // Clear timeouts on unmount
   const setTemporaryError = useCallback((msg: string, duration: number = 2000) => {
     if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
     
@@ -139,7 +122,25 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     }, duration);
   }, []);
 
-  // Clear timeouts on unmount
+  // Auto-Step Up Logic
+  useEffect(() => {
+    if (!userBid) return;
+    
+    const amount = parseFloat(bidAmount.replace(/,/g, ''));
+    if (amount === userBid.amount) {
+        const step = getSmartStep(amount);
+        const maxBid = getMaximumAllowedBid(item.askPrice);
+        
+        if (amount + step <= maxBid) {
+            setBidAmount((amount + step).toLocaleString());
+            setAnimTrigger(prev => prev + 1);
+        }
+    }
+    if (derivedStatus && pendingConfirmation) {
+        setPendingConfirmation(null);
+    }
+  }, [bidAmount, userBid, item.askPrice, derivedStatus, pendingConfirmation]);
+
   useEffect(() => {
     return () => {
       if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
@@ -148,15 +149,9 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     };
   }, []);
 
-  // Sync logic removed: We no longer auto-update bid amount to match high bid. 
-  // User is free to bid anywhere in range [70%, 150%].
-
   const handleSmartAdjust = useCallback((e: React.MouseEvent | React.TouchEvent, direction: 1 | -1) => {
     e.stopPropagation();
     
-    // Allow adjustment even if "Out of Bids" so user can see what they *could* have bid
-    // But block if already at absolute limits logic handles below
-
     const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
     const step = getSmartStep(current);
     const delta = step * direction;
@@ -164,19 +159,16 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     const minBid = getMinimumAllowedBid(item.askPrice);
     const maxBid = getMaximumAllowedBid(item.askPrice);
 
-    // Check Floor
     if (current + delta < minBid) {
       setTemporaryError("Below Min", 1000);
       return;
     }
 
-    // Check Ceiling
     if (current + delta > maxBid) {
        setTemporaryError("Max Reached", 1000);
        return;
     }
     
-    // Allow update
     const newValue = Math.max(0, current + delta);
     sonic.tick();
     
@@ -188,7 +180,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     setBidAmount(newValue.toLocaleString());
     setAnimTrigger(prev => prev + 1);
-  }, [bidAmount, item.askPrice, isQuotaReached]);
+  }, [bidAmount, item.askPrice, setTemporaryError]);
 
   type BidEvent = React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
 
@@ -216,21 +208,16 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     }
 
     try {
-      // Place/Update bid logic via store
       const success = await placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
-      
       if (!success) {
           setTemporaryError("Bid Failed");
           return;
       }
       
-      // Cooldown is now handled globally via MarketplaceContext.placeBid
-      
       setIsSuccess(true);
       sonic.chime();
 
       const nextAmount = amount + getSmartStep(amount);
-      // Don't auto-increment if it exceeds max
       if (nextAmount <= getMaximumAllowedBid(item.askPrice)) {
           setBidAmount(nextAmount.toLocaleString());
       }
@@ -263,29 +250,23 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     } finally {
       setIsSubmitting(false);
     }
-  }, [item, placeBid, onBidSuccess, isSubmitting, cooldownRemaining]);
+  }, [item, placeBid, onBidSuccess, isSubmitting, cooldownRemaining, setTemporaryError]);
 
   const attemptBid = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation();
     
     if (isSubmitting) return;
-    
-    // 0. Cooldown Check (Transient)
     if (cooldownRemaining > 0) {
         setTemporaryError(`Wait ${cooldownRemaining}s`, 2000);
         return;
     }
 
-    // 1. Sticky Status Blocking (Immediate Derived Check)
     if (derivedStatus) {
-        // Pulse the error but don't set a transient one
         sonic.thud();
         return; 
     }
 
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
-    
-    // 2. Range Check (Transient Logic)
     const minBid = getMinimumAllowedBid(item.askPrice);
     const maxBid = getMaximumAllowedBid(item.askPrice);
 
@@ -294,20 +275,16 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
 
-    // 3. Auth Check
     if (!user) {
       openAuthModal();
       return;
     }
 
-    // 4. Duplicate/Lower Amount Check (Redundant due to derivedStatus but kept for safety)
     if (userBid && amount <= userBid.amount) {
-        // Should be caught by derivedStatus, but just in case
         sonic.thud();
         return;
     }
 
-    // 5. Dual-Tap Confirmation Logic
     if (pendingConfirmation) {
       if (confirmationTimeoutRef.current) {
         clearTimeout(confirmationTimeoutRef.current);
@@ -318,7 +295,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
 
-    // MANDATORY Confirmation for every bid
     setPendingConfirmation({
       type: 'confirm_bid',
       message: 'Confirm?'
@@ -328,7 +304,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       setPendingConfirmation(null);
     }, 3000);
 
-  }, [bidAmount, item.askPrice, user, userBid, executeBid, pendingConfirmation, openAuthModal, isQuotaReached, isSubmitting, cooldownRemaining]);
+  }, [bidAmount, item.askPrice, user, userBid, executeBid, pendingConfirmation, isSubmitting, cooldownRemaining, derivedStatus, setTemporaryError, openAuthModal]);
 
   const clearPendingConfirmation = useCallback(() => {
     if (confirmationTimeoutRef.current) {
@@ -383,6 +359,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     isQuotaReached,
     userBid,
     initialBid,
-    derivedStatus // Export new sticky status
+    derivedStatus
   };
 }

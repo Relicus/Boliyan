@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Clock, MapPin, Trophy, AlertTriangle, MessageSquare, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item, User } from "@/types";
@@ -21,7 +21,13 @@ interface MyBidCardProps {
 }
 
 export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
-  const { user, now, bids, conversations } = useApp();
+  const { user, bids, conversations } = useApp();
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
   
   const isLeading = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isOutbid = user && item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;

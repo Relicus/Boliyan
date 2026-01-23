@@ -1,0 +1,222 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: YOUR LOCATION
+          - button "Karachi" [ref=e24]:
+            - img
+            - generic [ref=e25]: Karachi
+        - link "Sell Item" [ref=e26] [cursor=pointer]:
+          - /url: /list
+          - img
+          - generic [ref=e27]: Sell Item
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - link "Market" [ref=e30] [cursor=pointer]:
+              - /url: /
+              - img
+              - generic [ref=e31]: Market
+            - link "Offers" [ref=e32] [cursor=pointer]:
+              - /url: /dashboard?tab=active-bids
+              - img
+              - generic [ref=e33]: Offers
+            - link "Bids" [ref=e34] [cursor=pointer]:
+              - /url: /dashboard?tab=my-bids
+              - img
+              - generic [ref=e35]: Bids
+            - link "Chat" [ref=e36] [cursor=pointer]:
+              - /url: /inbox
+              - img
+              - generic [ref=e37]: Chat
+          - button "Notifications" [ref=e39]:
+            - img
+            - generic [ref=e40]: Notifications
+          - img [ref=e42] [cursor=pointer]
+  - generic [ref=e43]:
+    - complementary [ref=e44]:
+      - generic [ref=e46]:
+        - button "All" [ref=e47]:
+          - img [ref=e49]
+          - generic [ref=e53]: All
+        - button "Public" [ref=e54]:
+          - img [ref=e55]
+          - generic [ref=e58]: Public
+        - button "Secret" [ref=e59]:
+          - img [ref=e60]
+          - generic [ref=e63]: Secret
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - heading "LIST LOCATION" [level=3] [ref=e69]
+          - button "Karachi ∞" [ref=e71]:
+            - generic [ref=e72]:
+              - img
+              - generic [ref=e73]: Karachi
+            - generic [ref=e74]: ∞
+        - generic [ref=e75]:
+          - heading "Price Range" [level=3] [ref=e76]
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - generic [ref=e79]: ₨
+              - spinbutton [ref=e80]
+            - generic [ref=e81]:
+              - generic [ref=e82]: ₨
+              - spinbutton [ref=e83]
+        - generic [ref=e84]:
+          - heading "Condition" [level=3] [ref=e85]
+          - combobox [ref=e86]:
+            - generic: Any Condition
+            - img
+        - button "Reset All Filters" [ref=e88]:
+          - img
+          - text: Reset All Filters
+        - generic [ref=e90]:
+          - generic [ref=e91]:
+            - generic [ref=e92]: Ad
+            - heading "Supercharge Your Workflow" [level=3] [ref=e93]
+            - paragraph [ref=e94]: Get 50% off professional tools this week only.
+          - button "Check Offer" [ref=e95]:
+            - text: Check Offer
+            - img
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - generic [ref=e99]: Ad
+            - heading "Supercharge Your Workflow" [level=3] [ref=e100]
+            - paragraph [ref=e101]: Get 50% off professional tools this week only.
+          - button "Check Offer" [ref=e102]:
+            - text: Check Offer
+            - img
+    - main [ref=e104]:
+      - generic [ref=e107]:
+        - generic [ref=e110]:
+          - generic [ref=e112]:
+            - button "Trending" [ref=e113]:
+              - img [ref=e114]
+              - generic [ref=e116]: Trending
+            - button "Near Me" [ref=e117]:
+              - img [ref=e118]
+              - generic [ref=e121]: Near Me
+            - button "Ending Soon" [ref=e122]:
+              - img [ref=e123]
+              - generic [ref=e126]: Ending Soon
+            - button "High Value" [ref=e127]:
+              - img [ref=e128]
+              - generic [ref=e131]: High Value
+            - button "Just Listed" [ref=e132]:
+              - img [ref=e133]
+              - generic [ref=e136]: Just Listed
+            - button "Watchlist" [ref=e137]:
+              - img [ref=e138]
+              - generic [ref=e140]: Watchlist
+          - group [ref=e141]:
+            - radio "Compact View" [ref=e142]:
+              - img
+            - radio "Comfortable View" [checked] [ref=e143]:
+              - img
+            - radio "Spacious View" [ref=e144]:
+              - img
+        - generic [ref=e149]:
+          - button "All" [ref=e150]
+          - button "Mobiles" [ref=e151]:
+            - img
+            - text: Mobiles
+          - button "Electronics" [ref=e152]:
+            - img
+            - text: Electronics
+          - button "Appliances" [ref=e153]:
+            - img
+            - text: Appliances
+          - button "Furniture" [ref=e154]:
+            - img
+            - text: Furniture
+          - button "Fashion" [ref=e155]:
+            - img
+            - text: Fashion
+          - button "Sports" [ref=e156]:
+            - img
+            - text: Sports
+          - button "Gaming" [ref=e157]:
+            - img
+            - text: Gaming
+          - button "Watches" [ref=e158]:
+            - img
+            - text: Watches
+          - button "Audio" [ref=e159]:
+            - img
+            - text: Audio
+          - button "Cameras" [ref=e160]:
+            - img
+            - text: Cameras
+          - button "Hobbies" [ref=e161]:
+            - img
+            - text: Hobbies
+          - button "Community" [ref=e162]:
+            - img
+            - text: Community
+        - generic [ref=e167] [cursor=pointer]:
+          - generic [ref=e168]:
+            - img "Test Item Camera main image" [ref=e170]
+            - generic [ref=e171]:
+              - generic [ref=e172]:
+                - img [ref=e173]
+                - generic [ref=e176]: Karachi
+              - generic [ref=e177]:
+                - img [ref=e178]
+                - generic [ref=e181]: Cameras
+            - generic [ref=e182]:
+              - generic [ref=e183]:
+                - img [ref=e184]
+                - generic [ref=e187]: 2d 23h
+              - generic [ref=e189]: 👌 Used
+            - generic [ref=e191]:
+              - img [ref=e192]
+              - generic [ref=e195]: 0.2km • 1min
+            - img [ref=e198]
+          - generic [ref=e200]:
+            - heading "Test Item Camera" [level=3] [ref=e202]
+            - generic [ref=e203]:
+              - img "Demo Seller" [ref=e205]
+              - generic [ref=e206]: Demo Seller
+              - generic [ref=e208]:
+                - img [ref=e209]
+                - generic [ref=e211]:
+                  - generic [ref=e212]: "4.8"
+                  - generic [ref=e213]: (12)
+            - generic [ref=e214]:
+              - generic [ref=e215]:
+                - generic [ref=e216]: Asking
+                - generic [ref=e217]: 13,100
+              - generic [ref=e223]:
+                - generic [ref=e224]: Highest
+                - generic [ref=e227]: 13,100
+            - generic [ref=e229]:
+              - generic [ref=e231]:
+                - button [ref=e232]:
+                  - img [ref=e233]
+                - generic [ref=e234]:
+                  - textbox [ref=e235]: 13,600
+                  - generic:
+                    - generic: 13,600
+                - button [ref=e236]:
+                  - img [ref=e237]
+              - button "Update Bid" [ref=e239]:
+                - generic [ref=e241]:
+                  - img [ref=e242]
+                  - text: Update Bid
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e253] [cursor=pointer]:
+    - img [ref=e254]
+  - alert [ref=e257]
+```

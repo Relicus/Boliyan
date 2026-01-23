@@ -10,20 +10,27 @@ interface DealSealAnimationProps {
 }
 
 export function DealSealAnimation({ isVisible, onComplete }: DealSealAnimationProps) {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(isVisible);
 
   useEffect(() => {
     if (isVisible) {
-      setShow(true);
+      setTimeout(() => setShow(true), 0);
       const timer = setTimeout(() => {
         onComplete?.();
-        // Keep it visible but let interaction pass through? 
-        // Or fade out slightly? We want it to persist as a badge.
-        // For the animation itself, we might want to hide the overlay after a bit.
       }, 2000);
       return () => clearTimeout(timer);
+    } else {
+      setTimeout(() => setShow(false), 0);
     }
   }, [isVisible, onComplete]);
+
+  const [particles] = useState(() => 
+    [...Array(6)].map(() => ({
+      x: (Math.random() - 0.5) * 300,
+      y: (Math.random() - 0.5) * 300,
+      scale: Math.random() * 1.5
+    }))
+  );
 
   return (
     <AnimatePresence>
@@ -60,15 +67,15 @@ export function DealSealAnimation({ isVisible, onComplete }: DealSealAnimationPr
           </motion.div>
 
           {/* Particles */}
-          {[...Array(6)].map((_, i) => (
+          {particles.map((p, i) => (
             <motion.div
               key={i}
               initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
               animate={{ 
-                x: (Math.random() - 0.5) * 300, 
-                y: (Math.random() - 0.5) * 300,
+                x: p.x, 
+                y: p.y,
                 opacity: 0,
-                scale: Math.random() * 1.5
+                scale: p.scale
               }}
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="absolute w-2 h-2 rounded-full bg-slate-900"

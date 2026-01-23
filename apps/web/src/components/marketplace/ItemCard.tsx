@@ -36,7 +36,6 @@ interface ItemCardProps {
 
 const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) => {
   const { user, bids, watchedItemIds } = useApp();
-  const { now } = useTime(); // Use global heartbeat
   const isWatched = watchedItemIds.includes(item.id);
   const visibilityRef = useTrackVisibility(item.id);
 

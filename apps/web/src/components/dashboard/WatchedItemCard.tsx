@@ -22,41 +22,9 @@ interface WatchedItemCardProps {
 }
 
 export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCardProps) {
-  const { toggleWatch, now, user, bids, conversations } = useApp();
+  const { toggleWatch, user, bids, conversations } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
-
-  // If userBid not passed, try to find it in store
-  const activeBid = userBid || (user ? bids.find(b => b.itemId === item.id && b.bidderId === user.id) : undefined);
-  const acceptedConversation = useMemo(() => {
-    if (!user) return undefined;
-    return conversations.find(conversation =>
-      conversation.itemId === item.id && conversation.bidderId === user.id
-    );
-  }, [conversations, item.id, user]);
-  const isAccepted = activeBid?.status === 'accepted';
-  const canChat = isAccepted && !!acceptedConversation;
-  const canCall = canChat && !!seller.phone;
-
-  // Remaining Attempts
-  const remainingAttempts = useMemo(() => {
-    if (!activeBid) return MAX_BID_ATTEMPTS;
-    const updatesUsed = activeBid.update_count || 0;
-    return Math.max(0, (MAX_BID_ATTEMPTS - 1) - updatesUsed);
-  }, [activeBid]);
-
-  // Unified Bidding Config
-  const biddingConfig = createBiddingConfig(item, user, bids);
-
-  const getTimeLeft = (expiryAt: string) => {
-    if (now === 0) return "Loading...";
-    const diff = new Date(expiryAt).getTime() - now;
-    const hours = Math.max(0, Math.floor(diff / 3600000));
-    const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    
-    if (hours >= 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
-    return `${hours}h ${mins}m`;
-  };
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -1,0 +1,149 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: YOUR LOCATION
+          - button "Karachi" [ref=e24]:
+            - img
+            - generic [ref=e25]: Karachi
+        - link "Sell Item" [ref=e26] [cursor=pointer]:
+          - /url: /signin?redirect=%2Flist
+          - img
+          - generic [ref=e27]: Sell Item
+        - link "Sign In" [ref=e29] [cursor=pointer]:
+          - /url: /signin?redirect=%2Fsignin
+  - main [ref=e31]:
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - img [ref=e40]
+        - generic [ref=e43]: Welcome Back
+        - generic [ref=e44]: Sign in to continue to Boliyan
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - img [ref=e49]
+              - text: Email
+            - textbox "Email" [ref=e52]:
+              - /placeholder: you@example.com
+              - text: e2e-1769209066713@demo.com
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - img [ref=e55]
+              - text: Password
+            - textbox "Password" [active] [ref=e58]:
+              - /placeholder: ••••••••
+              - text: password123
+          - button "Sign In" [ref=e59]
+        - generic [ref=e64]: Or continue with
+        - generic [ref=e65]:
+          - button "Google" [ref=e66]:
+            - img
+            - text: Google
+          - button "Facebook" [ref=e67]:
+            - img
+            - text: Facebook
+        - generic [ref=e68]:
+          - text: Don't have an account?
+          - link "Sign Up" [ref=e69] [cursor=pointer]:
+            - /url: /signup
+  - region "Notifications alt+T"
+  - generic:
+    - generic [ref=e72]:
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - navigation [ref=e75]:
+            - button "previous" [disabled] [ref=e76]:
+              - img "previous" [ref=e77]
+            - generic [ref=e79]:
+              - generic [ref=e80]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e81]:
+              - img "next" [ref=e82]
+          - img
+        - generic [ref=e84]:
+          - link "Next.js 16.1.1 (stale) Turbopack" [ref=e85] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+            - img [ref=e86]
+            - generic "There is a newer version (16.1.4) available, upgrade recommended!" [ref=e88]: Next.js 16.1.1 (stale)
+            - generic [ref=e89]: Turbopack
+          - img
+      - dialog "Build Error" [ref=e91]:
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - generic [ref=e96]:
+              - generic [ref=e98]: Build Error
+              - generic [ref=e99]:
+                - button "Copy Error Info" [ref=e100] [cursor=pointer]:
+                  - img [ref=e101]
+                - button "No related documentation found" [disabled] [ref=e103]:
+                  - img [ref=e104]
+                - button "Attach Node.js inspector" [ref=e106] [cursor=pointer]:
+                  - img [ref=e107]
+            - generic [ref=e116]: Ecmascript file had an error
+          - generic [ref=e118]:
+            - generic [ref=e120]:
+              - img [ref=e122]
+              - generic [ref=e126]: ./src/hooks/useBidding.ts (55:9)
+              - button "Open in editor" [ref=e127] [cursor=pointer]:
+                - img [ref=e129]
+            - generic [ref=e132]:
+              - generic [ref=e133]: Ecmascript file had an error
+              - generic [ref=e134]: 53 |
+              - generic [ref=e135]: 54 |
+              - text: ">"
+              - generic [ref=e136]: 55 |
+              - text: const
+              - generic [ref=e137]: cooldownProgress
+              - text: =
+              - generic [ref=e138]: useMemo(()
+              - text: =>
+              - generic [ref=e139]: "{"
+              - generic [ref=e140]: "|"
+              - text: ^^^^^^^^^^^^^^^^
+              - generic [ref=e141]: 56 |
+              - text: if
+              - generic [ref=e142]: (
+              - text: "!"
+              - generic [ref=e143]: lastBidTimestamp)
+              - text: return 0;
+              - generic [ref=e144]: 57 |
+              - text: const
+              - generic [ref=e145]: elapsed
+              - text: =
+              - generic [ref=e146]: now
+              - text: "-"
+              - generic [ref=e147]: lastBidTimestamp
+              - text: ;
+              - generic [ref=e148]: 58 |
+              - text: const
+              - generic [ref=e149]: progress
+              - text: = Math.min(1,
+              - generic [ref=e150]: elapsed
+              - text: / 3000);
+              - generic [ref=e151]: "the name `cooldownProgress` is defined multiple times Import traces: Client Component Browser: ./src/hooks/useBidding.ts [Client Component Browser] ./src/components/marketplace/ItemCard.tsx [Client Component Browser] ./src/components/marketplace/MarketplaceGrid.tsx [Client Component Browser] ./src/components/marketplace/MarketplaceGrid.tsx [Server Component] ./src/app/page.tsx [Server Component] Client Component SSR: ./src/hooks/useBidding.ts [Client Component SSR] ./src/components/marketplace/ItemCard.tsx [Client Component SSR] ./src/components/marketplace/MarketplaceGrid.tsx [Client Component SSR] ./src/components/marketplace/MarketplaceGrid.tsx [Server Component] ./src/app/page.tsx [Server Component]"
+        - generic [ref=e152]: "1"
+        - generic [ref=e153]: "2"
+    - generic [ref=e158] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e159]:
+        - img [ref=e160]
+      - button "Open issues overlay" [ref=e164]:
+        - generic [ref=e165]:
+          - generic [ref=e166]: "0"
+          - generic [ref=e167]: "1"
+        - generic [ref=e168]: Issue
+  - alert [ref=e169]
+```

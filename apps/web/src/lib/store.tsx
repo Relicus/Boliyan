@@ -134,7 +134,8 @@ export function useApp() {
     // Providing 'search' as a sub-object is safer.
     search: search,
     
-    now: time.now,
+    now: time.now, // Keep for legacy but we should move away
+    time: time, // Expose raw time context if needed
     acceptBid: acceptBidCompat, // Override with composite function
     isLoading: auth.isLoading, // Stability Fix: Navbar should only load on AUTH check, not marketplace fetches
     isMarketplaceLoading: marketplace.isLoading, // Expose specific loading state if needed

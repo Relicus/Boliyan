@@ -80,7 +80,7 @@ export const PriceDisplay = memo(({
   useEffect(() => {
     // Stop if no user bid
     if (userCurrentBid === undefined || userCurrentBid === null) {
-      setShowUserBid(false);
+      // Don't set state here to avoid sync update loop
       return;
     }
 
@@ -102,6 +102,8 @@ export const PriceDisplay = memo(({
     return () => clearTimeout(timer);
   }, [showUserBid, userCurrentBid, config.variant, config.isUserHighBidder]);
   
+  const safeShowUserBid = showUserBid && (userCurrentBid !== undefined && userCurrentBid !== null);
+
   return (
     <div className={`grid grid-cols-[1fr_auto_1fr] items-end ${className}`}>
       {/* Asking Price */}
@@ -135,8 +137,9 @@ export const PriceDisplay = memo(({
       {/* Highest Bid / Secret Status / Your Bid (Rotating) */}
       <div className="flex flex-col items-end justify-self-end transition-all relative h-[2.5em] justify-end">
         <AnimatePresence mode="wait">
-           {showUserBid ? (
+           {safeShowUserBid ? (
              <motion.div
+
                key="user-bid"
                initial={{ opacity: 0, y: 5 }}
                animate={{ opacity: 1, y: 0 }}

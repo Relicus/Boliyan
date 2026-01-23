@@ -690,7 +690,7 @@
                 - generic [ref=e1032]:
                   - generic [ref=e1033]:
                     - img [ref=e1034]
-                    - generic [ref=e1037]: 2d 3h
+                    - generic [ref=e1037]: 2d 2h
                   - generic [ref=e1039]: 👌 Used
               - generic [ref=e1040]:
                 - heading "Gym Dumbbell Set (Pair of 10kg)" [level=3] [ref=e1042]

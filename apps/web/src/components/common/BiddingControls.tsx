@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo, useState, useRef, useLayoutEffect } from "react";
+import { memo, useMemo, useState, useRef, useLayoutEffect, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
@@ -226,12 +226,19 @@ export const BiddingControls = memo(({
 
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
-  // High-precision remaining seconds for the animation duration
-  const { lastBidTimestamp, now } = useApp();
-  const preciseRemaining = useMemo(() => {
-    if (!lastBidTimestamp) return 0;
-    return Math.max(0, (lastBidTimestamp + 3000 - now) / 1000);
-  }, [lastBidTimestamp, now]);
+  // Remove high-precision heartbeat dependency for performance
+  const { lastBidTimestamp } = useApp();
+  const [justFinishedCooldown, setJustFinishedCooldown] = useState(false);
+
+  useEffect(() => {
+    if (cooldownRemaining > 0) {
+      const timer = setTimeout(() => {
+        setJustFinishedCooldown(true);
+        setTimeout(() => setJustFinishedCooldown(false), 800);
+      }, cooldownRemaining * 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldownRemaining]);
   
   const { theme, content } = useMemo(() => {
     // 1. Success State
@@ -439,7 +446,7 @@ export const BiddingControls = memo(({
         initial={false}
         animate={{
           x: pendingConfirmation ? [0, -3, 3, -3, 3, 0] : 0,
-          scale: !isCoolingDown && preciseRemaining <= 0.05 && preciseRemaining > -0.5 ? [1, 1.18, 1] : 1,
+          scale: justFinishedCooldown ? [1, 1.18, 1] : 1,
           backgroundColor: isCoolingDown ? '#f8fafc' : activeTheme.bgHex, // Use slate-50 when cooling down
         }}
         whileHover={(!isDisabled && !isQuotaReached && !isCoolingDown && !isSuccess && activeTheme.hoverHex) ? {
