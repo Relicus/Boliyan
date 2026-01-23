@@ -55,7 +55,59 @@ interface BiddingControlsProps {
   onInputClick?: (e: React.MouseEvent) => void;
 }
 
-// Shared Label Component to ensure 1:1 pixel alignment
+// Centralized Theme Configuration
+type ButtonTheme = 'active' | 'success' | 'inactive' | 'danger' | 'warning' | 'neutral';
+
+const BUTTON_THEMES: Record<ButtonTheme, { classes: string; bgHex: string; textClass: string }> = {
+  active: {
+    classes: 'bg-blue-600 hover:bg-blue-700 text-white',
+    bgHex: '#2563eb', // bg-blue-600
+    textClass: 'text-white'
+  },
+  success: {
+    classes: 'bg-amber-600 text-white',
+    bgHex: '#d97706', // bg-amber-600
+    textClass: 'text-white'
+  },
+  inactive: {
+    classes: 'bg-slate-100 cursor-not-allowed shadow-none border border-slate-200 text-slate-400 font-medium',
+    bgHex: '#f1f5f9', // bg-slate-100
+    textClass: 'text-slate-400 font-medium'
+  },
+  danger: {
+    classes: 'bg-red-600 text-white',
+    bgHex: '#dc2626', // bg-red-600
+    textClass: 'text-white'
+  },
+  warning: {
+    classes: 'bg-orange-500 hover:bg-orange-600 text-white',
+    bgHex: '#f97316', // bg-orange-500
+    textClass: 'text-white'
+  },
+  neutral: {
+    classes: 'bg-slate-100 text-slate-900',
+    bgHex: '#f1f5f9', // bg-slate-100
+    textClass: 'text-slate-900'
+  }
+};
+
+// Reusable Content Component
+const BiddingButtonContent = ({ 
+  icon: Icon, 
+  text, 
+  className 
+}: { 
+  icon?: React.ElementType; 
+  text: React.ReactNode; 
+  className?: string 
+}) => (
+  <span className={cn("flex items-center gap-1.5", className)}>
+    {Icon && <Icon className={cn("w-4 h-4 md:w-5 md:h-5", className?.includes('opacity') ? "" : "shrink-0")} />}
+    {text}
+  </span>
+);
+
+// Re-add Label Component that was accidentally removed but is still used
 const BiddingButtonLabel = ({ content, className }: { content: React.ReactNode, className?: string }) => (
   <div className={cn("absolute inset-0 flex items-center justify-center font-black font-outfit gap-1.5 whitespace-nowrap", className)}>
     {content}
@@ -212,13 +264,11 @@ export const BiddingControls = memo(({
     return Math.max(0, (lastBidTimestamp + 15000 - now) / 1000);
   }, [lastBidTimestamp, now]);
   
-  // Determine Button Styling based on state
-  const btnConfig = useMemo(() => {
+  const { theme, content } = useMemo(() => {
     // 1. Success State
     if (isSuccess) {
       return { 
-        bgClass: 'bg-amber-600',
-        textClass: 'text-white',
+        theme: 'success' as ButtonTheme,
         content: (
           <span className="flex items-center gap-2">
              <motion.svg 
@@ -240,29 +290,21 @@ export const BiddingControls = memo(({
     // 2. Submission Loader
     if (isSubmitting) {
       return {
-        bgClass: 'bg-blue-600/80',
-        textClass: 'text-white/80',
+        theme: 'active' as ButtonTheme, // Blue base
         content: <Loader2 className="w-6 h-6 animate-spin" />
       };
     }
 
-    // 3. Critical Errors - SHOW INSIDE BUTTON NOW
-    // Sticky Derived Status (Indefinite) has priority over general messages
+    // 3. Critical Errors (Sticky Derived Status)
     if (derivedStatus) {
       return {
-        bgClass: 'bg-slate-100 cursor-not-allowed shadow-none border border-slate-200',
-        textClass: 'text-slate-400 font-medium',
-        content: (
-          <span className="flex items-center gap-1.5">
-            <AlertCircle className="w-4 h-4 opacity-70" />
-            {derivedStatus.message}
-          </span>
-        )
+        theme: 'inactive' as ButtonTheme,
+        content: <BiddingButtonContent icon={AlertCircle} text={derivedStatus.message} className="opacity-70" />
       };
     }
 
+    // 4. Standard Errors
     if (errorMessage) {
-      // Mapping for specific error messages to ensure max 2-3 words
       const shortError = (() => {
         if (errorMessage === "Out of Bids" || isQuotaReached) return "Out of Bids";
         if (errorMessage === "Already Bid This Amount") return "Already Bid";
@@ -273,74 +315,47 @@ export const BiddingControls = memo(({
         if (errorMessage === "Below Minimum") return "Below Min";
         if (errorMessage === "Above Maximum") return "Above Max";
         if (errorMessage.includes("Wait")) return "Cooldown Active";
-        return errorMessage; // Fallback (assume mostly short)
+        return errorMessage; 
       })();
 
       return {
-        bgClass: 'bg-slate-100 cursor-not-allowed shadow-none border border-slate-200',
-        textClass: 'text-slate-400 font-medium',
-        content: (
-          <span className="flex items-center gap-1.5">
-            <AlertCircle className="w-4 h-4 opacity-70" />
-            {shortError}
-          </span>
-        )
+        theme: 'inactive' as ButtonTheme,
+        content: <BiddingButtonContent icon={AlertCircle} text={shortError} className="opacity-70" />
       };
     }
 
-    // 4. Confirmation State
+    // 5. Confirmation State
     if (pendingConfirmation) {
       return {
-        bgClass: 'bg-red-600 hover:bg-red-500 hover:brightness-110',
-        textClass: 'text-white',
-        content: pendingConfirmation.message // "Confirm?" is already short
+        theme: 'danger' as ButtonTheme,
+        content: pendingConfirmation.message
       };
     }
     
-    // 5. Owner State
+    // 6. Owner State
     if (isOwner) {
       return {
-        bgClass: 'bg-slate-100',
-        textClass: 'text-slate-900',
+        theme: 'neutral' as ButtonTheme,
         content: "Your Listing"
       };
     }
 
-    // 6. Standard States
+    // 7. Standard States
     if (hasPriorBid) {
       return {
-        bgClass: 'bg-orange-500 hover:bg-orange-600',
-        textClass: 'text-white',
-        content: (
-          <>
-            <Gavel className="w-5 h-5" />
-            Update Bid
-          </>
-        )
+        theme: 'warning' as ButtonTheme,
+        content: <BiddingButtonContent icon={Gavel} text="Update Bid" />
       };
     }
 
     return {
-      bgClass: 'bg-blue-600 hover:bg-blue-700',
-      textClass: 'text-white',
-      content: (
-        <>
-          <Gavel className="w-5 h-5" />
-          Place Bid
-        </>
-      )
+      theme: 'active' as ButtonTheme,
+      content: <BiddingButtonContent icon={Gavel} text="Place Bid" />
     };
-  }, [isSuccess, isSubmitting, errorMessage, isQuotaReached, pendingConfirmation, isOwner, hasPriorBid]);
+  }, [isSuccess, isSubmitting, errorMessage, isQuotaReached, derivedStatus, pendingConfirmation, isOwner, hasPriorBid]);
 
-  // Hex color mapping for beautiful Framer Motion interpolation
-  const getTargetHex = () => {
-    if (isSuccess) return '#d97706'; // bg-amber-600
-    if (derivedStatus || errorMessage) return '#f1f5f9'; // bg-slate-100 (Disabled/Error)
-    if (pendingConfirmation) return '#dc2626'; // bg-red-600 (Confirm is action)
-    if (isOwner) return '#f1f5f9'; // bg-slate-100
-    if (hasPriorBid) return '#f97316'; // bg-orange-500
-    return '#2563eb'; // bg-blue-600
-  };
+  // Derived styles from centralized config
+  const activeTheme = BUTTON_THEMES[theme];
 
   return (
     <div id={buildId('bidding-controls')} className={cn("flex flex-col w-full relative", showStatus ? 'gap-1.5' : 'gap-1.5')}>
@@ -450,7 +465,7 @@ export const BiddingControls = memo(({
         animate={{
           x: pendingConfirmation ? [0, -3, 3, -3, 3, 0] : 0,
           scale: !isCoolingDown && preciseRemaining <= 0.05 && preciseRemaining > -0.5 ? [1, 1.18, 1] : 1,
-          backgroundColor: isCoolingDown ? '#FFFFFF' : getTargetHex(),
+          backgroundColor: isCoolingDown ? '#FFFFFF' : activeTheme.bgHex,
         }}
         transition={{ 
           x: { duration: 0.4 },
@@ -459,14 +474,15 @@ export const BiddingControls = memo(({
         }}
         className={cn(
           getInputHeight(viewMode),
-          "w-full rounded-xl font-bold font-outfit shadow-md active:scale-[0.98] text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center relative overflow-hidden",
+          "w-full rounded-xl font-bold font-outfit shadow-md active:scale-[0.98] text-[clamp(0.875rem,5cqi,1.125rem)] flex items-center justify-center relative overflow-hidden transition-colors duration-200",
+          activeTheme.classes,
           isCoolingDown ? "shadow-none border border-slate-200" : ""
         )}
       >
         {/* Active State Label (Revealed after handoff) */}
         <BiddingButtonLabel 
-          content={isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : btnConfig.content}
-          className={cn(btnConfig.textClass, "transition-colors duration-200")}
+          content={content}
+          className={cn(activeTheme.textClass, "transition-colors duration-200")}
         />
 
         {/* COOLDOWN LAYERS (Sliding Window Handoff) */}
@@ -482,7 +498,7 @@ export const BiddingControls = memo(({
                {/* Under-Layer (White Base) */}
                <div className="absolute inset-0 bg-white">
                   <BiddingButtonLabel 
-                    content={btnConfig.content} 
+                    content={content} 
                     className="text-black" 
                   />
                </div>
@@ -495,7 +511,7 @@ export const BiddingControls = memo(({
                   transition={{ duration: preciseRemaining, ease: "linear" }}
                 >
                   <BiddingButtonLabel 
-                    content={btnConfig.content} 
+                    content={content} 
                     className="text-white" 
                   />
                </motion.div>
