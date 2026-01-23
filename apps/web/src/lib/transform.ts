@@ -139,7 +139,8 @@ export function transformBidToHydratedBid(bid: BidWithProfile): Bid {
     amount: Number(bid.amount),
     status: (bid.status || 'pending') as Bid['status'],
     type: 'public', // Defaulting since bid_type was removed from schema
-    createdAt: bid.created_at || new Date().toISOString()
+    createdAt: bid.created_at || new Date().toISOString(),
+    update_count: (bid as any).update_count || 0
   };
 }
 

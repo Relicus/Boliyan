@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { Item, Bid } from "@/types";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/lib/supabase";
-import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
+import { transformListingToItem, transformBidToHydratedBid, ListingWithSeller, BidWithProfile } from "@/lib/transform";
 import { generateCacheKey, getFromCache, setCache } from "@/lib/cache";
 import { useBidRealtime } from "@/hooks/useBidRealtime";
 import { sonic } from "@/lib/sonic";
@@ -453,15 +453,16 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     const fetchUserBids = async () => {
         const { data, error } = await supabase
             .from('bids')
-            .select('*')
+            .select('*, profiles(*)')
             .eq('bidder_id', user.id);
         
         if (error) {
             console.error("Error fetching user bids:", error);
         } else if (data) {
-            // We replace bids state with user's historical bids
-            // Note: Realtime subscription will append new ones
-            setBids(data as Bid[]);
+            // We replace bids state with user's historical bids, transformed to match UI Model
+            // This fixes the mismatch between snake_case DB fields and camelCase UI fields
+            const hydratedBids = data.map(b => transformBidToHydratedBid(b as unknown as BidWithProfile));
+            setBids(hydratedBids);
         }
     };
 

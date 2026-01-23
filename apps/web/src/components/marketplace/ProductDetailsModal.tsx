@@ -43,7 +43,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     handleKeyDown,
     handleInputChange,
     getSmartStep,
-    remainingAttempts
+    remainingAttempts,
+    userBid
   } = useBidding(item, seller); // Removed auto-close callback
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -143,6 +144,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     user={user}
                     seller={seller}
                     bidAmount={bidAmount}
+                    userCurrentBid={userBid?.amount}
                     isHighBidder={isHighBidder}
                     hasPriorBid={!!hasPriorBid}
                     isSuccess={isSuccess}

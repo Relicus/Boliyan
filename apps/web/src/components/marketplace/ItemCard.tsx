@@ -65,7 +65,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     handleInputChange, 
     animTrigger,
     remainingAttempts,
-    errorMessage
+    errorMessage,
+    userBid
   } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
 
   
@@ -372,6 +373,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 className="min-h-[2.25rem]"
                 remainingAttempts={remainingAttempts}
                 showAttempts={user?.id !== seller.id}
+                userCurrentBid={userBid?.amount}
               />
 
               {/* Spacious Mode Description */}

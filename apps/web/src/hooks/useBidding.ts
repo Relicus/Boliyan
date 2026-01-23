@@ -10,14 +10,36 @@ import { sonic } from "@/lib/sonic";
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
   const { placeBid, user, bids, openAuthModal } = useApp();
 
+  // Get current user's active bid on this item - MOVED UP for initialization use
+  const userBid = useMemo(() => {
+    return user ? bids.find(b => b.itemId === item.id && b.bidderId === user.id) : null;
+  }, [user, bids, item.id]);
+
   // Pending confirmation for dual-tap pattern
   const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid' | 'out_of_bids', message: string } | null>(null);
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize with 70% Floor (Rounded up)
+  // Initialize with Smart Anchor Logic:
+  // 1. Existing Bid (Persistence)
+  // 2. Market Peak (Competition) -> MAX(Ask, High)
+  // 3. Ask Price (Default/Secret)
   const initialBid = useMemo(() => {
-    return Math.ceil(getMinimumAllowedBid(item.askPrice) / 100) * 100;
-  }, [item.askPrice]);
+    // Priority 1: User's existing bid
+    if (userBid) {
+        return userBid.amount;
+    }
+
+    // Priority 2: Public Market Peak
+    if (item.isPublicBid) {
+        // Start at higher of Ask or High Bid to be competitive immediately
+        const anchor = Math.max(item.askPrice, item.currentHighBid || 0);
+        // Clamp to Max Allowed
+        return Math.min(anchor, getMaximumAllowedBid(item.askPrice));
+    }
+
+    // Priority 3: Secret / Default -> Ask Price
+    return item.askPrice;
+  }, [item.askPrice, item.isPublicBid, item.currentHighBid, userBid]);
 
   const [bidAmount, setBidAmount] = useState<string>(initialBid.toLocaleString());
   const [error, setError] = useState<boolean>(false);
@@ -26,11 +48,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const [animTrigger, setAnimTrigger] = useState(0);
   const [lastDelta, setLastDelta] = useState<number | null>(null);
   const [showDelta, setShowDelta] = useState<boolean>(false);
-
-  // Get current user's active bid on this item
-  const userBid = useMemo(() => {
-    return user ? bids.find(b => b.itemId === item.id && b.bidderId === user.id) : null;
-  }, [user, bids, item.id]);
 
   // Calculate Remaining Attempts
   const remainingAttempts = useMemo(() => {

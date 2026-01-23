@@ -12,6 +12,7 @@ interface BiddingDashboardProps {
   user: User | null;
   seller: User;
   bidAmount: string;
+  userCurrentBid?: number; // Added to show confirmed bid amount
   isHighBidder: boolean;
   hasPriorBid: boolean;
   isSuccess: boolean;
@@ -35,6 +36,7 @@ export function BiddingDashboard({
   user,
   seller,
   bidAmount,
+  userCurrentBid,
   isHighBidder,
   hasPriorBid,
   isSuccess,
@@ -69,15 +71,29 @@ export function BiddingDashboard({
           </span>
         </div>
 
-        {/* Center: Attempt Dots */}
+        {/* Center: My Status (Beads + Current Offer) */}
         {!isOwner && (
-          <div className="flex items-center justify-center gap-1.5 px-1 w-[40px] shrink-0">
-             {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
-              <div 
-                key={i} 
-                className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
-              />
-            ))}
+          <div className="flex flex-col items-center justify-center gap-1.5 px-1 w-[90px] shrink-0">
+             
+             {/* Label */}
+             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none">Status</span>
+
+             {/* Beads */}
+             <div className="flex items-center justify-center gap-1.5">
+                {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+                  />
+                ))}
+             </div>
+
+             {/* Current Offer (Only if bid exists) */}
+             {hasPriorBid && userCurrentBid && (
+               <span className="text-[clamp(0.875rem,3cqi,1rem)] font-black font-outfit text-slate-700 leading-none mt-0.5 animate-in fade-in zoom-in duration-300">
+                  {formatPrice(userCurrentBid)}
+               </span>
+             )}
           </div>
         )}
 

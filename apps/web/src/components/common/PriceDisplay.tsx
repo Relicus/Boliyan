@@ -26,6 +26,7 @@ interface PriceDisplayProps {
   className?: string;
   remainingAttempts?: number;
   showAttempts?: boolean;
+  userCurrentBid?: number;
 }
 
 
@@ -68,7 +69,8 @@ export const PriceDisplay = memo(({
   viewMode = 'compact',
   className = '',
   remainingAttempts = MAX_BID_ATTEMPTS,
-  showAttempts = false
+  showAttempts = false,
+  userCurrentBid
 }: PriceDisplayProps) => {
   
   return (
@@ -84,15 +86,25 @@ export const PriceDisplay = memo(({
       </div>
 
       {/* Attempt Dots (Centered) */}
-      <div className="flex flex-col items-center justify-end pb-1.5 px-2 w-[40px]">
+      <div className="flex flex-col items-center justify-end pb-1.5 px-2 w-[56px]">
         {showAttempts && (
-           <div className="flex gap-1.5 justify-center w-full">
-            {Array.from({ length: Math.max(0, remainingAttempts) }).map((_, i) => (
-              <div 
-                key={i} 
-                className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
-              />
-            ))}
+           <div className="flex flex-col items-center gap-1 w-full">
+            {/* Dots */}
+            <div className="flex gap-1.5 justify-center w-full">
+              {Array.from({ length: Math.max(0, remainingAttempts) }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+                />
+              ))}
+            </div>
+            
+            {/* User Bid - Only if exists */}
+            {userCurrentBid && (
+                <span className="text-[10px] font-black font-outfit text-slate-600 leading-none animate-in fade-in zoom-in duration-300">
+                    {formatPrice(userCurrentBid)}
+                </span>
+            )}
           </div>
         )}
       </div>

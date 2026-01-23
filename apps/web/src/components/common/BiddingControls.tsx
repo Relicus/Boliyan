@@ -154,6 +154,18 @@ export const BiddingControls = memo(({
     // 5. Standard States
     if (hasPriorBid) {
       // If they have bids left, encourage update
+      if (isHighBidder) {
+        return {
+          bgClass: 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200 hover:shadow-orange-300',
+          content: (
+            <span className="flex items-center gap-1.5">
+              <TrendingUp className="w-5 h-5" />
+              Raise Bid
+            </span>
+          )
+        };
+      }
+      
       return {
         bgClass: 'bg-green-600 hover:bg-green-700 text-white shadow-green-200 hover:shadow-green-300',
         content: (
@@ -163,6 +175,22 @@ export const BiddingControls = memo(({
           </span>
         )
       };
+    }
+
+    if (isHighBidder && !hasPriorBid) {
+       // Edge case: Maybe realtime update made them high bidder before local state synced? 
+       // Or simply first bid scenario logic needs to be safe.
+       // Actually, if isHighBidder is true, they MUST have a prior bid logically, unless secret.
+       // But if we trust the flag:
+       return {
+          bgClass: 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200 hover:shadow-orange-300',
+          content: (
+            <span className="flex items-center gap-1.5">
+              <TrendingUp className="w-5 h-5" />
+              Raise Bid
+            </span>
+          )
+        };
     }
 
     return {
