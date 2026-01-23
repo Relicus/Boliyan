@@ -10,15 +10,17 @@ export function useBidRealtime(onBid: (bid: Bid) => void) {
     // Use a shared channel name so Supabase client can potentially multiplex
     const channel = supabase
       .channel('shared-bids-channel')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bids' }, async (payload: RealtimePostgresChangesPayload<Database['public']['Tables']['bids']['Row']>) => {
+      .on('postgres_changes', { 
+        event: '*', // Listen to ALL changes (INSERT, UPDATE, DELETE)
+        schema: 'public', 
+        table: 'bids' 
+      }, async (payload: RealtimePostgresChangesPayload<Database['public']['Tables']['bids']['Row']>) => {
         const newBidRaw = payload.new;
         if (!newBidRaw || !('bidder_id' in newBidRaw)) return;
         const bidRow = newBidRaw as Database['public']['Tables']['bids']['Row'];
         if (!bidRow.bidder_id) return;
         
         // Fetch profile to hydrate the bid
-        // Note: In high volume, this might be a bottleneck. 
-        // Future optimization: Include bidder info in the bid payload via webhook or denormalization
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')

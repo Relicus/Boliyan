@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { Maximize2, ChevronLeft, ChevronRight, Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { Item, User } from "@/types";
@@ -15,7 +15,7 @@ interface ProductGalleryProps {
   onToggleWatch?: (id: string) => void;
 }
 
-export function ProductGallery({
+export const ProductGallery = memo(function ProductGallery({
   item,
   currentImg,
   setCurrentImg,
@@ -161,4 +161,4 @@ export function ProductGallery({
       )}
     </div>
   );
-}
+});

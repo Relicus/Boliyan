@@ -103,7 +103,7 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 
 ## ROADMAP & CURRENT TASKS
 - **Notification System**: Real-time alerts for `isOutbidTrigger`.
-- **Payment Integration**: Transition from "deal acceptance" to secure escrow.
+- **Direct Deal Closure**: Smooth transition from "deal acceptance" to direct communication/meetup.
 - **Trust & Verification**: User ratings and reviews implementation.
 
 ## RULES FOR AI AGENTS

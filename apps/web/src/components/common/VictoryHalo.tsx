@@ -10,7 +10,7 @@
  */
 
 import { memo } from "react";
-import { motion } from "framer-motion";
+// motion removed for static border optimization
 
 // ============================================
 // PROPS
@@ -28,15 +28,9 @@ interface VictoryHaloProps {
 // ============================================
 
 const BASE_COLORS: Record<Exclude<HaloTheme, 'none'>, string> = {
-  orange: 'bg-[#fbbf24]',
-  green: 'bg-[#16a34a]',
-  blue: 'bg-[#0ea5e9]',
-};
-
-const GRADIENT_CLASSES: Record<Exclude<HaloTheme, 'none'>, string> = {
-  orange: 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(245,158,11,0.2)_20%,#f59e0b_45%,#ffffff_50%,#f59e0b_55%,rgba(245,158,11,0.2)_80%,transparent_100%)]',
-  green: 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(22,163,74,0.2)_20%,#4ade80_45%,#ffffff_50%,#4ade80_55%,rgba(22,163,74,0.2)_80%,transparent_100%)]',
-  blue: 'bg-[conic-gradient(from_0deg,transparent_0%,rgba(14,165,233,0.2)_20%,#38bdf8_45%,#ffffff_50%,#38bdf8_55%,rgba(14,165,233,0.2)_80%,transparent_100%)]',
+  orange: 'border-amber-500 shadow-[0_0_0_1px_rgba(245,158,11,0.4)]',
+  green: 'border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.4)]',
+  blue: 'border-blue-500 shadow-[0_0_0_1px_rgba(59,130,246,0.4)]',
 };
 
 // ============================================
@@ -76,17 +70,7 @@ export const VictoryHalo = memo(({ theme, className = '' }: VictoryHaloProps) =>
   if (theme === 'none') return null;
   
   return (
-    <div className={`absolute inset-0 pointer-events-none z-0 overflow-hidden rounded-[inherit] ${className}`}>
-      {/* Base Layer: Solid Vibrant Color */}
-      <div className={`absolute inset-0 ${BASE_COLORS[theme]}`} />
-      
-      {/* Top Layer: Racing Bar Animation */}
-      <motion.div 
-        className={`absolute inset-[-200%] ${GRADIENT_CLASSES[theme]}`}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-      />
-    </div>
+    <div className={`absolute inset-0 pointer-events-none z-[60] rounded-[inherit] border-[3px] bg-transparent ${BASE_COLORS[theme]} ${className}`} />
   );
 });
 

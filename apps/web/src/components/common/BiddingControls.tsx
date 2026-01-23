@@ -1,7 +1,8 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState, useRef, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { useApp } from "@/lib/store";
 import { Gavel, TrendingUp, Loader2, AlertCircle, Timer } from "lucide-react";
@@ -83,6 +84,83 @@ function getTextSize(viewMode: BiddingViewMode): string {
   }
 }
 
+// Separate portal component for floating deltas
+const FloatingDeltaPortal = ({ 
+  anchorRef, 
+  lastDelta, 
+  showDelta, 
+  animTrigger, 
+  viewMode 
+}: { 
+  anchorRef: React.RefObject<HTMLDivElement>;
+  lastDelta: number | null;
+  showDelta: boolean;
+  animTrigger: number;
+  viewMode: BiddingViewMode;
+}) => {
+  const [position, setPosition] = useState<{ top: number, left: number, width: number } | null>(null);
+
+  useLayoutEffect(() => {
+    if (showDelta && anchorRef.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.top + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+  }, [showDelta, animTrigger, anchorRef]);
+
+  if (!showDelta || lastDelta === null || !position) return null;
+
+  return createPortal(
+    <div 
+      className="absolute pointer-events-none z-[9999] flex items-center justify-center"
+      style={{
+        top: position.top - 48, // Start slightly above input
+        left: position.left,
+        width: position.width,
+        height: 40
+      }}
+    >
+      <AnimatePresence mode="popLayout">
+        <motion.div
+          key={animTrigger}
+          initial={{ opacity: 0, y: 20, scale: 0.8, rotate: lastDelta > 0 ? -10 : 10 }}
+          animate={{ 
+            opacity: 1, 
+            y: -5, 
+            scale: 1, 
+            rotate: 0,
+            transition: {
+              type: "spring",
+              stiffness: 600,
+              damping: 20,
+              mass: 0.8
+            }
+          }}
+          exit={{ 
+            opacity: 0, 
+            y: -40, 
+            scale: 0.9,
+            rotate: lastDelta > 0 ? 5 : -5,
+            transition: { duration: 0.3, ease: "easeOut" }
+          }}
+          className={cn(
+            "font-black font-outfit tracking-tight",
+            lastDelta > 0 ? "text-emerald-600" : "text-rose-600",
+            viewMode === 'modal' ? "text-xl" : "text-lg"
+          )}
+          style={{ willChange: "transform, opacity" }}
+        >
+          {lastDelta > 0 ? "+" : ""}{lastDelta.toLocaleString()}
+        </motion.div>
+      </AnimatePresence>
+    </div>,
+    document.body
+  );
+};
+
 export const BiddingControls = memo(({
   bidAmount,
   isSuccess,
@@ -121,6 +199,8 @@ export const BiddingControls = memo(({
 
   const isCoolingDown = cooldownRemaining > 0 && !isQuotaReached && !isSuccess;
   
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+
   // High-precision remaining seconds for the animation duration
   const { lastBidTimestamp, now } = useApp();
   const preciseRemaining = useMemo(() => {
@@ -288,7 +368,15 @@ export const BiddingControls = memo(({
       )}
 
       {/* Stepper Input Row */}
-      <div className={`flex w-full ${getInputHeight(viewMode)}`}>
+      <div className={`flex w-full ${getInputHeight(viewMode)} relative`} ref={inputContainerRef}>
+        <FloatingDeltaPortal 
+          anchorRef={inputContainerRef}
+          lastDelta={lastDelta}
+          showDelta={!!showDelta}
+          animTrigger={animTrigger}
+          viewMode={viewMode}
+        />
+
         <div className={`flex flex-1 border border-slate-300 rounded-xl shadow-sm overflow-hidden bg-white ${isOwner || isQuotaReached ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
           
           {/* Decrement Button */}
@@ -305,36 +393,16 @@ export const BiddingControls = memo(({
 
           {/* Input */}
           <div className="relative flex-1">
-            <AnimatePresence mode="popLayout">
-              {showDelta && lastDelta !== null && (
-                <motion.div
-                  initial={{ opacity: 0, y: lastDelta > 0 ? 10 : -10, scale: 0.8 }}
-                  animate={{ opacity: 1, y: lastDelta > 0 ? -25 : 25, scale: 1.1 }}
-                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                  className={cn(
-                    "absolute left-0 right-0 text-center font-black font-outfit pointer-events-none z-50",
-                    lastDelta > 0 ? "text-emerald-500" : "text-rose-500",
-                    viewMode === 'modal' ? "text-xl" : "text-base"
-                  )}
-                >
-                  {lastDelta > 0 ? "+" : ""}{lastDelta.toLocaleString()}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             <motion.input
               id={buildId('bid-input')}
               type="text"
               value={bidAmount}
-              key={`input-${animTrigger}`}
               initial={false}
               disabled={isDisabled || isQuotaReached}
               animate={{ 
-                scale: [1, 1.05, 1],
                 x: (error || pendingConfirmation) ? [0, -4, 4, -4, 4, 0] : 0
               }}
               transition={{ 
-                scale: { duration: 0.2, ease: "easeOut" },
                 x: { duration: 0.2 } // Shake duration
               }}
               onKeyDown={onKeyDown}

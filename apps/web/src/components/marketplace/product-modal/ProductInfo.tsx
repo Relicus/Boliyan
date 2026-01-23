@@ -5,6 +5,7 @@ import { Item, User } from "@/types";
 import { getFuzzyLocationString } from "@/lib/utils";
 import { ListingBadges } from "@/components/marketplace/ListingBadges";
 import { RatingBadge } from "@/components/common/RatingBadge";
+import { memo } from "react";
 
 
 interface ProductInfoProps {
@@ -15,7 +16,7 @@ interface ProductInfoProps {
   distance: number;
 }
 
-export function ProductInfo({
+export const ProductInfo = memo(function ProductInfo({
   item,
   seller,
   isOutside,
@@ -76,4 +77,4 @@ export function ProductInfo({
       </div>
     </div>
   );
-}
+});

@@ -274,17 +274,35 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           sonic.tick(); // Subtle notification
       }
 
-      setBids(prev => [...prev, newBid]);
+      setBids(prev => {
+          // Check if we already have this bid (from the same user on the same item)
+          const index = prev.findIndex(b => b.itemId === newBid.itemId && b.bidderId === newBid.bidderId);
+          if (index !== -1) {
+              const updated = [...prev];
+              updated[index] = newBid;
+              return updated;
+          }
+          return [...prev, newBid];
+      });
 
       setItems(prevItems => prevItems.map(item => {
         if (item.id === newBid.itemId) {
+            // For updates, we need to recalculate high bid if this was the high bid or is now the high bid
+            // However, the simple logic of "max of current and new" works if it's an increase.
+            // If it's a decrease (unlikely in our business rules but possible), we'd need more logic.
             const currentMax = item.currentHighBid || 0;
             const isNewHigh = newBid.amount > currentMax;
+            
+            // If it's an update from the SAME bidder who was previously high, 
+            // we update the amount even if it's not "higher" than the previous max 
+            // (though our rules enforce higher).
+            const isSameHighBidder = item.currentHighBidderId === newBid.bidderId;
+
             return {
                ...item,
-               bidCount: item.bidCount + 1,
-               currentHighBid: isNewHigh ? newBid.amount : currentMax,
-               currentHighBidderId: isNewHigh ? newBid.bidderId : item.currentHighBidderId
+               bidCount: isSameHighBidder ? item.bidCount : item.bidCount + 1,
+               currentHighBid: (isNewHigh || isSameHighBidder) ? newBid.amount : currentMax,
+               currentHighBidderId: (isNewHigh || isSameHighBidder) ? newBid.bidderId : item.currentHighBidderId
             };
         }
         return item;

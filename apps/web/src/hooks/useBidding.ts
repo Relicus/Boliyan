@@ -20,6 +20,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { now, lastBidTimestamp } = useApp(); // Need global heartbeat and cooldown
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const deltaTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const cooldownRemaining = useMemo(() => {
     if (!lastBidTimestamp) return 0;
@@ -145,7 +146,9 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     
     setLastDelta(delta);
     setShowDelta(true);
-    setTimeout(() => setShowDelta(false), 800);
+    
+    if (deltaTimeoutRef.current) clearTimeout(deltaTimeoutRef.current);
+    deltaTimeoutRef.current = setTimeout(() => setShowDelta(false), 800);
 
     setBidAmount(newValue.toLocaleString());
     setAnimTrigger(prev => prev + 1);

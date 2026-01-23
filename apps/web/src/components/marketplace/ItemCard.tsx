@@ -153,13 +153,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`@container group relative border-none bg-slate-50 rounded-xl overflow-hidden flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring,padding] duration-500 shadow-sm hover:shadow-md
-              ${haloTheme !== 'none' ? 'p-[3px]' : 'p-0'}
+            className={`@container group relative border-none bg-slate-50 rounded-xl flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring,padding] duration-500 shadow-sm hover:shadow-md
               ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
             `}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
-            <VictoryHalo theme={haloTheme} />
+            <VictoryHalo theme={haloTheme} className="z-50" />
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 overflow-hidden rounded-[calc(0.75rem-3px)]">
 
 

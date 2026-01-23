@@ -7,6 +7,7 @@ import { Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { getMinimumAllowedBid, MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import { motion, AnimatePresence } from "framer-motion";
+import { memo } from "react";
 
 interface BiddingDashboardProps {
   item: Item;
@@ -36,7 +37,7 @@ interface BiddingDashboardProps {
   lastDelta?: number | null;
 }
 
-export function BiddingDashboard({
+export const BiddingDashboard = memo(function BiddingDashboard({
   item,
   user,
   seller,
@@ -69,7 +70,7 @@ export function BiddingDashboard({
   const isOwner = user?.id === seller.id;
 
   return (
-    <div id={`product-details-dashboard-${item.id}`} className="w-full h-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between">
+    <div id={`product-details-dashboard-${item.id}`} className="w-full h-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between overflow-visible">
       {/* Stats Grid - Restore to 2-column layout */}
       <div className="@container w-full grid grid-cols-2 gap-4 mb-2">
         {/* Ask Price Card */}
@@ -161,4 +162,4 @@ export function BiddingDashboard({
       </div>
     </div>
   );
-}
+});
