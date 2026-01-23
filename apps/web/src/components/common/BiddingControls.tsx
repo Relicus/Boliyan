@@ -189,6 +189,34 @@ export const BiddingControls = memo(({
 
   const isCoolingDown = cooldownRemaining > 0 && !isQuotaReached && !isSuccess;
   
+  // Long Press Logic
+  const longPressRef = useRef<{ timeout: NodeJS.Timeout | null, interval: NodeJS.Timeout | null }>({ timeout: null, interval: null });
+
+  const handleStartLongPress = (e: React.PointerEvent | React.MouseEvent, direction: -1 | 1) => {
+    // Prevent default context menu and other gestures
+    // e.preventDefault(); 
+    
+    // Clear any existing timers just in case
+    handleStopLongPress();
+
+    // Trigger immediate action
+    onSmartAdjust(e as React.MouseEvent, direction);
+
+    // Start delay timer for auto-repeat
+    longPressRef.current.timeout = setTimeout(() => {
+      longPressRef.current.interval = setInterval(() => {
+        // Pass a dummy event since onSmartAdjust requires one but only uses stopPropagation
+        onSmartAdjust({ stopPropagation: () => {} } as React.MouseEvent, direction);
+      }, 100); // Speed: 100ms interval
+    }, 500); // Delay: 500ms before repeat starts
+  };
+
+  const handleStopLongPress = () => {
+    if (longPressRef.current.timeout) clearTimeout(longPressRef.current.timeout);
+    if (longPressRef.current.interval) clearInterval(longPressRef.current.interval);
+    longPressRef.current = { timeout: null, interval: null };
+  };
+
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (itemId) {
@@ -343,7 +371,10 @@ export const BiddingControls = memo(({
           {/* Decrement Button */}
           <button
             id={buildId('decrement-btn')}
-            onClick={(e) => onSmartAdjust(e, -1)}
+            onPointerDown={(e) => handleStartLongPress(e, -1)}
+            onPointerUp={handleStopLongPress}
+            onPointerLeave={handleStopLongPress}
+            onContextMenu={(e) => e.preventDefault()}
             disabled={isDisabled || isQuotaReached}
             className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
           >
@@ -386,7 +417,10 @@ export const BiddingControls = memo(({
           {/* Increment Button */}
           <button
             id={buildId('increment-btn')}
-            onClick={(e) => onSmartAdjust(e, 1)}
+            onPointerDown={(e) => handleStartLongPress(e, 1)}
+            onPointerUp={handleStopLongPress}
+            onPointerLeave={handleStopLongPress}
+            onContextMenu={(e) => e.preventDefault()}
             disabled={isDisabled || isQuotaReached}
             className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
           >

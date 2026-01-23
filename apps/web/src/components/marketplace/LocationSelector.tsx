@@ -13,11 +13,12 @@ import { cn, isLocationInCountry } from "@/lib/utils";
 
 interface LocationSelectorProps {
   className?: string;
+  triggerClassName?: string;
   align?: "start" | "center" | "end";
   variant?: "default" | "mobile-grid" | "sidebar" | "sidebar-compact"; 
 }
 
-export function LocationSelector({ className, align = "end", variant = "default" }: LocationSelectorProps) {
+export function LocationSelector({ className, triggerClassName, align = "end", variant = "default" }: LocationSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   if (variant === "sidebar") {
@@ -47,7 +48,7 @@ export function LocationSelector({ className, align = "end", variant = "default"
     <div id="location-selector-root" className={cn("flex items-center gap-2", className)}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <LocationSelectorTrigger variant={variant} isOpen={isOpen} />
+          <LocationSelectorTrigger variant={variant} isOpen={isOpen} className={triggerClassName} />
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0 shadow-2xl border-slate-200 rounded-2xl overflow-hidden" align={align} sideOffset={8}>
           <LocationSelectorContent onSelect={() => setIsOpen(false)} />
@@ -127,12 +128,12 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
       ref={ref}
       id="location-popover-trigger"
       variant="ghost"
-      className={cn("h-9 flex items-center gap-1.5 px-3 rounded-full hover:bg-slate-100 transition-colors", className)}
+      className={cn("h-7 min-h-0 flex items-center gap-1.5 px-2 rounded-full hover:bg-slate-100 transition-colors", className)}
       {...props}
       title={getDisplayLabel()}
     >
-      <MapPin className="h-5 w-5 text-red-600 fill-red-600" />
-      <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate hidden lg:inline">
+      <MapPin className="h-4 w-4 text-red-600 stroke-[2.5]" />
+      <span className="text-xs font-bold text-slate-700 max-w-[120px] truncate hidden lg:inline">
         {getDisplayLabel().split(' ')[0]}
       </span>
     </Button>

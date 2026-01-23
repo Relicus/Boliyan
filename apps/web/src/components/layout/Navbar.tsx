@@ -140,7 +140,8 @@ export default function Navbar() {
           className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto"
         >
           {/* Desktop Location Selector */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex flex-col items-end mr-2">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-[2px] pr-1 leading-none">YOUR LOCATION</span>
             <LocationSelector align="end" />
           </div>
 

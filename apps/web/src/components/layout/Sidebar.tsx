@@ -125,7 +125,7 @@ export default function Sidebar() {
           
           {/* Location (Standalone Dropdown) */}
           <div className="px-1">
-            <h3 className="mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Location</h3>
+            <h3 className="mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">LIST LOCATION</h3>
             <LocationSelector variant="sidebar-compact" className="shadow-none border-slate-200" />
           </div>
 

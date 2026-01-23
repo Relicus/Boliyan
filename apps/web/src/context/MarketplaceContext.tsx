@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
 import { Item, Bid } from "@/types";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -72,6 +72,12 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const [feedIds, setFeedIds] = useState<string[]>([]);
   const [involvedIds, setInvolvedIds] = useState<string[]>([]);
   const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
+  
+  // Fix: Use ref to access latest watchlist in fetchItems without triggering re-fetch loop
+  const watchedItemIdsRef = useRef<string[]>([]);
+  useEffect(() => {
+    watchedItemIdsRef.current = watchedItemIds;
+  }, [watchedItemIds]);
 
   // Derived arrays for backward compatibility
   const items = useMemo(() => feedIds.map(id => itemsById[id]).filter(Boolean), [feedIds, itemsById]);
@@ -203,25 +209,45 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           } // 'all' does nothing
 
            // --- APPLY SORT ---
-           // Mapping 'trending' to 'created_at' for now as per plan constraints
            switch (filters.sortBy) {
               case 'trending': 
                   // Sort by bid_count (popularity), then by created_at (freshness)
                   query = query.order('bid_count', { ascending: false })
                                .order('created_at', { ascending: false });
                   break;
+              
               case 'newest':
+                  // Fix: Explicitly sort by date to prevent fall-through to luxury
+                  query = query.order('created_at', { ascending: false });
+                  break;
+
               case 'luxury':
                   query = query.order('asked_price', { ascending: false });
                   break;
+
+              case 'watchlist':
+                   // Fix: Filter by watched IDs using Ref to avoid dependency loop
+                   const currentWatchedIds = watchedItemIdsRef.current;
+                   if (currentWatchedIds.length > 0) {
+                       query = query.in('id', currentWatchedIds);
+                   } else {
+                       // Return no results if watchlist is empty
+                       query = query.eq('id', '00000000-0000-0000-0000-000000000000');
+                   }
+                   query = query.order('created_at', { ascending: false });
+                   break;
+
               case 'ending_soon':
-                  // Note: DB doesn't have expiry column directly, transforming in JS usually. 
-                  // If we rely on created_at for expiry (72h), oldest created is ending soonest.
-                  query = query.order('created_at', { ascending: true });
+                  // Sort by ends_at ascending (soonest first)
+                  // Note: 'ends_at' is available in the marketplace_listings view
+                  query = query.order('ends_at', { ascending: true });
                   break;
-              // 'nearest' and 'watchlist' are tricky server-side without complex queries/schema changes.
-              // Fallback: Default to newest for robust fetch, client can optionally refinements if needed, 
-              // but we promised server-side.
+
+              case 'nearest':
+                  // Fallback: Default to newest until PostGIS is implemented
+                  query = query.order('created_at', { ascending: false });
+                  break;
+
               default:
                   query = query.order('created_at', { ascending: false });
            }
