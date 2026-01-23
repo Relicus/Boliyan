@@ -16,11 +16,12 @@ interface BiddingDashboardProps {
   isHighBidder: boolean;
   hasPriorBid: boolean;
   isSuccess: boolean;
-  isSubmitting?: boolean;
+  isSubmitting: boolean;
+  cooldownRemaining: number;
   error?: boolean;
   errorMessage?: string | null;
   remainingAttempts?: number;
-  pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids', message: string } | null;
+  pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids' | 'confirm_bid', message: string } | null;
   animTrigger: number;
   isWatched?: boolean;
   onToggleWatch?: (id: string) => void;
@@ -40,7 +41,8 @@ export function BiddingDashboard({
   isHighBidder,
   hasPriorBid,
   isSuccess,
-  isSubmitting = false,
+  isSubmitting,
+  cooldownRemaining,
   error = false,
   errorMessage = null,
   remainingAttempts = MAX_BID_ATTEMPTS,
@@ -94,6 +96,7 @@ export function BiddingDashboard({
           isHighBidder={isHighBidder}
           hasPriorBid={hasPriorBid}
           isSubmitting={isSubmitting}
+          cooldownRemaining={cooldownRemaining}
           error={error}
           errorMessage={errorMessage}
           remainingAttempts={remainingAttempts}

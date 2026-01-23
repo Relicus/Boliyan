@@ -18,7 +18,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
     const updateDimensions = () => {
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
-      setPosition(mobile ? "top-center" : "bottom-right")
+      setPosition(mobile ? "bottom-center" : "bottom-right")
     }
 
     updateDimensions()

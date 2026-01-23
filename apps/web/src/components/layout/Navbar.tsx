@@ -137,7 +137,7 @@ export default function Navbar() {
           layout
           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
           id="navbar-right-section-11" 
-          className="flex items-center gap-2 shrink-0"
+          className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto"
         >
           {/* Desktop Location Selector */}
           <div className="hidden md:block">
@@ -232,10 +232,11 @@ export default function Navbar() {
                   </Link>
                 </Button>
 
-                {/* New Notification Dropdown */}
-                <div className="mx-1">
-                   <NotificationDropdown />
-                </div>
+              </div>
+
+              {/* New Notification Dropdown */}
+              <div className="mx-1">
+                 <NotificationDropdown />
               </div>
 
               <DropdownMenu>

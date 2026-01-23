@@ -1,8 +1,8 @@
 "use client";
 
 import { memo } from "react";
-import { motion } from "framer-motion";
-import { Gavel, TrendingUp, Loader2, AlertCircle } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Gavel, TrendingUp, Loader2, AlertCircle, Timer } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import { formatPrice } from "@/lib/utils";
 
@@ -21,9 +21,10 @@ interface BiddingControlsProps {
   minBid?: number;
   remainingAttempts?: number;
   userCurrentBid?: number;
+  cooldownRemaining?: number;
   
   // Dual-tap confirmation state
-  pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids', message: string } | null;
+  pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids' | 'confirm_bid', message: string } | null;
   
   // Animation
   animTrigger: number;
@@ -80,6 +81,7 @@ export const BiddingControls = memo(({
   minBid = 0,
   remainingAttempts = MAX_BID_ATTEMPTS,
   userCurrentBid,
+  cooldownRemaining = 0,
   pendingConfirmation = null,
   animTrigger,
   viewMode = 'compact',
@@ -103,7 +105,15 @@ export const BiddingControls = memo(({
   
   // Determine Button Styling based on state
   const getButtonConfig = () => {
-    // 1. Critical Errors
+    // 1. Cooldown State (Highest Priority)
+    if (cooldownRemaining && cooldownRemaining > 0) {
+      return {
+        bgClass: 'bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed shadow-none',
+        content: `Wait ${cooldownRemaining}s`
+      };
+    }
+
+    // 2. Critical Errors
     if (errorMessage === "Out of Bids" || isQuotaReached) {
       return {
         bgClass: 'bg-red-50 text-red-600 border border-red-200 cursor-not-allowed shadow-none',
@@ -118,7 +128,7 @@ export const BiddingControls = memo(({
       };
     }
 
-    // 2. Success State
+    // 3. Success State
     if (isSuccess) {
       return { 
         bgClass: 'bg-amber-600 text-white scale-100 ring-4 ring-amber-100',
@@ -140,15 +150,23 @@ export const BiddingControls = memo(({
       };
     }
 
-    // 3. Confirmation State
+    // 4. Submission Loader
+    if (isSubmitting) {
+      return {
+        bgClass: 'bg-blue-600/80 text-white shadow-none cursor-wait',
+        content: <Loader2 className="w-6 h-6 animate-spin text-white/80" />
+      };
+    }
+
+    // 5. Confirmation State
     if (pendingConfirmation) {
       return {
-        bgClass: 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200',
+        bgClass: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200',
         content: pendingConfirmation.message
       };
     }
     
-    // 4. Owner State
+    // 6. Owner State
     if (isOwner) {
       return {
         bgClass: 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none active:scale-100',
@@ -156,7 +174,7 @@ export const BiddingControls = memo(({
       };
     }
 
-    // 5. Standard States
+    // 7. Standard States
     if (hasPriorBid) {
       // If they have bids left, encourage update
       if (isHighBidder) {
@@ -182,22 +200,6 @@ export const BiddingControls = memo(({
       };
     }
 
-    if (isHighBidder && !hasPriorBid) {
-       // Edge case: Maybe realtime update made them high bidder before local state synced? 
-       // Or simply first bid scenario logic needs to be safe.
-       // Actually, if isHighBidder is true, they MUST have a prior bid logically, unless secret.
-       // But if we trust the flag:
-       return {
-          bgClass: 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200 hover:shadow-orange-300',
-          content: (
-            <span className="flex items-center gap-1.5">
-              <TrendingUp className="w-5 h-5" />
-              Raise Bid
-            </span>
-          )
-        };
-    }
-
     return {
       bgClass: 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200 hover:shadow-blue-300',
       content: (
@@ -212,8 +214,25 @@ export const BiddingControls = memo(({
   const btnConfig = getButtonConfig();
 
   return (
-    <div id={buildId('bidding-controls')} className={`flex flex-col ${showStatus ? 'gap-1.5' : 'gap-2'} w-full`}>
+    <div id={buildId('bidding-controls')} className={`flex flex-col ${showStatus ? 'gap-1.5' : 'gap-2'} w-full relative`}>
       
+      {/* Sticky Cooldown Timer */}
+      <AnimatePresence>
+        {cooldownRemaining > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: -20, scale: 1 }}
+            exit={{ opacity: 0, y: 0, scale: 0.9 }}
+            className="absolute left-1/2 -translate-x-1/2 -top-4 z-30 bg-indigo-600 text-white px-3 py-1 rounded-full shadow-lg border border-indigo-400 flex items-center gap-2 pointer-events-none"
+          >
+            <Timer className="h-3 w-3 animate-pulse" />
+            <span className="text-[10px] font-black font-outfit uppercase tracking-wider whitespace-nowrap">
+              Cooldown: {cooldownRemaining}s
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Status Row (Modal/Product Page) */}
       {showStatus && !isOwner && (
         <div className="relative flex items-center justify-center px-1 min-h-[0.75rem]">

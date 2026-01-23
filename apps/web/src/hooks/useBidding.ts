@@ -16,8 +16,17 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   }, [user, bids, item.id]);
 
   // Pending confirmation for dual-tap pattern
-  const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid' | 'out_of_bids', message: string } | null>(null);
+  const [pendingConfirmation, setPendingConfirmation] = useState<{ type: 'double_bid' | 'high_bid' | 'out_of_bids' | 'confirm_bid', message: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldownEnd, setCooldownEnd] = useState<number | null>(null);
+  const { now } = useApp(); // Need global heartbeat for cooldown
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const cooldownRemaining = useMemo(() => {
+    if (!cooldownEnd) return 0;
+    const diff = Math.ceil((cooldownEnd - now) / 1000);
+    return Math.max(0, diff);
+  }, [cooldownEnd, now]);
 
   // Initialize with Smart Anchor Logic:
   // 1. Existing Bid -> Bid + Step (Encourage update)
@@ -123,6 +132,9 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   type BidEvent = React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
 
   const executeBid = useCallback(async (amount: number, e?: BidEvent) => {
+    if (isSubmitting || cooldownRemaining > 0) return;
+    
+    setIsSubmitting(true);
     let confettiX = 0.5;
     let confettiY = 0.5;
 
@@ -142,56 +154,74 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       }
     }
 
-    // Place/Update bid logic via store
-    // Await the result to ensure we don't show false success
-    const success = await placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
-    
-    if (!success) {
-        setError(true);
-        setErrorMessage("Bid Failed");
-        sonic.thud();
-        setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
-        return;
-    }
-    
-    setIsSuccess(true);
-    sonic.chime();
-
-    const nextAmount = amount + getSmartStep(amount);
-    // Don't auto-increment if it exceeds max
-    if (nextAmount <= getMaximumAllowedBid(item.askPrice)) {
-        setBidAmount(nextAmount.toLocaleString());
-    }
-
-    const commonConfig = {
-      origin: { x: confettiX, y: confettiY },
-      particleCount: 80,
-      spread: 60,
-      gravity: 1.1,
-      scalar: 0.8,
-      zIndex: 9999,
-      colors: ['#fbbf24', '#f59e0b', '#d97706', '#ffffff'],
-    };
-
     try {
-      confetti({ ...commonConfig, angle: 60 });
-      confetti({ ...commonConfig, angle: 120 });
-    } catch (err) {
-      console.warn('[useBidding] Confetti failed:', err);
-    }
+      // Place/Update bid logic via store
+      const success = await placeBid(item.id, amount, item.isPublicBid ? 'public' : 'private');
+      
+      if (!success) {
+          setError(true);
+          setErrorMessage("Bid Failed");
+          sonic.thud();
+          setTimeout(() => { setError(false); setErrorMessage(null); }, 2000);
+          return;
+      }
+      
+      // Set Cooldown (15 seconds)
+      setCooldownEnd(Date.now() + 15000);
+      
+      setIsSuccess(true);
+      sonic.chime();
 
-    if (onBidSuccess) {
-      setTimeout(() => {
-        onBidSuccess();
-        setIsSuccess(false);
-      }, 1500);
-    } else {
-      setTimeout(() => setIsSuccess(false), 1500);
+      const nextAmount = amount + getSmartStep(amount);
+      // Don't auto-increment if it exceeds max
+      if (nextAmount <= getMaximumAllowedBid(item.askPrice)) {
+          setBidAmount(nextAmount.toLocaleString());
+      }
+
+      const commonConfig = {
+        origin: { x: confettiX, y: confettiY },
+        particleCount: 80,
+        spread: 60,
+        gravity: 1.1,
+        scalar: 0.8,
+        zIndex: 9999,
+        colors: ['#fbbf24', '#f59e0b', '#d97706', '#ffffff'],
+      };
+
+      try {
+        confetti({ ...commonConfig, angle: 60 });
+        confetti({ ...commonConfig, angle: 120 });
+      } catch (err) {
+        console.warn('[useBidding] Confetti failed:', err);
+      }
+
+      if (onBidSuccess) {
+        setTimeout(() => {
+          onBidSuccess();
+          setIsSuccess(false);
+        }, 1500);
+      } else {
+        setTimeout(() => setIsSuccess(false), 1500);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [item, placeBid, onBidSuccess]);
+  }, [item, placeBid, onBidSuccess, isSubmitting, cooldownRemaining]);
 
   const attemptBid = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation();
+    
+    if (isSubmitting) return;
+    
+    // 0. Cooldown Check
+    if (cooldownRemaining > 0) {
+        setError(true);
+        setErrorMessage(`Wait ${cooldownRemaining}s`);
+        sonic.thud();
+        setTimeout(() => { setError(false); setErrorMessage(null); }, 1000);
+        return;
+    }
+
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
     
     // 1. Quota Check (Client Side)
@@ -241,25 +271,17 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
 
-    // Safety Warning: High Bid (140% of ask price)
-    // Using WARNING_PERCENTAGE (1.4)
-    const safetyThreshold = item.askPrice * WARNING_PERCENTAGE;
+    // MANDATORY Confirmation for every bid
+    setPendingConfirmation({
+      type: 'confirm_bid',
+      message: 'Confirm Bid? Tap Again'
+    });
     
-    if (amount >= safetyThreshold) {
-      const percentOver = Math.round(((amount - item.askPrice) / item.askPrice) * 100);
-      setPendingConfirmation({
-        type: 'high_bid',
-        message: `High Bid (+${percentOver}%) - Tap to Confirm`
-      });
-      confirmationTimeoutRef.current = setTimeout(() => {
-        setPendingConfirmation(null);
-      }, 3000);
-      return;
-    }
+    confirmationTimeoutRef.current = setTimeout(() => {
+      setPendingConfirmation(null);
+    }, 3000);
 
-    // If no warnings, execute immediately
-    executeBid(amount, e);
-  }, [bidAmount, item.askPrice, user, userBid, executeBid, pendingConfirmation, openAuthModal, isQuotaReached]);
+  }, [bidAmount, item.askPrice, user, userBid, executeBid, pendingConfirmation, openAuthModal, isQuotaReached, isSubmitting, cooldownRemaining]);
 
   const clearPendingConfirmation = useCallback(() => {
     if (confirmationTimeoutRef.current) {
@@ -302,6 +324,8 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     handleBid: attemptBid,
     clearPendingConfirmation,
     pendingConfirmation,
+    isSubmitting,
+    cooldownRemaining,
     handleKeyDown,
     handleInputChange,
     getSmartStep,

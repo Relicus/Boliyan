@@ -61,7 +61,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     animTrigger,
     remainingAttempts,
     errorMessage,
-    userBid
+    userBid,
+    isSubmitting,
+    cooldownRemaining
   } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
 
   
@@ -390,6 +392,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     error={!!error}
                     errorMessage={errorMessage}
                     remainingAttempts={remainingAttempts}
+                    isSubmitting={isSubmitting}
+                    cooldownRemaining={cooldownRemaining}
                     minBid={biddingConfig.minBid}
                     pendingConfirmation={pendingConfirmation}
                     animTrigger={animTrigger}
