@@ -36,7 +36,9 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     handleKeyDown,
     handleInputChange,
     getSmartStep,
-    pendingConfirmation
+    pendingConfirmation,
+    remainingAttempts,
+    userBid
   } = useBidding(item, seller, () => {});
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -275,9 +277,9 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                 </div>
 
                 {/* Unified Bidding Section - Stacked Layout */}
-                <div className="flex flex-col gap-4 py-4 border-y border-slate-50">
+                <div className="flex flex-col gap-3 py-3 border-y border-slate-50">
                   {/* Row 1: Price */}
-                  <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-24">
+                  <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Ask Price</span>
                     <div className="text-[clamp(1.25rem,5cqi,2rem)] font-black text-slate-800 leading-none">
                       Rs. {Math.round(item.askPrice).toLocaleString()}
@@ -285,7 +287,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                   </div>
 
                   {/* Row 2: Highest Bid */}
-                    <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-24">
+                    <div className="flex flex-col items-start justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
                         {item.isPublicBid ? "Highest Bid" : "Bids"}
                       </span>
@@ -313,7 +315,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
 
 
                   {/* Row 3: Bidding Controls Component */}
-                  <div className="mt-2 space-y-3">
+                  <div className="mt-1 space-y-2">
                     <BiddingControls
                       bidAmount={bidAmount}
                       isSuccess={isSuccess}
@@ -323,6 +325,8 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       isSubmitting={false}
                       error={error}
                       minBid={minNextBid}
+                      remainingAttempts={remainingAttempts}
+                      userCurrentBid={userBid?.amount}
                       pendingConfirmation={pendingConfirmation}
                       animTrigger={animTrigger}
                       viewMode="modal"
@@ -331,6 +335,8 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       onBid={handleBid}
                       onKeyDown={handleKeyDown}
                       onInputChange={handleInputChange}
+                      showAttemptsDots={false}
+                      showStatus={true}
                     />
 
                     {isHighBidder && !isSuccess && (

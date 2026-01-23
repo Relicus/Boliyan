@@ -100,8 +100,8 @@ export const PriceDisplay = memo(({
             </div>
             
             {/* User Bid - Only if exists */}
-            {userCurrentBid && (
-                <span className="text-[10px] font-black font-outfit text-slate-600 leading-none animate-in fade-in zoom-in duration-300">
+            {userCurrentBid !== undefined && userCurrentBid !== null && (
+                <span className="text-[10px] font-black font-outfit text-slate-700 leading-none animate-in fade-in zoom-in duration-300">
                     {formatPrice(userCurrentBid)}
                 </span>
             )}

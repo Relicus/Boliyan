@@ -61,44 +61,18 @@ export function BiddingDashboard({
 
   return (
     <div id={`product-details-dashboard-${item.id}`} className="w-full h-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between">
-      {/* Stats Grid - Now Flex to support center Dots */}
-      <div className="@container w-full flex items-stretch gap-2 mb-4">
+      {/* Stats Grid - Restore to 2-column layout */}
+      <div className="@container w-full grid grid-cols-2 gap-4 mb-2">
         {/* Ask Price Card */}
-        <div className="flex-1 flex flex-col items-center text-center min-w-0 bg-white border border-slate-200 shadow-sm rounded-xl p-4 h-full justify-center">
+        <div className="flex flex-col items-center text-center min-w-0 bg-white border border-slate-200 shadow-sm rounded-xl p-3 h-full justify-center">
           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Ask Price</span>
           <span className="text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit text-slate-900 leading-tight tracking-tight truncate w-full pb-1" title={formatPrice(item.askPrice)}>
             {formatPrice(item.askPrice)}
           </span>
         </div>
 
-        {/* Center: My Status (Beads + Current Offer) */}
-        {!isOwner && (
-          <div className="flex flex-col items-center justify-center gap-1.5 px-1 w-[90px] shrink-0">
-             
-             {/* Label */}
-             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none">Status</span>
-
-             {/* Beads */}
-             <div className="flex items-center justify-center gap-1.5">
-                {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
-                  <div 
-                    key={i} 
-                    className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
-                  />
-                ))}
-             </div>
-
-             {/* Current Offer (Only if bid exists) */}
-             {hasPriorBid && userCurrentBid && (
-               <span className="text-[clamp(0.875rem,3cqi,1rem)] font-black font-outfit text-slate-700 leading-none mt-0.5 animate-in fade-in zoom-in duration-300">
-                  {formatPrice(userCurrentBid)}
-               </span>
-             )}
-          </div>
-        )}
-
         {/* Highest Bid / Bids Card */}
-        <div className="flex-1 flex flex-col items-center text-center min-w-0 bg-white border border-slate-200 shadow-sm rounded-xl p-4 h-full justify-center">
+        <div className="flex flex-col items-center text-center min-w-0 bg-white border border-slate-200 shadow-sm rounded-xl p-3 h-full justify-center">
           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">
              {item.isPublicBid ? "Highest Bid" : "Bids"}
           </span>
@@ -112,7 +86,7 @@ export function BiddingDashboard({
       </div>
 
       {/* Controls Container */}
-      <div className="mt-4">
+      <div className="mt-1">
         <BiddingControls
           bidAmount={bidAmount}
           isSuccess={isSuccess}
@@ -123,6 +97,7 @@ export function BiddingDashboard({
           error={error}
           errorMessage={errorMessage}
           remainingAttempts={remainingAttempts}
+          userCurrentBid={userCurrentBid}
           minBid={minNextBid}
           pendingConfirmation={pendingConfirmation}
           animTrigger={animTrigger}
@@ -132,7 +107,8 @@ export function BiddingDashboard({
           onBid={onBid}
           onKeyDown={onKeyDown}
           onInputChange={onInputChange}
-          showAttemptsDots={false} // Rendered in stats grid above
+          showAttemptsDots={false} // Rendered in status row above input
+          showStatus={true}
         />
       </div>
 

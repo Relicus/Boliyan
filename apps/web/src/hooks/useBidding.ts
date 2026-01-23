@@ -309,6 +309,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     showDelta,
     remainingAttempts,
     isQuotaReached,
-    userBid
+    userBid,
+    initialBid
   };
 }

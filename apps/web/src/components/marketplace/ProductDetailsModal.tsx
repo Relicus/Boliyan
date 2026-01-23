@@ -44,7 +44,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     handleInputChange,
     getSmartStep,
     remainingAttempts,
-    userBid
+    userBid,
+    initialBid
   } = useBidding(item, seller); // Removed auto-close callback
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -53,15 +54,12 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
 
+  // Sync bid amount when modal opens or initialBid changes (Smart Anchor)
   useEffect(() => {
-    if (isOpen) {
-        // Reset state when opening
-        const initialBidValue = item.isPublicBid && item.currentHighBid
-          ? item.currentHighBid + getSmartStep(item.currentHighBid)
-          : item.askPrice;
-        setBidAmount(Math.round(initialBidValue).toLocaleString());
+    if (isOpen && initialBid) {
+        setBidAmount(initialBid.toLocaleString());
     }
-  }, [isOpen, item.askPrice, item.isPublicBid, item.currentHighBid, getSmartStep, setBidAmount]);
+  }, [isOpen, initialBid, setBidAmount]);
 
   // Toast Notification on Success
   useEffect(() => {

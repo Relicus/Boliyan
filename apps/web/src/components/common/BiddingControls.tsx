@@ -4,6 +4,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { Gavel, TrendingUp, Loader2, AlertCircle } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
+import { formatPrice } from "@/lib/utils";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -19,6 +20,7 @@ interface BiddingControlsProps {
   errorMessage?: string | null;
   minBid?: number;
   remainingAttempts?: number;
+  userCurrentBid?: number;
   
   // Dual-tap confirmation state
   pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids', message: string } | null;
@@ -31,6 +33,7 @@ interface BiddingControlsProps {
   disabled?: boolean;
   idPrefix: string;
   showAttemptsDots?: boolean;
+  showStatus?: boolean;
   
   // Handlers
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
@@ -76,12 +79,14 @@ export const BiddingControls = memo(({
   errorMessage = null,
   minBid = 0,
   remainingAttempts = MAX_BID_ATTEMPTS,
+  userCurrentBid,
   pendingConfirmation = null,
   animTrigger,
   viewMode = 'compact',
   disabled = false,
   idPrefix,
   showAttemptsDots = true,
+  showStatus = false,
   onSmartAdjust,
   onBid,
   onKeyDown,
@@ -207,10 +212,38 @@ export const BiddingControls = memo(({
   const btnConfig = getButtonConfig();
 
   return (
-    <div id={buildId('bidding-controls')} className={`flex flex-col gap-2 w-full`}>
+    <div id={buildId('bidding-controls')} className={`flex flex-col ${showStatus ? 'gap-1.5' : 'gap-2'} w-full`}>
       
-      {/* Error Message Indicator (Top Right) */}
-      {!isOwner && !isSuccess && errorMessage && (
+      {/* Status Row (Modal/Product Page) */}
+      {showStatus && !isOwner && (
+        <div className="relative flex items-center justify-center px-1 min-h-[0.75rem]">
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center gap-1.5">
+              {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+                />
+              ))}
+            </div>
+            {userCurrentBid !== undefined && userCurrentBid !== null && (
+              <span className="text-[11px] font-black font-outfit text-slate-700 leading-none">
+                {formatPrice(userCurrentBid)}
+              </span>
+            )}
+          </div>
+          {errorMessage && (
+            <div className="absolute right-1 top-1/2 -translate-y-1/2">
+              <span className="text-[10px] font-bold text-red-500 uppercase tracking-wide animate-pulse">
+                {errorMessage}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Error Message Indicator (Top Right - for ItemCard only) */}
+      {!showStatus && !isOwner && !isSuccess && errorMessage && (
         <div className="flex justify-end px-1 mb-0.5">
              <span className="text-[10px] font-bold text-red-500 uppercase tracking-wide animate-pulse">
                {errorMessage}
