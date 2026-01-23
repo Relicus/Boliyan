@@ -15,7 +15,7 @@ export function TimeProvider({ children }: { children: React.ReactNode }) {
     // Create the heartbeat
     const intervalId = setInterval(() => {
       setNow(Date.now());
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(intervalId);
   }, []);
