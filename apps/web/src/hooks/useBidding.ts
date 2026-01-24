@@ -266,11 +266,21 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
         return; 
     }
 
-    const amount = parseFloat(bidAmount.replace(/,/g, ''));
+    const rawAmount = parseFloat(bidAmount.replace(/,/g, ''));
+    if (isNaN(rawAmount)) return;
+
+    // Enforce reasonable rounding on attempt (handles edge case where blur hasn't fired)
+    const amount = roundToReasonablePrice(rawAmount);
+    
+    // Sync UI if rounding adjusted the value
+    if (amount !== rawAmount) {
+        setBidAmount(amount.toLocaleString());
+    }
+
     const minBid = getMinimumAllowedBid(item.askPrice);
     const maxBid = getMaximumAllowedBid(item.askPrice);
 
-    if (isNaN(amount) || amount < minBid || amount > maxBid) {
+    if (amount < minBid || amount > maxBid) {
       setTemporaryError(amount < minBid ? "Below Min" : "Above Max", 2000);
       return;
     }

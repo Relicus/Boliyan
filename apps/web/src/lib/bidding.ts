@@ -6,7 +6,8 @@ export const MAX_BID_ATTEMPTS = 3;     // 1 Initial + 2 Updates
 export function isValidBid(askedPrice: number, bidAmount: number): boolean {
   const min = askedPrice * MIN_BID_PERCENTAGE;
   const max = askedPrice * MAX_BID_PERCENTAGE;
-  return bidAmount >= min && bidAmount <= max;
+  // Must be within range AND end in 0 (min 10 Rs increment rule)
+  return bidAmount >= min && bidAmount <= max && bidAmount % 10 === 0;
 }
 
 export function getMinimumAllowedBid(askedPrice: number): number {
