@@ -13,12 +13,22 @@ export default function RollingPrice({ price, className }: RollingPriceProps) {
   const currentDisplayedPrice = useRef(price);
   
   // Track if this is the first render to avoid animation on hydration/initial load
-  // strictly matching RelicusRoad behavior
   const isFirstRender = useRef(true);
 
   useEffect(() => {
+    const prevPrice = currentDisplayedPrice.current;
+    
+    // Debug: Log price changes
+    if (prevPrice !== price) {
+      console.log('[RollingPrice] Price change detected:', { 
+        from: prevPrice, 
+        to: price, 
+        isFirstRender: isFirstRender.current 
+      });
+    }
+
     // If exact same value, do nothing
-    if (currentDisplayedPrice.current === price) {
+    if (prevPrice === price) {
       if (ref.current) ref.current.textContent = formatPrice(price);
       return;
     }
@@ -34,13 +44,10 @@ export default function RollingPrice({ price, className }: RollingPriceProps) {
     const element = ref.current;
     if (!element) return;
 
-    const startValue = currentDisplayedPrice.current;
+    const startValue = prevPrice;
     const endValue = price;
     const duration = 800;
     const startTime = performance.now();
-
-    // Cancel any existing animation frame if we had a ref to it
-    // (Simpler: just let the new loop overwrite the text content)
     
     let animationFrameId: number;
 

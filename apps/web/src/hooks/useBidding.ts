@@ -7,6 +7,9 @@ import { Item, User } from "@/types";
 import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, MAX_BID_ATTEMPTS, roundToReasonablePrice } from "@/lib/bidding";
 import { sonic } from "@/lib/sonic";
 
+// Cooldown between bids (must match server trigger)
+const BID_COOLDOWN_MS = 3000;
+
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
   const { placeBid, user, bids, openAuthModal, lastBidTimestamp } = useApp();
 
@@ -30,7 +33,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     const updateCooldown = () => {
       const now = Date.now();
-      const diff = Math.ceil((lastBidTimestamp + 3000 - now) / 1000);
+      const diff = Math.ceil((lastBidTimestamp + BID_COOLDOWN_MS - now) / 1000);
       const remaining = Math.max(0, diff);
       setCooldownRemaining(remaining);
       return remaining;
@@ -49,7 +52,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const cooldownProgress = useMemo(() => {
     if (!lastBidTimestamp || cooldownRemaining === 0) return 0;
     const elapsed = Date.now() - lastBidTimestamp;
-    return Math.min(1, elapsed / 3000);
+    return Math.min(1, elapsed / BID_COOLDOWN_MS);
   }, [lastBidTimestamp, cooldownRemaining]);
 
   const confirmationTimeoutRef = useRef<NodeJS.Timeout | null>(null);

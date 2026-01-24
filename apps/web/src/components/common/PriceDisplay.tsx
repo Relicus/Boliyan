@@ -64,25 +64,21 @@ export const PriceDisplay = memo(({
   const [showUserBid, setShowUserBid] = useState(false);
 
   // Rotation Logic
+  // Wait for rolling animation (800ms) + display time (2000ms) before switching
+  const ROLLING_ANIMATION_DURATION = 800;
+  const DISPLAY_HOLD_DURATION = 2000;
+  const TOTAL_ROTATION_INTERVAL = ROLLING_ANIMATION_DURATION + DISPLAY_HOLD_DURATION;
+
   useEffect(() => {
     // Stop if no user bid
     if (userCurrentBid === undefined || userCurrentBid === null) {
       return;
     }
 
-    // Start rotation
-    let timer: NodeJS.Timeout;
-
-    const runRotation = () => {
-        // Show each state for 2 seconds (2000ms)
-        const nextDuration = 2000;
-        
-        timer = setTimeout(() => {
-            setShowUserBid(prev => !prev);
-        }, nextDuration);
-    };
-
-    runRotation();
+    // Start rotation after animation completes + hold time
+    const timer = setTimeout(() => {
+      setShowUserBid(prev => !prev);
+    }, TOTAL_ROTATION_INTERVAL);
 
     return () => clearTimeout(timer);
   }, [showUserBid, userCurrentBid, config.variant, config.isUserHighBidder]);
@@ -159,11 +155,15 @@ export const PriceDisplay = memo(({
   );
 
   // Common Value Component
+  // Use a unique key based on the price SOURCE (not value) to maintain separate animation states
+  // This prevents animation glitches when rotating between "Your Bid" and "Highest"
+  const priceKey = safeShowUserBid ? 'user-bid' : 'high-bid';
+  
   const renderValue = () => (
       <div className={cn(getPriceClass(viewMode), "flex items-center gap-1.5 transition-colors duration-300", displayColor)}>
           {displayPrice !== null ? (
               <span {...highBidProps}>
-                <RollingPrice price={displayPrice} />
+                <RollingPrice key={priceKey} price={displayPrice} />
               </span>
           ) : (
               <span {...bidCountProps}>{displayText}</span>
