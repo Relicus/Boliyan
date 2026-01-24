@@ -71,13 +71,15 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const otherUser = conversation ? (isSeller ? conversation.bidder : conversation.seller) : undefined;
   const item = conversation?.item;
 
-  const isLocked = !conversation?.expiresAt ? false : isLockedState;
-
   // Handshake Logic
   const myRole = isSeller ? 'seller' : 'buyer';
   const iHaveConfirmed = myRole === 'seller' ? !!conversation?.sellerConfirmedAt : !!conversation?.buyerConfirmedAt;
   const theyHaveConfirmed = myRole === 'seller' ? !!conversation?.buyerConfirmedAt : !!conversation?.sellerConfirmedAt;
   const isSealed = conversation?.isSealed;
+
+  const isCancelled = item?.status === 'cancelled';
+  const isCompleted = item?.status === 'completed';
+  const isLocked = (!conversation?.expiresAt ? false : isLockedState) || isCancelled || (isCompleted && !isSealed);
 
   // Trigger Seal Animation
   useEffect(() => {
@@ -334,10 +336,10 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
             )}>
                 <div className="flex items-center gap-1.5 text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-widest text-slate-500">
                 <Clock className="h-2.5 w-2.5" />
-                {isLocked ? "Expired" : "Closing"}
+                {isLocked ? (isCancelled ? "Cancelled" : (isCompleted ? "Sold" : "Expired")) : "Closing"}
                 </div>
                 <div className="text-[11px] font-black tabular-nums">
-                {timeLeft}
+                {isCancelled ? "N/A" : (isCompleted ? "Closed" : timeLeft)}
                 </div>
             </div>
             )}
@@ -399,12 +401,12 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
               : (isSealed ? "bg-emerald-50 border-emerald-100 text-emerald-600" : "bg-blue-50 border-blue-100 text-blue-600")
           )}
         >
-           {isLocked ? (
-             <span className="flex items-center gap-2">
-               <Lock className="h-3 w-3" />
-               Discussion expired • Chat Locked
-             </span>
-           ) : isSealed ? (
+            {isLocked ? (
+              <span className="flex items-center gap-2">
+                <Lock className="h-3 w-3" />
+                {isCancelled ? "Listing Cancelled • Chat Locked" : (isCompleted ? "Item Sold • Chat Locked" : "Discussion expired • Chat Locked")}
+              </span>
+            ) : isSealed ? (
              <span className="flex items-center gap-2">
                <Handshake className="h-3 w-3" />
                Deal Sealed • Verified Exchange
@@ -511,9 +513,9 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                 animate={{ opacity: 1 }}
                 className="absolute inset-0 bg-white/95 backdrop-blur-sm z-40 flex items-center justify-center rounded-2xl border-2 border-dashed border-red-100"
                 >
-                <span className="text-xs font-black uppercase tracking-widest text-red-500 flex items-center gap-2">
+                 <span className="text-xs font-black uppercase tracking-widest text-red-500 flex items-center gap-2">
                     <Lock className="h-4 w-4" />
-                    Channel Inactive
+                    {isCancelled ? "Listing Cancelled" : (isCompleted ? "Item Sold" : "Channel Inactive")}
                 </span>
                 </motion.div>
             )}

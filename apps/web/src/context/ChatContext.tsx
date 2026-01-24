@@ -286,27 +286,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           .from('conversations')
           .update(conversationUpdates)
           .eq('id', conversationId);
-
-        // SEND NOTIFICATION TO RECIPIENT
-        // Find conversation to get recipient ID
-        const conversation = conversations.find(c => c.id === conversationId);
-        if (conversation) {
-            const recipientId = conversation.sellerId === user.id ? conversation.bidderId : conversation.sellerId;
-            
-            // Should strictly check if recipientId exists, but schema guarantees it
-            if (recipientId) {
-                const notificationPayload: NotificationInsert = {
-                  user_id: recipientId,
-                  type: 'new_message',
-                  title: `New message from ${user.name}`,
-                  body: content.length > 50 ? content.substring(0, 50) + '...' : content,
-                  link: `/inbox?id=${conversationId}`,
-                  is_read: false,
-                  metadata: { conversationId }
-                };
-                await supabase.from('notifications').insert(notificationPayload);
-            }
-        }
     }
   };
 

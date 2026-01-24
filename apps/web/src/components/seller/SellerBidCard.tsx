@@ -32,8 +32,8 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const timeDiff = expiresAt.getTime() - now.getTime();
   const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
   const minsLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-  const isExpired = timeDiff <= 0;
-  const isUrgent = timeDiff > 0 && hoursLeft < 2;
+  const isExpired = timeDiff <= 0 || bid.status === 'expired';
+  const isUrgent = timeDiff > 0 && hoursLeft < 2 && bid.status === 'pending';
 
   const handleReject = () => {
     rejectBid(bid.id);
@@ -102,10 +102,16 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             <p id={`bid-amount-mobile-${bid.id}`} className="font-black text-blue-600 leading-none truncate text-[clamp(1rem,5cqi,1.25rem)] font-outfit">Rs. {bid.amount.toLocaleString()}</p>
             
             {/* Expiration Timer (Mobile) */}
-            {!isExpired && bid.status === 'pending' && (
+            {!isExpired && (bid.status === 'pending' || bid.status === 'shortlisted') && (
                  <div className={`text-[9px] font-bold mt-1 text-right flex items-center justify-end gap-1 ${isUrgent ? 'text-red-500' : 'text-slate-400'}`}>
                     {hoursLeft}h {minsLeft}m left
                  </div>
+            )}
+            
+            {isExpired && bid.status !== 'accepted' && (
+                <div className="text-[9px] font-bold mt-1 text-right text-red-500 uppercase tracking-tighter">
+                   Expired
+                </div>
             )}
             
             {!isOutside && (
@@ -189,14 +195,14 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                 <p id={`bid-amount-desktop-${bid.id}`} className="text-[clamp(1.25rem,4cqi,1.75rem)] font-black text-blue-600 font-outfit leading-none">Rs. {bid.amount.toLocaleString()}</p>
                 
                 {/* Expiration Timer */}
-                {!isExpired && bid.status === 'pending' && (
+                {!isExpired && (bid.status === 'pending' || bid.status === 'shortlisted') && (
                      <div className={`text-[10px] font-bold mt-1 text-right flex items-center justify-end gap-1 ${isUrgent ? 'text-red-500' : 'text-slate-400'}`}>
                         <Clock className="w-3 h-3" />
                         {hoursLeft}h {minsLeft}m left
                      </div>
                 )}
-                {isExpired && bid.status === 'pending' && (
-                    <span className="text-[10px] font-bold text-red-500 mt-1 block">Expired</span>
+                {isExpired && bid.status !== 'accepted' && (
+                    <span className="text-[10px] font-bold text-red-500 mt-1 block uppercase tracking-tighter">Expired</span>
                 )}
               </div>
 
