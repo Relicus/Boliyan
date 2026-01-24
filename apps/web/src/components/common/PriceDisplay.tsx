@@ -80,7 +80,6 @@ export const PriceDisplay = memo(({
   useEffect(() => {
     // Stop if no user bid
     if (userCurrentBid === undefined || userCurrentBid === null) {
-      // Don't set state here to avoid sync update loop
       return;
     }
 
@@ -88,13 +87,12 @@ export const PriceDisplay = memo(({
     let timer: NodeJS.Timeout;
 
     const runRotation = () => {
-       // If currently showing User Bid (true), we want to switch to Market Bid after 1s
-       // If currently showing Market Bid (false), we want to switch to User Bid after 2s
-       const nextDuration = showUserBid ? 1000 : 2000;
-       
-       timer = setTimeout(() => {
-           setShowUserBid(prev => !prev);
-       }, nextDuration);
+        // Show each state for 2 seconds (2000ms)
+        const nextDuration = 2000;
+        
+        timer = setTimeout(() => {
+            setShowUserBid(prev => !prev);
+        }, nextDuration);
     };
 
     runRotation();
@@ -135,18 +133,23 @@ export const PriceDisplay = memo(({
       </div>
 
       {/* Highest Bid / Secret Status / Your Bid (Rotating) */}
-      <div className="flex flex-col items-end justify-self-end transition-all relative h-[2.5em] justify-end">
-        <AnimatePresence mode="wait">
-           {safeShowUserBid ? (
-             <motion.div
-
-               key="user-bid"
-               initial={{ opacity: 0, y: 5 }}
-               animate={{ opacity: 1, y: 0 }}
-               exit={{ opacity: 0, y: -5 }}
-               transition={{ duration: 0.2 }}
-               className="flex flex-col items-end absolute bottom-0 right-0 w-max"
-             >
+      <div 
+        className="flex flex-col items-end justify-self-end transition-all relative h-[2.5em] justify-end cursor-default"
+      >
+          <AnimatePresence mode="wait">
+            {safeShowUserBid ? (
+              <motion.div
+                key="user-bid"
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.95 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 800,
+                  damping: 35
+                }}
+                className="flex flex-col items-end absolute bottom-0 right-0 w-max"
+              >
                 <span className={`${getLabelClass(viewMode)} text-purple-600/80`}>
                   Your Bid
                 </span>
@@ -157,15 +160,19 @@ export const PriceDisplay = memo(({
                    )}
                 </span>
              </motion.div>
-           ) : (
-             <motion.div
-               key="market-bid"
-               initial={{ opacity: 0, y: 5 }}
-               animate={{ opacity: 1, y: 0 }}
-               exit={{ opacity: 0, y: -5 }}
-               transition={{ duration: 0.2 }}
-               className="flex flex-col items-end absolute bottom-0 right-0 w-max"
-             >
+            ) : (
+              <motion.div
+                key="market-bid"
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.95 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 800,
+                  damping: 35
+                }}
+                className="flex flex-col items-end absolute bottom-0 right-0 w-max"
+              >
                 <span className={getLabelClass(viewMode)}>
                   {config.variant === 'public' ? "Highest" : "Secret"}
                 </span>

@@ -140,7 +140,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
       <motion.div
         ref={visibilityRef}
         id={`item-card-${item.id}`}
-        onClick={() => setIsDialogOpen(true)}
 
         initial={false}
             animate={{
@@ -151,18 +150,17 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`@container group relative border-none bg-slate-50 rounded-xl flex flex-col will-change-transform cursor-pointer transition-[box-shadow,ring,padding] duration-500 shadow-sm hover:shadow-md
+            className={`@container group relative border-none bg-slate-50 rounded-xl flex flex-col will-change-transform transition-[box-shadow,ring,padding] duration-500 shadow-sm
               ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
             `}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
             <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)]">
 
-
-
             <div
               id={`item-card-${item.id}-image-wrapper`}
-              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 rounded-t-[inherit]`}
+              onClick={() => setIsDialogOpen(true)}
+              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 rounded-t-[inherit] cursor-pointer`}
             >
               <div className="relative w-full h-full flex items-center justify-center">
                 <img
@@ -319,7 +317,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             )}>
               {/* Title - Natural height with clamping */}
               <div className="flex items-start">
-                <h3 id={`item-card-${item.id}-title`} className={`font-bold ${getTitleClass()} text-slate-900 leading-tight line-clamp-2 transition-all w-full`} title={item.title}>
+                <h3 
+                  id={`item-card-${item.id}-title`} 
+                  onClick={() => setIsDialogOpen(true)}
+                  className={`font-bold ${getTitleClass()} text-slate-900 leading-tight line-clamp-2 transition-all w-full cursor-pointer hover:text-blue-600 hover:underline underline-offset-4 decoration-2`} 
+                  title={item.title}
+                >
                   {item.title}
                 </h3>
               </div>
