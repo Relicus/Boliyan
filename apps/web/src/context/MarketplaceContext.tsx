@@ -469,18 +469,29 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       status: 'pending'
     };
 
+    // Debug: Check auth state before making the call
+    const { data: sessionData } = await supabase.auth.getSession();
+    console.log('[placeBid] Auth state:', {
+      hasSession: !!sessionData.session,
+      authUid: sessionData.session?.user?.id,
+      appUserId: user.id,
+      idsMatch: sessionData.session?.user?.id === user.id
+    });
+
     const { data, error } = await supabase
       .from('bids')
       .upsert(bidPayload, { onConflict: 'listing_id,bidder_id' })
       .select();
+    
+    console.log('[placeBid] Supabase response:', { dataLength: data?.length, error, data });
 
-    // Check for error (Supabase returns null for no error)
+    // Only trust the bid when Supabase confirms it.
     if (error || !data || data.length === 0) {
-        console.error("Failed to place bid:", { 
-            message: error?.message, 
-            details: error?.details, 
+        console.error("Failed to place bid:", {
+            message: error?.message || 'No data returned',
+            details: error?.details,
             hint: error?.hint,
-            dataLength: data?.length 
+            dataLength: data?.length
         });
         
         // Handle Server-Level Cooldown Error
