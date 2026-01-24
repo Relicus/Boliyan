@@ -1,8 +1,9 @@
 "use client";
 
-import { memo, useState, useEffect } from "react";
+import { memo, useMemo, useEffect } from "react";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTime } from "@/context/TimeContext";
 
 interface TimerBadgeProps {
   expiryAt: string;
@@ -17,33 +18,31 @@ export const TimerBadge = memo(({
   className = "",
   onUrgentChange
 }: TimerBadgeProps) => {
-  const [timeLeft, setTimeLeft] = useState<string>("");
-  const [isUrgent, setIsUrgent] = useState(false);
+  // Use global time heartbeat instead of local interval
+  const { now } = useTime();
 
+  const { text, isUrgent } = useMemo(() => {
+    const diff = new Date(expiryAt).getTime() - now;
+    const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
+    const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
+    const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
+
+    const urgent = hoursLeft < 2;
+    
+    let timeString = "";
+    if (hoursLeft >= 24) {
+      timeString = `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`;
+    } else {
+      timeString = `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
+    }
+
+    return { text: timeString, isUrgent: urgent };
+  }, [expiryAt, now]);
+
+  // Handle urgency callback
   useEffect(() => {
-    const calculateTime = () => {
-      const diff = new Date(expiryAt).getTime() - Date.now();
-      const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
-      const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
-      const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
-
-      const urgent = hoursLeft < 2;
-      if (urgent !== isUrgent) {
-        setIsUrgent(urgent);
-        onUrgentChange?.(urgent);
-      }
-
-      if (hoursLeft >= 24) {
-        setTimeLeft(`${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`);
-      } else {
-        setTimeLeft(`${hoursLeft}h ${minsLeft}m ${secsLeft}s`);
-      }
-    };
-
-    calculateTime();
-    const timer = setInterval(calculateTime, 1000);
-    return () => clearInterval(timer);
-  }, [expiryAt, isUrgent, onUrgentChange]);
+    onUrgentChange?.(isUrgent);
+  }, [isUrgent, onUrgentChange]);
 
   const variants = {
     glass: isUrgent 
@@ -66,7 +65,7 @@ export const TimerBadge = memo(({
     )}>
       <Clock className="h-[clamp(0.625rem,2.5cqi,0.875rem)] w-[clamp(0.625rem,2.5cqi,0.875rem)] shrink-0" />
       <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] uppercase tracking-tight leading-none">
-        {timeLeft}
+        {text}
       </span>
     </div>
   );
