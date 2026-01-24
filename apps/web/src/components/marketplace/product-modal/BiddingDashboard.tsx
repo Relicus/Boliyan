@@ -5,8 +5,8 @@ import { formatPrice } from "@/lib/utils";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { getMinimumAllowedBid, MAX_BID_ATTEMPTS } from "@/lib/bidding";
-import { motion, AnimatePresence } from "framer-motion";
+import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
+import { motion } from "framer-motion";
 import { memo } from "react";
 import RollingPrice from "@/components/common/RollingPrice";
 
@@ -16,26 +16,20 @@ interface BiddingDashboardProps {
   seller: User;
   bidAmount: string;
   userCurrentBid?: number; // Added to show confirmed bid amount
-  isHighBidder: boolean;
   hasPriorBid: boolean;
   isSuccess: boolean;
   isSubmitting: boolean;
   cooldownRemaining: number;
-  cooldownProgress: number;
   error?: boolean;
   errorMessage?: string | null;
   remainingAttempts?: number;
   pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids' | 'confirm_bid', message: string } | null;
-  animTrigger: number;
   isWatched?: boolean;
   onToggleWatch?: (id: string) => void;
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
   onBid: (e: React.MouseEvent) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  getSmartStep: (currentBid: number) => number;
-  showDelta?: boolean;
-  lastDelta?: number | null;
   derivedStatus?: { type: 'error', message: string } | null;
 }
 
@@ -45,30 +39,22 @@ export const BiddingDashboard = memo(function BiddingDashboard({
   seller,
   bidAmount,
   userCurrentBid,
-  isHighBidder,
   hasPriorBid,
   isSuccess,
   isSubmitting,
   cooldownRemaining,
-  cooldownProgress,
   error = false,
   errorMessage = null,
   remainingAttempts = MAX_BID_ATTEMPTS,
   pendingConfirmation = null,
-  animTrigger,
   isWatched,
   onToggleWatch,
   onSmartAdjust,
   onBid,
   onKeyDown,
   onInputChange,
-  getSmartStep,
-  showDelta = false,
-  lastDelta = null,
   derivedStatus = null
 }: BiddingDashboardProps) {
-
-  const minNextBid = getMinimumAllowedBid(item.askPrice);
 
   const isOwner = user?.id === seller.id;
 
@@ -110,20 +96,14 @@ export const BiddingDashboard = memo(function BiddingDashboard({
           bidAmount={bidAmount}
           isSuccess={isSuccess}
           isOwner={isOwner}
-          isHighBidder={isHighBidder}
           hasPriorBid={hasPriorBid}
           isSubmitting={isSubmitting}
           cooldownRemaining={cooldownRemaining}
-          cooldownProgress={cooldownProgress}
           error={error}
           errorMessage={errorMessage}
           remainingAttempts={remainingAttempts}
           userCurrentBid={userCurrentBid}
-          minBid={minNextBid}
           pendingConfirmation={pendingConfirmation}
-          animTrigger={animTrigger}
-          showDelta={showDelta}
-          lastDelta={lastDelta}
           derivedStatus={derivedStatus}
           viewMode="modal"
           idPrefix={`modal-item-card-${item.id}`}

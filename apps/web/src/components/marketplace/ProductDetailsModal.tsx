@@ -37,27 +37,21 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     isSuccess,
     pendingConfirmation,
     // isSubmitting removed as it is not returned by useBidding
-    animTrigger,
     handleSmartAdjust,
     handleBid,
     handleKeyDown,
     handleInputChange,
-    getSmartStep,
     remainingAttempts,
     userBid,
     initialBid,
     isSubmitting,
     cooldownRemaining,
-    cooldownProgress,
-    showDelta,
-    lastDelta,
     derivedStatus
   } = useBidding(item, seller); // Removed auto-close callback
 
   const [currentImg, setCurrentImg] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
 
-  const isHighBidder = item.isPublicBid && item.currentHighBidderId === user?.id;
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
 
   // Sync bid amount when modal opens or initialBid changes (Smart Anchor)
@@ -149,26 +143,20 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     seller={seller}
                     bidAmount={bidAmount}
                     userCurrentBid={userBid?.amount}
-                    isHighBidder={isHighBidder}
                     hasPriorBid={!!hasPriorBid}
                     isSuccess={isSuccess}
                     isSubmitting={isSubmitting}
                     cooldownRemaining={cooldownRemaining}
-                    cooldownProgress={cooldownProgress}
-                    error={error}
+                    error={!!error}
                     errorMessage={errorMessage}
                     remainingAttempts={remainingAttempts}
                     pendingConfirmation={pendingConfirmation}
-                    animTrigger={animTrigger}
                     isWatched={isWatched}
                     onToggleWatch={toggleWatch}
                     onSmartAdjust={handleSmartAdjust}
                     onBid={handleBid}
                     onKeyDown={handleKeyDown}
                     onInputChange={handleInputChange}
-                    getSmartStep={getSmartStep}
-                    showDelta={showDelta}
-                    lastDelta={lastDelta}
                     derivedStatus={derivedStatus}
                   />
               </div>

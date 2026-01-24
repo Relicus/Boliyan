@@ -30,17 +30,13 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     bidAmount,
     error,
     isSuccess,
-    animTrigger,
     handleSmartAdjust,
     handleBid,
     handleKeyDown,
     handleInputChange,
-    getSmartStep,
     pendingConfirmation,
     remainingAttempts,
-    userBid,
-    showDelta,
-    lastDelta
+    userBid
   } = useBidding(item, seller, () => {});
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -68,11 +64,6 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
   const isHighBidder = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isSeller = user?.id === seller.id;
   const hasPriorBid = user && bids.some(b => b.itemId === item.id && b.bidderId === user.id);
-
-  // Calculate min bid for component
-  const minNextBid = item.isPublicBid && item.currentHighBid 
-    ? item.currentHighBid + getSmartStep(item.currentHighBid)
-    : item.askPrice * 0.7;
 
   return (
     <div id={`product-page-${item.id}`} className="min-h-screen bg-slate-50/50 pb-20">
@@ -322,15 +313,12 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       bidAmount={bidAmount}
                       isSuccess={isSuccess}
                       isOwner={isSeller}
-                      isHighBidder={!!isHighBidder}
                       hasPriorBid={!!hasPriorBid}
                       isSubmitting={false}
-                      error={error}
-                      minBid={minNextBid}
+                      error={!!error}
                       remainingAttempts={remainingAttempts}
                       userCurrentBid={userBid?.amount}
                       pendingConfirmation={pendingConfirmation}
-                      animTrigger={animTrigger}
                       viewMode="modal"
                       idPrefix={`product-page-${item.id}`}
                       onSmartAdjust={handleSmartAdjust}
@@ -339,8 +327,6 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       onInputChange={handleInputChange}
                       showAttemptsDots={false}
                       showStatus={true}
-                      showDelta={showDelta}
-                      lastDelta={lastDelta}
                     />
 
                     {isHighBidder && !isSuccess && (

@@ -1,8 +1,9 @@
 {
-  "timestamp": "2026-01-21T05:14:43.459Z",
+  "timestamp": "2026-01-23T23:04:07.161Z",
   "routes": [
     "/",
-    "/signin",
+    "/signin?redirect=%2Flist",
+    "/dashboard?tab=watchlist",
     "/list",
     "/inbox",
     "/dashboard"
@@ -15,17 +16,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nJust\nCategories\nType\nView\nKarachi\nP"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nAll"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -74,7 +75,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": ""
+          "text": "YOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "location-selector-root",
@@ -104,27 +105,27 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
+          "text": "All\nPublic\nSecret\nLIST LOCATION\nKarachi\n∞\nPRICE RA"
         },
         {
           "id": "sidebar-01",
           "tagName": "ASIDE",
-          "text": "AllPublicSecret[data-radix-scroll-area-viewport]{s"
+          "text": "All\nPublic\nSecret\nLIST LOCATION\nKarachi\n∞\nPRICE RA"
         },
         {
           "id": "sidebar-scroll-area-02",
           "tagName": "DIV",
-          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
+          "text": "LIST LOCATION\nKarachi\n∞\nPRICE RANGE\n₨\n₨\nCONDITION\n"
         },
         {
           "id": "location-selector-sidebar-compact",
           "tagName": "DIV",
-          "text": "Karachi∞"
+          "text": "Karachi\n∞"
         },
         {
           "id": "location-sidebar-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi∞",
+          "text": "Karachi\n∞",
           "type": "button"
         },
         {
@@ -148,30 +149,30 @@
           "type": "button"
         },
         {
-          "id": "banner-ad-sidebar",
-          "tagName": "DIV",
-          "text": "AdSupercharge Your WorkflowGet 50% off professiona"
-        },
-        {
           "id": "sidebar-reset-filters-btn",
           "tagName": "BUTTON",
           "text": "Reset All Filters",
           "type": "submit"
         },
         {
+          "id": "banner-ad-sidebar",
+          "tagName": "DIV",
+          "text": "AD\nSupercharge Your Workflow\n\nGet 50% off professi"
+        },
+        {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
+          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
         },
         {
           "id": "marketplace-grid-root",
           "tagName": "DIV",
-          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
+          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
         },
         {
           "id": "mobile-search-filter-container",
           "tagName": "DIV",
-          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
+          "text": "JustCategoriesTypeViewKarachiPrice"
         },
         {
           "id": "mobile-sort-select",
@@ -217,12 +218,12 @@
         {
           "id": "smart-filters-row",
           "tagName": "DIV",
-          "text": "TrendingNear MeEnding SoonHigh ValueJust ListedWat"
+          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
         },
         {
           "id": "smart-filter-bar-root",
           "tagName": "DIV",
-          "text": "TrendingNear MeEnding SoonHigh ValueJust ListedWat"
+          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
         },
         {
           "id": "smart-filter-btn-trending",
@@ -322,12 +323,12 @@
         {
           "id": "category-bar-row",
           "tagName": "DIV",
-          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
+          "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
         },
         {
           "id": "category-bar-root",
           "tagName": "DIV",
-          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
+          "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
         },
         {
           "id": "category-btn-all",
@@ -415,31 +416,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
-        },
-        {
-          "id": "bottom-nav-link-post",
-          "tagName": "A",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-item-post",
-          "tagName": "DIV",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-icon-post",
-          "tagName": "svg"
-        },
-        {
-          "id": "bottom-nav-text-post",
-          "tagName": "SPAN",
-          "text": "Post"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-link-market",
@@ -461,6 +443,44 @@
           "text": "Market"
         },
         {
+          "id": "bottom-nav-link-watchlist",
+          "tagName": "A",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-item-watchlist",
+          "tagName": "DIV",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-icon-watchlist",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-watchlist",
+          "tagName": "SPAN",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
           "id": "bottom-nav-link-inbox",
           "tagName": "A",
           "text": "Inbox"
@@ -480,49 +500,72 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dashboard",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-dashboard",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-dashboard",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dashboard",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"drvV01TgGinMWiwO_GJbN\""
+          "text": "self.__next_r=\"pwTuL7BDU2vS2we4EFIJY\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
         }
       ]
     },
     {
-      "route": "/signin",
+      "route": "/signin?redirect=%2Flist",
       "title": "Boliyan - Speak Your Price",
       "interactiveElements": [
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nWelcome Back\nSign in to continue to"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nWel"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -571,7 +614,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": ""
+          "text": "YOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "location-selector-root",
@@ -636,7 +679,7 @@
         {
           "id": "signin-form-container",
           "tagName": "DIV",
-          "text": "Email\nPassword\nSign In\nDon't have an account? Sign"
+          "text": "Email\nPassword\nSign In\nOR CONTINUE WITH\nGoogle\nFac"
         },
         {
           "id": "signin-form",
@@ -664,6 +707,18 @@
           "type": "submit"
         },
         {
+          "id": "google-signin-btn",
+          "tagName": "BUTTON",
+          "text": "Google",
+          "type": "button"
+        },
+        {
+          "id": "facebook-signin-btn",
+          "tagName": "BUTTON",
+          "text": "Facebook",
+          "type": "button"
+        },
+        {
           "id": "signup-link",
           "tagName": "A",
           "text": "Sign Up"
@@ -671,31 +726,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
-        },
-        {
-          "id": "bottom-nav-link-post",
-          "tagName": "A",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-item-post",
-          "tagName": "DIV",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-icon-post",
-          "tagName": "svg"
-        },
-        {
-          "id": "bottom-nav-text-post",
-          "tagName": "SPAN",
-          "text": "Post"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-link-market",
@@ -717,6 +753,44 @@
           "text": "Market"
         },
         {
+          "id": "bottom-nav-link-watchlist",
+          "tagName": "A",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-item-watchlist",
+          "tagName": "DIV",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-icon-watchlist",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-watchlist",
+          "tagName": "SPAN",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
           "id": "bottom-nav-link-inbox",
           "tagName": "A",
           "text": "Inbox"
@@ -736,28 +810,51 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dashboard",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-dashboard",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-dashboard",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dashboard",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"6pqSEn7ybYTcf_Pbi6kn7\""
+          "text": "self.__next_r=\"9p32RJY9tPYVfqiuo-C1t\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
         },
         {
           "id": "__next-route-announcer__",
@@ -767,23 +864,23 @@
       ]
     },
     {
-      "route": "/list",
+      "route": "/dashboard?tab=watchlist",
       "title": "Boliyan - Speak Your Price",
       "interactiveElements": [
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nList an Item\nMinimalist listing. Se"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nDas"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -832,7 +929,362 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
+          "text": "YOUR LOCATION\nKarachi\nSell Item"
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Karachi"
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Karachi",
+          "type": "button"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
           "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+        },
+        {
+          "id": "dashboard-root",
+          "tagName": "DIV",
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+        },
+        {
+          "id": "dashboard-title",
+          "tagName": "H1",
+          "text": "Dashboard"
+        },
+        {
+          "id": "dashboard-subtitle",
+          "tagName": "P",
+          "text": "Manage your marketplace activity."
+        },
+        {
+          "id": "dashboard-messages-btn",
+          "tagName": "A",
+          "text": "Messages"
+        },
+        {
+          "id": "dashboard-new-listing-btn",
+          "tagName": "A",
+          "text": "Post New"
+        },
+        {
+          "id": "dashboard-new-listing-plus",
+          "tagName": "svg"
+        },
+        {
+          "id": "dashboard-tabs",
+          "tagName": "DIV",
+          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0\nWatchlis"
+        },
+        {
+          "id": "dashboard-tabs-list",
+          "tagName": "DIV",
+          "text": "OffersBidsListingsWatchlist"
+        },
+        {
+          "id": "tab-trigger-active-bids-mobile",
+          "tagName": "BUTTON",
+          "text": "Offers",
+          "type": "button"
+        },
+        {
+          "id": "tab-trigger-my-bids-mobile",
+          "tagName": "BUTTON",
+          "text": "Bids",
+          "type": "button"
+        },
+        {
+          "id": "tab-trigger-my-listings-mobile",
+          "tagName": "BUTTON",
+          "text": "Listings",
+          "type": "button"
+        },
+        {
+          "id": "tab-trigger-watchlist-mobile",
+          "tagName": "BUTTON",
+          "text": "Watchlist",
+          "type": "button"
+        },
+        {
+          "id": "dashboard-tabs-list-desktop",
+          "tagName": "DIV",
+          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0"
+        },
+        {
+          "id": "tab-trigger-active-bids",
+          "tagName": "BUTTON",
+          "text": "Offers\n0",
+          "type": "button"
+        },
+        {
+          "id": "tab-badge-active-bids",
+          "tagName": "SPAN",
+          "text": "0"
+        },
+        {
+          "id": "tab-trigger-my-bids",
+          "tagName": "BUTTON",
+          "text": "Bids\n0",
+          "type": "button"
+        },
+        {
+          "id": "tab-badge-my-bids",
+          "tagName": "SPAN",
+          "text": "0"
+        },
+        {
+          "id": "tab-trigger-my-listings",
+          "tagName": "BUTTON",
+          "text": "My Listings\n0",
+          "type": "button"
+        },
+        {
+          "id": "tab-badge-my-listings",
+          "tagName": "SPAN",
+          "text": "0"
+        },
+        {
+          "id": "tab-trigger-watchlist",
+          "tagName": "BUTTON",
+          "text": "Watchlist\n0",
+          "type": "button"
+        },
+        {
+          "id": "tab-badge-watchlist",
+          "tagName": "SPAN",
+          "text": "0"
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "MarketWatchlistPostInboxDash"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "MarketWatchlistPostInboxDash"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-watchlist",
+          "tagName": "A",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-item-watchlist",
+          "tagName": "DIV",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-icon-watchlist",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-watchlist",
+          "tagName": "SPAN",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-dash",
+          "tagName": "A",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-item-dash",
+          "tagName": "DIV",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-icon-dash",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dash",
+          "tagName": "SPAN",
+          "text": "Dash"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"w4IAvrTq25FHnBHU-xNdA\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "route": "/list",
+      "title": "Boliyan - Speak Your Price",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nLis"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "text",
+          "placeholder": "Search items, categories..."
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": "YOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "location-selector-root",
@@ -897,7 +1349,7 @@
         {
           "id": "list-item-form",
           "tagName": "DIV",
-          "text": "Product Images (Max 5)\nAdd Photo\nItem Title\n*\nCate"
+          "text": "Product Images (Max 5)\nAdd Photo\nItem Title\n*\n0 / "
         },
         {
           "id": "images-label",
@@ -1010,31 +1462,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
-        },
-        {
-          "id": "bottom-nav-link-post",
-          "tagName": "A",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-item-post",
-          "tagName": "DIV",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-icon-post",
-          "tagName": "svg"
-        },
-        {
-          "id": "bottom-nav-text-post",
-          "tagName": "SPAN",
-          "text": "Post"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-link-market",
@@ -1056,6 +1489,44 @@
           "text": "Market"
         },
         {
+          "id": "bottom-nav-link-watchlist",
+          "tagName": "A",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-item-watchlist",
+          "tagName": "DIV",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-icon-watchlist",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-watchlist",
+          "tagName": "SPAN",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
           "id": "bottom-nav-link-inbox",
           "tagName": "A",
           "text": "Inbox"
@@ -1075,28 +1546,51 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dashboard",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-dashboard",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-dashboard",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dashboard",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"jGHU7FjlsiLWEIWqd9ThP\""
+          "text": "self.__next_r=\"KH7MlP3IAxhYDnCYoSUgP\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
         },
         {
           "id": "__next-route-announcer__",
@@ -1112,17 +1606,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nMessages\nAll\nOffers\nBids\n\nNo active"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nMes"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -1171,7 +1665,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": ""
+          "text": "YOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "location-selector-root",
@@ -1242,53 +1736,34 @@
           "type": "button"
         },
         {
-          "id": "radix-_R_9inebbe9lb_-content-all",
+          "id": "radix-_R_16atpddp9lb_-content-all",
           "tagName": "DIV",
           "text": "No active conversations\n\nChats appear here once a "
         },
         {
-          "id": "radix-_R_9inebbe9lb_-content-offers",
+          "id": "radix-_R_16atpddp9lb_-content-offers",
           "tagName": "DIV",
           "text": ""
         },
         {
-          "id": "radix-_R_9inebbe9lb_-content-bids",
+          "id": "radix-_R_16atpddp9lb_-content-bids",
           "tagName": "DIV",
           "text": ""
         },
         {
           "id": "chat-window-container",
           "tagName": "DIV",
-          "text": "Speak Your PriceChoose a chat from the left to arr"
+          "text": "Speak Your Price\n\nChoose a chat from the left to a"
         },
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
-        },
-        {
-          "id": "bottom-nav-link-post",
-          "tagName": "A",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-item-post",
-          "tagName": "DIV",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-icon-post",
-          "tagName": "svg"
-        },
-        {
-          "id": "bottom-nav-text-post",
-          "tagName": "SPAN",
-          "text": "Post"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-link-market",
@@ -1310,6 +1785,44 @@
           "text": "Market"
         },
         {
+          "id": "bottom-nav-link-watchlist",
+          "tagName": "A",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-item-watchlist",
+          "tagName": "DIV",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-icon-watchlist",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-watchlist",
+          "tagName": "SPAN",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
           "id": "bottom-nav-link-inbox",
           "tagName": "A",
           "text": "Inbox"
@@ -1329,28 +1842,51 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dashboard",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-dashboard",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-dashboard",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dashboard",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"LrUgAdwU9HHT_mQEb5ctu\""
+          "text": "self.__next_r=\"IgRQKQg-GISQnmtOnlBWv\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
         },
         {
           "id": "__next-route-announcer__",
@@ -1366,17 +1902,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nDashboard\n\nManage your marketplace "
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nDas"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "navbar-left-section-03",
@@ -1425,7 +1961,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": ""
+          "text": "YOUR LOCATION\nKarachi\nSell Item"
         },
         {
           "id": "location-selector-root",
@@ -1455,17 +1991,17 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nOffe"
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
         },
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nOffe"
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
         },
         {
           "id": "dashboard-root",
           "tagName": "DIV",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nOffe"
+          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
         },
         {
           "id": "dashboard-title",
@@ -1494,12 +2030,12 @@
         {
           "id": "dashboard-tabs",
           "tagName": "DIV",
-          "text": "Offers\nBids\nListings\nWatchlist\nNo activity\n\nNo one"
+          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0\nNo activ"
         },
         {
           "id": "dashboard-tabs-list",
           "tagName": "DIV",
-          "text": "Offers\nBids\nListings\nWatchlist"
+          "text": "OffersBidsListingsWatchlist"
         },
         {
           "id": "tab-trigger-active-bids-mobile",
@@ -1528,12 +2064,12 @@
         {
           "id": "dashboard-tabs-list-desktop",
           "tagName": "DIV",
-          "text": "Offers0Bids0My Listings0Watchlist0"
+          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0"
         },
         {
           "id": "tab-trigger-active-bids",
           "tagName": "BUTTON",
-          "text": "Offers0",
+          "text": "Offers\n0",
           "type": "button"
         },
         {
@@ -1544,7 +2080,7 @@
         {
           "id": "tab-trigger-my-bids",
           "tagName": "BUTTON",
-          "text": "Bids0",
+          "text": "Bids\n0",
           "type": "button"
         },
         {
@@ -1555,7 +2091,7 @@
         {
           "id": "tab-trigger-my-listings",
           "tagName": "BUTTON",
-          "text": "My Listings0",
+          "text": "My Listings\n0",
           "type": "button"
         },
         {
@@ -1566,7 +2102,7 @@
         {
           "id": "tab-trigger-watchlist",
           "tagName": "BUTTON",
-          "text": "Watchlist0",
+          "text": "Watchlist\n0",
           "type": "button"
         },
         {
@@ -1577,31 +2113,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "Post\nMarket\nInbox\nDashboard"
-        },
-        {
-          "id": "bottom-nav-link-post",
-          "tagName": "A",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-item-post",
-          "tagName": "DIV",
-          "text": "Post"
-        },
-        {
-          "id": "bottom-nav-icon-post",
-          "tagName": "svg"
-        },
-        {
-          "id": "bottom-nav-text-post",
-          "tagName": "SPAN",
-          "text": "Post"
+          "text": "MarketWatchlistPostInboxDash"
         },
         {
           "id": "bottom-nav-link-market",
@@ -1623,6 +2140,44 @@
           "text": "Market"
         },
         {
+          "id": "bottom-nav-link-watchlist",
+          "tagName": "A",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-item-watchlist",
+          "tagName": "DIV",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-icon-watchlist",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-watchlist",
+          "tagName": "SPAN",
+          "text": "Watchlist"
+        },
+        {
+          "id": "bottom-nav-link-post",
+          "tagName": "A",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-item-post",
+          "tagName": "DIV",
+          "text": "Post"
+        },
+        {
+          "id": "bottom-nav-icon-post",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-post",
+          "tagName": "SPAN",
+          "text": "Post"
+        },
+        {
           "id": "bottom-nav-link-inbox",
           "tagName": "A",
           "text": "Inbox"
@@ -1642,28 +2197,51 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dashboard",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-dashboard",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-dashboard",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dashboard",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Dashboard"
+          "text": "Dash"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"8wCuiRHAqDIPkoVDqFlzD\""
+          "text": "self.__next_r=\"dfR6xs6IFBObW-fWHYYLu\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": "",
+          "type": "submit"
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
         },
         {
           "id": "__next-route-announcer__",

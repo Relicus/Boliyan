@@ -25,7 +25,7 @@ import { supabase } from "@/lib/supabase";
 import { generateSlug, formatPrice } from "@/lib/utils";
 import { Database } from "@/types/database.types";
 import { toast } from "sonner";
-import { transformListingToItem } from "@/lib/transform";
+import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { Item } from "@/types";
 
 function ListForm() {
@@ -57,7 +57,7 @@ function ListForm() {
 
         if (error) throw error;
         if (data) {
-          setFetchedItem(transformListingToItem(data as any));
+          setFetchedItem(transformListingToItem(data as unknown as ListingWithSeller));
         }
       } catch (err) {
         console.error("Error fetching item for edit:", err);
@@ -95,17 +95,6 @@ function ListForm() {
     description?: boolean;
     images?: boolean;
   }>({});
-  const [isShaking, setIsShaking] = useState(false);
-
-  const isValid = 
-    title.length >= LISTING_LIMITS.TITLE.MIN && 
-    title.length <= LISTING_LIMITS.TITLE.MAX &&
-    category !== "" &&
-    parseFloat(askPrice) >= LISTING_LIMITS.PRICE.MIN &&
-    parseFloat(askPrice) <= LISTING_LIMITS.PRICE.MAX &&
-    description.length >= LISTING_LIMITS.DESCRIPTION.MIN &&
-    description.length <= LISTING_LIMITS.DESCRIPTION.MAX &&
-    imageEntries.length >= 1;
 
   useEffect(() => {
     if (editingItem) {
@@ -194,9 +183,6 @@ function ListForm() {
     setErrors(newErrors);
 
     if (Object.values(newErrors).some(Boolean)) {
-      setIsShaking(true);
-      setTimeout(() => setIsShaking(false), 500);
-      
       if (newErrors.images) toast.error("At least one image is required");
       return;
     }

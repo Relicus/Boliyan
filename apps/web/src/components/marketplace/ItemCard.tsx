@@ -3,14 +3,12 @@ import React, { useState, useMemo, useEffect, memo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Lock, Bookmark } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/lib/store";
-import { useTime } from "@/context/TimeContext";
 import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
-import { getFuzzyLocationString, calculatePrivacySafeDistance, formatPrice, getConditionLabel } from "@/lib/utils";
+import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
 import ProductDetailsModal from "./ProductDetailsModal";
@@ -62,15 +60,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     handleSmartAdjust,
     handleBid,
     handleInputChange, 
-    animTrigger,
     remainingAttempts,
     errorMessage,
     userBid,
     isSubmitting,
     cooldownRemaining,
-    cooldownProgress,
-    showDelta,
-    lastDelta,
     derivedStatus
   } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
 
@@ -407,20 +401,14 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     bidAmount={bidAmount}
                     isSuccess={isSuccess}
                     isOwner={user?.id === seller?.id}
-                    isHighBidder={biddingConfig.isUserHighBidder}
                     hasPriorBid={biddingConfig.hasUserBid}
                     error={!!error}
                     errorMessage={errorMessage}
                     remainingAttempts={remainingAttempts}
                     isSubmitting={isSubmitting}
                     cooldownRemaining={cooldownRemaining}
-                    cooldownProgress={cooldownProgress}
-                    showDelta={showDelta}
-                    lastDelta={lastDelta}
                     derivedStatus={derivedStatus}
-                    minBid={biddingConfig.minBid}
                     pendingConfirmation={pendingConfirmation}
-                    animTrigger={animTrigger}
                     viewMode={viewMode}
                     idPrefix={`item-card-${item.id}`}
                     onSmartAdjust={handleSmartAdjust}

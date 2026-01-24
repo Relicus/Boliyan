@@ -19,14 +19,13 @@ import { useSearchParams, useRouter } from "next/navigation";
 import DeleteConfirmationDialog from "@/components/seller/DeleteConfirmationDialog";
 import { Item } from "@/types";
 import { calculatePrivacySafeDistance } from "@/lib/utils";
-import { transformListingToItem } from "@/lib/transform";
+import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 
 function DashboardContent() {
   const { itemsById, bids, user, deleteItem, watchedItemIds, involvedIds } = useApp();
   const [myItems, setMyItems] = useState<Item[]>([]);
-  const [isMyListingsLoading, setIsMyListingsLoading] = useState(false);
   
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -59,7 +58,6 @@ function DashboardContent() {
     if (!user) return;
 
     const fetchMyItems = async () => {
-      setIsMyListingsLoading(true);
       try {
         const { data, error } = await supabase
           .from('marketplace_listings')
@@ -68,13 +66,11 @@ function DashboardContent() {
 
         if (error) throw error;
         if (data) {
-          const transformed = data.map(row => transformListingToItem(row as any));
+          const transformed = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
           setMyItems(transformed);
         }
       } catch (err) {
         console.error("Error fetching my listings:", err);
-      } finally {
-        setIsMyListingsLoading(false);
       }
     };
 

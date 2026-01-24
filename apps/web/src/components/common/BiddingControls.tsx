@@ -1,12 +1,10 @@
 "use client";
 
-import { memo, useMemo, useState, useRef, useLayoutEffect, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { createPortal } from "react-dom";
+import { memo, useMemo, useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { cn, formatPrice } from "@/lib/utils";
-import { useApp } from "@/lib/store";
-import { Gavel, TrendingUp, Loader2, AlertCircle, Timer, Edit } from "lucide-react";
+import { Gavel, Loader2, AlertCircle, Edit } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import RollingPrice from "./RollingPrice";
 import { BoliyanUrduMark } from "@/components/branding/BoliyanLogo";
@@ -18,29 +16,19 @@ interface BiddingControlsProps {
   bidAmount: string;
   isSuccess: boolean;
   isOwner: boolean;
-  isHighBidder: boolean;
   hasPriorBid: boolean;
   isSubmitting?: boolean;
   error?: boolean;
   errorMessage?: string | null;
-  minBid?: number;
   remainingAttempts?: number;
   userCurrentBid?: number;
   cooldownRemaining?: number;
-  cooldownProgress?: number;
   
   // New derived sticky status
   derivedStatus?: { type: 'error', message: string } | null;
 
-  // Delta Animation
-  showDelta?: boolean;
-  lastDelta?: number | null;
-  
   // Dual-tap confirmation state
   pendingConfirmation?: { type: 'double_bid' | 'high_bid' | 'out_of_bids' | 'confirm_bid', message: string } | null;
-  
-  // Animation
-  animTrigger: number;
   
   // Configuration
   viewMode?: BiddingViewMode;
@@ -150,21 +138,15 @@ export const BiddingControls = memo(({
   bidAmount,
   isSuccess,
   isOwner,
-  isHighBidder,
   hasPriorBid,
   isSubmitting = false,
   error = false,
   errorMessage = null,
-  minBid = 0,
   remainingAttempts = MAX_BID_ATTEMPTS,
   userCurrentBid,
   cooldownRemaining = 0,
-  cooldownProgress = 0,
-  showDelta = false,
-  lastDelta = null,
   derivedStatus = null,
   pendingConfirmation = null,
-  animTrigger,
   viewMode = 'compact',
   disabled = false,
   idPrefix,
@@ -227,7 +209,6 @@ export const BiddingControls = memo(({
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
   // Remove high-precision heartbeat dependency for performance
-  const { lastBidTimestamp } = useApp();
   const [justFinishedCooldown, setJustFinishedCooldown] = useState(false);
 
   useEffect(() => {

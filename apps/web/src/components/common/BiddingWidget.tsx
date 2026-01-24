@@ -71,15 +71,12 @@ export const BiddingWidget = memo(({
     bidAmount,
     error,
     isSuccess,
-    animTrigger,
     handleSmartAdjust,
     handleBid,
     pendingConfirmation,
     clearPendingConfirmation,
     handleKeyDown,
-    handleInputChange,
-    showDelta,
-    lastDelta
+    handleInputChange
   } = useBidding(item, seller, onBidSuccess);
 
   // Adapter for Legacy Dialog Logic (if we still want the dialog)
@@ -105,11 +102,8 @@ export const BiddingWidget = memo(({
           bidAmount={bidAmount}
           isSuccess={isSuccess}
           isOwner={isOwnListing}
-          isHighBidder={config.isUserHighBidder}
           hasPriorBid={config.hasUserBid}
-          error={error}
-          minBid={config.minBid}
-          animTrigger={animTrigger}
+          error={!!error}
           viewMode={viewMode}
           disabled={disabled}
           idPrefix={`bidding-widget-${item.id}`}
@@ -118,8 +112,6 @@ export const BiddingWidget = memo(({
           onKeyDown={handleKeyDown}
           onInputChange={handleInputChange}
           onInputClick={handleInputClick}
-          showDelta={showDelta}
-          lastDelta={lastDelta}
         />
       </div>
 
