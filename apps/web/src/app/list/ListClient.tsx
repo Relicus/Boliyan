@@ -27,6 +27,7 @@ import { Database } from "@/types/database.types";
 import { toast } from "sonner";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { Item } from "@/types";
+import { roundToReasonablePrice } from "@/lib/bidding";
 
 function ListForm() {
   const router = useRouter();
@@ -172,6 +173,8 @@ function ListForm() {
     }
 
     const priceNum = parseFloat(askPrice);
+    const roundedPrice = roundToReasonablePrice(priceNum);
+    
     const newErrors = {
       title: title.length < LISTING_LIMITS.TITLE.MIN || title.length > LISTING_LIMITS.TITLE.MAX,
       category: !category,
@@ -185,6 +188,11 @@ function ListForm() {
     if (Object.values(newErrors).some(Boolean)) {
       if (newErrors.images) toast.error("At least one image is required");
       return;
+    }
+
+    if (roundedPrice !== priceNum) {
+      setAskPrice(roundedPrice.toString());
+      toast.info(`Price rounded to Rs. ${roundedPrice.toLocaleString()} for better bidding.`);
     }
 
     setIsUploading(true);
@@ -210,7 +218,7 @@ function ListForm() {
         const listingPayload = {
           title,
           category,
-          asked_price: parseFloat(askPrice),
+          asked_price: roundedPrice,
           description,
           auction_mode: (isPublic ? 'visible' : 'sealed') as 'visible' | 'sealed',
           images: orderedUrls,
@@ -434,6 +442,15 @@ function ListForm() {
                     onChange={(e) => {
                       setAskPrice(e.target.value);
                       if (errors.askPrice) setErrors(prev => ({ ...prev, askPrice: false }));
+                    }}
+                    onBlur={() => {
+                      const num = parseFloat(askPrice);
+                      if (!isNaN(num) && num > 0) {
+                        const rounded = roundToReasonablePrice(num);
+                        if (rounded !== num) {
+                          setAskPrice(rounded.toString());
+                        }
+                      }
                     }}
                     className={`transition-all h-11 w-full ${errors.askPrice ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-100"}`} 
                   />

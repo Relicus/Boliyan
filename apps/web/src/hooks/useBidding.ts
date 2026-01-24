@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
 import { Item, User, Bid } from "@/types";
-import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, MAX_BID_ATTEMPTS } from "@/lib/bidding";
+import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, MAX_BID_ATTEMPTS, roundToReasonablePrice } from "@/lib/bidding";
 import { sonic } from "@/lib/sonic";
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
@@ -336,6 +336,16 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     }
   }, []);
 
+  const handleInputBlur = useCallback(() => {
+    const amount = parseFloat(bidAmount.replace(/,/g, ''));
+    if (!isNaN(amount) && amount > 0) {
+      const rounded = roundToReasonablePrice(amount);
+      if (rounded !== amount) {
+        setBidAmount(rounded.toLocaleString());
+      }
+    }
+  }, [bidAmount]);
+
   return {
     bidAmount,
     setBidAmount,
@@ -352,6 +362,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     cooldownProgress,
     handleKeyDown,
     handleInputChange,
+    handleInputBlur,
     getSmartStep,
     lastDelta,
     showDelta,

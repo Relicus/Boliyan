@@ -41,6 +41,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     handleBid,
     handleKeyDown,
     handleInputChange,
+    handleInputBlur,
     remainingAttempts,
     userBid,
     initialBid,
@@ -157,6 +158,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     onBid={handleBid}
                     onKeyDown={handleKeyDown}
                     onInputChange={handleInputChange}
+                    onInputBlur={handleInputBlur}
                     derivedStatus={derivedStatus}
                   />
               </div>

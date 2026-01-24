@@ -43,6 +43,7 @@ interface BiddingControlsProps {
   onBid: (e: React.MouseEvent) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onInputBlur?: () => void;
   onInputClick?: (e: React.MouseEvent) => void;
 }
 
@@ -156,6 +157,7 @@ export const BiddingControls = memo(({
   onBid,
   onKeyDown,
   onInputChange,
+  onInputBlur,
   onInputClick,
   itemId
 }: BiddingControlsProps) => {
@@ -386,7 +388,10 @@ export const BiddingControls = memo(({
                 x: { duration: 0.2 } // Shake duration
               }}
               onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
+              onBlur={() => {
+                setIsFocused(false);
+                if (onInputBlur) onInputBlur();
+              }}
               onKeyDown={onKeyDown}
               onChange={onInputChange}
               onClick={onInputClick}

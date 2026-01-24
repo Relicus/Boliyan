@@ -23,3 +23,27 @@ export function getSmartStep(currentPrice: number): number {
   if (currentPrice >= 10000) return 500;
   return 100;
 }
+
+/**
+ * Rounds a price to a "reasonable" human-friendly value based on tiers.
+ * This is separate from smart steps and prevents "weird" numbers like 4999.
+ */
+export function roundToReasonablePrice(amount: number): number {
+  if (amount <= 0) return 0;
+  
+  if (amount < 10000) {
+    // < 10k: Round to nearest 10
+    return Math.round(amount / 10) * 10;
+  }
+  if (amount < 100000) {
+    // 10k - 100k: Round to nearest 100
+    return Math.round(amount / 100) * 100;
+  }
+  if (amount < 1000000) {
+    // 100k - 1M: Round to nearest 500
+    return Math.round(amount / 500) * 500;
+  }
+  // 1M+: Round to nearest 1,000
+  return Math.round(amount / 1000) * 1000;
+}
+

@@ -36,6 +36,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     handleBid,
     handleKeyDown,
     handleInputChange,
+    handleInputBlur,
     pendingConfirmation,
     remainingAttempts,
     userBid
@@ -289,6 +290,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       onBid={handleBid}
                       onKeyDown={handleKeyDown}
                       onInputChange={handleInputChange}
+                      onInputBlur={handleInputBlur}
                       showAttemptsDots={false}
                       showStatus={true}
                     />

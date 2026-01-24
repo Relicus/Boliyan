@@ -60,6 +60,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     handleSmartAdjust,
     handleBid,
     handleInputChange, 
+    handleInputBlur,
     remainingAttempts,
     errorMessage,
     userBid,
@@ -426,6 +427,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     onBid={handleBid}
                     onKeyDown={handleKeyDown}
                     onInputChange={handleInputChange}
+                    onInputBlur={handleInputBlur}
                     onInputClick={handleInputClick}
                     showAttemptsDots={false}
                     itemId={item.id}

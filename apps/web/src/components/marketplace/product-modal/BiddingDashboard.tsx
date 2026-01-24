@@ -29,6 +29,7 @@ interface BiddingDashboardProps {
   onBid: (e: React.MouseEvent) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onInputBlur?: () => void;
   derivedStatus?: { type: 'error', message: string } | null;
 }
 
@@ -52,6 +53,7 @@ export const BiddingDashboard = memo(function BiddingDashboard({
   onBid,
   onKeyDown,
   onInputChange,
+  onInputBlur,
   derivedStatus = null
 }: BiddingDashboardProps) {
 
@@ -104,6 +106,7 @@ export const BiddingDashboard = memo(function BiddingDashboard({
           onBid={onBid}
           onKeyDown={onKeyDown}
           onInputChange={onInputChange}
+          onInputBlur={onInputBlur}
           showAttemptsDots={false}
           showStatus={true}
         />

@@ -76,7 +76,8 @@ export const BiddingWidget = memo(({
     pendingConfirmation,
     clearPendingConfirmation,
     handleKeyDown,
-    handleInputChange
+    handleInputChange,
+    handleInputBlur
   } = useBidding(item, seller, onBidSuccess);
 
   // Adapter for Legacy Dialog Logic (if we still want the dialog)
@@ -111,6 +112,7 @@ export const BiddingWidget = memo(({
           onBid={handleBid}
           onKeyDown={handleKeyDown}
           onInputChange={handleInputChange}
+          onInputBlur={handleInputBlur}
           onInputClick={handleInputClick}
         />
       </div>
