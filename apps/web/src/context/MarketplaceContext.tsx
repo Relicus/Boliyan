@@ -323,7 +323,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   // --- Realtime Subscription (Bids) ---
   const handleRealtimeBid = useCallback((newBid: Bid) => {
       // Play sound if someone ELSE bids on an item the user is watching
-      if (user && newBid.bidderId !== user.id && watchedItemIds.includes(newBid.itemId)) {
+      // Use ref to avoid re-subscription on watchlist toggle
+      if (user && newBid.bidderId !== user.id && watchedItemIdsRef.current.includes(newBid.itemId)) {
           sonic.tick(); // Subtle notification
       }
 
@@ -361,7 +362,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
         return upsertEntity(prevItems, updatedItem);
       });
-  }, [user, watchedItemIds]);
+  }, [user]);
 
   useBidRealtime(handleRealtimeBid, activeIds, user?.id);
 
