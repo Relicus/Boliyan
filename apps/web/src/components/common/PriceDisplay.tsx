@@ -9,9 +9,9 @@
 
 import { memo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, User as UserIcon } from "lucide-react";
+import { Lock, User as UserIcon, Tag, Trophy } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
-import { formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import RollingPrice from "./RollingPrice";
 
@@ -35,7 +35,7 @@ interface PriceDisplayProps {
 // SIZE HELPERS
 // ============================================
 
-function getLabelClass(viewMode: BiddingViewMode): string {
+function getLabelClass(_viewMode: BiddingViewMode): string {
   // Unified fluid metadata label style
   return 'text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1';
 }
@@ -46,13 +46,6 @@ function getPriceClass(viewMode: BiddingViewMode): string {
   switch (viewMode) {
     case 'modal': return `${base} text-xl`;
     default: return `${base} text-[clamp(1rem,6cqi,1.5rem)]`;
-  }
-}
-
-function getTrophySizeClass(viewMode: BiddingViewMode): string {
-  switch (viewMode) {
-    case 'modal': return 'w-8 h-8 p-1.5';
-    default: return 'w-[clamp(1.25rem,6cqi,1.75rem)] h-[clamp(1.25rem,6cqi,1.75rem)] p-[clamp(0.25rem,1cqi,0.375rem)]';
   }
 }
 
@@ -106,7 +99,8 @@ export const PriceDisplay = memo(({
     <div className={`grid grid-cols-[1fr_auto_1fr] items-end ${className}`}>
       {/* Asking Price */}
       <div className="flex flex-col justify-self-start">
-        <span className={getLabelClass(viewMode)}>
+        <span className={cn(getLabelClass(viewMode), "flex items-center gap-1")}>
+          <Tag className="w-2.5 h-2.5" />
           Asking
         </span>
         <span className={`${getPriceClass(viewMode)} text-slate-800`}>
@@ -150,14 +144,12 @@ export const PriceDisplay = memo(({
                 }}
                 className="flex flex-col items-end absolute bottom-0 right-0 w-max"
               >
-                <span className={`${getLabelClass(viewMode)} text-purple-600/80`}>
+                <span className={cn(getLabelClass(viewMode), "text-purple-600/80 flex items-center gap-1")}>
+                  <UserIcon className="w-2.5 h-2.5" />
                   Your Bid
                 </span>
                 <span className={`${getPriceClass(viewMode)} text-purple-700 flex items-center gap-1`}>
                    <RollingPrice price={userCurrentBid || 0} />
-                   {(viewMode === 'spacious' || viewMode === 'modal') && (
-                     <UserIcon className="h-3 w-3 ml-0.5 opacity-50" />
-                   )}
                 </span>
              </motion.div>
             ) : (
@@ -173,7 +165,12 @@ export const PriceDisplay = memo(({
                 }}
                 className="flex flex-col items-end absolute bottom-0 right-0 w-max"
               >
-                <span className={getLabelClass(viewMode)}>
+                <span className={cn(getLabelClass(viewMode), "flex items-center gap-1")}>
+                  {config.variant === 'public' ? (
+                    <Trophy className="w-2.5 h-2.5" />
+                  ) : (
+                    <Lock className="w-2.5 h-2.5" />
+                  )}
                   {config.variant === 'public' ? "Highest" : "Secret"}
                 </span>
 
@@ -192,16 +189,11 @@ export const PriceDisplay = memo(({
                       </motion.span>
                     </div>
                   ) : config.variant === 'secret' ? (
-                    // Secret: Show bid count with lock
+                    // Secret: Show bid count
                     <div className="flex items-center gap-1.5">
                       <span className={`${getPriceClass(viewMode)} text-amber-600`}>
                         {bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}
                       </span>
-                      {(viewMode === 'spacious' || viewMode === 'modal') && (
-                        <div className="bg-amber-100 text-amber-600 p-1 rounded" title="Secret Bidding">
-                          <Lock className="h-3.5 w-3.5" />
-                        </div>
-                      )}
                     </div>
                   ) : (
                     // Public with no bids yet
