@@ -21,7 +21,6 @@ type ConversationInsert = Database['public']['Tables']['conversations']['Insert'
 type ConversationUpdate = Database['public']['Tables']['conversations']['Update'];
 type MessageRow = Database['public']['Tables']['messages']['Row'];
 type MessageInsert = Database['public']['Tables']['messages']['Insert'];
-type NotificationInsert = Database['public']['Tables']['notifications']['Insert'];
 
 interface ChatContextType {
   conversations: Conversation[];

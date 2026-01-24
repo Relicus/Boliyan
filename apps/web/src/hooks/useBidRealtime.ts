@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Bid } from '@/types';
 import { transformBidToHydratedBid, BidWithProfile } from '@/lib/transform';

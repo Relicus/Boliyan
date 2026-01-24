@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, memo } from "react";
 import { Maximize2, ChevronLeft, ChevronRight, Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { Item, User } from "@/types";
+import { Item } from "@/types";
 import Skeleton from "@/components/ui/Skeleton";
 
 interface ProductGalleryProps {

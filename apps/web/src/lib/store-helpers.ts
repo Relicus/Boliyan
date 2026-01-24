@@ -1,5 +1,3 @@
-import { Item, Bid } from '@/types';
-
 /**
  * Normalizes an array of entities into a map indexed by ID.
  */
@@ -44,6 +42,7 @@ export function removeEntity<T extends { id: string }>(
   map: Record<string, T>,
   id: string
 ): Record<string, T> {
-  const { [id]: removed, ...rest } = map;
-  return rest;
+  const newMap = { ...map };
+  delete newMap[id];
+  return newMap;
 }

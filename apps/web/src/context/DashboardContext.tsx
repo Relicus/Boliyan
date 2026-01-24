@@ -80,7 +80,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       const soldListings = listings.filter(l => l.status === 'completed');
       
       const totalBids = listings.reduce((acc, curr) => acc + (curr.bidCount || 0), 0);
-      const totalRevenue = soldListings.reduce((acc, curr) => acc + (curr.currentHighBid || curr.askPrice), 0); // Simplified revenue
       
       const successRate = user.sellerSuccessRate ?? 100;
 

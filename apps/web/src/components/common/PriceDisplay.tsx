@@ -35,7 +35,7 @@ interface PriceDisplayProps {
 // SIZE HELPERS
 // ============================================
 
-function getLabelClass(_viewMode: BiddingViewMode): string {
+function getLabelClass(): string {
   // Unified fluid metadata label style
   return 'text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1';
 }
@@ -106,7 +106,7 @@ export const PriceDisplay = memo(({
         <div className={cn("grid grid-cols-2 gap-4 w-full", className)}>
              {/* Ask Price Block */}
              <div className="flex flex-col items-center justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20 min-w-0">
-                <span className={cn(getLabelClass(viewMode), "flex items-center gap-1.5 justify-center mb-0.5")}>
+                <span className={cn(getLabelClass(), "flex items-center gap-1.5 justify-center mb-0.5")}>
                     <Tag className="w-3 h-3 text-slate-400" />
                     Asking
                 </span>
@@ -127,7 +127,7 @@ export const PriceDisplay = memo(({
                             transition={{ type: "spring", stiffness: 800, damping: 35 }}
                             className="absolute inset-0 flex flex-col items-center justify-center"
                         >
-                            <span className={cn(getLabelClass(viewMode), "text-purple-600/80 flex items-center gap-1.5 justify-center mb-0.5")}>
+                            <span className={cn(getLabelClass(), "text-purple-600/80 flex items-center gap-1.5 justify-center mb-0.5")}>
                                 <UserIcon className="w-3 h-3" />
                                 Your Bid
                             </span>
@@ -144,7 +144,7 @@ export const PriceDisplay = memo(({
                             transition={{ type: "spring", stiffness: 800, damping: 35 }}
                             className="absolute inset-0 flex flex-col items-center justify-center"
                         >
-                             <span className={cn(getLabelClass(viewMode), "flex items-center gap-1.5 justify-center mb-0.5")}>
+                             <span className={cn(getLabelClass(), "flex items-center gap-1.5 justify-center mb-0.5")}>
                                 {config.variant === 'public' ? <Trophy className="w-3 h-3 text-slate-400" /> : <Lock className="w-3 h-3 text-slate-400" />}
                                 {config.variant === 'public' ? "Highest" : "Bids"}
                              </span>
@@ -172,7 +172,7 @@ export const PriceDisplay = memo(({
     <div className={`grid grid-cols-[1fr_auto_1fr] items-end ${className}`}>
       {/* Asking Price */}
       <div className="flex flex-col justify-self-start">
-        <span className={cn(getLabelClass(viewMode), "flex items-center gap-1")}>
+        <span className={cn(getLabelClass(), "flex items-center gap-1")}>
           <Tag className="w-2.5 h-2.5" />
           Asking
         </span>
@@ -217,7 +217,7 @@ export const PriceDisplay = memo(({
                 }}
                 className="flex flex-col items-end absolute bottom-0 right-0 w-max"
               >
-                <span className={cn(getLabelClass(viewMode), "text-purple-600/80 flex items-center gap-1")}>
+                <span className={cn(getLabelClass(), "text-purple-600/80 flex items-center gap-1")}>
                   <UserIcon className="w-2.5 h-2.5" />
                   Your Bid
                 </span>
@@ -238,7 +238,7 @@ export const PriceDisplay = memo(({
                 }}
                 className="flex flex-col items-end absolute bottom-0 right-0 w-max"
               >
-                <span className={cn(getLabelClass(viewMode), "flex items-center gap-1")}>
+                <span className={cn(getLabelClass(), "flex items-center gap-1")}>
                   {config.variant === 'public' ? (
                     <Trophy className="w-2.5 h-2.5" />
                   ) : (

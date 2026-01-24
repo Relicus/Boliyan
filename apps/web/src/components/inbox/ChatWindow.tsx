@@ -5,12 +5,11 @@ import { useApp } from '@/lib/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Star, Handshake } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn, formatPrice } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
-import ReviewForm from '@/components/profile/ReviewForm';
 import { useReviews } from '@/context/ReviewContext';
 import { sonic } from '@/lib/sonic';
 import { DealSealAnimation } from '@/components/common/DealSealAnimation';
@@ -29,9 +28,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const [inputValue, setInputValue] = useState("");
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isLockedState, setIsLockedState] = useState(false);
-  const { canReview, submitReview } = useReviews();
-  const [showReviewBtn, setShowReviewBtn] = useState(false);
-  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const { submitReview } = useReviews();
   const [showSealAnim, setShowSealAnim] = useState(false);
   const [showMissing, setShowMissing] = useState(false);
   
@@ -86,16 +83,18 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     if (isSealed && !showSealAnim) {
        // Only trigger if we haven't seen it in this session (simplified)
        // Ideally we check if 'sealedAt' is very recent
-       const sealedAt = conversation?.sellerConfirmedAt && conversation?.buyerConfirmedAt 
-         ? Math.max(new Date(conversation.sellerConfirmedAt).getTime(), new Date(conversation.buyerConfirmedAt).getTime())
-         : 0;
+       const sellerTime = conversation?.sellerConfirmedAt ? new Date(conversation.sellerConfirmedAt).getTime() : 0;
+       const buyerTime = conversation?.buyerConfirmedAt ? new Date(conversation.buyerConfirmedAt).getTime() : 0;
+       const sealedAt = Math.max(sellerTime, buyerTime);
+       const now = new Date().getTime();
        
-       if (Date.now() - sealedAt < 5000) { // Only animate if it happened in last 5s
+       if (now - sealedAt < 5000) { // Only animate if it happened in last 5s
           // Use setTimeout to avoid sync state update warning
-          setTimeout(() => {
+          const timer = setTimeout(() => {
              setShowSealAnim(true);
              sonic.thud();
           }, 0);
+          return () => clearTimeout(timer);
        }
     }
   }, [isSealed, conversation, showSealAnim]);
@@ -203,13 +202,6 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     const timer = setTimeout(() => setShowMissing(true), 1500);
     return () => clearTimeout(timer);
   }, [conversation, conversationId, user, showMissing]);
-
-  useEffect(() => {
-    if (item?.status === 'completed' && otherUser) {
-        canReview(item.id, isSeller ? 'seller' : 'buyer')
-            .then(setShowReviewBtn);
-    }
-  }, [item?.status, item?.id, otherUser, canReview, isSeller]);
 
   // Scroll to bottom on new message
   useEffect(() => {

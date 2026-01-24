@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useMotionValue, animate, useTransform } from "framer-motion";
+import { useMotionValue, animate } from "framer-motion";
 import { formatPrice, cn } from "@/lib/utils";
 
 interface RollingPriceProps {

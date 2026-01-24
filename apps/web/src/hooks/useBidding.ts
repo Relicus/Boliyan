@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
-import { Item, User, Bid } from "@/types";
+import { Item, User } from "@/types";
 import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, MAX_BID_ATTEMPTS, roundToReasonablePrice } from "@/lib/bidding";
 import { sonic } from "@/lib/sonic";
 
