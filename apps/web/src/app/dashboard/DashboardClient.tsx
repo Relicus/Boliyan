@@ -105,7 +105,7 @@ function DashboardContent() {
     .filter(Boolean); // Only show items we have data for
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 p-4 md:p-6 max-w-7xl mx-auto w-full">
       
       {/* Header with Add Button */}
       <div className="flex items-center justify-between">
@@ -253,12 +253,14 @@ function DashboardContent() {
         itemTitle={itemToDelete?.title || ''}
       />
 
-      <ProductDetailsModal 
-        item={viewingItem!} 
-        seller={viewingItem?.seller!} 
-        isOpen={!!viewingItem} 
-        onClose={() => setViewingItem(null)} 
-      />
+      {viewingItem && viewingItem.seller && (
+        <ProductDetailsModal 
+          item={viewingItem} 
+          seller={viewingItem.seller} 
+          isOpen={true} 
+          onClose={() => setViewingItem(null)} 
+        />
+      )}
     </div>
   );
 }

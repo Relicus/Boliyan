@@ -160,19 +160,20 @@ export const PriceDisplay = memo(({
   const priceKey = safeShowUserBid ? 'user-bid' : 'high-bid';
   
   const renderValue = () => (
-      <div className={cn(getPriceClass(viewMode), "flex items-center gap-1.5 transition-colors duration-300", displayColor)}>
+      <span 
+        className={cn(getPriceClass(viewMode), "flex items-center gap-1.5 transition-colors duration-300", displayColor)}
+        {...(displayPrice !== null ? highBidProps : bidCountProps)}
+      >
           {displayPrice !== null ? (
-              <span {...highBidProps}>
-                <RollingPrice key={priceKey} price={displayPrice} />
-              </span>
+              <RollingPrice key={priceKey} price={displayPrice} />
           ) : (
-              <span {...bidCountProps}>{displayText}</span>
+              displayText
           )}
           {/* Show Total Bids Count if in Public mode + High Bid is shown + NOT user view */}
           {!safeShowUserBid && showTotalBids && config.variant === 'public' && config.currentHighBid && (
                <span className="text-[clamp(0.75rem,3cqi,1rem)] font-bold text-slate-400 ml-1">({bidCount})</span>
           )}
-      </div>
+      </span>
   );
 
   // STACKED ORIENTATION
@@ -251,7 +252,7 @@ export const PriceDisplay = memo(({
         className="flex flex-col items-end justify-self-end justify-end h-[2.5em] relative"
       >
           {/* Label Container - Absolute to prevent layout jump during transition */}
-          <div className="h-4 w-full relative mb-1">
+          <div className="h-4 w-full relative mb-0">
              <AnimatePresence mode="wait">
                 <motion.span 
                     key={labelText}
@@ -259,7 +260,7 @@ export const PriceDisplay = memo(({
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
-                    className={cn(getLabelClass(), "flex items-center gap-1 absolute right-0 bottom-0 whitespace-nowrap", labelColor)}
+                    className={cn(getLabelClass(), "flex items-center gap-1 absolute right-0 bottom-0 whitespace-nowrap mb-0", labelColor)}
                 >
                     {LabelIcon && <LabelIcon className="w-2.5 h-2.5" />}
                     {labelText}
