@@ -31,6 +31,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   
   const isLeading = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isOutbid = user && item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
+  const isExpired = userBid.status === 'expired';
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
@@ -87,9 +88,9 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
           <div className="relative shrink-0">
             <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
             <Badge className={`absolute -top-2 -right-2 h-5 flex items-center justify-center px-1.5 text-[10px] font-bold border-2 border-white ${
-              isLeading ? "bg-amber-500" : isOutbid ? "bg-red-500" : "bg-blue-600"
+              isExpired ? "bg-slate-400" : isLeading ? "bg-amber-500" : isOutbid ? "bg-red-500" : "bg-blue-600"
             }`}>
-              {isLeading ? "Leading" : isOutbid ? "Outbid" : "Pending"}
+              {isExpired ? "Expired" : isLeading ? "Leading" : isOutbid ? "Outbid" : "Pending"}
             </Badge>
           </div>
           

@@ -33,7 +33,7 @@ interface ItemCardProps {
 }
 
 const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) => {
-  const { user, bids, watchedItemIds } = useApp();
+  const { user, bids, watchedItemIds, toggleWatch } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
   const visibilityRef = useTrackVisibility(item.id);
 
@@ -220,44 +220,52 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               )}
 
               {/* Bottom Right: Watchlist & Secret Indicators */}
-              {(isWatched || !item.isPublicBid) && (
-                <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1.5">
-                  {isWatched && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <motion.div
-                            id={`item-card-${item.id}-watch-indicator`}
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            whileHover={{ scale: 1.1 }}
-                            className="bg-blue-600/90 backdrop-blur-md text-white p-1.5 rounded-md border border-blue-400/50 shadow-lg cursor-help"
-                          >
-                            <Bookmark className="h-3 w-3 fill-current" />
-                          </motion.div>
-                        </TooltipTrigger>
-                        <TooltipContent side="left">
-                          <p>You are watching this item</p>
-                        </TooltipContent>
-                      </Tooltip>
-                  )}
-                  {!item.isPublicBid && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <motion.div 
-                            animate={isSuccess ? { scale: [1, 1.4, 1] } : {}}
-                            transition={{ duration: 0.5 }}
-                            className="bg-amber-600/90 backdrop-blur-md text-white p-1.5 rounded-md border border-amber-400/50 shadow-lg cursor-help"
-                          >
-                             <Lock className="h-3 w-3" />
-                          </motion.div>
-                        </TooltipTrigger>
-                        <TooltipContent side="left">
-                          <p>Secret Bidding</p>
-                        </TooltipContent>
-                      </Tooltip>
-                  )}
-                </div>
-              )}
+              <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1.5">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.button
+                      id={`item-card-${item.id}-watch-btn`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWatch(item.id);
+                      }}
+                      initial={false}
+                      animate={{ 
+                        scale: isWatched ? 1.1 : 1,
+                        backgroundColor: isWatched ? "rgba(37, 99, 235, 0.9)" : "rgba(0, 0, 0, 0.4)"
+                      }}
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={cn(
+                        "backdrop-blur-md text-white p-1.5 rounded-md border shadow-lg transition-colors cursor-pointer",
+                        isWatched ? "border-blue-400/50" : "border-white/20"
+                      )}
+                    >
+                      <Bookmark className={cn("h-3 w-3", isWatched && "fill-current")} />
+                    </motion.button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>{isWatched ? 'Remove from watchlist' : 'Add to watchlist'}</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                {!item.isPublicBid && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <motion.div 
+                          animate={isSuccess ? { scale: [1, 1.4, 1] } : {}}
+                          transition={{ duration: 0.5 }}
+                          className="bg-amber-600/90 backdrop-blur-md text-white p-1.5 rounded-md border border-amber-400/50 shadow-lg cursor-help"
+                        >
+                           <Lock className="h-3 w-3" />
+                        </motion.div>
+                      </TooltipTrigger>
+                      <TooltipContent side="left">
+                        <p>Secret Bidding</p>
+                      </TooltipContent>
+                    </Tooltip>
+                )}
+              </div>
 
 
               {item.images.length > 1 && viewMode === 'spacious' && thumbnailImages.length > 0 && (

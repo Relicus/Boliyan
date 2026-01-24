@@ -1,21 +1,20 @@
 "use client";
 
 import { Item, User } from "@/types";
-import { formatPrice } from "@/lib/utils";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { Bookmark, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
-import { motion } from "framer-motion";
-import { memo } from "react";
-import RollingPrice from "@/components/common/RollingPrice";
+import { memo, useMemo } from "react";
+import { PriceDisplay } from "@/components/common/PriceDisplay";
+import { createBiddingConfig } from "@/types/bidding";
 
 interface BiddingDashboardProps {
   item: Item;
   user: User | null;
   seller: User;
   bidAmount: string;
-  userCurrentBid?: number; // Added to show confirmed bid amount
+  userCurrentBid?: number; 
   hasPriorBid: boolean;
   isSuccess: boolean;
   isSubmitting: boolean;
@@ -56,41 +55,35 @@ export const BiddingDashboard = memo(function BiddingDashboard({
   derivedStatus = null
 }: BiddingDashboardProps) {
 
+  // Use the standard factory to ensure all required fields are present
+  const biddingConfig = useMemo(() => 
+    createBiddingConfig(item, user, []), // Pass empty array if we don't have all bids here, or use approximate
+    [item, user]);
+
+  // Override specific fields if we have more accurate local data
+  const finalConfig = useMemo(() => ({
+      ...biddingConfig,
+      hasUserBid: hasPriorBid,
+      isUserHighBidder: item.currentHighBidderId === user?.id,
+  }), [biddingConfig, hasPriorBid, item.currentHighBidderId, user?.id]);
+
   const isOwner = user?.id === seller.id;
 
   return (
     <div id={`product-details-dashboard-${item.id}`} className="w-full h-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between overflow-visible">
-      {/* Stats Grid - Restore to 2-column layout */}
-      <div className="@container w-full grid grid-cols-2 gap-4 mb-2">
-        {/* Ask Price Card */}
-        <div className="flex flex-col items-center text-center min-w-0 bg-white border border-slate-200 shadow-sm rounded-xl p-3 h-full justify-center">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Ask Price</span>
-          <motion.span 
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit text-slate-900 leading-tight tracking-tight truncate w-full pb-1" title={formatPrice(item.askPrice)}>
-            <RollingPrice price={item.askPrice} />
-          </motion.span>
-        </div>
-
-        {/* Highest Bid / Bids Card */}
-        <div className="flex flex-col items-center text-center min-w-0 bg-white border border-slate-200 shadow-sm rounded-xl p-3 h-full justify-center">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">
-             {item.isPublicBid ? "Highest" : "Bids"}
-          </span>
-          <motion.span 
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className={`text-[clamp(1.5rem,8cqi,3rem)] font-black font-outfit leading-tight tracking-tight truncate w-full pb-1 ${item.isPublicBid && item.currentHighBid ? 'text-blue-600' : 'text-slate-900'}`}>
-            {item.isPublicBid && item.currentHighBid
-              ? <RollingPrice price={item.currentHighBid} />
-              : <RollingPrice price={item.bidCount} />
-            }
-          </motion.span>
-        </div>
+      
+      <div className="mb-2">
+         <PriceDisplay 
+            config={finalConfig as any} // Cast to any to bypass the union type strictness if needed, but should be fine
+            askPrice={item.askPrice}
+            bidCount={item.bidCount}
+            viewMode="modal"
+            orientation="stacked"
+            showTotalBids={true}
+            userCurrentBid={userCurrentBid}
+         />
       </div>
 
-      {/* Controls Container */}
       <div className="mt-1">
         <BiddingControls
           bidAmount={bidAmount}
@@ -111,12 +104,11 @@ export const BiddingDashboard = memo(function BiddingDashboard({
           onBid={onBid}
           onKeyDown={onKeyDown}
           onInputChange={onInputChange}
-          showAttemptsDots={false} // Rendered in status row above input
+          showAttemptsDots={false}
           showStatus={true}
         />
       </div>
 
-      {/* Mobile-only Action Row: Full Page & Watch */}
       <div className="md:hidden grid grid-cols-2 gap-3 mt-4">
         <Link
           id={`view-details-btn-mobile-${item.id}`}

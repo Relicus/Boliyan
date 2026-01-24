@@ -25,6 +25,16 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
 
   const location = useMemo(() => getFuzzyLocationString(bidder.location.address), [bidder.location.address]);
 
+  // Calculate time remaining (24h from created_at + extensions?)
+  // Actually, we use expires_at if available, else created_at + 24h
+  const expiresAt = bid.expiresAt ? new Date(bid.expiresAt) : new Date(new Date(bid.createdAt).getTime() + 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const timeDiff = expiresAt.getTime() - now.getTime();
+  const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+  const minsLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+  const isExpired = timeDiff <= 0;
+  const isUrgent = timeDiff > 0 && hoursLeft < 2;
+
   const handleReject = () => {
     rejectBid(bid.id);
   };
@@ -90,6 +100,14 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
           <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right shrink-0 flex flex-col items-end">
             <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1">Bid Amount</span>
             <p id={`bid-amount-mobile-${bid.id}`} className="font-black text-blue-600 leading-none truncate text-[clamp(1rem,5cqi,1.25rem)] font-outfit">Rs. {bid.amount.toLocaleString()}</p>
+            
+            {/* Expiration Timer (Mobile) */}
+            {!isExpired && bid.status === 'pending' && (
+                 <div className={`text-[9px] font-bold mt-1 text-right flex items-center justify-end gap-1 ${isUrgent ? 'text-red-500' : 'text-slate-400'}`}>
+                    {hoursLeft}h {minsLeft}m left
+                 </div>
+            )}
+            
             {!isOutside && (
               <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-1 text-[10px] text-muted-foreground font-medium whitespace-nowrap">
                 <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
@@ -169,6 +187,17 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
               <div className="text-right">
                 <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 block mb-1">Bid Amount</span>
                 <p id={`bid-amount-desktop-${bid.id}`} className="text-[clamp(1.25rem,4cqi,1.75rem)] font-black text-blue-600 font-outfit leading-none">Rs. {bid.amount.toLocaleString()}</p>
+                
+                {/* Expiration Timer */}
+                {!isExpired && bid.status === 'pending' && (
+                     <div className={`text-[10px] font-bold mt-1 text-right flex items-center justify-end gap-1 ${isUrgent ? 'text-red-500' : 'text-slate-400'}`}>
+                        <Clock className="w-3 h-3" />
+                        {hoursLeft}h {minsLeft}m left
+                     </div>
+                )}
+                {isExpired && bid.status === 'pending' && (
+                    <span className="text-[10px] font-bold text-red-500 mt-1 block">Expired</span>
+                )}
               </div>
 
               <div id={`bid-actions-desktop-${bid.id}`} className="flex gap-2">

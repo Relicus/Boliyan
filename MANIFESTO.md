@@ -48,7 +48,7 @@ To become the **Default Operating System** for the secondary economy. Whether yo
 
 ## 📦 Current Development Status
 
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-01-24
 
 ### Completed Phases
 
@@ -62,6 +62,8 @@ To become the **Default Operating System** for the secondary economy. Whether yo
 ### Core Features Live
 - ✅ **Live Data**: Full Supabase integration (PostgreSQL + Real-time).
 - ✅ **Real-time bidding** with 70% minimum bid validation.
+- ✅ **24-hour Freshness**: Bids only stay in the public pool for 24 hours, keeping auctions alive.
+- ✅ **Total Bid Count**: Display lifetime bid interest (# bids) for social proof.
 - ✅ **"No Chat Before Deal"** — Messaging unlocks only after bid acceptance.
 - ✅ **"3-Chat Rule"**: Listing is auto-hidden once 3 bidders have been accepted (Strict Intent).
 - ✅ **Watchlist** with visual indicator.

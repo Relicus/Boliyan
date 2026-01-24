@@ -60,10 +60,11 @@ export interface Bid {
   bidderId: string;
   bidder?: User; // Hydrated bidder profile
   amount: number;
-  status: 'pending' | 'accepted' | 'rejected' | 'shortlisted' | 'ignored';
+  status: 'pending' | 'accepted' | 'rejected' | 'shortlisted' | 'ignored' | 'expired';
   type: 'public' | 'private';
   createdAt: string;
   update_count?: number; // Added for 70/150/3 protocol
+  expiresAt?: string; // Added for fresh bids logic
 }
 
 export interface LocationInfo {

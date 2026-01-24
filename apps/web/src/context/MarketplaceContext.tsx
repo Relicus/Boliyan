@@ -498,6 +498,13 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
     if (!watchedItemIds.includes(itemId)) {
          setWatchedItemIds(prev => [...prev, itemId]);
+         // Persist to database
+         supabase
+             .from('watchlist')
+             .insert({ user_id: user.id, listing_id: itemId })
+             .then(({ error }) => {
+                 if (error) console.error("Auto-add to watchlist failed:", error);
+             });
     }
     
     // Set global cooldown timestamp

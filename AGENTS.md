@@ -4,7 +4,7 @@
 
 
 **Context:** Monorepo (Next.js 16 + SQL), Manual Dependency Management.
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-01-24
 
 ## OVERVIEW
 Boliyan is a premium classifieds marketplace focused on high-intent bidding and strictly gated communication ("No chat before deal").
@@ -84,7 +84,8 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 |---------|----------------|--------------|-------|
 | **Bidding** | `useBidding` hook | `ItemCard.tsx`, `ProductDetailsModal.tsx` | Uses `SmartStepper` input. |
 | **Validation** | `packages/shared/bidding.ts` | `store.tsx` | Min bid: 70% of ask price. |
-| **Watchlist** | `toggleWatch` (store) | `ItemCard.tsx` (Bookmark icon) | |
+| **Watchlist** | `toggleWatch` (store) | `ItemCard.tsx` (Bookmark icon) | Persistent and auto-added on bid. |
+| **Freshness** | `expires_at` logic | `PriceDisplay.tsx` | 24h pool rule for highest bid. |
 | **Messaging** | `sendMessage` (store) | `ChatWindow.tsx` | Unlocks ONLY after deal acceptance. |
 | **Gallery** | `ItemCard` (internal state) | `ItemCard.tsx` | Immersive full-screen view. |
 

@@ -64,8 +64,10 @@ export const PriceDisplay = memo(({
   className = '',
   remainingAttempts = MAX_BID_ATTEMPTS,
   showAttempts = false,
-  userCurrentBid
-}: PriceDisplayProps) => {
+  userCurrentBid,
+  showTotalBids = false,
+  orientation = 'row' // 'row' | 'stacked'
+}: PriceDisplayProps & { showTotalBids?: boolean; orientation?: 'row' | 'stacked' }) => {
 
   const [showUserBid, setShowUserBid] = useState(false);
 
@@ -94,6 +96,77 @@ export const PriceDisplay = memo(({
   }, [showUserBid, userCurrentBid, config.variant, config.isUserHighBidder]);
   
   const safeShowUserBid = showUserBid && (userCurrentBid !== undefined && userCurrentBid !== null);
+  
+  // Layout Logic:
+  // 'row': Standard card layout (Ask - Dots - Bid)
+  // 'stacked': For modal/page where Ask and Bid are separate blocks
+  
+  if (orientation === 'stacked') {
+      return (
+        <div className={cn("grid grid-cols-2 gap-4 w-full", className)}>
+             {/* Ask Price Block */}
+             <div className="flex flex-col items-center justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20 min-w-0">
+                <span className={cn(getLabelClass(viewMode), "flex items-center gap-1.5 justify-center mb-0.5")}>
+                    <Tag className="w-3 h-3 text-slate-400" />
+                    Asking
+                </span>
+                <span className={cn(getPriceClass(viewMode), "text-slate-800")}>
+                    <RollingPrice price={askPrice} />
+                </span>
+             </div>
+
+             {/* Highest Bid Block (Rotating) */}
+             <div className="relative flex flex-col items-center justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20 min-w-0">
+                <AnimatePresence mode="wait">
+                    {safeShowUserBid ? (
+                        <motion.div
+                            key="user-bid-stacked"
+                            initial={{ scale: 0.95 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 800, damping: 35 }}
+                            className="absolute inset-0 flex flex-col items-center justify-center"
+                        >
+                            <span className={cn(getLabelClass(viewMode), "text-purple-600/80 flex items-center gap-1.5 justify-center mb-0.5")}>
+                                <UserIcon className="w-3 h-3" />
+                                Your Bid
+                            </span>
+                            <span className={cn(getPriceClass(viewMode), "text-purple-700")}>
+                                <RollingPrice price={userCurrentBid || 0} />
+                            </span>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="market-bid-stacked"
+                            initial={{ scale: 0.95 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 800, damping: 35 }}
+                            className="absolute inset-0 flex flex-col items-center justify-center"
+                        >
+                             <span className={cn(getLabelClass(viewMode), "flex items-center gap-1.5 justify-center mb-0.5")}>
+                                {config.variant === 'public' ? <Trophy className="w-3 h-3 text-slate-400" /> : <Lock className="w-3 h-3 text-slate-400" />}
+                                {config.variant === 'public' ? "Highest" : "Bids"}
+                             </span>
+                             <div className="flex items-center gap-1.5">
+                                <span className={cn(getPriceClass(viewMode), config.isUserHighBidder ? "text-amber-600" : "text-blue-600")}>
+                                    {config.variant === 'public' && config.currentHighBid ? (
+                                        <RollingPrice price={config.currentHighBid} />
+                                    ) : (
+                                        <span>{bidCount} {bidCount === 1 ? 'Bid' : 'Bids'}</span>
+                                    )}
+                                </span>
+                                {showTotalBids && config.variant === 'public' && (
+                                    <span className="text-[clamp(0.75rem,3cqi,1rem)] font-bold text-slate-400 ml-1">({bidCount})</span>
+                                )}
+                             </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+             </div>
+        </div>
+      );
+  }
 
   return (
     <div className={`grid grid-cols-[1fr_auto_1fr] items-end ${className}`}>
@@ -202,6 +275,11 @@ export const PriceDisplay = memo(({
                     </span>
                   )}
                 </div>
+                {showTotalBids && config.variant === 'public' && config.currentHighBid && (
+                    <div className="absolute top-0 -right-6 text-[10px] font-bold text-slate-400">
+                        ({bidCount})
+                    </div>
+                )}
              </motion.div>
            )}
         </AnimatePresence>
