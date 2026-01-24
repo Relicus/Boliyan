@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './AuthContext';
 import type { Item, Bid } from '@/types';
@@ -65,17 +65,17 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
 
-  const setFilters = (newFilters: SearchFilters) => {
+  const setFilters = useCallback((newFilters: SearchFilters) => {
     setFiltersState(newFilters);
-  };
+  }, []);
 
-  const updateFilter = <K extends keyof SearchFilters>(key: K, value: SearchFilters[K]) => {
+  const updateFilter = useCallback(<K extends keyof SearchFilters>(key: K, value: SearchFilters[K]) => {
     setFiltersState((prev) => ({ ...prev, [key]: value }));
-  };
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFiltersState(defaultFilters);
-  };
+  }, []);
 
   const executeSearch = useCallback(async () => {
     // Generate cache key
@@ -410,24 +410,38 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     fetchCategories();
   }, [fetchCategories]);
 
+  const contextValue = useMemo(() => ({
+    filters,
+    setFilters,
+    updateFilter,
+    clearFilters,
+    searchResults,
+    isSearching,
+    totalResults,
+    executeSearch,
+    categories,
+    fetchCategories,
+    suggestions,
+    fetchSuggestions,
+    getSimilarItems,
+  }), [
+    filters,
+    setFilters,
+    updateFilter,
+    clearFilters,
+    searchResults,
+    isSearching,
+    totalResults,
+    executeSearch,
+    categories,
+    fetchCategories,
+    suggestions,
+    fetchSuggestions,
+    getSimilarItems,
+  ]);
+
   return (
-    <SearchContext.Provider
-      value={{
-        filters,
-        setFilters,
-        updateFilter,
-        clearFilters,
-        searchResults,
-        isSearching,
-        totalResults,
-        executeSearch,
-        categories,
-        fetchCategories,
-        suggestions,
-        fetchSuggestions,
-        getSimilarItems,
-      }}
-    >
+    <SearchContext.Provider value={contextValue}>
       {children}
     </SearchContext.Provider>
   );

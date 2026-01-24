@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useAuth, AuthProvider } from '@/context/AuthContext';
 import { useMarketplace, MarketplaceProvider } from '@/context/MarketplaceContext';
 import { useChat, ChatProvider } from '@/context/ChatContext';
@@ -60,7 +60,7 @@ export function useApp() {
   // The new 'acceptBid' in MarketplaceContext only updates bid.
   // We patch it here for backward compatibility.
   
-  const acceptBidCompat = async (bidId: string) => {
+  const acceptBidCompat = useCallback(async (bidId: string) => {
     await marketplace.acceptBid(bidId);
     
     // Find the bid to get details for conversation
@@ -89,7 +89,7 @@ export function useApp() {
     }
 
     return convId;
-  };
+  }, [marketplace, chat]);
 
   type MarketplaceFilters = typeof marketplace.filters;
   type MarketplaceFilterKey = keyof MarketplaceFilters;
@@ -116,7 +116,28 @@ export function useApp() {
   const isMarketplaceFilterKey = (key: string): key is MarketplaceFilterKey =>
     marketplaceFilterKeys.includes(key as MarketplaceFilterKey);
 
-  return {
+  const setFilterCompat = useCallback((key: string, value: unknown) => {
+      // Update Marketplace Context
+      // Fix: Added 'radius' to allowed keys so location slider works
+      if (isMarketplaceFilterKey(key)) {
+        marketplace.setFilter(key, value as MarketplaceFilters[typeof key]);
+      }
+
+      // Update Search Context if it's a shared filter
+      const searchKey = searchKeyMap[key as MarketplaceFilterKey];
+      if (searchKey) {
+        let searchValue = value as SearchFilters[typeof searchKey];
+        if (searchKey === 'sortBy') {
+          // Map Marketplace Sorts to Search Sorts
+          if (value === 'luxury') searchValue = 'price_high';
+          if (value === 'trending') searchValue = 'newest';
+          if (value === 'watchlist') return; // Not supported in search
+        }
+        search.updateFilter(searchKey, searchValue);
+      }
+  }, [marketplace, search]);
+
+  return useMemo(() => ({
     ...auth,
     ...marketplace,
     items: marketplace.items,
@@ -141,25 +162,6 @@ export function useApp() {
     isMarketplaceLoading: marketplace.isLoading, // Expose specific loading state if needed
     
     // Override setFilter to sync both contexts for shared filters
-    setFilter: (key: string, value: unknown) => {
-      // Update Marketplace Context
-      // Fix: Added 'radius' to allowed keys so location slider works
-      if (isMarketplaceFilterKey(key)) {
-        marketplace.setFilter(key, value as MarketplaceFilters[typeof key]);
-      }
-
-      // Update Search Context if it's a shared filter
-      const searchKey = searchKeyMap[key as MarketplaceFilterKey];
-      if (searchKey) {
-        let searchValue = value as SearchFilters[typeof searchKey];
-        if (searchKey === 'sortBy') {
-          // Map Marketplace Sorts to Search Sorts
-          if (value === 'luxury') searchValue = 'price_high';
-          if (value === 'trending') searchValue = 'newest';
-          if (value === 'watchlist') return; // Not supported in search
-        }
-        search.updateFilter(searchKey, searchValue);
-      }
-    }
-  };
+    setFilter: setFilterCompat
+  }), [auth, marketplace, search, chat, time, reviews, acceptBidCompat, setFilterCompat]);
 }

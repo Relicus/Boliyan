@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Clock, MapPin, Trophy, AlertTriangle, MessageSquare, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item, User } from "@/types";
@@ -13,6 +13,7 @@ import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import { useApp } from "@/lib/store";
+import { useTime } from "@/context/TimeContext";
 
 interface MyBidCardProps {
   item: Item;
@@ -22,12 +23,7 @@ interface MyBidCardProps {
 
 export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   const { user, bids, conversations } = useApp();
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const { now } = useTime();
   
   const isLeading = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isOutbid = user && item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
@@ -42,7 +38,10 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   }, [userBid]);
 
   // Unified Bidding Config
-  const biddingConfig = createBiddingConfig(item, user, bids);
+  const biddingConfig = useMemo(() => 
+    createBiddingConfig(item, user, bids),
+    [item, user, bids]
+  );
 
   const getTimeLeft = (expiryAt: string) => {
     if (now === 0) return "Loading...";
@@ -79,111 +78,96 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   return (
     <>
       <div 
-        id={`my-bid-card-${item.id}`} 
         onClick={() => setIsModalOpen(true)}
-        className="group relative overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer p-0"
+        className="block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer relative"
       >
-        
-        <div className="relative z-10 bg-white rounded-[calc(0.75rem-3px)] p-4 flex gap-4 h-full">
-          <div className="relative shrink-0">
-            <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
-            <Badge className={`absolute -top-2 -right-2 h-5 flex items-center justify-center px-1.5 text-[10px] font-bold border-2 border-white ${
-              isExpired ? "bg-slate-400" : isLeading ? "bg-amber-500" : isOutbid ? "bg-red-500" : "bg-blue-600"
-            }`}>
-              {isExpired ? "Expired" : isLeading ? "Leading" : isOutbid ? "Outbid" : "Pending"}
-            </Badge>
+        {/* Status Badge */}
+        {isAccepted && (
+            <div className="absolute top-2 right-2 z-10 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                <Trophy className="w-3 h-3" />
+                OFFER ACCEPTED
+            </div>
+        )}
+        {!isAccepted && isLeading && (
+           <div className="absolute top-2 right-2 z-10 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+             <Trophy className="w-3 h-3" />
+             HIGHEST BIDDER
+           </div>
+        )}
+        {!isAccepted && isOutbid && (
+           <div className="absolute top-2 right-2 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 animate-pulse">
+             <AlertTriangle className="w-3 h-3" />
+             OUTBID
+           </div>
+        )}
+
+        <div className="flex p-3 gap-3">
+          {/* Image */}
+          <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden shrink-0">
+             {item.images[0] && (
+               <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+             )}
           </div>
-          
-          <div id={`my-bid-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
+
+          {/* Content */}
+          <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
-              <div className="flex justify-between items-start">
-                <h3 id={`my-bid-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2 text-[clamp(1rem,5cqi,1.25rem)]">{item.title}</h3>
+              <div className="flex items-start justify-between gap-2">
+                 <h3 className="font-bold text-sm text-slate-900 line-clamp-1">{item.title}</h3>
               </div>
-
-              {/* Centralized Price Row */}
-              <div className="mt-1 mb-2">
-                <PriceDisplay 
-                    config={biddingConfig}
-                    askPrice={item.askPrice}
-                    bidCount={item.bidCount}
-                    viewMode="compact"
-                    remainingAttempts={remainingAttempts}
-                    showAttempts={true}
-                    userCurrentBid={userBid.amount}
-                />
-              </div>
-
+              
               <div className="flex items-center gap-2 mt-1">
-                <ConditionBadge condition={item.condition} variant="outline" className="h-5 py-0 px-1.5" />
-                <CategoryBadge category={item.category} variant="outline" className="h-5 py-0 px-1.5" />
-              </div>
-
-              <div className="flex items-center gap-2 mt-1.5">
-                <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                  <MapPin className="h-3 w-3 text-red-400" />
-                  <span className="truncate">{seller.location.address}</span>
-                </div>
-                <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                  <Clock className="h-3 w-3 text-blue-400" />
-                  <span>{getTimeLeft(item.expiryAt)}</span>
-                </div>
+                  <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
+                  <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
               </div>
             </div>
 
-            <div className="mt-2 flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                 {isLeading && (
-                   <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
-                     <Trophy className="h-3 w-3 stroke-[3]" />
-                     Highest Bidder
-                   </div>
-                 )}
-                 {isOutbid && (
-                   <div className="flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-100">
-                     <AlertTriangle className="h-3 w-3 stroke-[3]" />
-                      Current: {item.currentHighBid?.toLocaleString()}
-                   </div>
-                 )}
-              </div>
-              <div className="flex items-center gap-2">
-                {canChat && (
-                  <div className="flex items-center gap-1">
-                    {canCall && (
-                      <Button
-                        id={`my-bid-call-btn-${item.id}`}
-                        size="icon"
-                        variant="outline"
-                        className="h-7 w-7 border-slate-200 text-slate-500 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50"
-                        onClick={handleCall}
-                      >
-                        <Phone className="h-3 w-3" />
-                      </Button>
-                    )}
-                    <Button
-                      id={`my-bid-chat-btn-${item.id}`}
-                      size="icon"
-                      variant="outline"
-                      className="h-7 w-7 border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
-                      onClick={handleChat}
-                    >
-                      <MessageSquare className="h-3 w-3" />
-                    </Button>
-                  </div>
-                )}
-                <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
-                  {item.isPublicBid ? "Public" : "Secret"}
-                </Badge>
-              </div>
+            <div className="flex items-end justify-between mt-2">
+               <PriceDisplay 
+                  config={biddingConfig}
+                  askPrice={item.askPrice}
+                  bidCount={item.bidCount}
+                  viewMode="compact"
+                  className="scale-90 origin-left -ml-1"
+                  userCurrentBid={userBid.amount}
+               />
+               
+               {/* Time Remaining */}
+               <div className="flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded-md border border-slate-100">
+                  <Clock className="w-3 h-3" />
+                  {getTimeLeft(item.expiryAt)}
+               </div>
             </div>
           </div>
         </div>
+
+        {/* Action Footer (Only for Accepted Deals) */}
+        {isAccepted && (
+            <div className="px-3 py-2 bg-green-50 border-t border-green-100 flex items-center justify-between">
+                <span className="text-xs font-bold text-green-700">Deal Closed! Connect with Seller:</span>
+                <div className="flex gap-2">
+                    {canChat && (
+                        <Button size="sm" variant="default" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={handleChat}>
+                            <MessageSquare className="w-3 h-3 mr-1" />
+                            Chat
+                        </Button>
+                    )}
+                     {canCall && (
+                        <Button size="sm" variant="outline" className="h-7 text-xs border-green-200 text-green-700 hover:bg-green-100" onClick={handleCall}>
+                            <Phone className="w-3 h-3 mr-1" />
+                            Call
+                        </Button>
+                    )}
+                </div>
+            </div>
+        )}
       </div>
-      
+
       <ProductDetailsModal 
         item={item} 
         seller={seller} 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+        onClose={setIsModalOpen} 
       />
     </>
   );

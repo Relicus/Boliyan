@@ -4,8 +4,13 @@ import { Bid } from '@/types';
 import { transformBidToHydratedBid, BidWithProfile } from '@/lib/transform';
 import type { Database } from '@/types/database.types';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { handleRealtimeBidDOM } from '@/lib/realtime-dom';
 
-export function useBidRealtime(onBid: (bid: Bid) => void, activeIds: Set<string>) {
+export function useBidRealtime(
+  onBid: (bid: Bid) => void, 
+  activeIds: Set<string>,
+  userId?: string
+) {
   useEffect(() => {
     // Use a shared channel name so Supabase client can potentially multiplex
     const channel = supabase
@@ -19,7 +24,23 @@ export function useBidRealtime(onBid: (bid: Bid) => void, activeIds: Set<string>
         if (!newBidRaw || !('listing_id' in newBidRaw)) return;
         
         const listingId = newBidRaw.listing_id;
-        if (!listingId || !activeIds.has(listingId)) {
+        const bidderId = newBidRaw.bidder_id;
+        if (!listingId || !bidderId) return;
+        
+        // --- DIRECT DOM UPDATE START ---
+        // We perform this BEFORE checking activeIds to ensure instant visual feedback
+        // for any visible item, even if React state hasn't caught up.
+        if (payload.eventType === 'INSERT') {
+          handleRealtimeBidDOM({
+            itemId: listingId,
+            newAmount: newBidRaw.amount,
+            bidderId: bidderId,
+            isNewHighBid: true // We assume true for instant update, server/state will correct if wrong
+          }, userId);
+        }
+        // --- DIRECT DOM UPDATE END ---
+
+        if (!activeIds.has(listingId)) {
            // Skip updates for items we aren't tracking (not in viewport and not involved)
            return;
         }
@@ -46,5 +67,5 @@ export function useBidRealtime(onBid: (bid: Bid) => void, activeIds: Set<string>
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [onBid, activeIds]);
+  }, [onBid, activeIds, userId]);
 }

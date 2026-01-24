@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Item, Bid } from "@/types";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -73,8 +73,16 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const [involvedIds, setInvolvedIds] = useState<string[]>([]);
   const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
   
+  // Refs for stable callback access to frequently-changing state
+  // This prevents recreating 11+ functions on every state change
+  const itemsByIdRef = useRef(itemsById);
+  const bidsByIdRef = useRef(bidsById);
+  const watchedItemIdsRef = useRef(watchedItemIds);
+
+  useEffect(() => { itemsByIdRef.current = itemsById; }, [itemsById]);
+  useEffect(() => { bidsByIdRef.current = bidsById; }, [bidsById]);
+  
   // Fix: Use ref to access latest watchlist in fetchItems without triggering re-fetch loop
-  const watchedItemIdsRef = useRef<string[]>([]);
   useEffect(() => {
     watchedItemIdsRef.current = watchedItemIds;
   }, [watchedItemIds]);
@@ -117,7 +125,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   // Note: Geolocation helper functions kept if needed for future hybrid sorting, 
   // though primary filtering is now Server-Side where possible.
   
-  const fetchItems = React.useCallback(async (targetPage: number, reset: boolean = false) => {
+  const fetchItems = useCallback(async (targetPage: number, reset: boolean = false) => {
       if (loadingLockRef.current) return;
       loadingLockRef.current = true;
       
@@ -313,7 +321,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   }, [fetchItems]);
 
   // --- Realtime Subscription (Bids) ---
-  const handleRealtimeBid = React.useCallback((newBid: Bid) => {
+  const handleRealtimeBid = useCallback((newBid: Bid) => {
       // Play sound if someone ELSE bids on an item the user is watching
       if (user && newBid.bidderId !== user.id && watchedItemIds.includes(newBid.itemId)) {
           sonic.tick(); // Subtle notification
@@ -355,21 +363,21 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       });
   }, [user, watchedItemIds]);
 
-  useBidRealtime(handleRealtimeBid, activeIds);
+  useBidRealtime(handleRealtimeBid, activeIds, user?.id);
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
       // Prevent loading more if initial load is processing (isLoading)
       if (isLoading || isLoadingMore || !hasMore || loadingLockRef.current) return;
       const nextPage = page + 1;
       setPage(nextPage);
       fetchItems(nextPage, false);
-  };
+  }, [isLoading, isLoadingMore, hasMore, page, fetchItems]);
 
-  const addItem = (newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => {
+  const addItem = useCallback((newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => {
     console.log("addItem - logic pending refactor in selling phase", newItem);
-  };
+  }, []);
 
-  const updateItem = async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => {
+  const updateItem = useCallback(async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => {
      const dbUpdates: ListingUpdate = {};
      if (updates.status) dbUpdates.status = updates.status;
      if (updates.title) dbUpdates.title = updates.title;
@@ -387,9 +395,9 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
             return upsertEntity(prev, { ...prev[id], ...updates });
          });
      }
-  };
+  }, []);
 
-  const deleteItem = async (id: string) => {
+  const deleteItem = useCallback(async (id: string) => {
     const { error } = await supabase
       .from('listings')
       .delete()
@@ -402,10 +410,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         setFeedIds(prev => prev.filter(fid => fid !== id));
         setInvolvedIds(prev => prev.filter(iid => iid !== id));
     }
-  };
+  }, []);
 
 
-  const placeBid = async (itemId: string, amount: number, type: 'public' | 'private'): Promise<boolean> => {
+  const placeBid = useCallback(async (itemId: string, amount: number, type: 'public' | 'private'): Promise<boolean> => {
     if (!user) {
         console.error("Must be logged in to bid");
         return false;
@@ -415,8 +423,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     // We just need to insert into database and update local state
     
     // Find item if available (may not be in current filtered view)
-    const originalItem = itemsById[itemId];
-    const existingBid = bidsById[`${itemId}-${user.id}`] || Object.values(bidsById).find(b => b.itemId === itemId && b.bidderId === user.id);
+    const originalItem = itemsByIdRef.current[itemId];
+    const existingBid = bidsByIdRef.current[`${itemId}-${user.id}`] || Object.values(bidsByIdRef.current).find(b => b.itemId === itemId && b.bidderId === user.id);
     
     // --- OPTIMISTIC UPDATE START ---
     // 1. Create a temporary bid object
@@ -496,7 +504,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     
     // Add to involved and watchlist on success
     setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
-    if (!watchedItemIds.includes(itemId)) {
+    if (!watchedItemIdsRef.current.includes(itemId)) {
          setWatchedItemIds(prev => [...prev, itemId]);
          // Persist to database
          supabase
@@ -511,7 +519,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     setLastBidTimestamp(Date.now());
     
     return true;
-  };
+  }, [user]);
 
   // --- EFFECT: Fetch User Bids on Mount/User Change ---
   useEffect(() => {
@@ -595,7 +603,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   }, [user]);
 
 
-  const toggleWatch = async (itemId: string) => {
+  const toggleWatch = useCallback(async (itemId: string) => {
     if (!user) {
         // UI fallback only? Or prompt login? For now just local until refresh or login check
         console.warn("User not logged in, watchlist is local-only temporarily");
@@ -605,7 +613,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         return;
     }
 
-    const isWatched = watchedItemIds.includes(itemId);
+    const isWatched = watchedItemIdsRef.current.includes(itemId);
     
     // Optimistic Update
     setWatchedItemIds(prev => 
@@ -625,7 +633,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
             setWatchedItemIds(prev => [...prev, itemId]);
         } else {
             // Check if we should remove from involvedIds (only if no bid)
-            const hasBid = Object.values(bidsById).some(b => b.itemId === itemId && b.bidderId === user.id);
+            const hasBid = Object.values(bidsByIdRef.current).some(b => b.itemId === itemId && b.bidderId === user.id);
             if (!hasBid) {
                 setInvolvedIds(prev => prev.filter(id => id !== itemId));
             }
@@ -645,16 +653,17 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         }
     }
 
-  };
+  }, [user]);
 
-  const setFilter = <K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => {
+  const setFilter = useCallback(<K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-  };
-  const updateFilters = (updates: Partial<MarketplaceContextType['filters']>) => {
-    setFilters(prev => ({ ...prev, ...updates }));
-  };
+  }, []);
 
-  const rejectBid = async (bidId: string) => {
+  const updateFilters = useCallback((updates: Partial<MarketplaceContextType['filters']>) => {
+    setFilters(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const rejectBid = useCallback(async (bidId: string) => {
       const bidUpdates: BidUpdate = { status: 'ignored' };
       const { error } = await supabase
         .from('bids')
@@ -665,9 +674,9 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           if (!prev[bidId]) return prev;
           return upsertEntity(prev, { ...prev[bidId], status: 'ignored' });
       });
-  };
+  }, []);
 
-  const acceptBid = async (bidId: string) => {
+  const acceptBid = useCallback(async (bidId: string) => {
       const bidUpdates: BidUpdate = { status: 'accepted' };
       const { error } = await supabase
         .from('bids')
@@ -679,10 +688,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           return upsertEntity(prev, { ...prev[bidId], status: 'accepted' });
       });
       return bidId;
-  };
+  }, []);
 
 
-  const confirmExchange = async (conversationId: string, role: 'buyer' | 'seller') => {
+  const confirmExchange = useCallback(async (conversationId: string, role: 'buyer' | 'seller') => {
     if (!user) return false;
 
     const timestamp = new Date().toISOString();
@@ -700,7 +709,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         return false;
     }
     return true;
-  };
+  }, [user]);
 
   const refreshInvolvedItems = React.useCallback(async () => {
     if (!user) return;
@@ -745,8 +754,23 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     refreshInvolvedItems();
   }, [refreshInvolvedItems]);
 
+  const contextValue = useMemo<MarketplaceContextType>(() => ({
+    items, bids, itemsById, bidsById, feedIds, involvedIds,
+    isLoading, isLoadingMore, hasMore, loadMore, addItem,
+    updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds,
+    rejectBid, acceptBid, confirmExchange, filters, setFilter,
+    updateFilters, lastBidTimestamp, setLastBidTimestamp, refreshInvolvedItems
+  }), [
+    items, bids, itemsById, bidsById, feedIds, involvedIds,
+    isLoading, isLoadingMore, hasMore, watchedItemIds, filters, lastBidTimestamp,
+    // All functions now stable via useCallback
+    loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch,
+    rejectBid, acceptBid, confirmExchange, setFilter, updateFilters,
+    setLastBidTimestamp, refreshInvolvedItems
+  ]);
+
   return (
-    <MarketplaceContext.Provider value={{ items, bids, itemsById, bidsById, feedIds, involvedIds, isLoading, isLoadingMore, hasMore, loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds, rejectBid, acceptBid, confirmExchange, filters, setFilter, updateFilters, lastBidTimestamp, setLastBidTimestamp, refreshInvolvedItems }}>
+    <MarketplaceContext.Provider value={contextValue}>
       {children}
     </MarketplaceContext.Provider>
   );

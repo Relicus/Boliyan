@@ -168,6 +168,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   id={`item-card-${item.id}-image-main`}
                   src={mainImage}
                   alt={`${item.title} main image`}
+                  loading="lazy"
+                  decoding="async"
                   className="object-cover w-full h-full object-center"
                 />
               </div>
@@ -397,6 +399,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 remainingAttempts={remainingAttempts}
                 showAttempts={user?.id !== seller.id}
                 userCurrentBid={userBid?.amount}
+                itemId={item.id}
               />
 
               {/* Spacious Mode Description */}

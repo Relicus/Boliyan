@@ -23,6 +23,7 @@ interface PriceDisplayProps {
   userCurrentBid?: number;
   showTotalBids?: boolean;
   orientation?: 'row' | 'stacked';
+  itemId?: string; // For Realtime DOM targeting
 }
 
 
@@ -56,7 +57,8 @@ export const PriceDisplay = memo(({
   showAttempts = false,
   userCurrentBid,
   showTotalBids = false,
-  orientation = 'row'
+  orientation = 'row',
+  itemId
 }: PriceDisplayProps) => {
 
   const [showUserBid, setShowUserBid] = useState(false);
@@ -94,6 +96,22 @@ export const PriceDisplay = memo(({
   let displayPrice: number | null = null;
   let displayText: string | null = null;
   let displayColor = "text-slate-800";
+  
+  // Realtime targeting props
+  const highBidProps = itemId && !safeShowUserBid && config.variant === 'public' && config.showHighBid 
+    ? {
+        'data-rt-item-id': itemId,
+        'data-rt-high-bid': 'true',
+        'data-rt-high-bid-value': config.currentHighBid || 0
+      }
+    : {};
+    
+  const bidCountProps = itemId && !safeShowUserBid && (!config.showHighBid || config.variant !== 'public')
+    ? {
+        'data-rt-item-id': itemId,
+        'data-rt-bid-count': 'true'
+      }
+    : {};
 
   if (safeShowUserBid) {
       labelText = "Your Bid";
@@ -144,9 +162,11 @@ export const PriceDisplay = memo(({
   const renderValue = () => (
       <div className={cn(getPriceClass(viewMode), "flex items-center gap-1.5 transition-colors duration-300", displayColor)}>
           {displayPrice !== null ? (
-              <RollingPrice price={displayPrice} />
+              <span {...highBidProps}>
+                <RollingPrice price={displayPrice} />
+              </span>
           ) : (
-              <span>{displayText}</span>
+              <span {...bidCountProps}>{displayText}</span>
           )}
           {/* Show Total Bids Count if in Public mode + High Bid is shown + NOT user view */}
           {!safeShowUserBid && showTotalBids && config.variant === 'public' && config.currentHighBid && (

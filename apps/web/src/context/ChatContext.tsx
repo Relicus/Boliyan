@@ -1,7 +1,7 @@
 "use client";
 
 import { get, set } from 'idb-keyval';
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Conversation, Message } from "@/types";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -41,6 +41,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
 
+  // Ref for accessing latest conversations in callbacks without re-subscribing
+  const conversationsRef = useRef(conversations);
+  useEffect(() => { conversationsRef.current = conversations; }, [conversations]);
+
   // 0. Offline Storage: LOAD
   useEffect(() => {
     if (!user?.id) return;
@@ -76,16 +80,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }, [conversations, messages, user?.id]);
 
 
-  const transformMessage = (row: MessageRow): Message => ({
+  const transformMessage = useCallback((row: MessageRow): Message => ({
     id: row.id,
     conversationId: row.conversation_id || "",
     senderId: row.sender_id || "",
     content: row.content,
     isRead: row.is_read ?? false,
     createdAt: row.created_at || new Date().toISOString(),
-  });
+  }), []);
 
-  const fetchHydratedConversation = async (conversationId: string) => {
+  const fetchHydratedConversation = useCallback(async (conversationId: string) => {
     const { data } = await supabase
       .from('conversations')
       .select(`
@@ -99,12 +103,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     if (!data) return undefined;
     return transformConversationToHydratedConversation(data as unknown as ConversationWithHydration);
-  };
+  }, []);
 
   // 1. Fetch Conversations & Realtime logic (remains mostly same, but essentially "merges" fresh data)
   useEffect(() => {
     if (!user) {
-  // ...
       const timer = setTimeout(() => setConversations([]), 0);
       return () => clearTimeout(timer);
     }
@@ -158,19 +161,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, fetchHydratedConversation]);
 
   // 2. Realtime Messages Listener (Global for participating chats)
   // Ref for accessing latest conversations in callback without re-subscribing
-  const conversationsRef = React.useRef(conversations);
-  useEffect(() => {
-    conversationsRef.current = conversations;
-  }, [conversations]);
+  // (Handled by conversationsRef above)
 
   // 2. Focused Realtime Subscription (Lazy Loading)
   const activeSubscriptions = React.useRef<Map<string, ReturnType<typeof supabase.channel>>>(new Map());
 
-  const subscribeToConversation = async (conversationId: string) => {
+  const subscribeToConversation = useCallback(async (conversationId: string) => {
     if (activeSubscriptions.current.has(conversationId)) return;
 
     const channel = supabase
@@ -204,15 +204,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       .subscribe();
 
     activeSubscriptions.current.set(conversationId, channel);
-  };
+  }, [transformMessage]);
 
-  const unsubscribeFromConversation = async (conversationId: string) => {
+  const unsubscribeFromConversation = useCallback(async (conversationId: string) => {
       const channel = activeSubscriptions.current.get(conversationId);
       if (channel) {
           await supabase.removeChannel(channel);
           activeSubscriptions.current.delete(conversationId);
       }
-  };
+  }, []);
 
   // Cleanup all on unmount
   useEffect(() => {
@@ -223,7 +223,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       };
   }, []);
 
-  const loadMessages = async (conversationId: string) => {
+  const loadMessages = useCallback(async (conversationId: string) => {
       const { data } = await supabase
         .from('messages')
         .select('*')
@@ -241,9 +241,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
               return [...prev, ...uniqueNew];
           });
       }
-  };
+  }, [transformMessage]);
 
-  const sendMessage = async (conversationId: string, content: string) => {
+  const sendMessage = useCallback(async (conversationId: string, content: string) => {
     if (!user) return; 
     
     // Optimistic Update
@@ -286,9 +286,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           .update(conversationUpdates)
           .eq('id', conversationId);
     }
-  };
+  }, [user, transformMessage]);
 
-  const markAsRead = async (conversationId: string) => {
+  const markAsRead = useCallback(async (conversationId: string) => {
     if (!user) return;
 
     // Local Optimistic Update
@@ -309,11 +309,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     if (error) {
       console.error("Failed to mark messages as read", error);
     }
-  };
+  }, [user]);
 
-  const startConversation = async (bidId: string, itemId: string, bidderId: string, sellerId: string) => {
+  const startConversation = useCallback(async (bidId: string, itemId: string, bidderId: string, sellerId: string) => {
     // 1. Check local cache
-    const existing = conversations.find(c => c.itemId === itemId && c.bidderId === bidderId);
+    const existing = conversationsRef.current.find(c => c.itemId === itemId && c.bidderId === bidderId);
     if (existing) return existing.id;
 
     // 2. Insert new conversation
@@ -353,10 +353,30 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         }
     }
     return undefined;
-  };
+  }, [fetchHydratedConversation]);
+
+  const contextValue = useMemo(() => ({
+    conversations,
+    messages,
+    sendMessage,
+    markAsRead,
+    startConversation,
+    loadMessages,
+    subscribeToConversation,
+    unsubscribeFromConversation
+  }), [
+    conversations,
+    messages,
+    sendMessage,
+    markAsRead,
+    startConversation,
+    loadMessages,
+    subscribeToConversation,
+    unsubscribeFromConversation
+  ]);
 
   return (
-    <ChatContext.Provider value={{ conversations, messages, sendMessage, markAsRead, startConversation, loadMessages, subscribeToConversation, unsubscribeFromConversation }}>
+    <ChatContext.Provider value={contextValue}>
       {children}
     </ChatContext.Provider>
   );

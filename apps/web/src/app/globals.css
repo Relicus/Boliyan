@@ -243,6 +243,26 @@
   .animate-border-glow {
     animation: border-glow 2s ease-in-out infinite;
   }
+
+  /* Realtime DOM Animations */
+  @keyframes rt-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); color: #2563eb; }
+    100% { transform: scale(1); }
+  }
+
+  .rt-pulse {
+    animation: rt-pulse 0.6s ease-out forwards;
+  }
+
+  @keyframes rt-outbid {
+    0%, 100% { box-shadow: none; }
+    25%, 75% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+  }
+
+  .rt-outbid {
+    animation: rt-outbid 0.8s ease-out forwards;
+  }
 }
 
 @layer base {
