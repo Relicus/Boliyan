@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Check, X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Clock, MapPin, Car } from "lucide-react";
+import { Check, X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Clock, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";

@@ -45,7 +45,7 @@ export async function loginUser(page: Page, email?: string, password = 'password
         // Then wait for the avatar
         await expect(page.locator('#navbar-avatar-18')).toBeVisible({ timeout: 10000 });
         console.log(`[loginUser] Signup and Auto-Login successful for ${testEmail}`);
-      } catch (signupError) {
+      } catch {
         // One last try: reload page to force session check
         console.log('[loginUser] Session not hydrated, reloading page...');
         await page.reload();

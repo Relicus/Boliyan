@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Lock, User as UserIcon, Tag, Trophy } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
 import { cn } from "@/lib/utils";
-import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 
 import RollingPrice from "./RollingPrice";
 
@@ -55,8 +54,6 @@ export const PriceDisplay = memo(({
   bidCount,
   viewMode = 'compact',
   className = '',
-  remainingAttempts: _remainingAttempts = MAX_BID_ATTEMPTS,
-  showAttempts: _showAttempts = false,
   userCurrentBid,
   showTotalBids = false,
   orientation = 'row',

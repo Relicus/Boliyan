@@ -44,8 +44,8 @@ export function transformProfileToUser(profile: ProfileRow): User {
       bidsAcceptedByMe: 0,
       myBidsAccepted: 0
     },
-    sellerSuccessRate: (profile as any).seller_success_rate ?? 100,
-    buyerSuccessRate: (profile as any).buyer_success_rate ?? 100
+    sellerSuccessRate: profile.seller_success_rate ?? 100,
+    buyerSuccessRate: profile.buyer_success_rate ?? 100
   };
 }
 
@@ -143,7 +143,7 @@ export function transformBidToHydratedBid(bid: BidWithProfile): Bid {
     status: (bid.status || 'pending') as Bid['status'],
     type: 'public', // Defaulting since bid_type was removed from schema
     createdAt: bid.created_at || new Date().toISOString(),
-    update_count: (bid as any).update_count || 0
+    update_count: bid.update_count || 0
   };
 }
 
@@ -168,8 +168,8 @@ export function transformConversationToHydratedConversation(conv: ConversationWi
     lastMessage: conv.last_message,
     updatedAt: conv.updated_at || conv.created_at || new Date().toISOString(),
     expiresAt: conv.expires_at || undefined,
-    sellerConfirmedAt: (conv as any).seller_confirmed_at,
-    buyerConfirmedAt: (conv as any).buyer_confirmed_at,
-    isSealed: (conv as any).is_sealed || false
+    sellerConfirmedAt: conv.seller_confirmed_at || undefined,
+    buyerConfirmedAt: conv.buyer_confirmed_at || undefined,
+    isSealed: conv.is_sealed || false
   };
 }

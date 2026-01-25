@@ -21,7 +21,6 @@ import { Item } from "@/types";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { useTime } from "@/context/TimeContext";
 
 function DashboardContent() {
   const { itemsById, bids, user, deleteItem, watchedItemIds } = useApp();
@@ -34,8 +33,6 @@ function DashboardContent() {
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
   const [viewingItem, setViewingItem] = useState<Item | null>(null);
   
-  const time = useTime();
-  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -46,10 +43,6 @@ function DashboardContent() {
     router.push(`/dashboard?tab=${value}`, { scroll: false });
   };
 
-  // Sync with shared timer
-  useEffect(() => {
-    setNow(time.now);
-  }, [time.now]);
 
   // Fetch My Listings independently of the discovery feed
   useEffect(() => {

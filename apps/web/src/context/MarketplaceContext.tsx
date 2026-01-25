@@ -581,8 +581,9 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 const latestBidTime = Math.max(...myBids.map(b => new Date(b.createdAt).getTime()));
                 setLastBidTimestamp(latestBidTime);
             }
-        } catch (err: any) {
-            console.error("Error fetching user bids:", err.message || err);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            console.error("Error fetching user bids:", message);
         }
     };
 
@@ -753,7 +754,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       if (error) throw error;
 
       if (data) {
-        const transformedItems = data.map(row => transformListingToItem(row as any));
+        const transformedItems = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
         setItemsById(prev => upsertEntities(prev, transformedItems));
         setInvolvedIds(allInvolvedIds);
       }

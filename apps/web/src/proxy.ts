@@ -22,7 +22,7 @@ export function proxy(req: NextRequest) {
   if (basicAuth) {
     const authValue = basicAuth.split(' ')[1];
     // Decode base64
-    const [user, pwd] = atob(authValue).split(':');
+    const [, pwd] = atob(authValue).split(':');
 
     if (pwd === validPassword) {
       return NextResponse.next();

@@ -124,28 +124,28 @@ export function useApp() {
   type MarketplaceFilterKey = keyof MarketplaceFilters;
   type SearchFilters = typeof search.filters;
   type SearchFilterKey = keyof SearchFilters;
-  const marketplaceFilterKeys: MarketplaceFilterKey[] = [
-    'category',
-    'search',
-    'minPrice',
-    'maxPrice',
-    'sortBy',
-    'listingType',
-    'condition',
-    'radius'
-  ];
-  const searchKeyMap: Partial<Record<MarketplaceFilterKey, SearchFilterKey>> = {
-    search: 'query',
-    category: 'category',
-    minPrice: 'minPrice',
-    maxPrice: 'maxPrice',
-    sortBy: 'sortBy',
-    condition: 'condition'
-  };
-  const isMarketplaceFilterKey = (key: string): key is MarketplaceFilterKey =>
-    marketplaceFilterKeys.includes(key as MarketplaceFilterKey);
-
   const setFilterCompat = useCallback((key: string, value: unknown) => {
+      const marketplaceFilterKeys: MarketplaceFilterKey[] = [
+        'category',
+        'search',
+        'minPrice',
+        'maxPrice',
+        'sortBy',
+        'listingType',
+        'condition',
+        'radius'
+      ];
+      const searchKeyMap: Partial<Record<MarketplaceFilterKey, SearchFilterKey>> = {
+        search: 'query',
+        category: 'category',
+        minPrice: 'minPrice',
+        maxPrice: 'maxPrice',
+        sortBy: 'sortBy',
+        condition: 'condition'
+      };
+      const isMarketplaceFilterKey = (target: string): target is MarketplaceFilterKey =>
+        marketplaceFilterKeys.includes(target as MarketplaceFilterKey);
+
       // Update Marketplace Context
       // Fix: Added 'radius' to allowed keys so location slider works
       if (isMarketplaceFilterKey(key)) {

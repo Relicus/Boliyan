@@ -68,14 +68,17 @@ test('Programmatic Feature Discovery', async ({ page, baseURL }) => {
 
 async function scrapePage(page: Page, route: string) {
   const title = await page.title();
-  const elementsWithId = await page.locator('[id]').evaluateAll((els) => 
-    els.map((el: any) => ({
-      id: el.id,
-      tagName: el.tagName,
-      text: el.innerText?.substring(0, 50),
-      type: el.type || undefined,
-      placeholder: el.placeholder || undefined
-    }))
+  const elementsWithId = await page.locator('[id]').evaluateAll((els) =>
+    els.map((el) => {
+      const element = el as HTMLElement;
+      return {
+        id: element.id,
+        tagName: element.tagName,
+        text: element.innerText?.substring(0, 50),
+        type: element.getAttribute('type') || undefined,
+        placeholder: element.getAttribute('placeholder') || undefined
+      };
+    })
   );
 
   discoveredFeatures.elements.push({

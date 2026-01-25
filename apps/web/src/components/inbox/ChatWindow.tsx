@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn, formatPrice } from '@/lib/utils';
+import { Conversation } from '@/types';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReviews } from '@/context/ReviewContext';
@@ -31,7 +32,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const { submitReview } = useReviews();
   const [showSealAnim, setShowSealAnim] = useState(false);
   const [showMissing, setShowMissing] = useState(false);
-  const [localConversation, setLocalConversation] = useState<any>(null);
+  const [localConversation, setLocalConversation] = useState<Conversation | null>(null);
   
   // Vouch State
   const [vouchRating, setVouchRating] = useState(0);
@@ -161,13 +162,6 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     }
   };
 
-
-  // 3-Slot Visual Indicator Logic (Seller Only)
-  // Calculate real active chat count for this item
-  const activeChatCount = item ? conversations.filter(c => c.itemId === item.id).length : 0;
-  const maxSlots = 3;
-  const displayChatCount = Math.min(activeChatCount, maxSlots);
-  const slots = Array.from({ length: maxSlots }).map((_, i) => i < displayChatCount);
 
   // Lock body scroll to prevent Safari from scrolling page when input focused
   useEffect(() => {
