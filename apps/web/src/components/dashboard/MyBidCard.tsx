@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Clock, MapPin, Trophy, AlertTriangle, MessageSquare, Phone } from "lucide-react";
+import { Clock, Trophy, AlertTriangle, MessageSquare, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item, User } from "@/types";
-import { Badge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
-import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
+
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
 
@@ -27,15 +27,8 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   
   const isLeading = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isOutbid = user && item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
-  const isExpired = userBid.status === 'expired';
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
-
-  // Remaining Attempts
-  const remainingAttempts = useMemo(() => {
-    const updatesUsed = userBid.update_count || 0;
-    return Math.max(0, (MAX_BID_ATTEMPTS - 1) - updatesUsed);
-  }, [userBid]);
 
   // Unified Bidding Config
   const biddingConfig = useMemo(() => 

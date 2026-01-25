@@ -40,12 +40,11 @@ export function NotificationDropdown() {
         <Button 
           id="notification-bell-btn" 
           variant="ghost" 
-          size="icon" 
-          className="relative rounded-full hover:bg-slate-100 transition-colors duration-300"
+          className="relative rounded-full h-9 w-9 p-1 hover:bg-slate-100 transition-colors duration-300"
         >
-          <Bell className={cn("h-5 w-5 text-slate-600 transition-colors duration-300", isOpen && "text-blue-600 fill-blue-50")} strokeWidth={isOpen ? 2.5 : 2} />
+          <Bell className={cn("!h-6 !w-6 text-slate-600 transition-colors duration-300", isOpen && "text-blue-600 fill-blue-50")} strokeWidth={isOpen ? 2.5 : 2} />
           {unreadCount > 0 && (
-            <span className="absolute top-2.5 right-2.5 flex h-2.5 w-2.5">
+            <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600 ring-2 ring-white"></span>
             </span>

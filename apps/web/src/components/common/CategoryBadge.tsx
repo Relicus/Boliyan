@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 interface CategoryBadgeProps {
   category: string;
-  variant?: "glass" | "outline" | "solid";
+  variant?: "glass" | "glass-light" | "outline" | "solid";
   className?: string;
   showIcon?: boolean;
   onClick?: () => void;
@@ -29,7 +29,8 @@ export const CategoryBadge = memo(({
   const Icon = categoryConfig.icon;
 
   const variants = {
-    glass: "bg-black/60 backdrop-blur-md text-white border-white/20 shadow-lg",
+    glass: "bg-black/75 text-white border-white/10 shadow-lg",
+    "glass-light": "bg-white/85 text-slate-800 border-black/5 shadow-lg",
     outline: "bg-white text-blue-700 border-blue-100 border",
     solid: "bg-blue-600 text-white border-none shadow-sm"
   };

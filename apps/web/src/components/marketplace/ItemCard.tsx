@@ -2,13 +2,13 @@ import { motion } from "framer-motion";
 import React, { useState, useMemo, useEffect, memo } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Lock, Bookmark } from "lucide-react";
+import { Lock, Bookmark } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
-import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
+import { calculatePrivacySafeDistance } from "@/lib/utils";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
 import ProductDetailsModal from "./ProductDetailsModal";
@@ -16,6 +16,8 @@ import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { RatingBadge } from "@/components/common/RatingBadge";
 import { TimerBadge } from "@/components/common/TimerBadge";
+import { LocationBadge } from "@/components/common/LocationBadge";
+import { DistanceBadge } from "@/components/common/DistanceBadge";
 import { useTrackVisibility } from "@/hooks/useTrackVisibility";
 import {
   Tooltip,
@@ -151,9 +153,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`@container group relative border-none bg-slate-50 rounded-xl flex flex-col will-change-transform transition-[box-shadow,ring,padding] duration-500 shadow-sm
-              ${isOutbidTrigger && item.isPublicBid ? 'ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
-            `}
+            className={cn(
+              "@container group relative border-none rounded-xl flex flex-col will-change-transform transition-[box-shadow,ring,padding] duration-500",
+              item.isPublicBid 
+                ? "bg-slate-50 shadow-sm" 
+                : "bg-slate-50 shadow-sm",
+              isOutbidTrigger && item.isPublicBid && "ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+            )}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
             <Card className={cn(
@@ -185,16 +191,14 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {/* Top-Left Stack: Geography & Identity */}
               <div id={`item-card-${item.id}-left-stack`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
                 {/* 1. Location (Geography First) */}
-                <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
-                  <MapPin className="h-3 w-3" />
-                  <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none truncate max-w-[120px]">
-                    {seller?.location ? getFuzzyLocationString(seller.location.address) : 'Unknown Location'}
-                  </span>
-                </div>
+                <LocationBadge 
+                  address={seller?.location?.address}
+                  variant={item.isPublicBid ? "glass-light" : "glass"}
+                />
                 {/* 2. Category Identity */}
                 <CategoryBadge 
                   category={item.category} 
-                  variant="glass" 
+                  variant={item.isPublicBid ? "glass-light" : "glass"} 
                   className="mt-0.5"
                   onClick={() => setFilter('category', item.category)}
                 />
@@ -205,13 +209,13 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 {/* 1. Timer (Urgency First) */}
                 <TimerBadge 
                   expiryAt={item.expiryAt} 
-                  variant="glass" 
+                  variant={item.isPublicBid ? "glass-light" : "glass"} 
                 />
                 
                 {/* 2. Condition State */}
                 <ConditionBadge 
                   condition={item.condition} 
-                  variant="glass"
+                  variant={item.isPublicBid ? "glass-light" : "glass"}
                   className="mt-0.5"
                 />
               </div>
@@ -222,12 +226,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {/* Bottom Left: Distance/Duration */}
               {!isOutside && (
                 <div className="absolute bottom-2 left-2 z-20 flex items-center gap-1">
-                  <div className="bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md flex items-center gap-1.5 shadow-lg border border-white/20">
-                    <MapPin className="h-3 w-3 text-red-500" />
-                    <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-bold tracking-wide tabular-nums leading-none">
-                      {distance}km • {duration}min
-                    </span>
-                  </div>
+                  <DistanceBadge 
+                    distance={distance}
+                    duration={duration}
+                    variant={item.isPublicBid ? "glass-light" : "glass"}
+                  />
                 </div>
               )}
 
@@ -249,8 +252,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       whileHover={{ scale: 1.15 }}
                       whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "backdrop-blur-md text-white p-1.5 rounded-md border shadow-lg transition-colors cursor-pointer",
-                        isWatched ? "border-blue-400/50" : "border-white/20"
+                        "text-white p-1.5 rounded-md border shadow-lg transition-colors cursor-pointer",
+                        isWatched ? "border-blue-400/50" : "border-white/10"
                       )}
                     >
                       <Bookmark className={cn("h-3 w-3", isWatched && "fill-current")} />
@@ -267,7 +270,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         <motion.div 
                           animate={isSuccess ? { scale: [1, 1.4, 1] } : {}}
                           transition={{ duration: 0.5 }}
-                          className="bg-amber-600/90 backdrop-blur-md text-white p-1.5 rounded-md border border-amber-400/50 shadow-lg cursor-help"
+                          className="bg-amber-600/90 text-white p-1.5 rounded-md border border-amber-400/50 shadow-lg cursor-help"
                         >
                            <Lock className="h-3 w-3" />
                         </motion.div>
@@ -283,7 +286,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {item.images.length > 1 && viewMode === 'spacious' && thumbnailImages.length > 0 && (
                 <div
                   id={`item-card-${item.id}-thumb-strip`}
-                  className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1.5 rounded-2xl bg-black/30 backdrop-blur-md border border-white/20 shadow-[0_10px_22px_rgba(0,0,0,0.35)] pointer-events-none"
+                  className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1.5 rounded-2xl bg-white/85 border border-black/5 shadow-[0_10px_22px_rgba(0,0,0,0.15)] pointer-events-none"
                 >
                   {thumbnailImages.map((src) => (
                     <div
@@ -310,16 +313,16 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               {item.images.length > 1 && viewMode !== 'spacious' && (
                 <div
                   id={`item-card-${item.id}-image-dots`}
-                  className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/35 backdrop-blur-md border border-white/20 shadow-[0_8px_18px_rgba(0,0,0,0.3)] pointer-events-none"
+                  className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/85 border border-black/5 shadow-[0_8px_18px_rgba(0,0,0,0.12)] pointer-events-none"
                 >
                   {Array.from({ length: Math.min(item.images.length, 5) }).map((_, i) => (
                     <span
                       key={`dot-${i}`}
-                      className={`rounded-full transition-all ${i === 0 ? 'h-1.5 w-5 bg-white' : 'h-1.5 w-1.5 bg-white/50'}`}
+                      className={`rounded-full transition-all ${i === 0 ? 'h-1.5 w-5 bg-slate-800' : 'h-1.5 w-1.5 bg-slate-800/40'}`}
                     />
                   ))}
                   {item.images.length > 5 && (
-                    <span className="text-[9px] font-bold text-white/80">+{item.images.length - 5}</span>
+                    <span className="text-[9px] font-bold text-slate-700">+{item.images.length - 5}</span>
                   )}
                 </div>
               )}
@@ -341,7 +344,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   id={`item-card-${item.id}-title`} 
                   onClick={() => setIsDialogOpen(true)}
                   className={cn(
-                    `font-bold ${getTitleClass()} leading-tight line-clamp-2 transition-all w-full cursor-pointer hover:underline underline-offset-4 decoration-2`,
+                    `font-bold ${getTitleClass()} leading-tight line-clamp-2 transition-all w-full cursor-pointer`,
                     !item.isPublicBid ? "text-white hover:text-blue-300" : "text-slate-900 hover:text-blue-600"
                   )} 
                   title={item.title}

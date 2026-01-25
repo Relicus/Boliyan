@@ -3,7 +3,7 @@
 import { memo, useMemo, useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { cn, formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Gavel, Loader2, AlertCircle, Edit } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import RollingPrice from "./RollingPrice";
@@ -196,15 +196,15 @@ export const BiddingControls = memo(({
   error = false,
   errorMessage = null,
   remainingAttempts = MAX_BID_ATTEMPTS,
-  userCurrentBid,
+  userCurrentBid: _userCurrentBid,
   cooldownRemaining = 0,
   derivedStatus = null,
   pendingConfirmation = null,
   viewMode = 'compact',
   disabled = false,
   idPrefix,
-  showAttemptsDots = true,
-  showStatus = false,
+  showAttemptsDots: _showAttemptsDots = true,
+  showStatus: _showStatus = false,
   onSmartAdjust,
   onBid,
   onKeyDown,

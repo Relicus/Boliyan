@@ -1,15 +1,13 @@
 "use client";
 
 import { useApp } from "@/lib/store";
-import { CategoryBadge } from "@/components/common/CategoryBadge";
-import { ConditionBadge } from "@/components/common/ConditionBadge";
-import { TimerBadge } from "@/components/common/TimerBadge";
+
 import SellerListingCard from "@/components/seller/SellerListingCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Clock, Eye, MessageSquare, Package, Bookmark, Gavel, Tag } from "lucide-react";
+import { Plus, Bookmark, Gavel, Tag } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -18,14 +16,14 @@ import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import DeleteConfirmationDialog from "@/components/seller/DeleteConfirmationDialog";
 import { Item } from "@/types";
-import { calculatePrivacySafeDistance } from "@/lib/utils";
+
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useTime } from "@/context/TimeContext";
 
 function DashboardContent() {
-  const { itemsById, bids, user, deleteItem, watchedItemIds, involvedIds } = useApp();
+  const { itemsById, bids, user, deleteItem, watchedItemIds } = useApp();
   const [myItems, setMyItems] = useState<Item[]>([]);
   
   const searchParams = useSearchParams();
@@ -89,15 +87,7 @@ function DashboardContent() {
     }
   };
 
-  const getTimeLeft = (expiryAt: string) => {
-    if (!now) return "Loading...";
-    const diff = new Date(expiryAt).getTime() - now;
-    const hours = Math.max(0, Math.floor(diff / 3600000));
-    const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    
-    if (hours >= 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
-    return `${hours}h ${mins}m`;
-  };
+
 
   const myBids = bids.filter(b => b.bidderId === user?.id);
   const watchedItems = watchedItemIds

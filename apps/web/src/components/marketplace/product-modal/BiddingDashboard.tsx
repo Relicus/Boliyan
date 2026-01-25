@@ -76,7 +76,7 @@ export const BiddingDashboard = memo(function BiddingDashboard({
       
       <div className="mb-2">
          <PriceDisplay 
-            config={finalConfig as any} // Cast to any to bypass the union type strictness if needed, but should be fine
+            config={finalConfig}
             askPrice={item.askPrice}
             bidCount={item.bidCount}
             viewMode="modal"

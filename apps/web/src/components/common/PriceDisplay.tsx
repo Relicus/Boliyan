@@ -6,6 +6,7 @@ import { Lock, User as UserIcon, Tag, Trophy } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
 import { cn } from "@/lib/utils";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
+
 import RollingPrice from "./RollingPrice";
 
 // ============================================
@@ -54,8 +55,8 @@ export const PriceDisplay = memo(({
   bidCount,
   viewMode = 'compact',
   className = '',
-  remainingAttempts = MAX_BID_ATTEMPTS,
-  showAttempts = false,
+  remainingAttempts: _remainingAttempts = MAX_BID_ATTEMPTS,
+  showAttempts: _showAttempts = false,
   userCurrentBid,
   showTotalBids = false,
   orientation = 'row',
@@ -162,22 +163,7 @@ export const PriceDisplay = memo(({
       }
   }
 
-  // Common Label Component
-  const renderLabel = () => (
-    <AnimatePresence mode="wait">
-        <motion.span 
-            key={labelText}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.2 }}
-            className={cn(getLabelClass(), "flex items-center gap-1.5 justify-center mb-0.5 whitespace-nowrap absolute right-0 bottom-0", labelColor)}
-        >
-            {LabelIcon && <LabelIcon className="w-3 h-3" />}
-            {labelText}
-        </motion.span>
-    </AnimatePresence>
-  );
+
 
   
   const renderValue = () => (

@@ -7,7 +7,7 @@ import { useTime } from "@/context/TimeContext";
 
 interface TimerBadgeProps {
   expiryAt: string;
-  variant?: "glass" | "outline" | "solid";
+  variant?: "glass" | "glass-light" | "outline" | "solid";
   className?: string;
   onUrgentChange?: (isUrgent: boolean) => void;
 }
@@ -46,8 +46,11 @@ export const TimerBadge = memo(({
 
   const variants = {
     glass: isUrgent 
-      ? "bg-red-500/80 backdrop-blur-md text-white border-white/20 shadow-lg" 
-      : "bg-black/60 backdrop-blur-md text-white border-white/20 shadow-lg",
+      ? "bg-red-500/90 text-white border-white/10 shadow-lg" 
+      : "bg-black/75 text-white border-white/10 shadow-lg",
+    "glass-light": isUrgent
+      ? "bg-red-100/90 text-red-700 border-red-200/50 shadow-lg"
+      : "bg-white/85 text-slate-800 border-black/5 shadow-lg",
     outline: isUrgent
       ? "bg-red-50 text-red-600 border-red-200"
       : "bg-white text-slate-700 border-slate-200",

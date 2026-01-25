@@ -5,7 +5,7 @@ import { getConditionLabel, cn } from "@/lib/utils";
 
 interface ConditionBadgeProps {
   condition: string;
-  variant?: "glass" | "outline" | "solid";
+  variant?: "glass" | "glass-light" | "outline" | "solid";
   className?: string;
 }
 
@@ -17,7 +17,8 @@ export const ConditionBadge = memo(({
   const label = getConditionLabel(condition);
 
   const variants = {
-    glass: "bg-black/60 backdrop-blur-md text-white border-white/20 shadow-lg",
+    glass: "bg-black/75 text-white border-white/10 shadow-lg",
+    "glass-light": "bg-white/85 text-slate-800 border-black/5 shadow-lg",
     outline: "bg-white text-slate-700 border-slate-200 border",
     solid: "bg-slate-800 text-white border-none shadow-sm"
   };

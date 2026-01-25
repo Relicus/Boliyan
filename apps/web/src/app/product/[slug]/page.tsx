@@ -2,7 +2,7 @@
 
 import { use, useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, MapPin, Clock, Bookmark, Maximize2, Share2, Zap, ArrowLeft, BadgeCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Clock, Bookmark, Maximize2, Share2, ArrowLeft, BadgeCheck } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
