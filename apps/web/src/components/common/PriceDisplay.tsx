@@ -217,42 +217,40 @@ export const PriceDisplay = memo(({
       );
   }
 
-  // ROW ORIENTATION (Default)
+  // ROW ORIENTATION (Default) - Minimalist/Typography Driven
   return (
-    <div className={`grid grid-cols-[1fr_auto_1fr] items-end ${className}`}>
-      {/* Asking Price */}
-      <div className="flex flex-col justify-self-start">
-        <span className={cn(getLabelClass(), "flex items-center gap-1")}>
-          <Tag className="w-2.5 h-2.5" />
+    <div className={`flex justify-between items-end w-full px-1 ${className}`}>
+      {/* Asking Price - Left Aligned */}
+      <div className="flex flex-col items-start">
+        <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400 mb-0.5 flex items-center gap-1">
+          <Tag className="w-3 h-3" />
           Asking
         </span>
-        <span className={`${getPriceClass(viewMode)} text-slate-800`}>
+        <span className={`${getPriceClass(viewMode)} text-slate-900 leading-[0.9]`}>
           <RollingPrice price={askPrice} />
         </span>
       </div>
 
-      {/* Attempt Dots (Centered) */}
-      <div className="flex flex-col items-center justify-end pb-1.5 px-2 w-[56px]">
+      {/* Attempt Dots (Centered/Bottom) */}
+      <div className="flex flex-col items-center justify-end h-[2.5em] pb-1.5 opacity-60">
         {showAttempts && (
-           <div className="flex flex-col items-center gap-1 w-full">
-            <div className="flex gap-1.5 justify-center w-full">
+           <div className="flex gap-1">
               {Array.from({ length: Math.max(0, remainingAttempts) }).map((_, i) => (
                 <div 
                   key={i} 
-                  className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+                  className="h-1 w-1 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
                 />
               ))}
-            </div>
-          </div>
+           </div>
         )}
       </div>
 
-      {/* Dynamic Right Side */}
+      {/* Dynamic Right Side - Right Aligned */}
       <div 
-        className="flex flex-col items-end justify-self-end justify-end h-[2.5em] relative"
+        className="flex flex-col items-end h-[2.5em] relative"
       >
           {/* Label Container - Absolute to prevent layout jump during transition */}
-          <div className="h-4 w-full relative mb-0">
+          <div className="h-4 w-full relative mb-0.5">
              <AnimatePresence mode="wait">
                 <motion.span 
                     key={labelText}
@@ -260,16 +258,33 @@ export const PriceDisplay = memo(({
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
-                    className={cn(getLabelClass(), "flex items-center gap-1 absolute right-0 bottom-0 whitespace-nowrap mb-0", labelColor)}
+                    className={cn(
+                        "text-[0.65rem] font-bold uppercase tracking-wider absolute right-0 bottom-0 whitespace-nowrap mb-0 flex items-center gap-1", 
+                        // Mute the colors for the label to keep focus on the number
+                        labelColor.replace('text-purple-600', 'text-purple-500').replace('text-amber-600', 'text-amber-500')
+                    )}
                 >
-                    {LabelIcon && <LabelIcon className="w-2.5 h-2.5" />}
+                    {LabelIcon && <LabelIcon className="w-3 h-3" />}
                     {labelText}
                 </motion.span>
              </AnimatePresence>
           </div>
 
           {/* Value Container - Stable */}
-          {renderValue()}
+          <span 
+            className={cn(getPriceClass(viewMode), "flex items-center gap-1.5 transition-colors duration-300 leading-[0.9]", displayColor)}
+            {...(displayPrice !== null ? highBidProps : bidCountProps)}
+          >
+              {displayPrice !== null ? (
+                  <RollingPrice key={priceKey} price={displayPrice} />
+              ) : (
+                  displayText
+              )}
+              {/* Show Total Bids Count if in Public mode + High Bid is shown + NOT user view */}
+              {!safeShowUserBid && showTotalBids && config.variant === 'public' && config.currentHighBid && (
+                   <span className="text-[clamp(0.75rem,3cqi,1rem)] font-bold text-slate-400 ml-1">({bidCount})</span>
+              )}
+          </span>
       </div>
     </div>
   );
