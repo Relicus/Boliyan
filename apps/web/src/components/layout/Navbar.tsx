@@ -233,7 +233,7 @@ export default function Navbar() {
               </div>
 
               {/* New Notification Dropdown */}
-              <div className="mx-1">
+              <div className="ml-1 mr-3">
                  <NotificationDropdown />
               </div>
 

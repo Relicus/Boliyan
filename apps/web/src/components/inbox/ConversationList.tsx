@@ -15,9 +15,11 @@ interface ConversationListProps {
   selectedId: string | null;
   onSelect: (id: string) => void;
   role: 'buyer' | 'seller' | 'auto';
+  emptyTitle?: string;
+  emptyBody?: string;
 }
 
-export function ConversationList({ conversations, selectedId, onSelect, role }: ConversationListProps) {
+export function ConversationList({ conversations, selectedId, onSelect, role, emptyTitle, emptyBody }: ConversationListProps) {
   const { user, refreshConversations, bids } = useApp();
   const [now, setNow] = useState(() => Date.now());
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -74,9 +76,9 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
         <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center mb-1">
           <Clock className="h-6 w-6 text-slate-200" />
         </div>
-        <p className="text-sm font-bold text-slate-500">No active conversations</p>
+        <p className="text-sm font-bold text-slate-500">{emptyTitle || "No active conversations"}</p>
         <p className="text-[10px] text-slate-400 max-w-[140px] leading-tight">
-          Chats appear here once a bid is accepted and the deal is moving.
+          {emptyBody || "Chats appear here once a bid is accepted and the deal is moving."}
         </p>
         <button 
            onClick={handleRefresh}

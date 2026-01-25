@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, Suspense } from 'react';
+import React, { useState, useMemo, Suspense, useEffect } from 'react';
 import { ConversationList } from '@/components/inbox/ConversationList';
 import { ChatWindow } from '@/components/inbox/ChatWindow';
 import { cn } from '@/lib/utils';
@@ -8,13 +8,60 @@ import { useApp } from '@/lib/store';
 import { useSearchParams } from 'next/navigation';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, ShoppingBag, Store } from 'lucide-react';
+import { MessageSquare, Search, ShoppingBag, Store } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 function InboxContent() {
   const { conversations, user } = useApp();
   const searchParams = useSearchParams();
   const [selectedId, setSelectedId] = useState<string | null | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<'all' | 'offers' | 'bids' | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery.trim().toLowerCase());
+    }, 200);
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  const isSearching = debouncedQuery.length > 0;
+
+  const searchIndex = useMemo(() => {
+    if (!isSearching) return new Map<string, string>();
+
+    const index = new Map<string, string>();
+
+    conversations.forEach(conversation => {
+      const otherUser = !user
+        ? (conversation.seller || conversation.bidder)
+        : (conversation.sellerId === user.id ? conversation.bidder : conversation.seller);
+
+      const item = conversation.item;
+      const text = [
+        otherUser?.name,
+        item?.title,
+        conversation.lastMessage
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      index.set(conversation.id, text);
+    });
+
+    return index;
+  }, [conversations, isSearching, user]);
+
+  const filteredAllConversations = useMemo(() => {
+    if (!isSearching) return conversations;
+
+    return conversations.filter(conversation =>
+      searchIndex.get(conversation.id)?.includes(debouncedQuery)
+    );
+  }, [conversations, debouncedQuery, isSearching, searchIndex]);
 
   const offerConversations = useMemo(() => {
     if (!user) return [];
@@ -39,7 +86,11 @@ function InboxContent() {
     }
     return 'all';
   }, [bidConversations, offerConversations, selectedIdParam]);
-  const resolvedTab = activeTab ?? derivedTab ?? 'all';
+
+  const resolvedTab = isSearching ? 'all' : activeTab ?? derivedTab ?? 'all';
+  const displayedAllConversations = isSearching ? filteredAllConversations : conversations;
+  const displayedOfferConversations = isSearching ? filteredAllConversations : offerConversations;
+  const displayedBidConversations = isSearching ? filteredAllConversations : bidConversations;
   const handleTabChange = (value: string) => {
     if (value === 'all' || value === 'offers' || value === 'bids') {
       setActiveTab(value);
@@ -58,6 +109,16 @@ function InboxContent() {
       >
         <div className="p-4 border-b shrink-0">
           <h1 className="font-black text-xl mb-4 text-slate-900">Messages</h1>
+          <div id="inbox-search" className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              id="inbox-search-input"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search people, listings, or notes"
+              className="h-10 pl-9 rounded-xl bg-white border-slate-200 focus-visible:ring-blue-100"
+            />
+          </div>
           <Tabs value={resolvedTab} onValueChange={handleTabChange} className="w-full">
             <TabsList id="inbox-tabs-list" className="grid w-full grid-cols-3 h-10 p-1 bg-slate-100 rounded-xl">
               <TabsTrigger 
@@ -67,9 +128,9 @@ function InboxContent() {
               >
                 <MessageSquare className="mr-2 h-3.5 w-3.5" />
                 All
-                {conversations.length > 0 && (
+                {displayedAllConversations.length > 0 && (
                   <span className="ml-2 bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded-md text-[10px]">
-                    {conversations.length}
+                    {displayedAllConversations.length}
                   </span>
                 )}
               </TabsTrigger>
@@ -79,10 +140,10 @@ function InboxContent() {
                 className="rounded-lg text-xs font-bold text-slate-500 data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm transition-all"
               >
                 <Store className="mr-2 h-3.5 w-3.5" />
-                Offers
-                {offerConversations.length > 0 && (
+                Selling
+                {displayedOfferConversations.length > 0 && (
                   <span className="ml-2 bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-md text-[10px]">
-                    {offerConversations.length}
+                    {displayedOfferConversations.length}
                   </span>
                 )}
               </TabsTrigger>
@@ -92,10 +153,10 @@ function InboxContent() {
                 className="rounded-lg text-xs font-bold text-slate-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all"
               >
                 <ShoppingBag className="mr-2 h-3.5 w-3.5" />
-                Bids
-                {bidConversations.length > 0 && (
+                Buying
+                {displayedBidConversations.length > 0 && (
                   <span className="ml-2 bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-md text-[10px]">
-                    {bidConversations.length}
+                    {displayedBidConversations.length}
                   </span>
                 )}
               </TabsTrigger>
@@ -106,28 +167,34 @@ function InboxContent() {
         <Tabs value={resolvedTab} className="flex-1 overflow-hidden">
           <TabsContent value="all" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
             <ConversationList 
-              conversations={conversations}
+              conversations={displayedAllConversations}
               selectedId={resolvedSelectedId} 
               onSelect={setSelectedId} 
               role="auto"
+              emptyTitle={isSearching ? "No matches" : undefined}
+              emptyBody={isSearching ? "Try another name, listing, or note." : undefined}
             />
           </TabsContent>
 
           <TabsContent value="offers" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
             <ConversationList 
-              conversations={offerConversations}
+              conversations={displayedOfferConversations}
               selectedId={resolvedSelectedId} 
               onSelect={setSelectedId} 
               role="seller"
+              emptyTitle={isSearching ? "No matches" : undefined}
+              emptyBody={isSearching ? "Try another name, listing, or note." : undefined}
             />
           </TabsContent>
           
           <TabsContent value="bids" className="h-full m-0 focus-visible:outline-none overflow-y-auto scrollbar-hide">
             <ConversationList 
-              conversations={bidConversations}
+              conversations={displayedBidConversations}
               selectedId={resolvedSelectedId} 
               onSelect={setSelectedId} 
               role="buyer"
+              emptyTitle={isSearching ? "No matches" : undefined}
+              emptyBody={isSearching ? "Try another name, listing, or note." : undefined}
             />
           </TabsContent>
         </Tabs>

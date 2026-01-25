@@ -157,7 +157,7 @@ function DashboardContent() {
         </TabsList>
 
         <AnimatePresence mode="wait">
-             {/* 1. OFFERS TAB (Bids received on MY listings, grouped by listing) */}
+              {/* 1. OFFERS TAB (Bids received on MY listings, grouped by listing) */}
              {activeTab === 'offers' && (
                 <motion.div
                     key="offers"
@@ -188,7 +188,7 @@ function DashboardContent() {
                 </motion.div>
              )}
 
-             {/* 2. MY BIDS TAB */}
+              {/* 2. MY BIDS TAB */}
              {activeTab === 'active-bids' && (
                 <motion.div
                     key="active-bids"
