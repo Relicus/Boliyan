@@ -3,7 +3,7 @@
 import { useDashboard } from '@/context/DashboardContext';
 import { ListingActionMenu } from './ListingActionMenu';
 import { Badge } from '@/components/ui/badge';
-import { formatDistanceToNow } from 'date-fns';
+import { formatShortTimestamp } from '@/lib/utils';
 
 export function MyListingsTable() {
   const { listings, isLoading } = useDashboard();
@@ -78,7 +78,7 @@ export function MyListingsTable() {
                   {item.views}
                 </td>
                 <td className="px-4 py-3 text-right text-muted-foreground whitespace-nowrap">
-                  {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                  {formatShortTimestamp(new Date(item.createdAt))}
                 </td>
                 <td className="px-4 py-3 text-right">
                   <ListingActionMenu listing={item} />

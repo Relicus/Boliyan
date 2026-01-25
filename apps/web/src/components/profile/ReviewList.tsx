@@ -5,7 +5,7 @@ import { useReviews } from '@/context/ReviewContext';
 import type { Review } from '@/types/review';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StarRating from './StarRating';
-import { formatDistanceToNow } from 'date-fns';
+import { formatShortTimestamp } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
@@ -67,7 +67,7 @@ export default function ReviewList({ userId, className }: ReviewListProps) {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
                     <StarRating rating={review.rating} size={12} readonly />
                     <span>•</span>
-                    <span>{formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}</span>
+                    <span>{formatShortTimestamp(new Date(review.createdAt))}</span>
                 </div>
               </div>
             </div>

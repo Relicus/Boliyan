@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star } from "lucide-react";
+import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, Sparkles, CreditCard, Clock, Calculator, Plus, Minus } from "lucide-react";
 import { CATEGORIES, LISTING_LIMITS } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { Item } from "@/types";
 import { roundToReasonablePrice } from "@/lib/bidding";
+import { calculateDepreciation, formatPriceEstimate, getPurchaseYearOptions, getPurchaseMonthOptions, DepreciationResult } from "@/lib/depreciation";
 
 function ListForm() {
   const router = useRouter();
@@ -78,6 +79,28 @@ function ListForm() {
   const [isPublic, setIsPublic] = useState(true);
   const [duration, setDuration] = useState<"24" | "48" | "72">("24");
   const [condition, setCondition] = useState<'new' | 'like_new' | 'used' | 'fair'>("used");
+  const [purchasePrice, setPurchasePrice] = useState<string>("");
+  const [purchaseYear, setPurchaseYear] = useState<string>("");
+  const [purchaseMonth, setPurchaseMonth] = useState<string>("");
+  const [currentNewPrice, setCurrentNewPrice] = useState<string>("");
+  const [showPriceEstimator, setShowPriceEstimator] = useState(false);
+  
+  // Computed price estimate
+  const priceEstimate: DepreciationResult | null = React.useMemo(() => {
+    const price = parseFloat(purchasePrice);
+    const year = parseInt(purchaseYear);
+    if (!category || !price || !year || isNaN(price) || isNaN(year)) return null;
+    const newPrice = parseFloat(currentNewPrice);
+    const month = parseInt(purchaseMonth);
+    return calculateDepreciation({
+      purchasePrice: price,
+      purchaseYear: year,
+      purchaseMonth: isNaN(month) ? undefined : month,
+      category,
+      condition,
+      currentNewPrice: isNaN(newPrice) || newPrice <= 0 ? undefined : newPrice,
+    });
+  }, [purchasePrice, purchaseYear, purchaseMonth, category, condition, currentNewPrice]);
   
   type ImageEntry = {
     id: string;
@@ -95,6 +118,8 @@ function ListForm() {
     askPrice?: boolean;
     description?: boolean;
     images?: boolean;
+    purchasePrice?: boolean;
+    purchaseYear?: boolean;
   }>({});
 
   useEffect(() => {
@@ -180,7 +205,9 @@ function ListForm() {
       category: !category,
       askPrice: isNaN(priceNum) || priceNum < LISTING_LIMITS.PRICE.MIN || priceNum > LISTING_LIMITS.PRICE.MAX,
       description: description.length < LISTING_LIMITS.DESCRIPTION.MIN || description.length > LISTING_LIMITS.DESCRIPTION.MAX,
-      images: imageEntries.length < 1
+      images: imageEntries.length < 1,
+      purchasePrice: !purchasePrice || isNaN(parseFloat(purchasePrice)) || parseFloat(purchasePrice) <= 0,
+      purchaseYear: !purchaseYear
     };
 
     setErrors(newErrors);
@@ -384,7 +411,8 @@ function ListForm() {
                 </AnimatePresence>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* Category + Condition Row */}
+              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1">
                     Category <span className="text-red-500">*</span>
@@ -398,7 +426,7 @@ function ListForm() {
                   >
                     <SelectTrigger 
                       id="category-select" 
-                      className={`transition-all w-full h-11 ${errors.category ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-100"}`}
+                      className={`transition-all w-full h-10 ${errors.category ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-100"}`}
                     >
                       <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
@@ -406,12 +434,10 @@ function ListForm() {
                       {CATEGORIES.filter(c => c.label !== "All Items").map(cat => {
                         const Icon = cat.icon;
                         return (
-                          <SelectItem key={cat.label} value={cat.label} className="py-3">
-                            <div className="flex items-center gap-3">
-                              <div className="p-1.5 rounded-md bg-slate-100 text-slate-600 group-data-[selected]:bg-blue-100 group-data-[selected]:text-blue-600">
-                                <Icon className="h-4 w-4" />
-                              </div>
-                              <span className="font-medium text-slate-700">{cat.label}</span>
+                          <SelectItem key={cat.label} value={cat.label} className="py-2">
+                            <div className="flex items-center gap-2">
+                              <Icon className="h-4 w-4" />
+                              <span>{cat.label}</span>
                             </div>
                           </SelectItem>
                         );
@@ -419,21 +445,196 @@ function ListForm() {
                     </SelectContent>
                   </Select>
                   {errors.category && (
-                    <p className="text-[10px] font-bold text-red-500">Selection required</p>
+                    <p className="text-[10px] font-bold text-red-500">Required</p>
                   )}
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="price-input" className="flex items-center justify-between gap-1">
-                    <div className="flex items-center gap-1">
-                      Ask Price (Rs.) <span className="text-red-500">*</span>
-                    </div>
-                    {askPrice && !isNaN(parseFloat(askPrice)) && parseFloat(askPrice) >= 1000000 && (
-                      <span className="text-[10px] font-black text-blue-600 animate-in fade-in zoom-in-95 duration-300">
-                        Preview: Rs. {formatPrice(parseFloat(askPrice))}
+                  <Label className="flex items-center gap-1">Condition</Label>
+                  <Select 
+                    value={condition} 
+                    onValueChange={(val: 'new' | 'like_new' | 'used' | 'fair') => setCondition(val)}
+                  >
+                    <SelectTrigger id="condition-select" className="bg-slate-50 border-slate-100 h-10 w-full">
+                      <SelectValue placeholder="Select Condition" />
+                    </SelectTrigger>
+                    <SelectContent id="condition-select-content">
+                      <SelectItem value="new">🌟 Brand New</SelectItem>
+                      <SelectItem value="like_new">✨ Like New</SelectItem>
+                      <SelectItem value="used">👌 Used</SelectItem>
+                      <SelectItem value="fair">🔨 Fair</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Price Estimator Toggle - Optional Helper */}
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPriceEstimator(!showPriceEstimator)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all w-full md:w-auto justify-center ${
+                    showPriceEstimator 
+                      ? "bg-slate-100 text-slate-600 hover:bg-slate-200" 
+                      : "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200/50"
+                  }`}
+                >
+                  <Calculator className="w-4 h-4" />
+                  {showPriceEstimator ? "Hide Price Estimator" : "Help me price this item"}
+                </button>
+
+                <AnimatePresence>
+                  {showPriceEstimator && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+                        
+                        <div className="grid grid-cols-2 gap-6">
+                          {/* Paid Price */}
+                          <div className="space-y-1">
+                            <Label htmlFor="purchase-price-input" className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
+                              <CreditCard className="w-3 h-3" /> Paid (Rs.)
+                            </Label>
+                            <Input 
+                              id="purchase-price-input" 
+                              type="number" 
+                              placeholder="Original Price" 
+                              value={purchasePrice}
+                              onChange={(e) => {
+                                setPurchasePrice(e.target.value);
+                                if (errors.purchasePrice) setErrors(prev => ({ ...prev, purchasePrice: false }));
+                              }}
+                              className={`h-9 text-sm bg-white ${errors.purchasePrice ? "border-red-500" : "border-slate-200"}`} 
+                            />
+                          </div>
+                          
+                          {/* Date (Month + Year) */}
+                          <div className="space-y-1">
+                            <Label className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
+                              <Calendar className="w-3 h-3" /> Date
+                            </Label>
+                            <div className="flex gap-2 w-full">
+                              <div className="flex-[2] min-w-0">
+                                <Select value={purchaseMonth} onValueChange={setPurchaseMonth}>
+                                  <SelectTrigger id="purchase-month-select" className="h-9 text-xs bg-white border-slate-200 px-2 w-full">
+                                    <SelectValue placeholder="Mo" />
+                                  </SelectTrigger>
+                                  <SelectContent id="purchase-month-select-content">
+                                    {getPurchaseMonthOptions().map(m => (
+                                      <SelectItem key={m.value} value={m.value.toString()} className="text-xs">{m.label.slice(0,3)}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex-[3] min-w-0">
+                                <Select 
+                                  value={purchaseYear} 
+                                  onValueChange={(val) => {
+                                    setPurchaseYear(val);
+                                    if (errors.purchaseYear) setErrors(prev => ({ ...prev, purchaseYear: false }));
+                                  }}
+                                >
+                                  <SelectTrigger 
+                                    id="purchase-year-select" 
+                                    className={`h-9 text-xs bg-white px-2 w-full ${errors.purchaseYear ? "border-red-500" : "border-slate-200"}`}
+                                  >
+                                    <SelectValue placeholder="Year" />
+                                  </SelectTrigger>
+                                  <SelectContent id="purchase-year-select-content">
+                                    {getPurchaseYearOptions().map(year => (
+                                      <SelectItem key={year} value={year.toString()} className="text-xs">{year}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Current New Price - Very Compact */}
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                            <Sparkles className="w-3 h-3 text-slate-400" />
+                          </div>
+                          <Input 
+                            id="current-new-price-input" 
+                            type="number" 
+                            placeholder="Current New Price (Optional)" 
+                            value={currentNewPrice}
+                            onChange={(e) => setCurrentNewPrice(e.target.value)}
+                            className="h-8 text-xs bg-white border-slate-200 pl-7 placeholder:text-slate-400"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Price Suggestion + Ask Price in one block */}
+              <AnimatePresence>
+                {priceEstimate && (
+                  <motion.div
+                    id="price-estimate-suggestion"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="p-3 rounded-lg bg-amber-50 border border-amber-200"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">💡</span>
+                      <p className="text-sm font-bold text-amber-900">
+                        Suggested: {formatPriceEstimate(priceEstimate)}
+                      </p>
+                      <span className="text-[10px] text-amber-600 ml-auto font-bold">
+                        {priceEstimate.yearsOwned.toFixed(1)} years old
                       </span>
-                    )}
-                  </Label>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Ask Price - Now after suggestion */}
+              <div className="space-y-2">
+                <Label htmlFor="price-input" className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
+                    Your Ask Price (Rs.) <span className="text-red-500">*</span>
+                  </span>
+                  {askPrice && !isNaN(parseFloat(askPrice)) && parseFloat(askPrice) >= 1000000 && (
+                    <span className="text-[10px] font-bold text-blue-600">
+                      Rs. {formatPrice(parseFloat(askPrice))}
+                    </span>
+                  )}
+                </Label>
+                
+                <div className={`flex w-full h-14 rounded-xl relative transition-all ${
+                  errors.askPrice 
+                    ? "border border-red-500 bg-red-50/50" 
+                    : "border border-slate-200 bg-white hover:border-blue-400 ring-4 ring-blue-500/5 focus-within:ring-blue-500/20 focus-within:border-blue-500"
+                }`}>
+                  {/* Decrement */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = parseFloat(askPrice) || 0;
+                      let step = 100;
+                      if (current >= 100000) step = 5000;
+                      else if (current >= 20000) step = 1000;
+                      else if (current >= 5000) step = 500;
+                      
+                      const newVal = Math.max(0, current - step);
+                      setAskPrice(newVal.toString());
+                      if (errors.askPrice) setErrors(prev => ({ ...prev, askPrice: false }));
+                    }}
+                    className="w-14 flex items-center justify-center border-r border-slate-100 text-slate-400 hover:text-blue-600 hover:bg-slate-50 active:bg-slate-100 transition-colors rounded-l-xl"
+                  >
+                    <Minus className="h-5 w-5" />
+                  </button>
+
                   <Input 
                     id="price-input" 
                     type="number" 
@@ -447,39 +648,37 @@ function ListForm() {
                       const num = parseFloat(askPrice);
                       if (!isNaN(num) && num > 0) {
                         const rounded = roundToReasonablePrice(num);
-                        if (rounded !== num) {
-                          setAskPrice(rounded.toString());
-                        }
+                        if (rounded !== num) setAskPrice(rounded.toString());
                       }
                     }}
-                    className={`transition-all h-11 w-full ${errors.askPrice ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-100"}`} 
+                    className="flex-1 h-full border-none shadow-none focus-visible:ring-0 text-center text-2xl font-bold bg-transparent"
                   />
-                  {errors.askPrice && (
-                    <p className="text-[10px] font-bold text-red-500">
-                      {parseFloat(askPrice) < LISTING_LIMITS.PRICE.MIN 
-                        ? `Minimum price is Rs. ${LISTING_LIMITS.PRICE.MIN.toLocaleString()}` 
-                        : `Maximum price is Rs. ${LISTING_LIMITS.PRICE.MAX.toLocaleString()}`}
-                    </p>
-                  )}
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label className="flex items-center gap-1">Item Condition</Label>
-                <Select 
-                  value={condition} 
-                  onValueChange={(val: 'new' | 'like_new' | 'used' | 'fair') => setCondition(val)}
-                >
-                  <SelectTrigger id="condition-select" className="bg-slate-50 border-slate-100 h-11 w-full">
-                    <SelectValue placeholder="Select Condition" />
-                  </SelectTrigger>
-                  <SelectContent id="condition-select-content">
-                    <SelectItem value="new">🌟 Brand New</SelectItem>
-                    <SelectItem value="like_new">✨ Like New / Mint</SelectItem>
-                    <SelectItem value="used">👌 Gently Used</SelectItem>
-                    <SelectItem value="fair">🔨 Heavily Used (Fair)</SelectItem>
-                  </SelectContent>
-                </Select>
+                  {/* Increment */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = parseFloat(askPrice) || 0;
+                      let step = 100;
+                      if (current >= 100000) step = 5000;
+                      else if (current >= 20000) step = 1000;
+                      else if (current >= 5000) step = 500;
+
+                      const newVal = current + step;
+                      setAskPrice(newVal.toString());
+                      if (errors.askPrice) setErrors(prev => ({ ...prev, askPrice: false }));
+                    }}
+                    className="w-14 flex items-center justify-center border-l border-slate-100 text-slate-400 hover:text-blue-600 hover:bg-slate-50 active:bg-slate-100 transition-colors rounded-r-xl"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {errors.askPrice && (
+                  <p className="text-[10px] font-bold text-red-500">
+                    Price must be Rs. {LISTING_LIMITS.PRICE.MIN.toLocaleString()} – {LISTING_LIMITS.PRICE.MAX.toLocaleString()}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">

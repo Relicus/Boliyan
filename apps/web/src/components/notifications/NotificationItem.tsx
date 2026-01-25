@@ -2,7 +2,7 @@
 
 import { Gavel, MessageSquare, Check, Bell, X } from 'lucide-react';
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
+import { formatShortTimestamp } from '@/lib/utils';
 import { Notification } from '@/types/notification';
 import { cn } from '@/lib/utils';
 import { resolveNotificationLink } from '@/lib/notifications';
@@ -55,7 +55,7 @@ export function NotificationItem({ notification, onClick, onDismiss }: Notificat
               {notification.title}
             </p>
             <span className="text-[10px] font-medium text-slate-400 whitespace-nowrap shrink-0 mt-0.5">
-              {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+              {formatShortTimestamp(new Date(notification.createdAt))}
             </span>
           </div>
           {notification.body && (

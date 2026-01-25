@@ -5,8 +5,7 @@ import { useApp } from '@/lib/store';
 import { Conversation } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { formatDistanceToNow } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn, formatShortTimestamp } from '@/lib/utils';
 import { Clock } from 'lucide-react';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -190,9 +189,9 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
                 </div>
 
                 {displayPrice !== undefined && (
-                  <div className="shrink-0 text-right">
-                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">
-                      {conv.updatedAt ? formatDistanceToNow(new Date(conv.updatedAt), { addSuffix: false }) : 'now'}
+                  <div className="shrink-0 flex flex-col items-end">
+                    <div className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">
+                      {conv.updatedAt ? formatShortTimestamp(new Date(conv.updatedAt)) : 'now'}
                     </div>
                     {item && (
                       <div className="price-font text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
