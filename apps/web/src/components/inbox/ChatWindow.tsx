@@ -23,7 +23,7 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
-  const { user, messages, sendMessage, markAsRead, conversations, bids, subscribeToConversation, unsubscribeFromConversation, confirmExchange, fetchConversation } = useApp();
+  const { user, messages, sendMessage, markAsRead, conversations, bids, subscribeToConversation, unsubscribeFromConversation, confirmExchange, fetchConversation, loadMessages } = useApp();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
@@ -64,6 +64,14 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
         }
     };
   }, [conversationId, subscribeToConversation, unsubscribeFromConversation]);
+
+  // Load message history on open
+  useEffect(() => {
+    if (!conversationId) return;
+    if (loadMessages) {
+      loadMessages(conversationId);
+    }
+  }, [conversationId, loadMessages]);
 
   // Fetch Fallback if not in global state
   useEffect(() => {

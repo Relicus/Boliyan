@@ -18,6 +18,16 @@ WITH CHECK (
   (SELECT auth.uid()) = seller_id OR (SELECT auth.uid()) = bidder_id
 );
 
+-- Users can update their own conversations (last_message, updated_at, etc.)
+CREATE POLICY "Users can update their conversations"
+ON conversations FOR UPDATE
+USING (
+  (SELECT auth.uid()) = seller_id OR (SELECT auth.uid()) = bidder_id
+)
+WITH CHECK (
+  (SELECT auth.uid()) = seller_id OR (SELECT auth.uid()) = bidder_id
+);
+
 -- 2. Messages Policies
 -- Users can view messages of conversations they belong to
 CREATE POLICY "Users can view messages in their conversations"

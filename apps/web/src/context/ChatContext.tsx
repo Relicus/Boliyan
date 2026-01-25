@@ -42,6 +42,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const loadedConversationsRef = useRef<Set<string>>(new Set());
 
   // Ref for accessing latest conversations in callbacks without re-subscribing
   const conversationsRef = useRef(conversations);
@@ -157,6 +158,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    loadedConversationsRef.current.clear();
+  }, [user?.id]);
+
   // Initial Fetch Effect
   useEffect(() => {
     if (user) {
@@ -268,6 +273,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const loadMessages = useCallback(async (conversationId: string) => {
+      if (loadedConversationsRef.current.has(conversationId)) return;
       const { data } = await supabase
         .from('messages')
         .select('*')
@@ -284,6 +290,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
               // but solves the immediate requirement.
               return [...prev, ...uniqueNew];
           });
+          loadedConversationsRef.current.add(conversationId);
       }
   }, [transformMessage]);
 

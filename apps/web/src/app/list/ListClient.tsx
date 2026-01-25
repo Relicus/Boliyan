@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, Sparkles, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
-import { CATEGORIES, LISTING_LIMITS } from "@/lib/constants";
+import { CATEGORIES, LISTING_IMAGE_ACCEPT, LISTING_LIMITS, isAllowedListingImage } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useApp } from "@/lib/store";
@@ -156,12 +156,18 @@ function ListForm() {
     const files = e.target.files;
     if (files) {
       const newFiles = Array.from(files);
+      const allowedFiles = newFiles.filter(isAllowedListingImage);
+      const rejectedCount = newFiles.length - allowedFiles.length;
+      if (rejectedCount > 0) {
+        toast.error("Only JPG, PNG, or iPhone HEIC/HEIF images are allowed.");
+      }
+      if (allowedFiles.length === 0) return;
       setImageEntries(prev => {
         const remainingSlots = Math.max(0, 5 - prev.length);
         if (remainingSlots === 0) return prev;
 
         const stamp = Date.now();
-        const newEntries = newFiles.slice(0, remainingSlots).map((file, index) => ({
+        const newEntries = allowedFiles.slice(0, remainingSlots).map((file, index) => ({
           id: `new-${stamp}-${index}`,
           url: URL.createObjectURL(file),
           file,
@@ -377,7 +383,7 @@ function ListForm() {
                     >
                       <Camera id="camera-icon" className="h-7 w-7 text-slate-400 mb-1 group-hover:text-blue-500 transition-colors" />
                       <span id="add-photo-text" className="text-[11px] text-slate-500 font-bold group-hover:text-blue-600">Add Photo</span>
-                      <input id="image-upload-input" type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
+                      <input id="image-upload-input" type="file" multiple accept={LISTING_IMAGE_ACCEPT} className="hidden" onChange={handleImageUpload} />
                     </label>
                   )}
                 </div>

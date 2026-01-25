@@ -36,4 +36,28 @@ export const LISTING_LIMITS = {
   DESCRIPTION: { MIN: 20, MAX: 2000 }
 };
 
+export const LISTING_IMAGE_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/heic",
+  "image/heif"
+];
+
+export const LISTING_IMAGE_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".heic",
+  ".heif"
+];
+
+export const LISTING_IMAGE_ACCEPT = LISTING_IMAGE_MIME_TYPES.join(",");
+
+export const isAllowedListingImage = (file: File) => {
+  const type = file.type.toLowerCase();
+  if (LISTING_IMAGE_MIME_TYPES.includes(type)) return true;
+  const name = file.name.toLowerCase();
+  return LISTING_IMAGE_EXTENSIONS.some((ext) => name.endsWith(ext));
+};
+
 
