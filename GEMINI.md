@@ -1,110 +1,102 @@
 # PROJECT KNOWLEDGE BASE
 
-> **[🗺️ OPEN PROJECT INDEX (Navigation Hub)](file:///d:/VSCode/Boliyan/INDEX.md)** | **[📖 THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
-
+> **[OPEN PROJECT INDEX](file:///d:/VSCode/Boliyan/INDEX.md)** | **[THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
 
 **Context:** Monorepo (Next.js 16 + SQL), Manual Dependency Management.
-**Last Updated:** 2026-01-19
-
+**Last Updated:** 2026-01-25
 
 ## OVERVIEW
 Boliyan is a premium classifieds marketplace focused on high-intent bidding and strictly gated communication ("No chat before deal").
-Built with **Next.js 16.1 (React 19)**, **Tailwind CSS v4**, and **Framer Motion**.
+Built with Next.js 16.1 (React 19), Tailwind CSS v4, and Framer Motion.
 Data is managed via raw SQL in `packages/database` and a custom Context-based store in `apps/web`.
 
 ## COMMANDS (Run from `apps/web/`)
 
 | Action | Command | Notes |
 |--------|---------|-------|
-| **Dev Server** | `npm run dev` | Runs on localhost:3000 |
-| **Lint** | `npm run lint` | Uses ESLint 9 + eslint-config-next |
-| **Build** | `npm run build` | Full production build |
-| **Test (All)** | `npx playwright test` | Runs all E2E tests |
-| **Test (Single)** | `npx playwright test tests/my-test.spec.ts` | Run specific test file |
-| **Test (UI)** | `npx playwright test --ui` | Opens interactive test runner |
+| Dev Server | `npm run dev` | Runs on localhost:3000 |
+| Lint | `npm run lint` | Uses ESLint 9 + eslint-config-next |
+| Pre-flight Check | `npx tsc --noEmit -p apps/web/tsconfig.json` | Project-wide TypeScript check |
+| Build | `npm run build` | Full production build |
+| Test (All) | `npx playwright test` | Runs all E2E tests |
+| Test (Single) | `npx playwright test tests/my-test.spec.ts` | Run specific test file |
+| Test (UI) | `npx playwright test --ui` | Opens interactive test runner |
 
 ## DESIGN PHILOSOPHY (APPLE-STYLE MINIMALISM)
-**Core Tenet:** "Subtract before you add. If a visual cue works, delete the text."
+Core Tenet: "Subtract before you add. If a visual cue works, delete the text."
 
-1.  **Ruthless Reduction**:
-    -   Do not use labels if context or icons suffice (e.g., remove "Global Search", just use a Search Icon).
-    -   Avoid "helper text" unless absolutely critical. If the UI needs explanation, the UI is wrong.
-    -   **The Exchange Rule**: If you add a new visual element, try to remove an existing one to maintain density equilibrium.
+- Space-first clarity: prioritize compact information density by layering badges/overlays/dots on existing elements, avoid adding rows unless unavoidable, use gentle state motion (swap/rotate/shift) instead of flashing, and preserve measured whitespace so the layout breathes without feeling empty.
+- Impact over Volume: use motion to convey state; keep one strong headline; let whitespace breathe.
 
-2.  **Impact over Volume**:
-    -   Use *Motion* instead of *Text* to convey state (e.g., Shake for error, Pulse for attention).
-    -   **Typography**: One bold header is better than three paragraphs of explanation.
-    -   **Whitespace**: Is an active element. Do not fill empty space just because it's empty.
+## CODE STYLE AND CONVENTIONS
 
-## CODE STYLE & CONVENTIONS
-
-### 1. Structure & Imports
-- **Monorepo**: Manual linking. `packages/shared` logic is imported directly or via TS paths.
-- **Path Aliases**: Use `@/components`, `@/lib`, `@/hooks`, `@/types` (mapped to `src/*`).
-- **Import Order**:
-  1. External Libraries (`react`, `framer-motion`, `lucide-react`)
+### Structure and Imports
+- Monorepo: manual linking. `packages/shared` logic is imported directly or via TS paths.
+- Path Aliases: use `@/components`, `@/lib`, `@/hooks`, `@/types` (mapped to `src/*`).
+- Import Order:
+  1. External libraries (`react`, `framer-motion`, `lucide-react`)
   2. Types (`@/types`)
   3. Components (`@/components/ui`, `@/components/marketplace`)
-  4. Hooks & Lib (`@/lib/store`, `@/hooks/useBidding`)
+  4. Hooks and lib (`@/lib/store`, `@/hooks/useBidding`)
 
-### 2. Naming Conventions
-- **Files**:
+### Naming Conventions
+- Files:
   - Components: `PascalCase.tsx` (e.g., `ItemCard.tsx`)
   - Hooks: `camelCase.ts` (e.g., `useBidding.ts`)
   - Utilities: `camelCase.ts` (e.g., `utils.ts`)
-- **Components**: PascalCase. Functional components only.
-- **IDs (CRITICAL)**: specific `id` attributes for AI targeting:
+- Components: PascalCase. Functional components only.
+- IDs (critical): every interactive element and major container must have an `id`.
   - Format: `kebab-case` with descriptive prefix + ID.
-  - Example: `id="item-card-i123"`, `id="place-bid-btn-i123"`
-  - **MANDATORY**: Every interactive element and major container MUST have an ID.
+  - Example: `id="item-card-i123"`, `id="place-bid-btn-i123"`.
 
-### 3. Styling (Tailwind v4 + Framer Motion)
-- **Engine**: Tailwind CSS v4. No config file needed for standard usage.
-- **Animations**: Use `framer-motion` (`motion.div`, `AnimatePresence`) for ALL state changes.
-- **Patterns**:
-  - **Glassmorphism**: `backdrop-blur-md bg-black/60` for overlays.
-  - **Fluid Typography**: Use custom classes like `text-fluid-h3` (if defined) or standard tailwind responsive prefixes.
+### Styling (Tailwind v4 + Framer Motion)
+- Engine: Tailwind CSS v4. No config file needed for standard usage.
+- Animations: use `framer-motion` (`motion.div`, `AnimatePresence`) for all state changes.
+- Pattern: glassmorphism overlays use `backdrop-blur-md bg-black/60`.
 
-### 4. State Management
-- **Store**: `apps/web/src/lib/store.tsx` (AppContext).
-- **Pattern**: No Redux/Zustand. Use `useApp()` hook to access global state (`items`, `user`, `bids`).
-- **Data Flow**:
-  - **Read**: `const { items, user } = useApp();`
-  - **Write**: `const { placeBid, toggleWatch } = useApp();`
-  - **Validation**: Logic (e.g., 70% min bid) lives in `packages/shared` or `store.tsx`, NOT in components.
+### State Management
+- Store: `apps/web/src/lib/store.tsx` (AppContext).
+- Pattern: no Redux/Zustand. Use `useApp()` to access state (`items`, `user`, `bids`).
+- Validation: business rules live in `packages/shared` or `store.tsx`, not in components.
 
-### 5. Type Safety
-- **Strict Mode**: Enabled. No `any`.
-- **Interfaces**: Define props interface for every component.
-- **Shared Types**: Use `apps/web/src/types/index.ts` for domain entities (`Item`, `Bid`, `User`).
+### Type Safety
+- Strict mode is enabled. No `any`.
+- Define a props interface for every component.
+- Shared types live in `apps/web/src/types/index.ts` for domain entities (`Item`, `Bid`, `User`).
 
-## FEATURE IMPLEMENTATION MAP
-
-| Feature | Logic Location | UI Component | Notes |
-|---------|----------------|--------------|-------|
-| **Bidding** | `useBidding` hook | `ItemCard.tsx`, `ProductDetailsModal.tsx` | Uses `SmartStepper` input. |
-| **Validation** | `packages/shared/bidding.ts` | `store.tsx` | Min bid: 70% of ask price. |
-| **Watchlist** | `toggleWatch` (store) | `ItemCard.tsx` (Bookmark icon) | Triggers Blue Halo. |
-| **Messaging** | `sendMessage` (store) | `ChatWindow.tsx` | Unlocks ONLY after deal acceptance. |
-| **Gallery** | `ItemCard` (internal state) | `ItemCard.tsx` | Immersive full-screen view. |
+## KEY AREAS (BY LOCATION)
+- Bidding: `apps/web/src/hooks/useBidding.ts`, `packages/shared/bidding.ts`, `apps/web/src/components/marketplace/ItemCard.tsx`.
+- Details UI: `apps/web/src/components/marketplace/ProductDetailsModal.tsx`.
+- Messaging UI: `apps/web/src/components/inbox/ChatWindow.tsx`.
+- Global store: `apps/web/src/lib/store.tsx`.
 
 ## ANTI-PATTERNS (DO NOT DO)
-- **❌ NO ORM**: Use raw SQL in `packages/database`.
-- **❌ NO Alerts**: Never use `window.alert()`. Use in-UI feedback (red rings, shaking animations).
-- **❌ NO Loose Strings**: Hardcoded strings in logic. Use constants.
-- **❌ NO Direct DOM Access**: Use Refs if absolutely necessary, but prefer React state.
-- **❌ NO Node APIs in Shared**: `packages/shared` must run in browser too.
+- No ORM. Use raw SQL in `packages/database`.
+- No alerts. Never use `window.alert()`.
+- No loose strings. Hardcoded strings in logic must be constants.
+- No direct DOM access. Use React state or refs only when necessary.
+- No Node APIs in `packages/shared` (must run in browser too).
 
 ## TESTING GUIDELINES
-- **Framework**: Playwright.
-- **Selectors**: Use the mandatory `id` attributes (`page.locator('#place-bid-btn-i123')`).
-- **State**: Mock data is loaded by default in `AppProvider`. Tests run against this mock state.
+- Framework: Playwright.
+- Selectors: use the mandatory `id` attributes (`page.locator('#place-bid-btn-i123')`).
+- State: mock data loads by default in `AppProvider` for tests.
+- Checks: run `npm run checks`.
 
-## ROADMAP & CURRENT TASKS
-- **SEO & Performance**: Audit and optimize Core Web Vitals.
+## ROADMAP AND CURRENT PRIORITIES
+- Notification system (outbid, deal accepted, message alerts).
+- Direct deal closure flow (acceptance to meetup).
+- Trust and verification (ratings and reviews).
+- Search and discovery (filters, relevance, location).
+- Seller tools (my listings, analytics, relist).
+- Performance and SEO polish.
 
 ## RULES FOR AI AGENTS
-1.  **Minimalist Check**: Before implementing, ask "Can this be done with FEWER elements?"
-2.  **Always Check IDs**: Before interacting with elements, verify the `id` exists or add it.
-3.  **Verify Animations**: Ensure Framer Motion transitions are smooth and don't cause layout shifts.
-4.  **SQL First**: DDL changes must be reflected in `packages/database/schema.sql`.
+1. Minimalist check: can this be done with fewer elements?
+2. Always check IDs: verify the `id` exists or add it.
+3. Verify animations: ensure Framer Motion transitions are smooth and avoid layout shifts.
+4. SQL first: DDL changes must be reflected in `packages/database/schema.sql`.
+5. Pre-flight requirement: always run `npx tsc --noEmit -p apps/web/tsconfig.json` before finishing a task.
+
+## PROJECT MANIFESTO
+D:\VSCode\Boliyan\MANIFESTO.md
