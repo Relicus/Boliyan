@@ -9,10 +9,11 @@ import AdCard from "@/components/ads/AdCard";
 import ItemCardSkeleton from "./ItemCardSkeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import SmartFilterBar, { FILTERS } from "./SmartFilterBar";
-import CategoryNav from "@/components/search/CategoryNav"; // Replaces CategoryBar
+import CategoryNav from "@/components/search/CategoryNav";
 import { LocationSelector } from "./LocationSelector";
 import { Button } from "@/components/ui/button";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { ActiveFilters } from "@/components/common/ActiveFilters";
 import { 
   Select,
   SelectContent,
@@ -267,6 +268,9 @@ export default function MarketplaceGrid() {
                   <PriceSelector />
                 </div>
               </div>
+
+              {/* Mobile Active Filters Row */}
+              <ActiveFilters variant="mobile" className="-mx-4" />
             </div>
           </div>
 

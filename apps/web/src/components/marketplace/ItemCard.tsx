@@ -33,7 +33,7 @@ interface ItemCardProps {
 }
 
 const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) => {
-  const { user, bids, watchedItemIds, toggleWatch } = useApp();
+  const { user, bids, watchedItemIds, toggleWatch, setFilter } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
   const visibilityRef = useTrackVisibility(item.id);
 
@@ -196,6 +196,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   category={item.category} 
                   variant="glass" 
                   className="mt-0.5"
+                  onClick={() => setFilter('category', item.category)}
                 />
               </div>
 

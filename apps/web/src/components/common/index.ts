@@ -13,4 +13,5 @@ export { TimerBadge } from './TimerBadge';
 export { BiddingControls } from './BiddingControls';
 export { VerifiedBadge } from './VerifiedBadge';
 export { GamificationBadge } from './GamificationBadge';
+export { ActiveFilters } from './ActiveFilters';
 
