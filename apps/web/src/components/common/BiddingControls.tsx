@@ -111,6 +111,48 @@ const BiddingButtonLabel = ({ content, className }: { content: React.ReactNode, 
   </div>
 );
 
+// Pyramid Beads Component - displays remaining attempts in a pyramid (2 top, 3 bottom)
+const PyramidBeads = ({ remaining, darkMode = false }: { remaining: number; darkMode?: boolean }) => {
+  // Pyramid layout: [0,1] top row, [2,3,4] bottom row
+  // Depletion order: Top-Right (1) -> Top-Left (0) -> Bot-Right (4) -> Bot-Mid (3) -> Bot-Left (2)
+  const beadActive = (index: number) => {
+    const used = 5 - remaining;
+    // Lower priority means it depletes sooner
+    const priorityMap: Record<number, number> = {
+      1: 0, // Top Right (Dies 1st)
+      0: 1, // Top Left (Dies 2nd)
+      4: 2, // Bot Right (Dies 3rd)
+      3: 3, // Bot Mid   (Dies 4th)
+      2: 4  // Bot Left  (Dies 5th)
+    };
+    // Alive if priority >= used count
+    return priorityMap[index] >= used;
+  };
+  
+  const beadClass = (active: boolean) => cn(
+    "h-1.5 w-1.5 rounded-full transition-all duration-300 shrink-0",
+    active 
+      ? (darkMode ? "bg-white/70" : "bg-white/80")
+      : (darkMode ? "bg-white/20" : "bg-white/30")
+  );
+  
+  return (
+    <div className="flex flex-col items-center gap-0.5 ml-2">
+      {/* Top row: 2 beads */}
+      <div className="flex gap-1">
+        <div className={beadClass(beadActive(0))} />
+        <div className={beadClass(beadActive(1))} />
+      </div>
+      {/* Bottom row: 3 beads */}
+      <div className="flex gap-1">
+        <div className={beadClass(beadActive(2))} />
+        <div className={beadClass(beadActive(3))} />
+        <div className={beadClass(beadActive(4))} />
+      </div>
+    </div>
+  );
+};
+
 // Size Helpers
 function getInputHeight(viewMode: BiddingViewMode): string {
   switch (viewMode) {
@@ -133,6 +175,15 @@ function getTextSize(viewMode: BiddingViewMode): string {
     case 'modal': return 'text-lg sm:text-xl';
     case 'spacious': return 'text-[clamp(0.875rem,5cqi,1.125rem)]';
     default: return 'text-[clamp(0.875rem,5cqi,1.125rem)]';
+  }
+}
+
+// Gap between stepper and button (viewMode-aware)
+function getGapClass(viewMode: BiddingViewMode): string {
+  switch (viewMode) {
+    case 'modal': return 'gap-3';     // More breathing room
+    case 'spacious': return 'gap-2.5';
+    default: return 'gap-1.5';        // Compact for ItemCards
   }
 }
 
@@ -319,35 +370,9 @@ export const BiddingControls = memo(({
   const activeTheme = BUTTON_THEMES[theme];
 
   return (
-    <div id={buildId('bidding-controls')} className={cn("flex flex-col w-full relative", showStatus ? 'gap-1.5' : 'gap-1.5')}>
+    <div id={buildId('bidding-controls')} className={cn("flex flex-col w-full relative", getGapClass(viewMode))}>
       
-      {/* Status Row (Modal/Product Page) */}
-      {showStatus && !isOwner && (
-        <div className="relative flex items-center justify-center px-1 min-h-[0.75rem]">
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
-              <div
-                key={i}
-                className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Attempts Dots (Optional - for ItemCard) */}
-      {showAttemptsDots && !isOwner && !isSuccess && (
-        <div className="flex justify-center mb-1">
-           <div className="flex gap-1.5">
-            {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
-              <div 
-                key={i} 
-                className={cn("h-1.5 w-1.5 rounded-full transition-all duration-300 shrink-0", darkMode ? "bg-slate-500" : "bg-slate-300")}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Beads now integrated into the button - see PyramidBeads component */}
 
       {/* Stepper Input Row */}
       <div className={`flex w-full ${getInputHeight(viewMode)} relative`} ref={inputContainerRef}>
@@ -474,7 +499,14 @@ export const BiddingControls = memo(({
           </div>
         ) : (
           <BiddingButtonLabel 
-            content={content}
+            content={
+              <>
+                {content}
+                {!isOwner && !isSuccess && !isQuotaReached && (
+                  <PyramidBeads remaining={remainingAttempts} darkMode={darkMode} />
+                )}
+              </>
+            }
             className={cn(activeTheme.textClass, "transition-colors duration-200")}
           />
         )}

@@ -259,18 +259,9 @@ export const PriceDisplay = memo(({
         </span>
       </div>
 
-      {/* Attempt Dots (Centered/Bottom) */}
+      {/* Attempt Dots (Removed per request - moved to button) */}
       <div className="flex flex-col items-center justify-end h-[2.5em] pb-1.5 opacity-60">
-        {showAttempts && (
-           <div className="flex gap-1">
-              {Array.from({ length: Math.max(0, remainingAttempts) }).map((_, i) => (
-                <div 
-                  key={i} 
-                  className={cn("h-1 w-1 rounded-full transition-all duration-300 shrink-0", darkMode ? "bg-slate-500" : "bg-slate-300")}
-                />
-              ))}
-           </div>
-        )}
+        {/* Dots moved to BiddingControls button */}
       </div>
 
       {/* Dynamic Right Side - Right Aligned */}

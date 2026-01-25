@@ -299,10 +299,24 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       <motion.div 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-amber-50 text-amber-800 px-4 py-2.5 rounded-xl text-center font-bold text-sm flex items-center justify-center gap-2 border border-amber-200/60 shadow-sm"
+                        className="mt-3 bg-amber-50 text-amber-800 px-4 py-2.5 rounded-xl text-center font-bold text-sm flex items-center justify-center gap-2 border border-amber-200/60 shadow-sm"
                       >
-                        <Zap className="h-4 w-4 fill-current text-amber-500" />
-                        You are the high bidder!
+                         <motion.div
+                           animate={{ 
+                             scale: [1, 1.35, 1],
+                             rotate: [0, -20, 20, 0]
+                           }}
+                           transition={{ 
+                             duration: 0.6,
+                             ease: "backOut",
+                             repeat: Infinity,
+                             repeatDelay: 3
+                           }}
+                           className="text-lg leading-none"
+                         >
+                           🎉
+                         </motion.div>
+                        Highest Bidder!
                       </motion.div>
                     )}
                   </div>

@@ -1,7 +1,7 @@
 export const MIN_BID_PERCENTAGE = 0.7; // 30% lower than asked price
 export const MAX_BID_PERCENTAGE = 1.5; // 50% higher than asked price
 export const WARNING_PERCENTAGE = 1.4; // Dual-tap warning threshold
-export const MAX_BID_ATTEMPTS = 3;     // 1 Initial + 2 Updates
+export const MAX_BID_ATTEMPTS = 5;     // Pyramid: 2 top row + 3 bottom row
 
 export function isValidBid(askedPrice: number, bidAmount: number): boolean {
   const min = askedPrice * MIN_BID_PERCENTAGE;
