@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, User as UserIcon, Tag, Trophy } from "lucide-react";
 import { BiddingConfig, BiddingViewMode } from "@/types/bidding";
@@ -62,13 +62,29 @@ export const PriceDisplay = memo(({
 }: PriceDisplayProps) => {
 
   const [showUserBid, setShowUserBid] = useState(false);
+  const prevUserBid = useRef(userCurrentBid);
+  const lastBidTimestamp = useRef(0);
 
   // Rotation Logic
-  // Wait for rolling animation (800ms) + display time (2000ms) before switching
-  const ROLLING_ANIMATION_DURATION = 800;
+  // Wait for rolling animation (500ms) + display time (2000ms) before switching
+  const ROLLING_ANIMATION_DURATION = 500;
   const DISPLAY_HOLD_DURATION = 2000;
   const TOTAL_ROTATION_INTERVAL = ROLLING_ANIMATION_DURATION + DISPLAY_HOLD_DURATION;
 
+  // Force show "Your Bid" immediately when user places a new bid
+  // Using queueMicrotask to avoid synchronous setState in effect (lint error)
+  useEffect(() => {
+    if (userCurrentBid !== undefined && userCurrentBid !== null && userCurrentBid !== prevUserBid.current) {
+      // New bid detected - force show "Your Bid" on next microtask
+      queueMicrotask(() => {
+        setShowUserBid(true);
+        lastBidTimestamp.current = Date.now();
+      });
+      prevUserBid.current = userCurrentBid;
+    }
+  }, [userCurrentBid]);
+
+  // Auto-rotate between views
   useEffect(() => {
     // Stop if no user bid
     if (userCurrentBid === undefined || userCurrentBid === null) {
@@ -81,7 +97,7 @@ export const PriceDisplay = memo(({
     }, TOTAL_ROTATION_INTERVAL);
 
     return () => clearTimeout(timer);
-  }, [showUserBid, userCurrentBid, config.variant, config.isUserHighBidder]);
+  }, [showUserBid, userCurrentBid, config.variant, config.isUserHighBidder, TOTAL_ROTATION_INTERVAL]);
   
   const safeShowUserBid = showUserBid && (userCurrentBid !== undefined && userCurrentBid !== null);
   
@@ -154,10 +170,6 @@ export const PriceDisplay = memo(({
     </AnimatePresence>
   );
 
-  // Common Value Component
-  // Use a unique key based on the price SOURCE (not value) to maintain separate animation states
-  // This prevents animation glitches when rotating between "Your Bid" and "Highest"
-  const priceKey = safeShowUserBid ? 'user-bid' : 'high-bid';
   
   const renderValue = () => (
       <span 
@@ -165,7 +177,7 @@ export const PriceDisplay = memo(({
         {...(displayPrice !== null ? highBidProps : bidCountProps)}
       >
           {displayPrice !== null ? (
-              <RollingPrice key={priceKey} price={displayPrice} />
+              <RollingPrice key="stacked-price" price={displayPrice} />
           ) : (
               displayText
           )}
@@ -276,7 +288,7 @@ export const PriceDisplay = memo(({
             {...(displayPrice !== null ? highBidProps : bidCountProps)}
           >
               {displayPrice !== null ? (
-                  <RollingPrice key={priceKey} price={displayPrice} />
+                  <RollingPrice key="stable-price-display" price={displayPrice} />
               ) : (
                   displayText
               )}
