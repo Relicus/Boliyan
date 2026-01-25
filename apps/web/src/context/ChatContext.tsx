@@ -31,6 +31,8 @@ interface ChatContextType {
   loadMessages: (conversationId: string) => Promise<void>;
   subscribeToConversation: (conversationId: string) => Promise<void>;
   unsubscribeFromConversation: (conversationId: string) => Promise<void>;
+  fetchConversation: (conversationId: string) => Promise<Conversation | undefined>;
+  refreshConversations: () => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -90,46 +92,85 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }), []);
 
   const fetchHydratedConversation = useCallback(async (conversationId: string) => {
-    const { data } = await supabase
+    // 1. Try fully hydrated fetch
+    const { data, error } = await supabase
       .from('conversations')
       .select(`
         *,
-        listings:listing_id(*, profiles(*)),
+        listings:listing_id(*, profiles:profiles!listings_seller_id_fkey(*)),
         seller_profile:seller_id(*),
         bidder_profile:bidder_id(*)
       `)
       .eq('id', conversationId)
       .single();
 
-    if (!data) return undefined;
+    if (error) {
+        console.error("[fetchHydratedConversation] Complex fetch error:", error);
+    }
+
+    if (!data) {
+        // 2. Debug: Check if raw conversation exists (Diagnose RLS vs Missing Join Data)
+        const { data: rawData, error: rawError } = await supabase
+            .from('conversations')
+            .select('*')
+            .eq('id', conversationId)
+            .single();
+            
+        console.log("[fetchHydratedConversation] Fallback check:", {
+            id: conversationId,
+            rawFound: !!rawData,
+            rawError,
+            details: rawData
+        });
+        
+        return undefined;
+    }
+    
     return transformConversationToHydratedConversation(data as unknown as ConversationWithHydration);
   }, []);
 
-  // 1. Fetch Conversations & Realtime logic (remains mostly same, but essentially "merges" fresh data)
-  useEffect(() => {
-    if (!user) {
-      const timer = setTimeout(() => setConversations([]), 0);
-      return () => clearTimeout(timer);
-    }
-
-    const fetchConversations = async () => {
-      const { data } = await supabase
+  // 1. Fetch Conversations
+  const fetchConversations = useCallback(async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
         .from('conversations')
         .select(`
           *,
-          listings:listing_id(*, profiles(*)),
+          listings:listing_id(*, profiles:profiles!listings_seller_id_fkey(*)),
           seller_profile:seller_id(*),
           bidder_profile:bidder_id(*)
         `)
-        .or(`seller_id.eq.${user.id},bidder_id.eq.${user.id}`)
+        // .or(`seller_id.eq.${user.id},bidder_id.eq.${user.id}`) // Rely on RLS for security & simplicity
         .order('updated_at', { ascending: false });
 
       if (data) {
         setConversations(data.map(conv => transformConversationToHydratedConversation(conv as unknown as ConversationWithHydration)));
       }
-    };
+  }, [user]);
 
-    fetchConversations();
+  // Subscription cleanup/reset
+  useEffect(() => {
+    if (!user) {
+      const timer = setTimeout(() => setConversations([]), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
+
+  // Initial Fetch Effect
+  useEffect(() => {
+    if (user) {
+      // Wrap in async function to satisfy linter (avoid sync setState warning)
+      const load = async () => {
+        await fetchConversations();
+      };
+      load();
+    }
+  }, [user, fetchConversations]);
+
+  // Realtime Subscription Effect
+  useEffect(() => {
+    if (!user) return;
 
     const handleConvUpdate = async (payload: RealtimePostgresChangesPayload<ConversationRow>) => {
         const convRow = payload.new;
@@ -139,7 +180,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         if (!transformed) return;
 
         if (payload.eventType === 'INSERT') {
-            setConversations(prev => [transformed, ...prev]);
+            setConversations(prev => {
+                if (prev.some(c => c.id === transformed.id)) return prev;
+                return [transformed, ...prev];
+            });
         } else if (payload.eventType === 'UPDATE') {
             setConversations(prev => prev.map(c => c.id === transformed.id ? transformed : c));
         }
@@ -363,7 +407,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     startConversation,
     loadMessages,
     subscribeToConversation,
-    unsubscribeFromConversation
+    unsubscribeFromConversation,
+    fetchConversation: fetchHydratedConversation,
+    refreshConversations: fetchConversations
   }), [
     conversations,
     messages,
@@ -372,7 +418,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     startConversation,
     loadMessages,
     subscribeToConversation,
-    unsubscribeFromConversation
+    unsubscribeFromConversation,
+    fetchHydratedConversation,
+    fetchConversations
   ]);
 
   return (

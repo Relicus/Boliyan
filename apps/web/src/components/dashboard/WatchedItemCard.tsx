@@ -135,12 +135,13 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                     {canCall && (
                       <Button
                         id={`watched-item-call-btn-${item.id}`}
-                        size="icon"
+                        size="sm"
                         variant="outline"
-                        className="h-7 w-7 border-slate-200 text-slate-500 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50"
+                        className="h-7 px-2 text-[10px] font-bold border-slate-200 text-slate-500 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50"
                         onClick={handleCall}
                       >
-                        <Phone className="h-3 w-3" />
+                        <Phone className="h-3 w-3 mr-1" />
+                        Call
                       </Button>
                     )}
                     <Button

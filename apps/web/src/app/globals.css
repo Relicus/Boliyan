@@ -197,6 +197,10 @@
 }
 
 @layer utilities {
+  .price-font {
+    font-family: var(--font-outfit);
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

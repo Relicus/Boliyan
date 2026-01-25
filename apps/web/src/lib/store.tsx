@@ -8,6 +8,8 @@ import { TimeProvider, useTime } from '@/context/TimeContext';
 import { useSearch, SearchProvider } from '@/context/SearchContext';
 import { useReviews, ReviewProvider } from '@/context/ReviewContext';
 import { ViewportProvider } from '@/context/ViewportContext';
+import { supabase } from '@/lib/supabase';
+import { transformBidToHydratedBid, transformListingToItem, type BidWithProfile, type ListingWithSeller } from '@/lib/transform';
 
 /* 
   LEGACY COMPATIBILITY LAYER
@@ -61,14 +63,41 @@ export function useApp() {
   // We patch it here for backward compatibility.
   
   const acceptBidCompat = useCallback(async (bidId: string) => {
-    await marketplace.acceptBid(bidId);
-    
-    // Find the bid to get details for conversation
-    const bid = marketplace.bids.find(b => b.id === bidId);
+    const updated = await marketplace.acceptBid(bidId);
+    if (!updated) return undefined;
+
+    const getBid = async () => {
+      const existing = marketplace.bids.find(b => b.id === bidId);
+      if (existing) return existing;
+
+      const { data } = await supabase
+        .from('bids')
+        .select('*, profiles(*)')
+        .eq('id', bidId)
+        .single();
+
+      if (!data) return undefined;
+      return transformBidToHydratedBid(data as unknown as BidWithProfile);
+    };
+
+    const getItem = async (itemId: string) => {
+      const existing = marketplace.items.find(i => i.id === itemId);
+      if (existing) return existing;
+
+      const { data } = await supabase
+        .from('marketplace_listings')
+        .select('*')
+        .eq('id', itemId)
+        .single();
+
+      if (!data) return undefined;
+      return transformListingToItem(data as unknown as ListingWithSeller);
+    };
+
+    const bid = await getBid();
     if (!bid) return undefined;
-    
-    // Find item
-    const item = marketplace.items.find(i => i.id === bid.itemId);
+
+    const item = await getItem(bid.itemId);
     if (!item) return undefined;
 
     // Start conversation via ChatContext

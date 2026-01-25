@@ -5,9 +5,10 @@ import { useApp } from "@/lib/store";
 import SellerListingCard from "@/components/seller/SellerListingCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
+import ListingOffersCard from "@/components/dashboard/ListingOffersCard";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Bookmark, Gavel, Tag } from "lucide-react";
+import { Plus, Bookmark, Gavel, Tag, Inbox } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -90,6 +91,21 @@ function DashboardContent() {
 
 
   const myBids = bids.filter(b => b.bidderId === user?.id);
+  
+  // Offers received on MY listings (I'm the seller) - grouped by listing
+  const listingsWithOffers = myItems
+    .map(item => ({
+      item,
+      offers: bids.filter(b => 
+        b.itemId === item.id && 
+        (b.status === 'pending' || b.status === 'accepted')
+      )
+    }))
+    .filter(group => group.offers.length > 0);
+  
+  // Total offer count for badge
+  const totalOfferCount = listingsWithOffers.reduce((sum, g) => sum + g.offers.length, 0);
+  
   const watchedItems = watchedItemIds
     .map(id => itemsById[id])
     .filter(Boolean); // Only show items we have data for
@@ -109,23 +125,33 @@ function DashboardContent() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6 bg-slate-100 p-1 rounded-xl">
-          <TabsTrigger value="active-bids" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
-             My Bids
+        <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl">
+          <TabsTrigger id="dashboard-bids-tab" value="active-bids" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
+             <Gavel className="w-4 h-4" />
+             <span className="hidden sm:inline">My Bids</span>
              {myBids.length > 0 && (
-                <Badge variant="secondary" className="ml-2 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myBids.length}</Badge>
+                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myBids.length}</Badge>
              )}
           </TabsTrigger>
-          <TabsTrigger value="listings" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
-             My Listings
+          <TabsTrigger id="dashboard-offers-tab" value="offers" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
+             <Inbox className="w-4 h-4" />
+             <span className="hidden sm:inline">Offers</span>
+             {totalOfferCount > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-700 hover:bg-amber-200 h-5 px-1.5">{totalOfferCount}</Badge>
+             )}
+          </TabsTrigger>
+          <TabsTrigger id="dashboard-listings-tab" value="listings" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
+             <Tag className="w-4 h-4" />
+             <span className="hidden sm:inline">Listings</span>
              {myItems.length > 0 && (
-                <Badge variant="secondary" className="ml-2 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myItems.length}</Badge>
+                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myItems.length}</Badge>
              )}
           </TabsTrigger>
-          <TabsTrigger value="watchlist" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
-             Watchlist
+          <TabsTrigger id="dashboard-watchlist-tab" value="watchlist" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
+             <Bookmark className="w-4 h-4" />
+             <span className="hidden sm:inline">Watchlist</span>
              {watchedItems.length > 0 && (
-                <Badge variant="secondary" className="ml-2 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{watchedItems.length}</Badge>
+                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{watchedItems.length}</Badge>
              )}
           </TabsTrigger>
         </TabsList>
@@ -171,7 +197,38 @@ function DashboardContent() {
                 </motion.div>
              )}
 
-             {/* 2. MY LISTINGS TAB */}
+             {/* 2. OFFERS TAB (Bids received on MY listings, grouped by listing) */}
+             {activeTab === 'offers' && (
+                <motion.div
+                    key="offers"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="grid gap-4 grid-cols-1 lg:grid-cols-2"
+                >
+                    {listingsWithOffers.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                            <Inbox className="w-12 h-12 text-slate-300 mb-3" />
+                            <h3 className="text-lg font-bold text-slate-700">No offers yet</h3>
+                            <p className="max-w-xs mx-auto mb-4">When buyers bid on your listings, their offers will appear here.</p>
+                            <Link href="/sell">
+                                <Button variant="outline">Create a Listing</Button>
+                            </Link>
+                        </div>
+                    ) : (
+                        listingsWithOffers.map(({ item, offers }) => (
+                            <ListingOffersCard 
+                                key={item.id} 
+                                item={item} 
+                                offers={offers} 
+                            />
+                        ))
+                    )}
+                </motion.div>
+             )}
+
+             {/* 3. MY LISTINGS TAB */}
              {activeTab === 'listings' && (
                 <motion.div
                     key="listings"
@@ -203,7 +260,7 @@ function DashboardContent() {
                 </motion.div>
              )}
 
-             {/* 3. WATCHLIST TAB */}
+             {/* 4. WATCHLIST TAB */}
              {activeTab === 'watchlist' && (
                 <motion.div
                     key="watchlist"

@@ -19,8 +19,17 @@ interface ConversationListProps {
 }
 
 export function ConversationList({ conversations, selectedId, onSelect, role }: ConversationListProps) {
-  const { user } = useApp();
+  const { user, refreshConversations, bids } = useApp();
   const [now, setNow] = useState(() => Date.now());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    if (refreshConversations) {
+        setIsRefreshing(true);
+        await refreshConversations();
+        setTimeout(() => setIsRefreshing(false), 500);
+    }
+  };
 
   // Update timestamps every second for live countdown
   useEffect(() => {
@@ -70,6 +79,13 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
         <p className="text-[10px] text-slate-400 max-w-[140px] leading-tight">
           Chats appear here once a bid is accepted and the deal is moving.
         </p>
+        <button 
+           onClick={handleRefresh}
+           disabled={isRefreshing}
+           className="mt-2 text-xs font-bold text-blue-600 hover:text-blue-700 disabled:opacity-50"
+        >
+            {isRefreshing ? "Refreshing..." : "Refresh List"}
+        </button>
       </div>
     );
   }
@@ -80,6 +96,9 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
         {conversations.map((conv, idx) => {
           const otherUser = getOtherUser(conv);
           const item = getItem(conv);
+          const bidAmount = bids.find(b => b.itemId === conv.itemId && b.bidderId === conv.bidderId)?.amount;
+          const priceValue = bidAmount ?? item?.currentHighBid ?? item?.askPrice;
+          const displayPrice = typeof priceValue === 'number' ? priceValue : undefined;
           const timeLeft = getChatTimeLeft(conv.expiresAt);
           const isSelected = selectedId === conv.id;
           
@@ -130,15 +149,11 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
                 </div>
                 
                 <div className="flex-1 min-w-0 z-10">
-                  <div className="flex justify-between items-baseline gap-2 mb-0.5">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 mb-0.5">
                     <h4 className="font-black text-[14px] text-slate-900 truncate leading-none flex items-center gap-1">
                       {otherUser?.name || "Anonymous"}
                       {otherUser?.isVerified && <VerifiedBadge size="sm" />}
                     </h4>
-                    
-                    <span className="text-[9px] font-black text-slate-500 whitespace-nowrap uppercase tracking-widest">
-                      {conv.updatedAt ? formatDistanceToNow(new Date(conv.updatedAt), { addSuffix: false }) : 'now'}
-                    </span>
                   </div>
                   
                   <div className="flex items-center gap-1.5 mb-1.5 min-w-0">
@@ -168,9 +183,27 @@ export function ConversationList({ conversations, selectedId, onSelect, role }: 
                     "text-[12px] truncate font-medium tracking-tight",
                     isSelected ? "text-slate-600" : "text-slate-500 group-hover:text-slate-600"
                   )}>
-                    {conv.lastMessage || "Message the user..."}
+                    {conv.lastMessage && conv.lastMessage !== 'Chat started'
+                      ? conv.lastMessage
+                      : "No messages yet"}
                   </p>
                 </div>
+
+                {displayPrice !== undefined && (
+                  <div className="shrink-0 text-right">
+                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                      {conv.updatedAt ? formatDistanceToNow(new Date(conv.updatedAt), { addSuffix: false }) : 'now'}
+                    </div>
+                    {item && (
+                      <div className="price-font text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        Ask {item.askPrice.toLocaleString()}
+                      </div>
+                    )}
+                    <div className="price-font text-[18px] font-black text-emerald-600 leading-none">
+                      Rs. {displayPrice.toLocaleString()}
+                    </div>
+                  </div>
+                )}
 
                 {isSelected && (
                   <motion.div 

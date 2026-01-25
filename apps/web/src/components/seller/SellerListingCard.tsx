@@ -8,6 +8,7 @@ import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { Clock, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useTime } from "@/context/TimeContext";
+import { useApp } from "@/lib/store";
 
 interface SellerListingCardProps {
   item: Item;
@@ -17,6 +18,12 @@ interface SellerListingCardProps {
 
 export default function SellerListingCard({ item, onView, onDelete }: SellerListingCardProps) {
   const { now } = useTime();
+  const { conversations } = useApp();
+  const maxSlots = 3;
+  const displayChatCount = Math.min(
+    conversations.filter(c => c.itemId === item.id).length,
+    maxSlots
+  );
   
   const getTimeLeft = (expiryAt: string) => {
     if (!now) return { text: "--:--", color: "text-slate-500", isUrgent: false };
@@ -72,13 +79,20 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
             <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-0.5">
               Asking Price
             </span>
-            <p id={`listing-price-${item.id}`} className="text-[clamp(0.75rem,4cqi,1rem)] text-blue-600 font-black font-outfit leading-none">
+            <p id={`listing-price-${item.id}`} className="price-font text-[clamp(0.75rem,4cqi,1rem)] text-blue-600 font-black leading-none">
               Rs. {item.askPrice.toLocaleString()}
             </p>
           </div>
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
               {item.listingDuration}h
+            </Badge>
+            <Badge
+              id={`listing-slots-${item.id}`}
+              variant="outline"
+              className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400"
+            >
+              Slots {displayChatCount}/{maxSlots}
             </Badge>
             <div className={`text-[10px] font-bold flex items-center gap-1 ${timeInfo.color}`}>
               <Clock className={`h-2.5 w-2.5 ${timeInfo.isUrgent ? 'animate-pulse' : ''}`} />

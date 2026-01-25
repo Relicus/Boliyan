@@ -22,7 +22,7 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
-  const { user, messages, sendMessage, markAsRead, conversations, subscribeToConversation, unsubscribeFromConversation, confirmExchange } = useApp();
+  const { user, messages, sendMessage, markAsRead, conversations, bids, subscribeToConversation, unsubscribeFromConversation, confirmExchange, fetchConversation } = useApp();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
@@ -31,6 +31,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const { submitReview } = useReviews();
   const [showSealAnim, setShowSealAnim] = useState(false);
   const [showMissing, setShowMissing] = useState(false);
+  const [localConversation, setLocalConversation] = useState<any>(null);
   
   // Vouch State
   const [vouchRating, setVouchRating] = useState(0);
@@ -63,10 +64,43 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     };
   }, [conversationId, subscribeToConversation, unsubscribeFromConversation]);
 
-  const conversation = conversations.find(c => c.id === conversationId);
+  // Fetch Fallback if not in global state
+  useEffect(() => {
+    if (!conversationId || conversations.find(c => c.id === conversationId)) return;
+    
+    // Attempt fetch
+    const loadMissing = async () => {
+        // Need fetchConversation exposed in useApp -> context
+        if (fetchConversation) {
+            const fetched = await fetchConversation(conversationId);
+            if (fetched) {
+                setLocalConversation(fetched);
+            }
+        }
+    };
+    loadMissing();
+  }, [conversationId, conversations, fetchConversation]);
+
+  const conversation = conversations.find(c => c.id === conversationId) || localConversation;
   const isSeller = user && conversation ? conversation.sellerId === user.id : false;
   const otherUser = conversation ? (isSeller ? conversation.bidder : conversation.seller) : undefined;
   const item = conversation?.item;
+  const offerBid = conversation
+    ? bids.find(b => b.itemId === conversation.itemId && b.bidderId === conversation.bidderId)
+    : undefined;
+  const offerPrice = offerBid?.amount ?? item?.currentHighBid;
+  const priceBlock = item ? (
+    <div className="flex flex-col items-start">
+      <span className="price-font text-[9px] md:text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">
+        Ask {formatPrice(item.askPrice)}
+      </span>
+      {typeof offerPrice === 'number' && (
+        <span className="price-font text-[clamp(0.9rem,2.6cqi,1.1rem)] font-black text-emerald-600 leading-none tabular-nums">
+          {formatPrice(offerPrice)}
+        </span>
+      )}
+    </div>
+  ) : null;
 
   // Handshake Logic
   const myRole = isSeller ? 'seller' : 'buyer';
@@ -132,7 +166,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   // Calculate real active chat count for this item
   const activeChatCount = item ? conversations.filter(c => c.itemId === item.id).length : 0;
   const maxSlots = 3;
-  const slots = Array.from({ length: maxSlots }).map((_, i) => i < activeChatCount);
+  const displayChatCount = Math.min(activeChatCount, maxSlots);
+  const slots = Array.from({ length: maxSlots }).map((_, i) => i < displayChatCount);
 
   // Lock body scroll to prevent Safari from scrolling page when input focused
   useEffect(() => {
@@ -199,7 +234,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
       return;
     }
 
-    const timer = setTimeout(() => setShowMissing(true), 1500);
+    const timer = setTimeout(() => setShowMissing(true), 2500); // Increased timeout to give fetch time
     return () => clearTimeout(timer);
   }, [conversation, conversationId, user, showMissing]);
 
@@ -216,11 +251,45 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     }
   }, [currentMessages, conversationId, user?.id, markAsRead]);
 
+  const handleRetryFetch = async () => {
+    setShowMissing(false);
+    if (fetchConversation && conversationId) {
+        console.log("Manual retry fetching conversation:", conversationId);
+        const fetched = await fetchConversation(conversationId);
+        if (fetched) {
+            setLocalConversation(fetched);
+        } else {
+            console.error("Manual retry failed to find conversation");
+            toast.error("Could not find conversation. It may have been deleted.");
+            setTimeout(() => setShowMissing(true), 500);
+        }
+    }
+  };
+
   if (!user) return <div className="p-10 text-center">Please sign in to view chats.</div>;
   if (!conversation) {
     return showMissing
-      ? <div className="p-10 text-center">Conversation not found</div>
-      : <div className="p-10 text-center">Loading chat...</div>;
+      ? (
+        <div className="flex flex-col items-center justify-center h-full p-10 text-center space-y-4">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-2">
+                <Clock className="h-8 w-8 text-red-300" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">Conversation not found</h3>
+            <p className="text-sm text-slate-500 max-w-[280px]">
+               We couldn't load this chat (ID: {conversationId?.slice(0, 8)}...). 
+            </p>
+            <div className="text-[10px] text-slate-400 bg-slate-50 p-2 rounded border border-slate-100 font-mono mt-2">
+                User: {user.id.slice(0, 8)}...
+            </div>
+            <Button onClick={handleRetryFetch} variant="outline" className="mt-4">
+                Retry Connection
+            </Button>
+            <Button onClick={onBack || (() => window.history.back())} variant="ghost" className="text-slate-400">
+                Go Back
+            </Button>
+        </div>
+      )
+      : <div className="flex items-center justify-center h-full p-10 text-center text-slate-400 animate-pulse">Loading chat...</div>;
   }
 
   const handleSend = (e: React.FormEvent) => {
@@ -241,83 +310,66 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
       {/* Premium Header */}
       <header id="chat-header" className="flex flex-col border-b shrink-0 bg-white/80 backdrop-blur-xl z-30 sticky top-0">
-        <div className="flex items-center gap-3 p-4 pb-3">
-            {onBack && (
-            <Button id="chat-back-btn" variant="ghost" size="icon" onClick={onBack} className="md:hidden -ml-2 rounded-full">
-                <ArrowLeft className="h-5 w-5" />
-            </Button>
-            )}
-            <div className="relative">
-            <Avatar className="h-10 w-10 border shadow-sm ring-2 ring-white">
-                <AvatarImage src={otherUser?.avatar} />
-                <AvatarFallback className="bg-slate-100 text-slate-400 font-black text-xs">{otherUser?.name?.[0] || "?"}</AvatarFallback>
-            </Avatar>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-white bg-emerald-500 shadow-sm" />
-            </div>
-            
-            <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-                <h3 className="font-black text-[15px] text-slate-900 truncate tracking-tight">{otherUser?.name || "Unknown"}</h3>
-                {otherUser?.isVerified && <VerifiedBadge size="sm" />}
-                <span className={cn(
-                "text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter shadow-sm",
-                isSeller ? "bg-slate-900 text-white" : "bg-blue-600 text-white"
-                )}>
-                {isSeller ? "Buyer" : "Seller"}
-                </span>
-                {item && (
-                <span className="text-[10px] font-black text-slate-400 ml-auto mr-2 tracking-tighter uppercase whitespace-nowrap bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
-                    Ask: {formatPrice(item.askPrice)}
-                </span>
-                )}
-            </div>
-            
-            <div className="flex items-center gap-1.5 min-w-0">
-                {item && (
-                <div className="h-4 w-4 rounded-[4px] bg-slate-100 overflow-hidden flex-shrink-0 ring-1 ring-slate-200/50">
-                    <img src={item.images[0]} alt="" className="h-full w-full object-cover" />
-                </div>
-                )}
-                <div className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-tight">
-                {item?.title || "Product"}
-                </div>
-            </div>
+        <div className="flex flex-col gap-2 p-4 pb-3 md:flex-row md:items-center">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              {onBack && (
+              <Button id="chat-back-btn" variant="ghost" size="icon" onClick={onBack} className="md:hidden -ml-2 rounded-full">
+                  <ArrowLeft className="h-5 w-5" />
+              </Button>
+              )}
+              <div className="relative">
+              <Avatar className="h-10 w-10 border shadow-sm ring-2 ring-white">
+                  <AvatarImage src={otherUser?.avatar} />
+                  <AvatarFallback className="bg-slate-100 text-slate-400 font-black text-xs">{otherUser?.name?.[0] || "?"}</AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-white bg-emerald-500 shadow-sm" />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5 min-w-0">
+                  <h3 className="font-black text-[15px] text-slate-900 truncate tracking-tight">{otherUser?.name || "Unknown"}</h3>
+                  {otherUser?.isVerified && <VerifiedBadge size="sm" />}
+                  <span className={cn(
+                  "text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter shadow-sm shrink-0",
+                  isSeller ? "bg-slate-900 text-white" : "bg-blue-600 text-white"
+                  )}>
+                  {isSeller ? "Buyer" : "Seller"}
+                  </span>
+              </div>
+              
+              <div className="flex items-center gap-1.5 min-w-0">
+                  {item && (
+                  <div className="h-4 w-4 rounded-[4px] bg-slate-100 overflow-hidden flex-shrink-0 ring-1 ring-slate-200/50">
+                      <img src={item.images[0]} alt="" className="h-full w-full object-cover" />
+                  </div>
+                  )}
+                  <div className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-tight">
+                  {item?.title || "Product"}
+                  </div>
+              </div>
+              </div>
             </div>
 
-            {/* 3-Slot Indicator (Seller Only) */}
-            {isSeller && (
-            <div className="flex flex-col items-end mr-2">
-                <div className="flex gap-1 mb-0.5">
-                {slots.map((filled, i) => (
-                    <div 
-                    key={i} 
-                    className={cn(
-                        "w-2 h-2 rounded-full ring-1 ring-slate-100 transition-all", 
-                        filled ? "bg-emerald-500 shadow-sm shadow-emerald-200" : "bg-slate-100"
-                    )} 
-                    />
-                ))}
-                </div>
-                <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-tighter text-slate-400">
-                {activeChatCount}/{maxSlots} Slots
-                </span>
+            <div className="flex items-center gap-2 justify-between md:justify-end">
+              {priceBlock}
+              {!isLocked && (
+                  <Button
+                      id="chat-call-btn"
+                      size="sm"
+                      variant="outline"
+                      className="h-9 px-3 text-xs font-bold rounded-full border-slate-200 text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-colors shadow-sm"
+                      onClick={() => {
+                          const phone = otherUser?.phone || "+971500000000"; // Fallback or Mock
+                          window.location.href = `tel:${phone}`;
+                      }}
+                  >
+                      <Phone className="h-4 w-4 mr-1" />
+                      Call
+                  </Button>
+              )}
             </div>
-            )}
-            
-            {!isLocked && (
-                <Button
-                    id="chat-call-btn"
-                    size="icon"
-                    variant="outline"
-                    className="rounded-full h-9 w-9 border-slate-200 text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-colors shadow-sm"
-                    onClick={() => {
-                        const phone = otherUser?.phone || "+971500000000"; // Fallback or Mock
-                        window.location.href = `tel:${phone}`;
-                    }}
-                >
-                    <Phone className="h-4 w-4" />
-                </Button>
-            )}
+
+            {/* Slot indicator shown on listing/dashboard only */}
 
             {timeLeft && !isSealed && (
             <div className={cn(
@@ -381,7 +433,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
       {/* Messages Area */}
       <div 
         id="chat-messages"
-        className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide bg-gradient-to-b from-white to-slate-50/30"
+        className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-hide bg-gradient-to-b from-white to-slate-50/30 flex flex-col justify-end"
       >
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
@@ -421,34 +473,32 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                 animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
                 transition={{ type: "spring", damping: 20, stiffness: 200 }}
                 className={cn(
-                  "flex flex-col gap-1.5 max-w-[80%] relative",
-                  isMe ? "ml-auto" : "mr-auto"
+                  "flex flex-col gap-1 max-w-[85%] md:max-w-[70%] w-fit",
+                  isMe ? "ml-auto self-end items-end" : "mr-auto self-start items-start"
                 )}
               >
                 <div className={cn(
-                  "px-4 py-2.5 text-[14px] font-medium shadow-sm transition-all",
+                  "relative inline-flex w-fit max-w-full px-3 pt-1.5 pb-4 pr-12 text-[12px] md:text-[13px] font-medium leading-snug shadow-sm transition-all",
                   isMe 
-                    ? "bg-blue-600 text-white rounded-[22px] rounded-tr-[4px] shadow-blue-200/50" 
-                    : "bg-white text-slate-800 rounded-[22px] rounded-tl-[4px] ring-1 ring-slate-100 shadow-slate-200/50"
+                    ? "bg-blue-600 text-white rounded-[18px] rounded-tr-[6px] shadow-blue-200/50" 
+                    : "bg-white text-slate-800 rounded-[18px] rounded-tl-[6px] ring-1 ring-slate-100 shadow-slate-200/50"
                 )}>
-                  {msg.content}
-                </div>
-                <div className={cn(
-                  "flex items-center gap-1.5 px-1",
-                  isMe ? "justify-end" : "justify-start"
-                )}>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <span className="whitespace-pre-wrap break-words">{msg.content}</span>
+                  <span className={cn(
+                    "absolute bottom-1 right-2 flex items-center gap-1 text-[9px] font-bold uppercase tracking-tighter whitespace-nowrap",
+                    isMe ? "text-blue-100/90" : "text-slate-400"
+                  )}>
                     {format(new Date(msg.createdAt), 'h:mm a')}
+                    {isMe && (
+                      <span className="flex items-center justify-center">
+                        {msg.isRead ? (
+                          <CheckCheck className="h-3 w-3 text-blue-100/90" />
+                        ) : (
+                           <Check className="h-3 w-3 text-blue-100/70" />
+                        )}
+                      </span>
+                    )}
                   </span>
-                  {isMe && (
-                    <div className="flex items-center justify-center">
-                      {msg.isRead ? (
-                        <CheckCheck className="h-3 w-3 text-blue-500" />
-                      ) : (
-                         <Check className="h-3 w-3 text-slate-300" />
-                      )}
-                    </div>
-                  )}
                 </div>
               </motion.div>
             );
