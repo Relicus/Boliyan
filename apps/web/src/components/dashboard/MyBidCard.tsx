@@ -54,7 +54,8 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   }, [conversations, item.id, user]);
   const isAccepted = userBid.status === 'accepted';
   const canChat = isAccepted && !!acceptedConversation;
-  const canCall = canChat && !!seller.phone;
+  const listingPhone = item.contactPhone || seller.phone;
+  const canCall = canChat && !!listingPhone;
 
   const handleChat = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -64,8 +65,8 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
 
   const handleCall = (event: React.MouseEvent) => {
     event.stopPropagation();
-    if (!seller.phone) return;
-    window.location.href = `tel:${seller.phone}`;
+    if (!listingPhone) return;
+    window.location.href = `tel:${listingPhone}`;
   };
 
   return (

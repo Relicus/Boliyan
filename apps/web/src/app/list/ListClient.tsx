@@ -13,7 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, Sparkles, CreditCard, Clock, Calculator, Plus, Minus } from "lucide-react";
+import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, Sparkles, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
 import { CATEGORIES, LISTING_LIMITS } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -83,6 +83,7 @@ function ListForm() {
   const [purchaseYear, setPurchaseYear] = useState<string>("");
   const [purchaseMonth, setPurchaseMonth] = useState<string>("");
   const [currentNewPrice, setCurrentNewPrice] = useState<string>("");
+  const [contactPhone, setContactPhone] = useState("");
   const [showPriceEstimator, setShowPriceEstimator] = useState(false);
   
   // Computed price estimate
@@ -117,6 +118,7 @@ function ListForm() {
     category?: boolean;
     askPrice?: boolean;
     description?: boolean;
+    contactPhone?: boolean;
     images?: boolean;
     purchasePrice?: boolean;
     purchaseYear?: boolean;
@@ -124,7 +126,6 @@ function ListForm() {
 
   useEffect(() => {
     if (editingItem) {
-
       setTitle(editingItem.title);
       setCategory(editingItem.category);
       setAskPrice(editingItem.askPrice.toString());
@@ -139,11 +140,17 @@ function ListForm() {
       );
       setDuration(editingItem.listingDuration.toString() as "24" | "48" | "72");
       setCondition(editingItem.condition || "used");
+      setContactPhone(editingItem.contactPhone || user?.phone || "");
       return;
     }
 
     setImageEntries([]);
-  }, [editingItem]);
+    if (user?.phone && !contactPhone) {
+      setContactPhone(user.phone);
+    }
+  }, [editingItem, user, contactPhone]);
+
+  const isValidPhone = (value: string) => value.replace(/\D/g, "").length >= 10;
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -205,6 +212,7 @@ function ListForm() {
       category: !category,
       askPrice: isNaN(priceNum) || priceNum < LISTING_LIMITS.PRICE.MIN || priceNum > LISTING_LIMITS.PRICE.MAX,
       description: description.length < LISTING_LIMITS.DESCRIPTION.MIN || description.length > LISTING_LIMITS.DESCRIPTION.MAX,
+      contactPhone: !isValidPhone(contactPhone),
       images: imageEntries.length < 1,
       purchasePrice: !purchasePrice || isNaN(parseFloat(purchasePrice)) || parseFloat(purchasePrice) <= 0,
       purchaseYear: !purchaseYear
@@ -247,6 +255,7 @@ function ListForm() {
           category,
           asked_price: roundedPrice,
           description,
+          contact_phone: contactPhone.trim(),
           auction_mode: (isPublic ? 'visible' : 'hidden') as 'visible' | 'hidden',
           images: orderedUrls,
           condition: condition,
@@ -310,7 +319,10 @@ function ListForm() {
             >
               {/* Image Section */}
               <div className="space-y-4">
-                <Label id="images-label" className="text-sm font-semibold text-slate-900">Product Images (Max 5)</Label>
+                <Label id="images-label" className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+                  <Camera className="h-3.5 w-3.5 text-slate-500" />
+                  Product Images (Max 5)
+                </Label>
                 <div id="images-preview-container" className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                   {imageEntries.map((entry, index) => (
                     <div key={entry.id} id={`image-preview-${index}`} className="relative h-28 w-28 shrink-0 rounded-xl overflow-hidden border border-slate-100 shadow-sm group">
@@ -374,6 +386,7 @@ function ListForm() {
               <div className="space-y-2">
                 <Label htmlFor="title" className="flex items-center justify-between gap-1">
                   <div className="flex items-center gap-1">
+                    <Tag className="h-3.5 w-3.5 text-slate-500" />
                     Item Title <span className="text-red-500">*</span>
                   </div>
                   <span className={cn(
@@ -415,6 +428,7 @@ function ListForm() {
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1">
+                    <Shapes className="h-3.5 w-3.5 text-slate-500" />
                     Category <span className="text-red-500">*</span>
                   </Label>
                   <Select 
@@ -450,7 +464,10 @@ function ListForm() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1">Condition</Label>
+                  <Label className="flex items-center gap-1">
+                    <BadgeCheck className="h-3.5 w-3.5 text-slate-500" />
+                    Condition
+                  </Label>
                   <Select 
                     value={condition} 
                     onValueChange={(val: 'new' | 'like_new' | 'used' | 'fair') => setCondition(val)}
@@ -602,6 +619,7 @@ function ListForm() {
               <div className="space-y-2">
                 <Label htmlFor="price-input" className="flex items-center justify-between">
                   <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
+                    <DollarSign className="h-3.5 w-3.5" />
                     Your Ask Price (Rs.) <span className="text-red-500">*</span>
                   </span>
                   {askPrice && !isNaN(parseFloat(askPrice)) && parseFloat(askPrice) >= 1000000 && (
@@ -684,6 +702,7 @@ function ListForm() {
               <div className="space-y-2">
                 <Label htmlFor="description-textarea" className="flex items-center justify-between gap-1">
                   <div className="flex items-center gap-1">
+                    <AlignLeft className="h-3.5 w-3.5 text-slate-500" />
                     Description <span className="text-red-500">*</span>
                   </div>
                   <span className={cn(
@@ -721,6 +740,27 @@ function ListForm() {
                 </AnimatePresence>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="listing-phone-input" className="flex items-center gap-1">
+                  <Phone className="h-3.5 w-3.5 text-slate-500" />
+                  Phone for this listing <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="listing-phone-input"
+                  type="tel"
+                  placeholder="Enter phone number"
+                  value={contactPhone}
+                  onChange={(e) => {
+                    setContactPhone(e.target.value);
+                    if (errors.contactPhone) setErrors(prev => ({ ...prev, contactPhone: false }));
+                  }}
+                  className={`transition-all ${errors.contactPhone ? "border-red-500 bg-red-50/50 ring-red-500/20" : "bg-slate-50 border-slate-100"}`}
+                />
+                {errors.contactPhone && (
+                  <p className="text-[10px] font-bold text-red-500">Please enter a valid phone number</p>
+                )}
+              </div>
+
               <div className="space-y-4 pt-4">
                 <h3 id="bidding-style-heading" className="text-sm font-semibold text-slate-900">Bidding Style</h3>
                 
@@ -755,7 +795,10 @@ function ListForm() {
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  <Label className="text-sm font-semibold text-slate-900">Listing Duration</Label>
+                  <Label className="text-sm font-semibold text-slate-900 flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5 text-slate-500" />
+                    Listing Duration
+                  </Label>
                   <div className="grid grid-cols-3 gap-3">
                     {(['24', '48', '72'] as const).map((d) => (
                       <button

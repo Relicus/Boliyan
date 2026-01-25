@@ -18,6 +18,7 @@ CREATE TABLE listings (
   seller_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   description TEXT,
+  contact_phone TEXT,
   asked_price DECIMAL NOT NULL,
   category TEXT,
   images TEXT[] DEFAULT '{}',

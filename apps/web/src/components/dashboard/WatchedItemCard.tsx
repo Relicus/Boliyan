@@ -52,7 +52,8 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
 
   const biddingConfig = createBiddingConfig(item, user, bids);
   const canChat = activeBid?.status === 'accepted' && !!acceptedConversation;
-  const canCall = canChat && !!seller.phone;
+  const listingPhone = item.contactPhone || seller.phone;
+  const canCall = canChat && !!listingPhone;
 
   const handleChat = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -62,8 +63,8 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
 
   const handleCall = (event: React.MouseEvent) => {
     event.stopPropagation();
-    if (!seller.phone) return;
-    window.location.href = `tel:${seller.phone}`;
+    if (!listingPhone) return;
+    window.location.href = `tel:${listingPhone}`;
   };
 
   return (

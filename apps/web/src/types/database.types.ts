@@ -7,8 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
@@ -19,28 +17,37 @@ export type Database = {
           amount: number
           bidder_id: string | null
           created_at: string | null
+          expires_at: string | null
           id: string
           listing_id: string | null
           message: string | null
           status: string | null
+          update_count: number | null
+          updated_at: string | null
         }
         Insert: {
           amount: number
           bidder_id?: string | null
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           listing_id?: string | null
           message?: string | null
           status?: string | null
+          update_count?: number | null
+          updated_at?: string | null
         }
         Update: {
           amount?: number
           bidder_id?: string | null
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           listing_id?: string | null
           message?: string | null
           status?: string | null
+          update_count?: number | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -104,39 +111,42 @@ export type Database = {
       conversations: {
         Row: {
           bidder_id: string | null
+          buyer_confirmed_at: string | null
           created_at: string | null
           expires_at: string | null
           id: string
+          is_sealed: boolean | null
           last_message: string | null
           listing_id: string | null
+          seller_confirmed_at: string | null
           seller_id: string | null
           updated_at: string | null
-          seller_confirmed_at?: string | null
-          buyer_confirmed_at?: string | null
         }
         Insert: {
           bidder_id?: string | null
+          buyer_confirmed_at?: string | null
           created_at?: string | null
           expires_at?: string | null
           id?: string
+          is_sealed?: boolean | null
           last_message?: string | null
           listing_id?: string | null
+          seller_confirmed_at?: string | null
           seller_id?: string | null
           updated_at?: string | null
-          seller_confirmed_at?: string | null
-          buyer_confirmed_at?: string | null
         }
         Update: {
           bidder_id?: string | null
+          buyer_confirmed_at?: string | null
           created_at?: string | null
           expires_at?: string | null
           id?: string
+          is_sealed?: boolean | null
           last_message?: string | null
           listing_id?: string | null
+          seller_confirmed_at?: string | null
           seller_id?: string | null
           updated_at?: string | null
-          seller_confirmed_at?: string | null
-          buyer_confirmed_at?: string | null
         }
         Relationships: [
           {
@@ -175,9 +185,11 @@ export type Database = {
           auction_mode: string | null
           category: string | null
           condition: string | null
+          contact_phone: string | null
           created_at: string | null
           description: string | null
           ends_at: string | null
+          final_buyer_id: string | null
           id: string
           images: string[] | null
           search_vector: unknown
@@ -191,9 +203,11 @@ export type Database = {
           auction_mode?: string | null
           category?: string | null
           condition?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: string | null
           ends_at?: string | null
+          final_buyer_id?: string | null
           id?: string
           images?: string[] | null
           search_vector?: unknown
@@ -207,9 +221,11 @@ export type Database = {
           auction_mode?: string | null
           category?: string | null
           condition?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: string | null
           ends_at?: string | null
+          final_buyer_id?: string | null
           id?: string
           images?: string[] | null
           search_vector?: unknown
@@ -219,6 +235,13 @@ export type Database = {
           title?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "listings_final_buyer_id_fkey"
+            columns: ["final_buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "listings_seller_id_fkey"
             columns: ["seller_id"]
@@ -309,7 +332,9 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          buyer_success_rate: number | null
           created_at: string | null
+          deals_sealed_count: number | null
           email: string | null
           full_name: string | null
           id: string
@@ -318,10 +343,13 @@ export type Database = {
           phone: string | null
           rating: number | null
           rating_count: number | null
+          seller_success_rate: number | null
         }
         Insert: {
           avatar_url?: string | null
+          buyer_success_rate?: number | null
           created_at?: string | null
+          deals_sealed_count?: number | null
           email?: string | null
           full_name?: string | null
           id: string
@@ -330,10 +358,13 @@ export type Database = {
           phone?: string | null
           rating?: number | null
           rating_count?: number | null
+          seller_success_rate?: number | null
         }
         Update: {
           avatar_url?: string | null
+          buyer_success_rate?: number | null
           created_at?: string | null
+          deals_sealed_count?: number | null
           email?: string | null
           full_name?: string | null
           id?: string
@@ -342,6 +373,7 @@ export type Database = {
           phone?: string | null
           rating?: number | null
           rating_count?: number | null
+          seller_success_rate?: number | null
         }
         Relationships: []
       }
@@ -504,6 +536,7 @@ export type Database = {
           bid_count: number | null
           category: string | null
           condition: string | null
+          contact_phone: string | null
           created_at: string | null
           description: string | null
           ends_at: string | null
@@ -534,7 +567,8 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_bids: { Args: never; Returns: undefined }
+      expire_old_bids: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

@@ -41,6 +41,7 @@ export interface Item {
   images: string[];
   sellerId: string;
   seller?: User; // Embedded seller profile for UI & Logic
+  contactPhone?: string;
   askPrice: number;
   category: string;
   condition: 'new' | 'like_new' | 'used' | 'fair';

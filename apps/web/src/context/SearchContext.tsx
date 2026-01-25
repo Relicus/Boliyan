@@ -126,7 +126,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             high_bid,
             high_bidder_id,
             condition,
-            slug
+            slug,
+            contact_phone
         `, { count: 'exact' });
         
       if (filters.status !== 'all') {

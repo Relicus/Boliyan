@@ -352,21 +352,26 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
             <div className="flex items-center gap-2 justify-between md:justify-end">
               {priceBlock}
-              {!isLocked && (
+              {!isLocked && (() => {
+                const listingPhone = !isSeller ? item?.contactPhone : undefined;
+                const phone = listingPhone || otherUser?.phone;
+                if (!phone) return null;
+
+                return (
                   <Button
-                      id="chat-call-btn"
-                      size="sm"
-                      variant="outline"
-                      className="h-9 px-3 text-xs font-bold rounded-full border-slate-200 text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-colors shadow-sm"
-                      onClick={() => {
-                          const phone = otherUser?.phone || "+971500000000"; // Fallback or Mock
-                          window.location.href = `tel:${phone}`;
-                      }}
+                    id="chat-call-btn"
+                    size="sm"
+                    variant="outline"
+                    className="h-9 px-3 text-xs font-bold rounded-full border-slate-200 text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-colors shadow-sm"
+                    onClick={() => {
+                      window.location.href = `tel:${phone}`;
+                    }}
                   >
-                      <Phone className="h-4 w-4 mr-1" />
-                      Call
+                    <Phone className="h-4 w-4 mr-1" />
+                    Call
                   </Button>
-              )}
+                );
+              })()}
             </div>
 
             {/* Slot indicator shown on listing/dashboard only */}

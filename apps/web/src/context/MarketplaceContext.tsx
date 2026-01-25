@@ -184,7 +184,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 high_bid,
                 high_bidder_id,
                 condition,
-                slug
+                slug,
+                contact_phone
             `, { count: 'exact' }).eq('status', 'active');
 
             // --- APPLY FILTERS ---

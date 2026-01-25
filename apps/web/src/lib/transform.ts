@@ -112,6 +112,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     images: imageUrls,
     sellerId: listing.seller_id || 'unknown',
     seller: seller,
+    contactPhone: listing.contact_phone || undefined,
     askPrice: listing.asked_price,
     category: listing.category || 'Other',
     condition: isValidCondition(listing.condition) ? listing.condition : 'used',
