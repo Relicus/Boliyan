@@ -114,6 +114,7 @@ export const BiddingWidget = memo(({
           onInputChange={handleInputChange}
           onInputBlur={handleInputBlur}
           onInputClick={handleInputClick}
+          isSecretBid={!item.isPublicBid}
         />
       </div>
 

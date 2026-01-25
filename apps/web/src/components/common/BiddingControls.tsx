@@ -4,7 +4,7 @@ import { memo, useMemo, useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Gavel, Loader2, AlertCircle, Edit } from "lucide-react";
+import { Gavel, HatGlasses, Loader2, AlertCircle, Edit } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import RollingPrice from "./RollingPrice";
 import { BoliyanUrduMark } from "@/components/branding/BoliyanLogo";
@@ -38,6 +38,7 @@ interface BiddingControlsProps {
   showStatus?: boolean;
   itemId?: string; // Need Item ID for edit navigation
   darkMode?: boolean; // For hidden bidding dark theme
+  isSecretBid?: boolean;
   
   // Handlers
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
@@ -209,7 +210,8 @@ export const BiddingControls = memo(({
   onInputBlur,
   onInputClick,
   itemId,
-  darkMode = false
+  darkMode = false,
+  isSecretBid = false
 }: BiddingControlsProps) => {
 
   const router = useRouter();
@@ -274,6 +276,7 @@ export const BiddingControls = memo(({
   }, [cooldownRemaining]);
   
   const { theme, content } = useMemo(() => {
+    const actionIcon = isSecretBid ? HatGlasses : Gavel;
     // 1. Success State
     if (isSuccess) {
       return { 
@@ -353,15 +356,15 @@ export const BiddingControls = memo(({
     if (hasPriorBid) {
       return {
         theme: 'warning' as ButtonTheme,
-        content: <BiddingButtonContent icon={Gavel} text="Update Bid" />
+        content: <BiddingButtonContent icon={actionIcon} text="Update Bid" />
       };
     }
 
     return {
       theme: 'active' as ButtonTheme,
-      content: <BiddingButtonContent icon={Gavel} text="Place Bid" />
+      content: <BiddingButtonContent icon={actionIcon} text="Place Bid" />
     };
-  }, [isSuccess, isSubmitting, errorMessage, isQuotaReached, derivedStatus, pendingConfirmation, isOwner, hasPriorBid]);
+  }, [isSuccess, isSubmitting, errorMessage, isQuotaReached, derivedStatus, pendingConfirmation, isOwner, hasPriorBid, isSecretBid]);
 
   // Derived styles from centralized config
   const activeTheme = BUTTON_THEMES[theme];

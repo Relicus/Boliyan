@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Store, PlusCircle, MessageSquare, LayoutDashboard, BarChart3, type LucideIcon } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -11,8 +11,6 @@ import { useState } from "react";
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentTab = searchParams.get('tab');
   const { messages, items, bids, user } = useApp();
 
 

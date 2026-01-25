@@ -109,6 +109,7 @@ export const BiddingDashboard = memo(function BiddingDashboard({
           onInputBlur={onInputBlur}
           showAttemptsDots={false}
           showStatus={true}
+          isSecretBid={!item.isPublicBid}
         />
       </div>
 

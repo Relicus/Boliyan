@@ -293,6 +293,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       onInputBlur={handleInputBlur}
                       showAttemptsDots={false}
                       showStatus={true}
+                      isSecretBid={!item.isPublicBid}
                     />
 
                     {isHighBidder && !isSuccess && (
