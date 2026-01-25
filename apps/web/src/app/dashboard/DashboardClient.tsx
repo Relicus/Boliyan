@@ -28,7 +28,8 @@ function DashboardContent() {
   
   const searchParams = useSearchParams();
   const router = useRouter();
-  const initialTab = searchParams.get("tab") || "active-bids";
+  const tabParam = searchParams.get("tab");
+  const initialTab = tabParam || "offers";
   const [activeTab, setActiveTab] = useState(initialTab);
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
   const [viewingItem, setViewingItem] = useState<Item | null>(null);
@@ -37,6 +38,12 @@ function DashboardContent() {
   useEffect(() => {
     setActiveTab(initialTab);
   }, [initialTab]);
+
+  useEffect(() => {
+    if (!tabParam) {
+      router.replace(`/dashboard?tab=${initialTab}`, { scroll: false });
+    }
+  }, [initialTab, router, tabParam]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -119,13 +126,6 @@ function DashboardContent() {
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl">
-          <TabsTrigger id="dashboard-bids-tab" value="active-bids" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
-             <Gavel className="w-4 h-4" />
-             <span className="hidden sm:inline">My Bids</span>
-             {myBids.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myBids.length}</Badge>
-             )}
-          </TabsTrigger>
           <TabsTrigger id="dashboard-offers-tab" value="offers" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
              <Inbox className="w-4 h-4" />
              <span className="hidden sm:inline">Offers</span>
@@ -133,11 +133,11 @@ function DashboardContent() {
                 <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-700 hover:bg-amber-200 h-5 px-1.5">{totalOfferCount}</Badge>
              )}
           </TabsTrigger>
-          <TabsTrigger id="dashboard-listings-tab" value="listings" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
-             <Tag className="w-4 h-4" />
-             <span className="hidden sm:inline">Listings</span>
-             {myItems.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myItems.length}</Badge>
+          <TabsTrigger id="dashboard-bids-tab" value="active-bids" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
+             <Gavel className="w-4 h-4" />
+             <span className="hidden sm:inline">My Bids</span>
+             {myBids.length > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myBids.length}</Badge>
              )}
           </TabsTrigger>
           <TabsTrigger id="dashboard-watchlist-tab" value="watchlist" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
@@ -147,10 +147,48 @@ function DashboardContent() {
                 <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{watchedItems.length}</Badge>
              )}
           </TabsTrigger>
+          <TabsTrigger id="dashboard-listings-tab" value="listings" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
+             <Tag className="w-4 h-4" />
+             <span className="hidden sm:inline">Listings</span>
+             {myItems.length > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myItems.length}</Badge>
+             )}
+          </TabsTrigger>
         </TabsList>
 
         <AnimatePresence mode="wait">
-             {/* 1. MY BIDS TAB */}
+             {/* 1. OFFERS TAB (Bids received on MY listings, grouped by listing) */}
+             {activeTab === 'offers' && (
+                <motion.div
+                    key="offers"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="grid gap-4 grid-cols-1 lg:grid-cols-2"
+                >
+                    {listingsWithOffers.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                            <Inbox className="w-12 h-12 text-slate-300 mb-3" />
+                            <h3 className="text-lg font-bold text-slate-700">No offers yet</h3>
+                            <p className="max-w-xs mx-auto mb-4">When buyers bid on your listings, their offers will appear here.</p>
+                            <Link href="/sell">
+                                <Button variant="outline">Create a Listing</Button>
+                            </Link>
+                        </div>
+                    ) : (
+                        listingsWithOffers.map(({ item, offers }) => (
+                            <ListingOffersCard 
+                                key={item.id} 
+                                item={item} 
+                                offers={offers} 
+                            />
+                        ))
+                    )}
+                </motion.div>
+             )}
+
+             {/* 2. MY BIDS TAB */}
              {activeTab === 'active-bids' && (
                 <motion.div
                     key="active-bids"
@@ -190,38 +228,38 @@ function DashboardContent() {
                 </motion.div>
              )}
 
-             {/* 2. OFFERS TAB (Bids received on MY listings, grouped by listing) */}
-             {activeTab === 'offers' && (
+             {/* 3. WATCHLIST TAB */}
+             {activeTab === 'watchlist' && (
                 <motion.div
-                    key="offers"
+                    key="watchlist"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="grid gap-4 grid-cols-1 lg:grid-cols-2"
+                    className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"
                 >
-                    {listingsWithOffers.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                            <Inbox className="w-12 h-12 text-slate-300 mb-3" />
-                            <h3 className="text-lg font-bold text-slate-700">No offers yet</h3>
-                            <p className="max-w-xs mx-auto mb-4">When buyers bid on your listings, their offers will appear here.</p>
-                            <Link href="/sell">
-                                <Button variant="outline">Create a Listing</Button>
+                     {watchedItems.length === 0 ? (
+                        <div className="col-span-full flex flex-col items-center justify-center py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                            <Bookmark className="w-12 h-12 text-slate-300 mb-3" />
+                            <h3 className="text-lg font-bold text-slate-700">Watchlist is empty</h3>
+                            <p className="max-w-xs mx-auto mb-4">Save items you're interested in to track their price and status.</p>
+                            <Link href="/">
+                                <Button variant="outline">Browse Items</Button>
                             </Link>
                         </div>
                     ) : (
-                        listingsWithOffers.map(({ item, offers }) => (
-                            <ListingOffersCard 
-                                key={item.id} 
-                                item={item} 
-                                offers={offers} 
+                        watchedItems.map(item => (
+                             <WatchedItemCard
+                                key={item.id}
+                                item={item}
+                                seller={item.seller!}
                             />
                         ))
                     )}
                 </motion.div>
              )}
 
-             {/* 3. MY LISTINGS TAB */}
+             {/* 4. MY LISTINGS TAB */}
              {activeTab === 'listings' && (
                 <motion.div
                     key="listings"
@@ -247,37 +285,6 @@ function DashboardContent() {
                                 item={item}
                                 onView={() => setViewingItem(item)}
                                 onDelete={() => handleDeleteClick(item)}
-                            />
-                        ))
-                    )}
-                </motion.div>
-             )}
-
-             {/* 4. WATCHLIST TAB */}
-             {activeTab === 'watchlist' && (
-                <motion.div
-                    key="watchlist"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"
-                >
-                     {watchedItems.length === 0 ? (
-                        <div className="col-span-full flex flex-col items-center justify-center py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                            <Bookmark className="w-12 h-12 text-slate-300 mb-3" />
-                            <h3 className="text-lg font-bold text-slate-700">Watchlist is empty</h3>
-                            <p className="max-w-xs mx-auto mb-4">Save items you're interested in to track their price and status.</p>
-                            <Link href="/">
-                                <Button variant="outline">Browse Items</Button>
-                            </Link>
-                        </div>
-                    ) : (
-                        watchedItems.map(item => (
-                             <WatchedItemCard
-                                key={item.id}
-                                item={item}
-                                seller={item.seller!}
                             />
                         ))
                     )}

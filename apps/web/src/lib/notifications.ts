@@ -21,8 +21,7 @@ export function resolveNotificationLink(
 
   switch (type) {
     case 'outbid':
-      // Link to the product or dashboard
-      return metadata.itemId ? `/dashboard?id=${metadata.itemId}` : '/dashboard';
+      return metadata.itemId ? `/dashboard?tab=active-bids&id=${metadata.itemId}` : '/dashboard?tab=active-bids';
     
     case 'bid_accepted':
     case 'new_message':
@@ -40,7 +39,7 @@ export function resolveNotificationLink(
       return '/inbox';
 
     case 'bid_received':
-      return metadata.itemId ? `/dashboard/seller?id=${metadata.itemId}` : '/dashboard/seller';
+      return metadata.itemId ? `/dashboard?tab=offers&id=${metadata.itemId}` : '/dashboard?tab=offers';
 
     default:
       return null;

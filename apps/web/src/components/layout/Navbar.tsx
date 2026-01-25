@@ -30,6 +30,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab');
+  const dashboardTab = currentTab || 'offers';
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -190,10 +191,10 @@ export default function Navbar() {
 
                 <Button id="navbar-offers-btn" asChild variant="ghost" className={cn(
                   "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
-                  pathname === '/dashboard' && currentTab === 'active-bids' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
+                  pathname === '/dashboard' && dashboardTab === 'offers' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
                 )}>
-                  <Link href="/dashboard?tab=active-bids">
-                    <Tag id="navbar-offers-icon" className={cn("h-5 w-5", pathname === '/dashboard' && currentTab === 'active-bids' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && currentTab === 'active-bids' ? 2.5 : 1.5} />
+                  <Link href="/dashboard?tab=offers">
+                    <Tag id="navbar-offers-icon" className={cn("h-5 w-5", pathname === '/dashboard' && dashboardTab === 'offers' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && dashboardTab === 'offers' ? 2.5 : 1.5} />
                     <span>Offers</span>
                     {receivedBidsCount > 0 && (
                       <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white">
@@ -205,10 +206,10 @@ export default function Navbar() {
 
                 <Button id="navbar-bids-btn" asChild variant="ghost" className={cn(
                   "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
-                  pathname === '/dashboard' && currentTab === 'my-bids' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
+                  pathname === '/dashboard' && dashboardTab === 'active-bids' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
                 )}>
-                  <Link href="/dashboard?tab=my-bids">
-                    <Gavel id="navbar-bids-icon" className={cn("h-5 w-5", pathname === '/dashboard' && currentTab === 'my-bids' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && currentTab === 'my-bids' ? 2.5 : 1.5} />
+                  <Link href="/dashboard?tab=active-bids">
+                    <Gavel id="navbar-bids-icon" className={cn("h-5 w-5", pathname === '/dashboard' && dashboardTab === 'active-bids' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && dashboardTab === 'active-bids' ? 2.5 : 1.5} />
                     <span>Bids</span>
                     {currentOutbidCount > 0 && (
                       <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white">
