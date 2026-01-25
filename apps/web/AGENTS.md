@@ -6,6 +6,7 @@
 
 ## OVERVIEW
 Main marketplace application. Strict TypeScript. See [Manifesto](../../MANIFESTO.md) for product rules.
+Runs in a combined buyer + seller mode with unified analytics.
 
 ## STRUCTURE
 ```

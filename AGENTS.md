@@ -7,6 +7,7 @@
 
 ## OVERVIEW
 Boliyan is a premium classifieds marketplace focused on high-intent bidding and strictly gated communication ("No chat before deal").
+The product runs in a combined buyer + seller mode; analytics is unified across offers, bids, listings, and watchlist.
 Built with Next.js 16.1 (React 19), Tailwind CSS v4, and Framer Motion.
 Data is managed via raw SQL in `packages/database` and a custom Context-based store in `apps/web`.
 

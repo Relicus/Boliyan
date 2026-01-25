@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, LogOut, Activity, Bookmark, UserCircle, MessageSquare, LayoutGrid, Tag, Gavel } from "lucide-react";
+import { Plus, LogOut, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -42,6 +42,7 @@ export default function Navbar() {
   
   const myBidsItems = user ? items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id)) : [];
   const currentOutbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
+  const dashboardAlertCount = receivedBidsCount + currentOutbidCount;
 
   useEffect(() => {
     const controlNavbar = () => {
@@ -184,38 +185,33 @@ export default function Navbar() {
                   pathname === '/' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
                 )}>
                   <Link href="/">
-                    <LayoutGrid id="navbar-market-icon" className={cn("h-5 w-5", pathname === '/' && "stroke-[2.5]")} strokeWidth={pathname === '/' ? 2.5 : 1.5} />
+                    <Store id="navbar-market-icon" className={cn("h-5 w-5", pathname === '/' && "stroke-[2.5]")} strokeWidth={pathname === '/' ? 2.5 : 1.5} />
                     <span>Market</span>
                   </Link>
                 </Button>
 
-                <Button id="navbar-offers-btn" asChild variant="ghost" className={cn(
+                <Button id="navbar-dash-btn" asChild variant="ghost" className={cn(
                   "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
-                  pathname === '/dashboard' && dashboardTab === 'offers' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
+                  pathname === '/dashboard' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
                 )}>
-                  <Link href="/dashboard?tab=offers">
-                    <Tag id="navbar-offers-icon" className={cn("h-5 w-5", pathname === '/dashboard' && dashboardTab === 'offers' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && dashboardTab === 'offers' ? 2.5 : 1.5} />
-                    <span>Offers</span>
-                    {receivedBidsCount > 0 && (
+                  <Link href={`/dashboard?tab=${dashboardTab}`}>
+                    <LayoutDashboard id="navbar-dash-icon" className={cn("h-5 w-5", pathname === '/dashboard' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' ? 2.5 : 1.5} />
+                    <span>Dash</span>
+                    {dashboardAlertCount > 0 && (
                       <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white">
-                        {receivedBidsCount}
+                        {dashboardAlertCount}
                       </span>
                     )}
                   </Link>
                 </Button>
 
-                <Button id="navbar-bids-btn" asChild variant="ghost" className={cn(
+                <Button id="navbar-analytics-btn" asChild variant="ghost" className={cn(
                   "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
-                  pathname === '/dashboard' && dashboardTab === 'active-bids' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
+                  pathname === '/dashboard/seller' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
                 )}>
-                  <Link href="/dashboard?tab=active-bids">
-                    <Gavel id="navbar-bids-icon" className={cn("h-5 w-5", pathname === '/dashboard' && dashboardTab === 'active-bids' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' && dashboardTab === 'active-bids' ? 2.5 : 1.5} />
-                    <span>Bids</span>
-                    {currentOutbidCount > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white">
-                        {currentOutbidCount}
-                      </span>
-                    )}
+                  <Link href="/dashboard/seller">
+                    <BarChart3 id="navbar-analytics-icon" className={cn("h-5 w-5", pathname === '/dashboard/seller' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard/seller' ? 2.5 : 1.5} />
+                    <span>Analytics</span>
                   </Link>
                 </Button>
 
@@ -260,33 +256,9 @@ export default function Navbar() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-slate-100" />
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
-                    <Link href="/dashboard" className="flex items-center w-full">
-                      <Activity className="mr-2.5 h-4 w-4 opacity-70" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
                     <Link href="/profile" className="flex items-center w-full">
                       <UserCircle className="mr-2.5 h-4 w-4 opacity-70" />
-                      Profile Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
-                    <Link href="/dashboard/seller" className="flex items-center w-full">
-                      <LayoutGrid className="mr-2.5 h-4 w-4 opacity-70" />
-                      Seller Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
-                    <Link href="/inbox" className="flex items-center w-full">
-                      <MessageSquare className="mr-2.5 h-4 w-4 opacity-70" />
-                      Messages
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
-                    <Link href="/dashboard?tab=watchlist" className="flex items-center w-full">
-                      <Bookmark className="mr-2.5 h-4 w-4 opacity-70" />
-                      Watched Items
+                      Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-slate-100" />

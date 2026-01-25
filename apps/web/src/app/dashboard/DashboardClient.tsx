@@ -128,14 +128,14 @@ function DashboardContent() {
         <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl">
           <TabsTrigger id="dashboard-offers-tab" value="offers" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
              <Inbox className="w-4 h-4" />
-             <span className="hidden sm:inline">Offers</span>
+              <span className="hidden sm:inline">Selling</span>
              {totalOfferCount > 0 && (
                 <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-700 hover:bg-amber-200 h-5 px-1.5">{totalOfferCount}</Badge>
              )}
           </TabsTrigger>
           <TabsTrigger id="dashboard-bids-tab" value="active-bids" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
              <Gavel className="w-4 h-4" />
-             <span className="hidden sm:inline">My Bids</span>
+              <span className="hidden sm:inline">Buying</span>
              {myBids.length > 0 && (
                 <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myBids.length}</Badge>
              )}

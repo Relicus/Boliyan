@@ -2,20 +2,27 @@
 
 import { DashboardProvider } from '@/context/DashboardContext';
 import { SellerStats } from '@/components/dashboard/SellerStats';
+import BuyerStats from '@/components/dashboard/BuyerStats';
 import { MyListingsTable } from '@/components/dashboard/MyListingsTable';
+import MyBidCard from '@/components/dashboard/MyBidCard';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { BarChart3, Gavel, Plus, Store, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { useApp } from '@/lib/store';
 import Link from 'next/link';
 
 export default function SellerDashboardPage() {
+  const { bids, itemsById, user } = useApp();
+  const myBids = user ? bids.filter(bid => bid.bidderId === user.id) : [];
+
   return (
     <DashboardProvider>
-      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 max-w-7xl space-y-8">
+      <div id="analytics-page" className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 max-w-7xl space-y-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Seller Dashboard</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage your listings and track your performance.
+            <h1 id="analytics-title" className="text-3xl font-bold tracking-tight text-foreground">Analytics</h1>
+            <p id="analytics-subtitle" className="text-muted-foreground mt-1">
+              Combined performance for buying and selling activity.
             </p>
           </div>
           <Button asChild className="shrink-0 gap-2">
@@ -26,12 +33,68 @@ export default function SellerDashboardPage() {
           </Button>
         </div>
 
-        <SellerStats />
+        <Tabs defaultValue="seller" className="space-y-6">
+          <TabsList id="analytics-tabs" className="grid w-full grid-cols-2 max-w-md bg-muted/60 p-1 rounded-xl">
+            <TabsTrigger id="analytics-buyer-tab" value="buyer" className="rounded-lg font-bold gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <UserCircle className="h-4 w-4" />
+              Buyer
+            </TabsTrigger>
+            <TabsTrigger id="analytics-seller-tab" value="seller" className="rounded-lg font-bold gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <Store className="h-4 w-4" />
+              Seller
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold tracking-tight">Active Listings</h2>
-          <MyListingsTable />
-        </div>
+          <TabsContent id="analytics-buyer-panel" value="buyer" className="space-y-6">
+            <BuyerStats />
+
+            <div id="buyer-activity-section" className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Gavel className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-xl font-semibold tracking-tight">Buying Activity</h2>
+              </div>
+
+              {myBids.length === 0 ? (
+                <div id="buyer-activity-empty" className="flex flex-col items-center justify-center py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                  <Gavel className="w-12 h-12 text-slate-300 mb-3" />
+                  <h3 className="text-lg font-bold text-slate-700">No buying activity</h3>
+                  <p className="max-w-xs mx-auto mb-4">Place a bid to start tracking your buying performance.</p>
+                  <Link href="/">
+                    <Button variant="outline">Explore Marketplace</Button>
+                  </Link>
+                </div>
+              ) : (
+                <div id="buyer-activity-list" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                  {myBids.map(bid => {
+                    const item = itemsById[bid.itemId];
+                    if (!item || !item.seller) return null;
+
+                    return (
+                      <MyBidCard
+                        key={bid.id}
+                        item={item}
+                        userBid={bid}
+                        seller={item.seller}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent id="analytics-seller-panel" value="seller" className="space-y-6">
+            <SellerStats />
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-xl font-semibold tracking-tight">Listing Performance</h2>
+              </div>
+              <MyListingsTable />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardProvider>
   );

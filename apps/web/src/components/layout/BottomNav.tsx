@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { LayoutGrid, PlusCircle, MessageSquare, LayoutDashboard, Bookmark, type LucideIcon } from "lucide-react";
+import { Store, PlusCircle, MessageSquare, LayoutDashboard, BarChart3, type LucideIcon } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -31,13 +31,13 @@ export default function BottomNav() {
   const navItems: { label: string; icon: LucideIcon; href: string; isDrawer?: boolean }[] = [
     {
       label: "Market",
-      icon: LayoutGrid,
+      icon: Store,
       href: "/",
     },
     {
-      label: "Watchlist",
-      icon: Bookmark,
-      href: "/dashboard?tab=watchlist",
+      label: "Dash",
+      icon: LayoutDashboard,
+      href: "/dashboard?tab=offers",
     },
     {
       label: "Post",
@@ -50,9 +50,9 @@ export default function BottomNav() {
       href: "/inbox",
     },
     {
-      label: "Dash",
-      icon: LayoutDashboard,
-      href: "/dashboard",
+      label: "Analytics",
+      icon: BarChart3,
+      href: "/dashboard/seller",
     },
   ];
 
@@ -65,10 +65,10 @@ export default function BottomNav() {
         {navItems.map((item) => {
           let isActive = false;
           
-          if (item.label === "Watchlist") {
-            isActive = pathname === "/dashboard" && currentTab === "watchlist";
-          } else if (item.label === "Dash") {
-            isActive = pathname === "/dashboard" && currentTab !== "watchlist";
+          if (item.label === "Dash") {
+            isActive = pathname === "/dashboard";
+          } else if (item.label === "Analytics") {
+            isActive = pathname === "/dashboard/seller";
           } else {
             isActive = item.href ? pathname === item.href : false;
           }
