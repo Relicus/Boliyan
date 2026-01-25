@@ -37,7 +37,7 @@ interface BiddingControlsProps {
   showAttemptsDots?: boolean;
   showStatus?: boolean;
   itemId?: string; // Need Item ID for edit navigation
-  darkMode?: boolean; // For secret bidding dark theme
+  darkMode?: boolean; // For hidden bidding dark theme
   
   // Handlers
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;

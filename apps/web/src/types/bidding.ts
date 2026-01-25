@@ -5,13 +5,20 @@
  * Shared base properties + variant-specific overrides.
  */
 
+/**
+ * Bidding Configuration Types
+ * 
+ * OOP-style type system for bidding behavior.
+ * Shared base properties + variant-specific overrides.
+ */
+
 import { Item, User, Bid } from './index';
 
 // ============================================
 // VARIANT TYPES
 // ============================================
 
-export type BiddingVariant = 'public' | 'secret';
+export type BiddingVariant = 'public' | 'hidden';
 
 // ============================================
 // BASE CONFIG (Shared by all variants)
@@ -49,17 +56,17 @@ export interface PublicBiddingConfig extends BiddingConfigBase {
   showOutbidWarning: boolean; // True when user was outbid
 }
 
-export interface SecretBiddingConfig extends BiddingConfigBase {
-  variant: 'secret';
+export interface HiddenBiddingConfig extends BiddingConfigBase {
+  variant: 'hidden';
   
-  // Secret-specific: we CANNOT see the competition
+  // Hidden-specific: we CANNOT see the competition
   showHighBid: false;
   showHighBidder: false;
   currentHighBid: undefined;
   currentHighBidderId: undefined;
   
   // Visual states
-  showSecretBadge: true;
+  showHiddenBadge: true;
   showDuplicateBidWarning: boolean; // True when user already bid
 }
 
@@ -67,7 +74,7 @@ export interface SecretBiddingConfig extends BiddingConfigBase {
 // UNION TYPE
 // ============================================
 
-export type BiddingConfig = PublicBiddingConfig | SecretBiddingConfig;
+export type BiddingConfig = PublicBiddingConfig | HiddenBiddingConfig;
 
 // ============================================
 // FACTORY FUNCTION
@@ -111,20 +118,20 @@ export function createBiddingConfig(
     };
   } else {
     return {
-      variant: 'secret',
+      variant: 'hidden',
       itemId: item.id,
       askPrice: item.askPrice,
       minBid: baseMinBid,
       smartStep: getSmartStep(item.askPrice),
-      isUserHighBidder: false, // Can never know in secret
+      isUserHighBidder: false, // Can never know in hidden
       hasUserBid,
       
-      // Secret-specific
+      // Hidden-specific
       showHighBid: false,
       showHighBidder: false,
       currentHighBid: undefined,
       currentHighBidderId: undefined,
-      showSecretBadge: true,
+      showHiddenBadge: true,
       showDuplicateBidWarning: hasUserBid,
     };
   }

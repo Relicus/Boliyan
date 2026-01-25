@@ -220,7 +220,7 @@ function ListForm() {
           category,
           asked_price: roundedPrice,
           description,
-          auction_mode: (isPublic ? 'visible' : 'sealed') as 'visible' | 'sealed',
+          auction_mode: (isPublic ? 'visible' : 'hidden') as 'visible' | 'hidden',
           images: orderedUrls,
           condition: condition,
           ends_at: endsAt
@@ -541,14 +541,14 @@ function ListForm() {
                 </div>
 
                 <div 
-                  id="sealed-bids-option"
+                  id="hidden-bids-option"
                   className={`flex items-center justify-between p-3 border rounded-lg transition-colors cursor-pointer ${!isPublic ? 'bg-blue-50 border-blue-200' : 'bg-slate-50'}`}
                   onClick={() => setIsPublic(false)}
                 >
                   <div className="flex items-center gap-3">
                     <EyeOff className={`h-4 w-4 ${!isPublic ? 'text-blue-600' : 'text-slate-500'}`} />
                     <div>
-                      <p className="text-sm font-medium">Secret Bids Only</p>
+                      <p className="text-sm font-medium">Hidden Bids Only</p>
                       <p className="text-[10px] text-muted-foreground">Only you see the bid amounts</p>
                     </div>
                   </div>

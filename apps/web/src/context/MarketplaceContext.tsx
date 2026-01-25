@@ -24,7 +24,7 @@ interface MarketplaceFilters {
   minPrice: number | null;
   maxPrice: number | null;
   condition: 'new' | 'like_new' | 'used' | 'fair' | 'all';
-  listingType: 'all' | 'public' | 'sealed';
+  listingType: 'all' | 'public' | 'hidden';
 }
 
 interface MarketplaceContextType {
@@ -211,9 +211,9 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
           if (filters.listingType === 'public') {
               query = query.eq('auction_mode', 'visible');
-          } else if (filters.listingType === 'sealed') {
-               // Match both 'sealed' and 'hidden' for secret/sealed bids
-               query = query.in('auction_mode', ['sealed', 'hidden']);
+          } else if (filters.listingType === 'hidden') {
+               // Match 'hidden' primarily, keeping 'sealed' as fallback for any legacy records
+               query = query.in('auction_mode', ['hidden', 'sealed']);
           } // 'all' does nothing
 
            // --- APPLY SORT ---

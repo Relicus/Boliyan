@@ -29,7 +29,7 @@ import { CATEGORIES } from "@/lib/constants";
 const LISTING_TYPES = [
   { id: 'all', label: 'All Types' },
   { id: 'public', label: 'Public Bid' },
-  { id: 'sealed', label: 'Sealed Bid' },
+  { id: 'hidden', label: 'Hidden Bid' },
 ] as const;
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
@@ -217,7 +217,7 @@ export default function MarketplaceGrid() {
                           <>
                              <Gavel className={`h-5 w-5 ${mpFilters.listingType !== 'all' ? 'text-blue-500' : 'text-slate-500'}`} />
                             <span className="text-[10px] font-medium leading-none text-slate-600 truncate w-full text-center">
-                              {mpFilters.listingType === 'all' ? 'Type' : mpFilters.listingType === 'public' ? 'Public' : 'Sealed'}
+                              {mpFilters.listingType === 'all' ? 'Type' : mpFilters.listingType === 'public' ? 'Public' : 'Hidden'}
                             </span>
                           </>
                         );

@@ -158,7 +158,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
           >
             <Card className={cn(
               "border-none shadow-none h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)]",
-              // Secret Bidding: Full dark theme
+              // Hidden Bidding: Full dark theme
               !item.isPublicBid && "bg-slate-900",
               // Leading Public Bid: Warm orange tint
               item.isPublicBid && item.currentHighBidderId === user?.id && "bg-orange-50/80",
@@ -230,7 +230,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 </div>
               )}
 
-              {/* Bottom Right: Watchlist & Secret Indicators */}
+              {/* Bottom Right: Watchlist & Hidden Indicators */}
               <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1.5">
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -272,7 +272,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         </motion.div>
                       </TooltipTrigger>
                       <TooltipContent side="left">
-                        <p>Secret Bidding</p>
+                        <p>Hidden Bidding</p>
                       </TooltipContent>
                     </Tooltip>
                 )}

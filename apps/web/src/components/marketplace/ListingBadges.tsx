@@ -31,14 +31,13 @@ export function ListingBadges({ item, seller, showTimer = true, className }: Lis
         </Badge>
       )}
 
-      {/* Secret Bidding Badge */}
+      {/* Hidden Bidding Badge */}
       {!item.isPublicBid && (
         <Badge variant="secondary" className={`font-bold bg-amber-500 text-white border-none shadow-sm flex items-center gap-1.5 ${badgeStyle}`}>
           <Lock className="h-3.5 w-3.5" />
-          Secret Bidding
+          Hidden Bidding
         </Badge>
       )}
     </div>
   );
 }
-

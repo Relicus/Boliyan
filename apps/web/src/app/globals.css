@@ -205,6 +205,7 @@
   .skeleton-shimmer {
     position: relative;
     overflow: hidden;
+    contain: layout paint;
   }
 
   .skeleton-shimmer::after {

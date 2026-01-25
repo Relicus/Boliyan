@@ -99,15 +99,15 @@ export default function Sidebar() {
             <span className="relative z-20">Public</span>
           </button>
 
-          {/* Secret Toggle */}
+          {/* Hidden Toggle */}
           <button
-            onClick={() => setFilter('listingType', 'sealed')}
+            onClick={() => setFilter('listingType', 'hidden')}
             className={cn(
               "flex-1 relative flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-colors duration-200 z-10",
-              filters.listingType === 'sealed' ? "text-amber-600" : "text-slate-500 hover:text-amber-600"
+              filters.listingType === 'hidden' ? "text-amber-600" : "text-slate-500 hover:text-amber-600"
             )}
           >
-            {filters.listingType === 'sealed' && (
+            {filters.listingType === 'hidden' && (
               <motion.div
                 layoutId="listing-type-pill"
                 className="absolute inset-0 bg-white shadow-sm shadow-amber-100 ring-1 ring-amber-100 rounded-xl -z-10"
@@ -115,7 +115,7 @@ export default function Sidebar() {
               />
             )}
             <Lock className="h-4 w-4 relative z-20" />
-            <span className="relative z-20">Secret</span>
+            <span className="relative z-20">Hidden</span>
           </button>
         </div>
       </div>

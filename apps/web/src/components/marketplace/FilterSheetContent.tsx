@@ -161,7 +161,7 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
           <section id="filter-section-type">
             <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Listing Type</Label>
             <div className="flex p-1 bg-slate-100 rounded-xl">
-              {(['all', 'public', 'sealed'] as const).map((type) => (
+              {(['all', 'public', 'hidden'] as const).map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilter('listingType', type)}
@@ -172,7 +172,7 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
                       : "text-slate-500 hover:text-slate-700"
                   )}
                 >
-                  {type}
+                  {type === 'hidden' ? 'Hidden' : type}
                 </button>
               ))}
             </div>

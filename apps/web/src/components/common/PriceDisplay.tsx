@@ -153,8 +153,8 @@ export const PriceDisplay = memo(({
               displayColor = darkMode ? "text-blue-400" : "text-blue-600";
           }
       } else {
-          // Secret
-          labelText = "Secret";
+          // Hidden
+          labelText = "Hidden";
           LabelIcon = Lock;
           displayPrice = null;
           displayText = bidCount === 0 ? 'Be first!' : `${bidCount} ${bidCount === 1 ? 'Bid' : 'Bids'}`;

@@ -68,7 +68,7 @@
         { "id": "list-page-layout", "name": "List Page Container", "ui_ids": ["list-page-container", "list-item-card", "list-item-header", "list-item-title-heading", "list-item-description-text"] },
         { "id": "list-item-form", "name": "Listing Creation Form", "ui_ids": ["list-item-form", "title-input", "category-select", "category-select-content", "price-input", "condition-select", "condition-select-content", "description-textarea"] },
         { "id": "image-upload", "name": "Image Upload Interface", "ui_ids": ["images-label", "images-preview-container", "add-image-label", "camera-icon", "add-photo-text", "image-upload-input"] },
-        { "id": "bidding-style-select", "name": "Bidding Style Selection", "ui_ids": ["bidding-style-heading", "public-auction-option", "sealed-bids-option"] },
+        { "id": "bidding-style-select", "name": "Bidding Style Selection", "ui_ids": ["bidding-style-heading", "public-auction-option", "hidden-bids-option"] },
         { "id": "listing-actions", "name": "Listing Form Actions", "ui_ids": ["cancel-listing-btn", "post-listing-btn"] },
         { "id": "listing-type-pills", "name": "Listing Type Pills", "ui_ids": ["listing-type-pill"] }
       ],
