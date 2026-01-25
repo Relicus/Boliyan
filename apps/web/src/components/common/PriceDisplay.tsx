@@ -24,6 +24,7 @@ interface PriceDisplayProps {
   showTotalBids?: boolean;
   orientation?: 'row' | 'stacked';
   itemId?: string; // For Realtime DOM targeting
+  darkMode?: boolean; // For secret bidding dark theme
 }
 
 
@@ -58,7 +59,8 @@ export const PriceDisplay = memo(({
   userCurrentBid,
   showTotalBids = false,
   orientation = 'row',
-  itemId
+  itemId,
+  darkMode = false
 }: PriceDisplayProps) => {
 
   const [showUserBid, setShowUserBid] = useState(false);
@@ -104,10 +106,10 @@ export const PriceDisplay = memo(({
   // Determine Right-Side Content (Dynamic)
   let labelText = "";
   let LabelIcon = null;
-  let labelColor = "text-slate-500/80";
+  let labelColor = darkMode ? "text-slate-400" : "text-slate-500/80";
   let displayPrice: number | null = null;
   let displayText: string | null = null;
-  let displayColor = "text-slate-800";
+  let displayColor = darkMode ? "text-white" : "text-slate-800";
   
   // Realtime targeting props
   const highBidProps = itemId && !safeShowUserBid && config.variant === 'public' && config.showHighBid 
@@ -125,12 +127,12 @@ export const PriceDisplay = memo(({
       }
     : {};
 
-  if (safeShowUserBid) {
+  if (safeShowUserBid && userCurrentBid) {
       labelText = "Your Bid";
       LabelIcon = UserIcon;
-      labelColor = "text-purple-600/80";
-      displayPrice = userCurrentBid || 0;
-      displayColor = "text-purple-700";
+      labelColor = darkMode ? "text-purple-500" : "text-purple-700";
+      displayPrice = userCurrentBid;
+      displayColor = darkMode ? "text-purple-500" : "text-purple-700";
   } else {
       // Market View
       if (config.variant === 'public') {
@@ -138,18 +140,25 @@ export const PriceDisplay = memo(({
           LabelIcon = Trophy;
           if (config.showHighBid && config.currentHighBid) {
               displayPrice = config.currentHighBid;
-              displayColor = config.isUserHighBidder ? "text-amber-600" : "text-blue-600";
+              if (config.isUserHighBidder) {
+                displayColor = darkMode ? "text-amber-400" : "text-amber-600";
+              } else {
+                displayColor = darkMode ? "text-blue-400" : "text-blue-600";
+              }
           } else {
               // No bids or not showing high bid
-              displayText = `${bidCount} ${bidCount === 1 ? 'Bid' : 'Bids'}`;
-              displayColor = "text-blue-600";
+              // Explicitly ensure displayPrice is null here
+              displayPrice = null;
+              displayText = bidCount === 0 ? 'Be first!' : `${bidCount} ${bidCount === 1 ? 'Bid' : 'Bids'}`;
+              displayColor = darkMode ? "text-blue-400" : "text-blue-600";
           }
       } else {
           // Secret
           labelText = "Secret";
           LabelIcon = Lock;
-          displayText = `${bidCount} ${bidCount === 1 ? 'Bid' : 'Bids'}`;
-          displayColor = "text-amber-600";
+          displayPrice = null;
+          displayText = bidCount === 0 ? 'Be first!' : `${bidCount} ${bidCount === 1 ? 'Bid' : 'Bids'}`;
+          displayColor = darkMode ? "text-amber-400" : "text-amber-600";
       }
   }
 
@@ -172,20 +181,27 @@ export const PriceDisplay = memo(({
 
   
   const renderValue = () => (
-      <span 
-        className={cn(getPriceClass(viewMode), "flex items-center gap-1.5 transition-colors duration-300", displayColor)}
+    <AnimatePresence mode="wait">
+      <motion.span 
+        key={safeShowUserBid ? 'user-bid' : (displayPrice !== null ? 'market-price' : 'text')}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -5 }}
+        transition={{ duration: 0.2 }}
+        className={cn(getPriceClass(viewMode), "flex items-center gap-1 transition-colors duration-300", displayColor)}
         {...(displayPrice !== null ? highBidProps : bidCountProps)}
       >
+          {/* Show Total Bids Count only when there are bids */}
+          {(showTotalBids && config.variant === 'public' && bidCount > 0) ? (
+               <span className="text-[0.8em] font-bold text-slate-400">({bidCount})</span>
+          ) : null}
           {displayPrice !== null ? (
-              <RollingPrice key="stacked-price" price={displayPrice} />
+              <RollingPrice price={displayPrice} />
           ) : (
               displayText
           )}
-          {/* Show Total Bids Count if in Public mode + High Bid is shown + NOT user view */}
-          {!safeShowUserBid && showTotalBids && config.variant === 'public' && config.currentHighBid && (
-               <span className="text-[clamp(0.75rem,3cqi,1rem)] font-bold text-slate-400 ml-1">({bidCount})</span>
-          )}
-      </span>
+      </motion.span>
+    </AnimatePresence>
   );
 
   // STACKED ORIENTATION
@@ -234,11 +250,11 @@ export const PriceDisplay = memo(({
     <div className={`flex justify-between items-end w-full px-1 ${className}`}>
       {/* Asking Price - Left Aligned */}
       <div className="flex flex-col items-start">
-        <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400 mb-0.5 flex items-center gap-1">
+        <span className={cn("text-[0.65rem] font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1", darkMode ? "text-slate-400" : "text-slate-400")}>
           <Tag className="w-3 h-3" />
           Asking
         </span>
-        <span className={`${getPriceClass(viewMode)} text-slate-900 leading-[0.9]`}>
+        <span className={cn(getPriceClass(viewMode), "leading-[0.9]", darkMode ? "text-white" : "text-slate-900")}>
           <RollingPrice price={askPrice} />
         </span>
       </div>
@@ -250,7 +266,7 @@ export const PriceDisplay = memo(({
               {Array.from({ length: Math.max(0, remainingAttempts) }).map((_, i) => (
                 <div 
                   key={i} 
-                  className="h-1 w-1 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+                  className={cn("h-1 w-1 rounded-full transition-all duration-300 shrink-0", darkMode ? "bg-slate-500" : "bg-slate-300")}
                 />
               ))}
            </div>
@@ -284,17 +300,17 @@ export const PriceDisplay = memo(({
 
           {/* Value Container - Stable */}
           <span 
-            className={cn(getPriceClass(viewMode), "flex items-center gap-1.5 transition-colors duration-300 leading-[0.9]", displayColor)}
+            className={cn(getPriceClass(viewMode), "flex items-center gap-1 transition-colors duration-300 leading-[0.9]", displayColor)}
             {...(displayPrice !== null ? highBidProps : bidCountProps)}
           >
+              {/* Show Total Bids Count only when there are bids */}
+              {(showTotalBids && config.variant === 'public' && bidCount > 0) ? (
+                   <span className="text-[0.8em] font-bold text-slate-400">({bidCount})</span>
+              ) : null}
               {displayPrice !== null ? (
                   <RollingPrice key="stable-price-display" price={displayPrice} />
               ) : (
                   displayText
-              )}
-              {/* Show Total Bids Count if in Public mode + High Bid is shown + NOT user view */}
-              {!safeShowUserBid && showTotalBids && config.variant === 'public' && config.currentHighBid && (
-                   <span className="text-[clamp(0.75rem,3cqi,1rem)] font-bold text-slate-400 ml-1">({bidCount})</span>
               )}
           </span>
       </div>

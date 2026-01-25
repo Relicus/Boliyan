@@ -156,7 +156,15 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             `}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
-            <Card className="border-none shadow-none bg-white h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)]">
+            <Card className={cn(
+              "border-none shadow-none h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)]",
+              // Secret Bidding: Full dark theme
+              !item.isPublicBid && "bg-slate-900",
+              // Leading Public Bid: Warm orange tint
+              item.isPublicBid && item.currentHighBidderId === user?.id && "bg-orange-50/80",
+              // Default: White background
+              item.isPublicBid && item.currentHighBidderId !== user?.id && "bg-white"
+            )}>
 
             <div
               id={`item-card-${item.id}-image-wrapper`}
@@ -331,7 +339,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 <h3 
                   id={`item-card-${item.id}-title`} 
                   onClick={() => setIsDialogOpen(true)}
-                  className={`font-bold ${getTitleClass()} text-slate-900 leading-tight line-clamp-2 transition-all w-full cursor-pointer hover:text-blue-600 hover:underline underline-offset-4 decoration-2`} 
+                  className={cn(
+                    `font-bold ${getTitleClass()} leading-tight line-clamp-2 transition-all w-full cursor-pointer hover:underline underline-offset-4 decoration-2`,
+                    !item.isPublicBid ? "text-white hover:text-blue-300" : "text-slate-900 hover:text-blue-600"
+                  )} 
                   title={item.title}
                 >
                   {item.title}
@@ -347,7 +358,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     </div>
                   )}
                   
-                  <span className={`text-[clamp(0.8125rem,3.5cqi,0.9375rem)] ${viewMode === 'comfortable' ? 'font-medium text-slate-500' : 'font-semibold text-slate-600'} truncate leading-none ${viewMode === 'comfortable' ? 'max-w-[120px]' : ''}`}>
+                  <span className={cn(
+                    `text-[clamp(0.8125rem,3.5cqi,0.9375rem)] truncate leading-none`,
+                    viewMode === 'comfortable' ? 'font-medium max-w-[120px]' : 'font-semibold',
+                    !item.isPublicBid ? "text-slate-300" : (viewMode === 'comfortable' ? 'text-slate-500' : 'text-slate-600')
+                  )}>
                     {seller?.name || 'Unknown Seller'}
                   </span>
 
@@ -358,17 +373,21 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       rating={seller?.rating || 0} 
                       count={seller?.reviewCount || 0}
                       size={viewMode === 'spacious' ? 'md' : 'sm'}
+                      darkMode={!item.isPublicBid}
                     />
                     {seller?.sellerSuccessRate !== undefined && (
-                      <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-slate-100 rounded-md border border-slate-200 shadow-sm">
+                      <div className={cn(
+                        "flex items-center gap-0.5 px-1.5 py-0.5 rounded-md border shadow-sm",
+                        !item.isPublicBid ? "bg-slate-700 border-slate-600" : "bg-slate-100 border-slate-200"
+                      )}>
                          <span className={cn(
                            "text-[10px] font-black tracking-tight tabular-nums",
-                           seller.sellerSuccessRate >= 95 ? "text-emerald-600" : 
-                           seller.sellerSuccessRate >= 80 ? "text-amber-600" : "text-slate-600"
+                           seller.sellerSuccessRate >= 95 ? "text-emerald-500" : 
+                           seller.sellerSuccessRate >= 80 ? "text-amber-500" : (!item.isPublicBid ? "text-slate-300" : "text-slate-600")
                          )}>
                            {seller.sellerSuccessRate}%
                          </span>
-                         <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Success</span>
+                         <span className={cn("text-[9px] font-bold uppercase tracking-tighter", !item.isPublicBid ? "text-slate-400" : "text-slate-400")}>Success</span>
                       </div>
                     )}
                     {seller?.badges && seller.badges.some(b => b.category === 'seller') && (
@@ -399,13 +418,18 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 remainingAttempts={remainingAttempts}
                 showAttempts={user?.id !== seller.id}
                 userCurrentBid={userBid?.amount}
+                showTotalBids={true}
                 itemId={item.id}
+                darkMode={!item.isPublicBid}
               />
 
               {/* Spacious Mode Description */}
               {viewMode === 'spacious' && (
                 <div className="mt-2 mb-1 animate-in fade-in duration-300">
-                  <p className="text-[clamp(0.75rem,3cqi,0.875rem)] text-slate-600 line-clamp-3 leading-relaxed font-medium">
+                  <p className={cn(
+                    "text-[clamp(0.75rem,3cqi,0.875rem)] line-clamp-3 leading-relaxed font-medium",
+                    !item.isPublicBid ? "text-slate-400" : "text-slate-600"
+                  )}>
                     {item.description}
                   </p>
                 </div>
@@ -434,6 +458,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     onInputClick={handleInputClick}
                     showAttemptsDots={false}
                     itemId={item.id}
+                    darkMode={!item.isPublicBid}
                   />
               </div>
 

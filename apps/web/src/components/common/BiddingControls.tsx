@@ -37,6 +37,7 @@ interface BiddingControlsProps {
   showAttemptsDots?: boolean;
   showStatus?: boolean;
   itemId?: string; // Need Item ID for edit navigation
+  darkMode?: boolean; // For secret bidding dark theme
   
   // Handlers
   onSmartAdjust: (e: React.MouseEvent, direction: -1 | 1) => void;
@@ -159,7 +160,8 @@ export const BiddingControls = memo(({
   onInputChange,
   onInputBlur,
   onInputClick,
-  itemId
+  itemId,
+  darkMode = false
 }: BiddingControlsProps) => {
 
   const router = useRouter();
@@ -322,20 +324,13 @@ export const BiddingControls = memo(({
       {/* Status Row (Modal/Product Page) */}
       {showStatus && !isOwner && (
         <div className="relative flex items-center justify-center px-1 min-h-[0.75rem]">
-          <div className="flex items-center justify-center gap-2">
-            <div className="flex items-center gap-1.5">
-              {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
-                />
-              ))}
-            </div>
-            {userCurrentBid !== undefined && userCurrentBid !== null && (
-              <span className="text-[11px] font-black font-outfit text-slate-700 leading-none">
-                {formatPrice(userCurrentBid)}
-              </span>
-            )}
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
+              <div
+                key={i}
+                className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+              />
+            ))}
           </div>
         </div>
       )}
@@ -347,7 +342,7 @@ export const BiddingControls = memo(({
             {Array.from({ length: Math.max(0, remainingAttempts ?? 0) }).map((_, i) => (
               <div 
                 key={i} 
-                className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-all duration-300 shrink-0"
+                className={cn("h-1.5 w-1.5 rounded-full transition-all duration-300 shrink-0", darkMode ? "bg-slate-500" : "bg-slate-300")}
               />
             ))}
           </div>
@@ -356,7 +351,11 @@ export const BiddingControls = memo(({
 
       {/* Stepper Input Row */}
       <div className={`flex w-full ${getInputHeight(viewMode)} relative`} ref={inputContainerRef}>
-        <div className={`flex flex-1 border border-slate-300 rounded-xl shadow-sm overflow-hidden bg-white ${isOwner || isQuotaReached ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
+        <div className={cn(
+          "flex flex-1 rounded-xl shadow-sm overflow-hidden",
+          darkMode ? "border border-slate-600 bg-slate-800" : "border border-slate-300 bg-white",
+          (isOwner || isQuotaReached) && 'opacity-50 grayscale pointer-events-none'
+        )}>
           
           {/* Decrement Button */}
           <button
@@ -366,7 +365,13 @@ export const BiddingControls = memo(({
             onPointerLeave={handleStopLongPress}
             onContextMenu={(e) => e.preventDefault()}
             disabled={isDisabled || isQuotaReached}
-            className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500 hover:text-red-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
+            className={cn(
+              getButtonWidth(viewMode),
+              "flex items-center justify-center transition-colors group disabled:cursor-not-allowed",
+              darkMode 
+                ? "bg-slate-700 hover:bg-slate-600 border-r border-slate-600 text-slate-300 hover:text-red-400 active:bg-slate-500" 
+                : "bg-slate-50 hover:bg-slate-100 border-r border-slate-200 text-slate-500 hover:text-red-600 active:bg-slate-200"
+            )}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M18 12H6" />
@@ -395,14 +400,16 @@ export const BiddingControls = memo(({
               onKeyDown={onKeyDown}
               onChange={onInputChange}
               onClick={onInputClick}
-              className={`w-full h-full text-center ${getTextSize(viewMode)} font-black font-outfit text-slate-900 focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300
-                ${error ? 'bg-red-50 text-red-900' : 'bg-transparent'}
-                ${isFocused ? 'opacity-100' : 'opacity-0'}
-              `}
+              className={cn(
+                `w-full h-full text-center ${getTextSize(viewMode)} font-black font-outfit focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300`,
+                darkMode ? "text-white" : "text-slate-900",
+                error ? (darkMode ? 'bg-red-900/50 text-red-200' : 'bg-red-50 text-red-900') : 'bg-transparent',
+                isFocused ? 'opacity-100' : 'opacity-0'
+              )}
             />
              {!isFocused && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                 <RollingPrice price={numericBid} className={getTextSize(viewMode) + " font-black font-outfit text-slate-900"} />
+                 <RollingPrice price={numericBid} className={cn(getTextSize(viewMode), "font-black font-outfit", darkMode ? "text-white" : "text-slate-900")} />
               </div>
             )}
           </div>
@@ -415,7 +422,13 @@ export const BiddingControls = memo(({
             onPointerLeave={handleStopLongPress}
             onContextMenu={(e) => e.preventDefault()}
             disabled={isDisabled || isQuotaReached}
-            className={`${getButtonWidth(viewMode)} bg-slate-50 hover:bg-slate-100 border-l border-slate-200 flex items-center justify-center text-slate-500 hover:text-amber-600 transition-colors active:bg-slate-200 group disabled:cursor-not-allowed`}
+            className={cn(
+              getButtonWidth(viewMode),
+              "flex items-center justify-center transition-colors group disabled:cursor-not-allowed",
+              darkMode 
+                ? "bg-slate-700 hover:bg-slate-600 border-l border-slate-600 text-slate-300 hover:text-amber-400 active:bg-slate-500" 
+                : "bg-slate-50 hover:bg-slate-100 border-l border-slate-200 text-slate-500 hover:text-amber-600 active:bg-slate-200"
+            )}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6v12m6-6H6" />

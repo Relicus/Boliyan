@@ -10,8 +10,10 @@ interface RollingPriceProps {
 
 export default function RollingPrice({ price, className }: RollingPriceProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  // Initialize to 0 so first mount triggers roll animation from $0 to actual price
-  const currentDisplayedPrice = useRef(0);
+  // Initialize to actual price so mount doesn't trigger roll animation
+  // Animation only triggers when price CHANGES from a previous value
+  const currentDisplayedPrice = useRef(price);
+  const isFirstMount = useRef(true);
   const isAnimating = useRef(false);
 
   useEffect(() => {
@@ -19,6 +21,14 @@ export default function RollingPrice({ price, className }: RollingPriceProps) {
     if (!element) return;
 
     const prevPrice = currentDisplayedPrice.current;
+
+    // Skip animation on first mount - just display the initial value
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      element.textContent = formatPrice(price);
+      currentDisplayedPrice.current = price;
+      return;
+    }
 
     // If exact same value, just ensure display is correct
     if (prevPrice === price) {

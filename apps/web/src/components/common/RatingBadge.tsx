@@ -10,6 +10,7 @@ interface RatingBadgeProps {
   size?: "sm" | "md" | "lg";
   className?: string;
   showCount?: boolean;
+  darkMode?: boolean;
 }
 
 export const RatingBadge = memo(({ 
@@ -17,7 +18,8 @@ export const RatingBadge = memo(({
   count, 
   size = "md", 
   className = "",
-  showCount = true
+  showCount = true,
+  darkMode = false
 }: RatingBadgeProps) => {
   
   const sizes = {
@@ -43,9 +45,9 @@ export const RatingBadge = memo(({
   return (
     <div className={cn(
       "inline-flex items-center rounded-md font-outfit transition-all duration-300",
-      "bg-white/80 backdrop-blur-sm",
-      "border border-amber-200/50 shadow-[0_2px_8px_-2px_rgba(217,119,6,0.15),inset_0_1px_0_white]",
-      "text-amber-700",
+      darkMode 
+        ? "bg-slate-700/80 backdrop-blur-sm border border-slate-600 shadow-sm text-amber-400"
+        : "bg-white/80 backdrop-blur-sm border border-amber-200/50 shadow-[0_2px_8px_-2px_rgba(217,119,6,0.15),inset_0_1px_0_white] text-amber-700",
       currentSize.container,
       className
     )}>
@@ -59,7 +61,8 @@ export const RatingBadge = memo(({
         <span className={cn(currentSize.text, "font-black leading-none")}>{rating.toFixed(1)}</span>
         {showCount && count !== undefined && (
           <span className={cn(
-            "ml-1 font-bold text-amber-600/60 leading-none",
+            "ml-1 font-bold leading-none",
+            darkMode ? "text-amber-500/60" : "text-amber-600/60",
             size === "sm" ? "text-[8px]" : "text-[10px]"
           )}>
             ({count})

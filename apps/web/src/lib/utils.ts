@@ -135,7 +135,7 @@ export function calculatePrivacySafeDistance(
  * 2. 1,000,000+: "lac" notation (e.g., 10 lac, 100 lac).
  */
 export function formatPrice(price: number | undefined | null, viewMode?: string): string {
-  if (price === undefined || price === null) return "0";
+  if (price === undefined || price === null) return "";
   const p = Math.round(price);
   
   if (p >= 1_000_000) {
