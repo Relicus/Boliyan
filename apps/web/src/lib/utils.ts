@@ -178,6 +178,21 @@ export function formatCountdown(targetMs: number, nowMs: number): string {
 }
 
 /**
+ * Generates a WhatsApp deep link with a pre-filled message.
+ */
+export function getWhatsAppUrl(phone: string, text: string): string {
+  const cleanPhone = phone.replace(/\D/g, "");
+  // Ensure it starts with a country code if it looks like a local number
+  // For Pakistan, if it starts with 03..., we prefix with 92
+  let finalPhone = cleanPhone;
+  if (finalPhone.startsWith("03") && finalPhone.length === 11) {
+    finalPhone = "92" + finalPhone.substring(1);
+  }
+  
+  return `https://wa.me/${finalPhone}?text=${encodeURIComponent(text)}`;
+}
+
+/**
  * Maps database condition strings to UI display labels.
  * 
  * Mappings:

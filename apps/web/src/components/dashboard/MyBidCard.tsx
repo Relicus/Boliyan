@@ -11,9 +11,11 @@ import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
+import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
+import { getWhatsAppUrl } from "@/lib/utils";
 
 interface MyBidCardProps {
   item: Item;
@@ -151,12 +153,27 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
               {/* Action Footer (Only for Accepted Deals) */}
               {isAccepted && (
                   <div className="px-3 py-2 bg-green-50 border-t border-green-100 flex items-center justify-between">
-                      <span className="text-xs font-bold text-green-700">Deal Closed! Connect with Seller:</span>
+                      <span className="text-xs font-bold text-green-700">Offer Accepted! Coordinate:</span>
                       <div className="flex gap-2">
                           {canChat && (
                               <Button size="sm" variant="default" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={handleChat}>
                                   <MessageSquare className="w-3 h-3 mr-1" />
                                   Chat
+                              </Button>
+                          )}
+                          {listingPhone && (
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="h-7 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-100" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const msg = `Hi ${seller.name.split(' ')[0]}, you accepted my bid for "${item.title}" on Boliyan. Let's coordinate the pickup! ${window.location.origin}/product/${item.slug || item.id}`;
+                                  window.open(getWhatsAppUrl(listingPhone, msg), '_blank');
+                                }}
+                              >
+                                  <WhatsAppIcon className="w-3 h-3 mr-1" />
+                                  WhatsApp
                               </Button>
                           )}
                           {canCall && (

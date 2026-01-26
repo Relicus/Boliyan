@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
-import { calculatePrivacySafeDistance, formatCountdown } from "@/lib/utils";
+import { calculatePrivacySafeDistance, formatCountdown, getWhatsAppUrl } from "@/lib/utils";
+import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 interface ListingOffersCardProps {
   item: Item;
@@ -195,6 +196,21 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
           )}
           {isAccepted && (
             <>
+              <Button 
+                id={`whatsapp-btn-${bid.id}`}
+                variant="outline"
+                size="icon"
+                className="h-9 w-full md:w-8 md:h-8 text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg"
+                 onClick={() => {
+                   const msg = `Hi ${bidder.name.split(' ')[0]}, I've accepted your bid for "${item.title}" on Boliyan. When can we meet? ${window.location.origin}/product/${item.slug || item.id}`;
+                   window.open(getWhatsAppUrl(bidder.phone!, msg), '_blank');
+                 }}
+                 disabled={!bidder.phone || actionsDisabled}
+                 title="WhatsApp"
+              >
+                <WhatsAppIcon className="w-4 h-4" />
+                <span className="md:hidden ml-2 text-sm font-medium">WhatsApp</span>
+              </Button>
               <Button 
                 id={`call-btn-${bid.id}`}
                 variant="outline"

@@ -5,9 +5,10 @@ import { Bid, User } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { MapPin, MessageSquare, Star, Clock, Check, X } from "lucide-react";
-import { calculatePrivacySafeDistance, getFuzzyLocationString } from "@/lib/utils";
+import { calculatePrivacySafeDistance, getFuzzyLocationString, getWhatsAppUrl } from "@/lib/utils";
 import { useApp } from "@/lib/store";
 import { useRouter } from "next/navigation";
+import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 interface SellerBidCardProps {
   bid: Bid;
@@ -15,9 +16,10 @@ interface SellerBidCardProps {
 }
 
 export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
-  const { rejectBid, acceptBid, conversations, user } = useApp();
+  const { rejectBid, acceptBid, conversations, user, itemsById } = useApp();
   const router = useRouter();
   
+  const item = itemsById[bid.itemId];
   // Stable derived values based on bidder profile
   const { distance, duration, isOutside } = useMemo(() => {
     return calculatePrivacySafeDistance(user?.location, bidder.location);
@@ -136,10 +138,25 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             </Button>
           )}
           {bid.status === 'accepted' ? (
-            <Button id={`bid-chat-btn-mobile-${bid.id}`} onClick={handleChat} className="w-full h-10 bg-green-600 hover:bg-green-700 font-bold">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Chat
-            </Button>
+            <div className="col-span-2 flex gap-2">
+              <Button 
+                id={`bid-whatsapp-btn-mobile-${bid.id}`} 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const msg = `Hi ${bidder.name.split(' ')[0]}, I've accepted your bid for "${item?.title || 'item'}" on Boliyan. When can we meet? ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
+                  window.open(getWhatsAppUrl(bidder.phone!, msg), '_blank');
+                }} 
+                className="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 font-bold"
+                disabled={!bidder.phone}
+              >
+                <WhatsAppIcon className="h-4 w-4 mr-2" />
+                WhatsApp
+              </Button>
+              <Button id={`bid-chat-btn-mobile-${bid.id}`} onClick={handleChat} className="flex-1 h-10 bg-green-600 hover:bg-green-700 font-bold">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Chat
+              </Button>
+            </div>
           ) : (
             <Button id={`bid-unlock-btn-mobile-${bid.id}`} onClick={handleAccept} className="w-full h-10 bg-blue-600 hover:bg-blue-700 font-bold">
               <Check className="h-4 w-4 mr-2" />
@@ -214,10 +231,26 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                   </Button>
                 )}
                 {bid.status === 'accepted' ? (
-                  <Button id={`bid-chat-btn-desktop-${bid.id}`} onClick={handleChat} size="sm" className="h-9 px-4 bg-green-600 hover:bg-green-700 font-bold">
-                    <MessageSquare className="h-4 w-4 mr-1" />
-                    Chat
-                  </Button>
+                  <>
+                    <Button 
+                      id={`bid-whatsapp-btn-desktop-${bid.id}`} 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const msg = `Hi ${bidder.name.split(' ')[0]}, I've accepted your bid for "${item?.title || 'item'}" on Boliyan. When can we meet? ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
+                        window.open(getWhatsAppUrl(bidder.phone!, msg), '_blank');
+                      }} 
+                      size="sm" 
+                      className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 font-bold"
+                      disabled={!bidder.phone}
+                    >
+                      <WhatsAppIcon className="h-4 w-4 mr-1" />
+                      WhatsApp
+                    </Button>
+                    <Button id={`bid-chat-btn-desktop-${bid.id}`} onClick={handleChat} size="sm" className="h-9 px-4 bg-green-600 hover:bg-green-700 font-bold">
+                      <MessageSquare className="h-4 w-4 mr-1" />
+                      Chat
+                    </Button>
+                  </>
                 ) : (
                   <Button id={`bid-unlock-btn-desktop-${bid.id}`} onClick={handleAccept} size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold">
                     <Check className="h-4 w-4 mr-1" />

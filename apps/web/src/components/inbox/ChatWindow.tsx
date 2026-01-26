@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn, formatPrice } from '@/lib/utils';
+import { cn, formatPrice, getWhatsAppUrl } from '@/lib/utils';
 import { Conversation } from '@/types';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
+import { WhatsAppIcon } from '@/components/common/WhatsAppIcon';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReviews } from '@/context/ReviewContext';
 import { sonic } from '@/lib/sonic';
@@ -371,6 +372,28 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                   >
                     <Phone className="h-4 w-4 mr-1" />
                     Call
+                  </Button>
+                );
+              })()}
+              {!isLocked && (() => {
+                const listingPhone = !isSeller ? item?.contactPhone : undefined;
+                const phone = listingPhone || otherUser?.phone;
+                if (!phone) return null;
+
+                const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
+
+                return (
+                  <Button
+                    id="chat-whatsapp-btn"
+                    size="sm"
+                    variant="outline"
+                    className="h-9 px-3 text-xs font-bold rounded-full border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-sm"
+                    onClick={() => {
+                      window.open(getWhatsAppUrl(phone, waMessage), '_blank');
+                    }}
+                  >
+                    <WhatsAppIcon className="h-4 w-4 mr-1.5" />
+                    WhatsApp
                   </Button>
                 );
               })()}
