@@ -1,0 +1,123 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: YOUR LOCATION
+          - button "Karachi" [ref=e24]:
+            - img
+            - generic [ref=e25]: Karachi
+        - link "Sell Item" [ref=e26] [cursor=pointer]:
+          - /url: /list
+          - img
+          - generic [ref=e27]: Sell Item
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - link "Market" [ref=e30] [cursor=pointer]:
+              - /url: /
+              - img
+              - generic [ref=e31]: Market
+            - link "Dash" [ref=e32] [cursor=pointer]:
+              - /url: /dashboard?tab=offers
+              - img
+              - generic [ref=e33]: Dash
+            - link "Analytics" [ref=e34] [cursor=pointer]:
+              - /url: /dashboard/seller
+              - img
+              - generic [ref=e35]: Analytics
+            - link "Chat" [ref=e36] [cursor=pointer]:
+              - /url: /inbox
+              - img
+              - generic [ref=e37]: Chat
+          - button "Notifications" [ref=e39]:
+            - img
+            - generic [ref=e43]: Notifications
+          - img [ref=e45] [cursor=pointer]
+  - main [ref=e47]:
+    - generic [ref=e49]:
+      - heading "Dashboard" [level=1] [ref=e50]
+      - generic [ref=e51]:
+        - tablist [ref=e52]:
+          - tab "Selling 4" [selected] [ref=e53]:
+            - generic [ref=e54]:
+              - img
+            - generic [ref=e55]: Selling
+            - generic [ref=e56]: "4"
+          - tab "Buying 13" [ref=e57]:
+            - generic [ref=e58]:
+              - img
+            - generic [ref=e59]: Buying
+            - generic [ref=e60]: "13"
+          - tab "Watchlist 14" [ref=e61]:
+            - generic [ref=e62]:
+              - img
+            - generic [ref=e63]: Watchlist
+            - generic [ref=e64]: "14"
+          - tab "Listings 1" [ref=e65]:
+            - generic [ref=e66]:
+              - img
+            - generic [ref=e67]: Listings
+            - generic [ref=e68]: "1"
+        - generic [ref=e71] [cursor=pointer]:
+          - generic [ref=e72]:
+            - generic [ref=e73]:
+              - img "My Cloud" [ref=e75]
+              - generic [ref=e76]:
+                - heading "My Cloud" [level=3] [ref=e77]
+                - paragraph [ref=e78]: It's gud
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - generic [ref=e81]:
+                  - img [ref=e82]
+                  - text: Asking
+                - generic [ref=e85]: PKR 50,000
+              - generic [ref=e86]:
+                - img [ref=e87]
+                - text: Active Listing
+          - generic [ref=e89]:
+            - generic [ref=e90]:
+              - img [ref=e91]
+              - text: 3h 8m
+            - generic [ref=e94]:
+              - generic [ref=e95]:
+                - img [ref=e96]
+                - text: 4 Offers
+              - generic [ref=e99]:
+                - img [ref=e100]
+                - text: 4 Accepted
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - img [ref=e105]
+                - text: Top Offer
+              - generic [ref=e111]: PKR 54,000
+            - button "Show 4 offers" [ref=e112]:
+              - text: Show 4 offers
+              - img [ref=e113]
+  - region "Notifications alt+T"
+  - generic [ref=e119] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e120]:
+      - img [ref=e121]
+    - generic [ref=e124]:
+      - button "Open issues overlay" [ref=e125]:
+        - generic [ref=e126]:
+          - generic [ref=e127]: "1"
+          - generic [ref=e128]: "2"
+        - generic [ref=e129]:
+          - text: Issue
+          - generic [ref=e130]: s
+      - button "Collapse issues badge" [ref=e131]:
+        - img [ref=e132]
+  - alert [ref=e134]
+```

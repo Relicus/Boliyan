@@ -1,0 +1,12 @@
+{
+  "name": "boliyan",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm --prefix apps/web install",
+    "checks": "npm --prefix apps/web run checks",
+    "build": "npm --prefix apps/web run build",
+    "lint": "npm --prefix apps/web run lint",
+    "typecheck": "npm --prefix apps/web run typecheck",
+    "dev": "npm --prefix apps/web run dev"
+  }
+}

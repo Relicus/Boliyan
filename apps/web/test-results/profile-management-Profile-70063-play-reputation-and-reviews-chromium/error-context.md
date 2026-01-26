@@ -1,0 +1,113 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: YOUR LOCATION
+          - button "Karachi" [ref=e24]:
+            - img
+            - generic [ref=e25]: Karachi
+        - link "Sell Item" [ref=e26] [cursor=pointer]:
+          - /url: /list
+          - img
+          - generic [ref=e27]: Sell Item
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - link "Market" [ref=e30] [cursor=pointer]:
+              - /url: /
+              - img
+              - generic [ref=e31]: Market
+            - link "Dash" [ref=e32] [cursor=pointer]:
+              - /url: /dashboard?tab=offers
+              - img
+              - generic [ref=e33]: Dash
+            - link "Analytics" [ref=e34] [cursor=pointer]:
+              - /url: /dashboard/seller
+              - img
+              - generic [ref=e35]: Analytics
+            - link "Chat" [ref=e36] [cursor=pointer]:
+              - /url: /inbox
+              - img
+              - generic [ref=e37]: Chat
+          - button "Notifications" [ref=e39]:
+            - img
+            - generic [ref=e40]: Notifications
+          - img [ref=e42] [cursor=pointer]
+  - main [ref=e44]:
+    - generic [ref=e46]:
+      - generic [ref=e47]:
+        - heading "My Profile" [level=1] [ref=e48]
+        - paragraph [ref=e49]: Manage your identity and view your achievements.
+        - generic [ref=e51]:
+          - heading "Profile Strength 75%" [level=3] [ref=e53]:
+            - generic [ref=e54]: Profile Strength
+            - generic [ref=e55]: 75%
+          - generic [ref=e58]:
+            - generic [ref=e59]:
+              - img [ref=e60]
+              - generic [ref=e63]: Profile Picture
+            - generic [ref=e64]:
+              - img [ref=e65]
+              - generic [ref=e67]: Phone Number
+              - generic [ref=e68]: +25%
+            - generic [ref=e69]:
+              - img [ref=e70]
+              - generic [ref=e73]: Location
+            - generic [ref=e74]:
+              - img [ref=e75]
+              - generic [ref=e78]: Verified Account
+          - link "Complete Profile" [ref=e79] [cursor=pointer]:
+            - /url: /settings/profile
+      - generic [ref=e80]:
+        - tablist [ref=e81]:
+          - tab "Profile Details" [ref=e82]:
+            - img
+            - generic [ref=e83]: Profile Details
+          - tab "Achievements" [ref=e84]:
+            - img
+            - generic [ref=e85]: Achievements
+          - tab "Reviews" [active] [selected] [ref=e86]:
+            - img
+            - generic [ref=e87]: Reviews
+        - generic [ref=e89]:
+          - heading "Reviews & Reputation" [level=3] [ref=e90]
+          - generic [ref=e92]:
+            - generic [ref=e94]:
+              - img [ref=e96]
+              - generic [ref=e97]:
+                - generic [ref=e98]:
+                  - generic [ref=e99]: Anonymous
+                  - generic [ref=e100]: Buyer Review
+                - generic [ref=e101]:
+                  - generic [ref=e102]:
+                    - button [disabled] [ref=e103]:
+                      - img [ref=e104]
+                    - button [disabled] [ref=e106]:
+                      - img [ref=e107]
+                    - button [disabled] [ref=e109]:
+                      - img [ref=e110]
+                    - button [disabled] [ref=e112]:
+                      - img [ref=e113]
+                    - button [disabled] [ref=e115]:
+                      - img [ref=e116]
+                  - generic [ref=e118]: •
+                  - generic [ref=e119]: 6:40pm
+            - paragraph [ref=e120]: Great buyer!
+            - generic [ref=e121]: "Item: Camera"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e127] [cursor=pointer]:
+    - img [ref=e128]
+  - alert [ref=e131]
+```

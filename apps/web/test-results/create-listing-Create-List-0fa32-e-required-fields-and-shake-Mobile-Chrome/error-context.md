@@ -1,0 +1,95 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e21]:
+        - button "Notifications" [ref=e23]:
+          - img
+          - generic [ref=e27]: Notifications
+        - img [ref=e29] [cursor=pointer]
+  - main [ref=e31]:
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - img [ref=e40]
+        - generic [ref=e43]: Welcome Back
+        - generic [ref=e44]: Sign in to continue to Boliyan
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - img [ref=e49]
+              - text: Email
+            - textbox "Email" [ref=e52]:
+              - /placeholder: you@example.com
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - img [ref=e55]
+              - text: Password
+            - textbox "Password" [ref=e58]:
+              - /placeholder: ••••••••
+          - button "Sign In" [ref=e59]
+        - generic [ref=e64]: Or continue with
+        - generic [ref=e65]:
+          - button "Google" [ref=e66]:
+            - img
+            - text: Google
+          - button "Facebook" [ref=e67]:
+            - img
+            - text: Facebook
+        - generic [ref=e68]:
+          - text: Don't have an account?
+          - link "Sign Up" [ref=e69] [cursor=pointer]:
+            - /url: /signup
+  - generic [ref=e72]:
+    - link "Market" [ref=e73] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e75]:
+        - img [ref=e77]
+        - generic [ref=e81]: Market
+    - link "Dash" [ref=e82] [cursor=pointer]:
+      - /url: /dashboard?tab=offers
+      - generic [ref=e84]:
+        - img [ref=e86]
+        - generic [ref=e91]: Dash
+    - link "Sell" [ref=e92] [cursor=pointer]:
+      - /url: /list
+      - generic [ref=e94]:
+        - img [ref=e96]
+        - generic [ref=e98]: Sell
+    - link "Inbox" [ref=e99] [cursor=pointer]:
+      - /url: /inbox
+      - generic [ref=e101]:
+        - img [ref=e103]
+        - generic [ref=e105]: Inbox
+    - link "Analytics" [ref=e106] [cursor=pointer]:
+      - /url: /dashboard/seller
+      - generic [ref=e108]:
+        - img [ref=e110]
+        - generic [ref=e112]: Analytics
+  - region "Notifications alt+T"
+  - generic [ref=e117] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e118]:
+      - img [ref=e119]
+    - generic [ref=e122]:
+      - button "Open issues overlay" [ref=e123]:
+        - generic [ref=e124]:
+          - generic [ref=e125]: "1"
+          - generic [ref=e126]: "2"
+        - generic [ref=e127]:
+          - text: Issue
+          - generic [ref=e128]: s
+      - button "Collapse issues badge" [ref=e129]:
+        - img [ref=e130]
+  - alert [ref=e132]
+```

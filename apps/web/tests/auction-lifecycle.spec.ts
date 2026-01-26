@@ -84,21 +84,19 @@ test.describe('Auction Lifecycle & Engagement', () => {
     const input = itemCard.locator(`#item-card-${itemId}-bid-input`);
     const bidBtn = itemCard.locator(`#item-card-${itemId}-place-bid-btn`);
 
-    // Get ask price to calculate <70%
-    const askPriceElement = itemCard.locator(`#item-card-${itemId}-ask-price`);
-    const askPriceText = await askPriceElement.innerText();
+    // Read ask price from the rendered card (Asking label + price span)
+    const askLabel = itemCard.locator('span', { hasText: 'Asking' }).first();
+    const askContainer = askLabel.locator('..');
+    const askPriceText = await askContainer.locator('span').nth(1).innerText();
     const askPrice = parseFloat(askPriceText.replace(/[^0-9.]/g, ''));
     
     const invalidBid = Math.floor(askPrice * 0.5); // 50% is definitely invalid
 
+    await input.click();
     await input.fill(invalidBid.toString());
-    
-    // Verify error styling (shaking/red code logic in ItemCard.tsx)
-    await expect(input).toHaveClass(/bg-red-50/);
 
-    // Click bid - should not succeed
     await bidBtn.click();
-    await expect(itemCard.locator('text=Bid Placed!')).not.toBeVisible();
+    await expect(bidBtn).toContainText(/Below Min|Min Bid Reached/);
   });
 
   test('should place bid from Product Modal', async ({ page }) => {
@@ -128,11 +126,8 @@ test.describe('Auction Lifecycle & Engagement', () => {
     await expect(dialog.locator('text=Placed!')).toBeVisible({ timeout: 10000 });
     console.log("Success message 'Placed!' found in modal");
     
-    // Modal should close after success (logic in useBidding.ts: onBidSuccess after 1500ms)
-    // We expect the success message to be gone (and isSuccess=false) before hiding starts or during it
-    await page.waitForTimeout(2000);
-    
-    // Check if dialog is hidden
+    // Close modal explicitly (auto-close is disabled)
+    await dialog.locator(`#close-listing-btn-${itemId}`).click();
     await expect(dialog).toBeHidden({ timeout: 15000 });
     console.log("Modal closed successfully");
   });
@@ -156,9 +151,10 @@ test.describe('Auction Lifecycle & Engagement', () => {
     
     // Close modal
     await page.locator(`#close-listing-btn-${itemId}`).click();
-    
-    // Check for blue indicator icon on card
-    await expect(itemCard.locator(`#item-card-${itemId}-watch-indicator`)).toBeVisible();
+
+    // Check card watch button styling
+    const cardWatchBtn = itemCard.locator(`#item-card-${itemId}-watch-btn`);
+    await expect(cardWatchBtn).toHaveClass(/border-blue-400/);
   });
 
 

@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-01-23T23:04:07.161Z",
+  "timestamp": "2026-01-26T13:39:48.556Z",
   "routes": [
     "/",
     "/signin?redirect=%2Flist",
-    "/dashboard?tab=watchlist",
+    "/dashboard?tab=offers",
     "/list",
     "/inbox",
-    "/dashboard"
+    "/dashboard/seller"
   ],
   "elements": [
     {
@@ -16,17 +16,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nAll"
+          "text": "بولیاں\nBOLIYAN\nJust\nCategories\nType\nView\nKarachi\nP"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -69,13 +69,12 @@
           "id": "navbar-search-input",
           "tagName": "INPUT",
           "text": "",
-          "type": "text",
           "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "YOUR LOCATION\nKarachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -105,27 +104,27 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "All\nPublic\nSecret\nLIST LOCATION\nKarachi\n∞\nPRICE RA"
+          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
         },
         {
           "id": "sidebar-01",
           "tagName": "ASIDE",
-          "text": "All\nPublic\nSecret\nLIST LOCATION\nKarachi\n∞\nPRICE RA"
+          "text": "AllPublicHidden[data-radix-scroll-area-viewport]{s"
         },
         {
           "id": "sidebar-scroll-area-02",
           "tagName": "DIV",
-          "text": "LIST LOCATION\nKarachi\n∞\nPRICE RANGE\n₨\n₨\nCONDITION\n"
+          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
         },
         {
           "id": "location-selector-sidebar-compact",
           "tagName": "DIV",
-          "text": "Karachi\n∞"
+          "text": "Karachi∞"
         },
         {
           "id": "location-sidebar-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi\n∞",
+          "text": "Karachi∞",
           "type": "button"
         },
         {
@@ -151,28 +150,27 @@
         {
           "id": "sidebar-reset-filters-btn",
           "tagName": "BUTTON",
-          "text": "Reset All Filters",
-          "type": "submit"
+          "text": "Reset All Filters"
         },
         {
           "id": "banner-ad-sidebar",
           "tagName": "DIV",
-          "text": "AD\nSupercharge Your Workflow\n\nGet 50% off professi"
+          "text": "AdSupercharge Your WorkflowGet 50% off professiona"
         },
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
         },
         {
           "id": "marketplace-grid-root",
           "tagName": "DIV",
-          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
         },
         {
           "id": "mobile-search-filter-container",
           "tagName": "DIV",
-          "text": "JustCategoriesTypeViewKarachiPrice"
+          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
         },
         {
           "id": "mobile-sort-select",
@@ -195,8 +193,7 @@
         {
           "id": "mobile-view-toggle",
           "tagName": "BUTTON",
-          "text": "View",
-          "type": "submit"
+          "text": "View"
         },
         {
           "id": "location-selector-root",
@@ -218,18 +215,17 @@
         {
           "id": "smart-filters-row",
           "tagName": "DIV",
-          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+          "text": "TrendingNear MeEnding SoonHigh ValueJust ListedWat"
         },
         {
           "id": "smart-filter-bar-root",
           "tagName": "DIV",
-          "text": "Trending\nNear Me\nEnding Soon\nHigh Value\nJust Liste"
+          "text": "TrendingNear MeEnding SoonHigh ValueJust ListedWat"
         },
         {
           "id": "smart-filter-btn-trending",
           "tagName": "BUTTON",
-          "text": "Trending",
-          "type": "submit"
+          "text": "Trending"
         },
         {
           "id": "smart-filter-icon-trending",
@@ -243,8 +239,7 @@
         {
           "id": "smart-filter-btn-nearest",
           "tagName": "BUTTON",
-          "text": "Near Me",
-          "type": "submit"
+          "text": "Near Me"
         },
         {
           "id": "smart-filter-icon-nearest",
@@ -258,8 +253,7 @@
         {
           "id": "smart-filter-btn-ending_soon",
           "tagName": "BUTTON",
-          "text": "Ending Soon",
-          "type": "submit"
+          "text": "Ending Soon"
         },
         {
           "id": "smart-filter-icon-ending_soon",
@@ -273,8 +267,7 @@
         {
           "id": "smart-filter-btn-luxury",
           "tagName": "BUTTON",
-          "text": "High Value",
-          "type": "submit"
+          "text": "High Value"
         },
         {
           "id": "smart-filter-icon-luxury",
@@ -288,8 +281,7 @@
         {
           "id": "smart-filter-btn-newest",
           "tagName": "BUTTON",
-          "text": "Just Listed",
-          "type": "submit"
+          "text": "Just Listed"
         },
         {
           "id": "smart-filter-icon-newest",
@@ -303,8 +295,7 @@
         {
           "id": "smart-filter-btn-watchlist",
           "tagName": "BUTTON",
-          "text": "Watchlist",
-          "type": "submit"
+          "text": "Watchlist"
         },
         {
           "id": "smart-filter-icon-watchlist",
@@ -323,90 +314,77 @@
         {
           "id": "category-bar-row",
           "tagName": "DIV",
-          "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
+          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
         },
         {
           "id": "category-bar-root",
           "tagName": "DIV",
-          "text": "All\nMobiles\nElectronics\nAppliances\nFurniture\nFashi"
+          "text": "[data-radix-scroll-area-viewport]{scrollbar-width:"
         },
         {
           "id": "category-btn-all",
           "tagName": "BUTTON",
-          "text": "All",
-          "type": "submit"
+          "text": "All"
         },
         {
           "id": "category-btn-mobiles",
           "tagName": "BUTTON",
-          "text": "Mobiles",
-          "type": "submit"
+          "text": "Mobiles"
         },
         {
           "id": "category-btn-electronics",
           "tagName": "BUTTON",
-          "text": "Electronics",
-          "type": "submit"
+          "text": "Electronics"
         },
         {
           "id": "category-btn-appliances",
           "tagName": "BUTTON",
-          "text": "Appliances",
-          "type": "submit"
+          "text": "Appliances"
         },
         {
           "id": "category-btn-furniture",
           "tagName": "BUTTON",
-          "text": "Furniture",
-          "type": "submit"
+          "text": "Furniture"
         },
         {
           "id": "category-btn-fashion",
           "tagName": "BUTTON",
-          "text": "Fashion",
-          "type": "submit"
+          "text": "Fashion"
         },
         {
           "id": "category-btn-sports",
           "tagName": "BUTTON",
-          "text": "Sports",
-          "type": "submit"
+          "text": "Sports"
         },
         {
           "id": "category-btn-gaming",
           "tagName": "BUTTON",
-          "text": "Gaming",
-          "type": "submit"
+          "text": "Gaming"
         },
         {
           "id": "category-btn-watches",
           "tagName": "BUTTON",
-          "text": "Watches",
-          "type": "submit"
+          "text": "Watches"
         },
         {
           "id": "category-btn-audio",
           "tagName": "BUTTON",
-          "text": "Audio",
-          "type": "submit"
+          "text": "Audio"
         },
         {
           "id": "category-btn-cameras",
           "tagName": "BUTTON",
-          "text": "Cameras",
-          "type": "submit"
+          "text": "Cameras"
         },
         {
           "id": "category-btn-hobbies",
           "tagName": "BUTTON",
-          "text": "Hobbies",
-          "type": "submit"
+          "text": "Hobbies"
         },
         {
           "id": "category-btn-community",
           "tagName": "BUTTON",
-          "text": "Community",
-          "type": "submit"
+          "text": "Community"
         },
         {
           "id": "marketplace-grid-container",
@@ -416,12 +394,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-link-market",
@@ -443,42 +421,42 @@
           "text": "Market"
         },
         {
-          "id": "bottom-nav-link-watchlist",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-watchlist",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-watchlist",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-watchlist",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-link-post",
+          "id": "bottom-nav-link-sell",
           "tagName": "A",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-item-post",
+          "id": "bottom-nav-item-sell",
           "tagName": "DIV",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-icon-post",
+          "id": "bottom-nav-icon-sell",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-post",
+          "id": "bottom-nav-text-sell",
           "tagName": "SPAN",
-          "text": "Post"
+          "text": "Sell"
         },
         {
           "id": "bottom-nav-link-inbox",
@@ -500,28 +478,28 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dash",
+          "id": "bottom-nav-link-analytics",
           "tagName": "A",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-item-dash",
+          "id": "bottom-nav-item-analytics",
           "tagName": "DIV",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-icon-dash",
+          "id": "bottom-nav-icon-analytics",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dash",
+          "id": "bottom-nav-text-analytics",
           "tagName": "SPAN",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"pwTuL7BDU2vS2we4EFIJY\""
+          "text": "self.__next_r=\"UOaSYcdFuLdZGKZ7mWdse\""
         },
         {
           "id": "devtools-indicator",
@@ -531,8 +509,7 @@
         {
           "id": "next-logo",
           "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
+          "text": ""
         },
         {
           "id": "next_logo_paint0_linear_1357_10853",
@@ -555,17 +532,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nWel"
+          "text": "بولیاں\nBOLIYAN\nWelcome Back\nSign in to continue to"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -608,13 +585,12 @@
           "id": "navbar-search-input",
           "tagName": "INPUT",
           "text": "",
-          "type": "text",
           "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "YOUR LOCATION\nKarachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -726,12 +702,12 @@
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-link-market",
@@ -753,42 +729,42 @@
           "text": "Market"
         },
         {
-          "id": "bottom-nav-link-watchlist",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-watchlist",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-watchlist",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-watchlist",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-link-post",
+          "id": "bottom-nav-link-sell",
           "tagName": "A",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-item-post",
+          "id": "bottom-nav-item-sell",
           "tagName": "DIV",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-icon-post",
+          "id": "bottom-nav-icon-sell",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-post",
+          "id": "bottom-nav-text-sell",
           "tagName": "SPAN",
-          "text": "Post"
+          "text": "Sell"
         },
         {
           "id": "bottom-nav-link-inbox",
@@ -810,28 +786,28 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dash",
+          "id": "bottom-nav-link-analytics",
           "tagName": "A",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-item-dash",
+          "id": "bottom-nav-item-analytics",
           "tagName": "DIV",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-icon-dash",
+          "id": "bottom-nav-icon-analytics",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dash",
+          "id": "bottom-nav-text-analytics",
           "tagName": "SPAN",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"9p32RJY9tPYVfqiuo-C1t\""
+          "text": "self.__next_r=\"9b-8pirgck3k90SSUd1u8\""
         },
         {
           "id": "devtools-indicator",
@@ -841,8 +817,7 @@
         {
           "id": "next-logo",
           "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
+          "text": ""
         },
         {
           "id": "next_logo_paint0_linear_1357_10853",
@@ -864,23 +839,23 @@
       ]
     },
     {
-      "route": "/dashboard?tab=watchlist",
+      "route": "/dashboard?tab=offers",
       "title": "Boliyan - Speak Your Price",
       "interactiveElements": [
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nDas"
+          "text": "بولیاں\nBOLIYAN\nDashboard\nSelling\nBuying\nWatchlist\n"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -923,13 +898,12 @@
           "id": "navbar-search-input",
           "tagName": "INPUT",
           "text": "",
-          "type": "text",
           "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "YOUR LOCATION\nKarachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -959,134 +933,46 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+          "text": "Dashboard\nSelling\nBuying\nWatchlist\nListings\nNo off"
         },
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+          "text": "Dashboard\nSelling\nBuying\nWatchlist\nListings\nNo off"
         },
         {
-          "id": "dashboard-root",
-          "tagName": "DIV",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
-        },
-        {
-          "id": "dashboard-title",
-          "tagName": "H1",
-          "text": "Dashboard"
-        },
-        {
-          "id": "dashboard-subtitle",
-          "tagName": "P",
-          "text": "Manage your marketplace activity."
-        },
-        {
-          "id": "dashboard-messages-btn",
-          "tagName": "A",
-          "text": "Messages"
-        },
-        {
-          "id": "dashboard-new-listing-btn",
-          "tagName": "A",
-          "text": "Post New"
-        },
-        {
-          "id": "dashboard-new-listing-plus",
-          "tagName": "svg"
-        },
-        {
-          "id": "dashboard-tabs",
-          "tagName": "DIV",
-          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0\nWatchlis"
-        },
-        {
-          "id": "dashboard-tabs-list",
-          "tagName": "DIV",
-          "text": "OffersBidsListingsWatchlist"
-        },
-        {
-          "id": "tab-trigger-active-bids-mobile",
+          "id": "dashboard-offers-tab",
           "tagName": "BUTTON",
-          "text": "Offers",
+          "text": "Selling",
           "type": "button"
         },
         {
-          "id": "tab-trigger-my-bids-mobile",
+          "id": "dashboard-bids-tab",
           "tagName": "BUTTON",
-          "text": "Bids",
+          "text": "Buying",
           "type": "button"
         },
         {
-          "id": "tab-trigger-my-listings-mobile",
-          "tagName": "BUTTON",
-          "text": "Listings",
-          "type": "button"
-        },
-        {
-          "id": "tab-trigger-watchlist-mobile",
+          "id": "dashboard-watchlist-tab",
           "tagName": "BUTTON",
           "text": "Watchlist",
           "type": "button"
         },
         {
-          "id": "dashboard-tabs-list-desktop",
-          "tagName": "DIV",
-          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0"
-        },
-        {
-          "id": "tab-trigger-active-bids",
+          "id": "dashboard-listings-tab",
           "tagName": "BUTTON",
-          "text": "Offers\n0",
+          "text": "Listings",
           "type": "button"
-        },
-        {
-          "id": "tab-badge-active-bids",
-          "tagName": "SPAN",
-          "text": "0"
-        },
-        {
-          "id": "tab-trigger-my-bids",
-          "tagName": "BUTTON",
-          "text": "Bids\n0",
-          "type": "button"
-        },
-        {
-          "id": "tab-badge-my-bids",
-          "tagName": "SPAN",
-          "text": "0"
-        },
-        {
-          "id": "tab-trigger-my-listings",
-          "tagName": "BUTTON",
-          "text": "My Listings\n0",
-          "type": "button"
-        },
-        {
-          "id": "tab-badge-my-listings",
-          "tagName": "SPAN",
-          "text": "0"
-        },
-        {
-          "id": "tab-trigger-watchlist",
-          "tagName": "BUTTON",
-          "text": "Watchlist\n0",
-          "type": "button"
-        },
-        {
-          "id": "tab-badge-watchlist",
-          "tagName": "SPAN",
-          "text": "0"
         },
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-link-market",
@@ -1108,42 +994,42 @@
           "text": "Market"
         },
         {
-          "id": "bottom-nav-link-watchlist",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-watchlist",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-watchlist",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-watchlist",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-link-post",
+          "id": "bottom-nav-link-sell",
           "tagName": "A",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-item-post",
+          "id": "bottom-nav-item-sell",
           "tagName": "DIV",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-icon-post",
+          "id": "bottom-nav-icon-sell",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-post",
+          "id": "bottom-nav-text-sell",
           "tagName": "SPAN",
-          "text": "Post"
+          "text": "Sell"
         },
         {
           "id": "bottom-nav-link-inbox",
@@ -1165,28 +1051,28 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dash",
+          "id": "bottom-nav-link-analytics",
           "tagName": "A",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-item-dash",
+          "id": "bottom-nav-item-analytics",
           "tagName": "DIV",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-icon-dash",
+          "id": "bottom-nav-icon-analytics",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dash",
+          "id": "bottom-nav-text-analytics",
           "tagName": "SPAN",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"w4IAvrTq25FHnBHU-xNdA\""
+          "text": "self.__next_r=\"49zZFQ1ZihsBcHSXDzAPS\""
         },
         {
           "id": "devtools-indicator",
@@ -1196,8 +1082,7 @@
         {
           "id": "next-logo",
           "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
+          "text": ""
         },
         {
           "id": "next_logo_paint0_linear_1357_10853",
@@ -1225,17 +1110,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nLis"
+          "text": "بولیاں\nBOLIYAN\nList an Item\nMinimalist listing. Se"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -1278,13 +1163,12 @@
           "id": "navbar-search-input",
           "tagName": "INPUT",
           "text": "",
-          "type": "text",
           "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "YOUR LOCATION\nKarachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -1385,13 +1269,18 @@
           "id": "title-input",
           "tagName": "INPUT",
           "text": "",
-          "type": "text",
           "placeholder": "e.g. Sony Headphones, Wood Table..."
         },
         {
           "id": "category-select",
           "tagName": "BUTTON",
           "text": "Select Category",
+          "type": "button"
+        },
+        {
+          "id": "condition-select",
+          "tagName": "BUTTON",
+          "text": "👌 Used",
           "type": "button"
         },
         {
@@ -1402,17 +1291,17 @@
           "placeholder": "0"
         },
         {
-          "id": "condition-select",
-          "tagName": "BUTTON",
-          "text": "👌 Gently Used",
-          "type": "button"
-        },
-        {
           "id": "description-textarea",
           "tagName": "TEXTAREA",
           "text": "",
-          "type": "textarea",
           "placeholder": "Tell buyers about condition, usage, and any defects..."
+        },
+        {
+          "id": "listing-phone-input",
+          "tagName": "INPUT",
+          "text": "",
+          "type": "tel",
+          "placeholder": "Enter phone number"
         },
         {
           "id": "bidding-style-heading",
@@ -1425,27 +1314,24 @@
           "text": "Public Auction\n\nEveryone can see the highest bid"
         },
         {
-          "id": "sealed-bids-option",
+          "id": "hidden-bids-option",
           "tagName": "DIV",
-          "text": "Secret Bids Only\n\nOnly you see the bid amounts"
+          "text": "Hidden Bids Only\n\nOnly you see the bid amounts"
         },
         {
           "id": "duration-btn-24",
           "tagName": "BUTTON",
-          "text": "24 Hours",
-          "type": "submit"
+          "text": "24 Hours"
         },
         {
           "id": "duration-btn-48",
           "tagName": "BUTTON",
-          "text": "48 Hours",
-          "type": "submit"
+          "text": "48 Hours"
         },
         {
           "id": "duration-btn-72",
           "tagName": "BUTTON",
-          "text": "72 Hours",
-          "type": "submit"
+          "text": "72 Hours"
         },
         {
           "id": "cancel-listing-btn",
@@ -1456,18 +1342,22 @@
         {
           "id": "post-listing-btn",
           "tagName": "BUTTON",
-          "text": "Post Listing",
-          "type": "submit"
+          "text": "Post Listing"
+        },
+        {
+          "id": "go-live-note",
+          "tagName": "DIV",
+          "text": "Goes live in 1 hour after saving."
         },
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-link-market",
@@ -1489,42 +1379,42 @@
           "text": "Market"
         },
         {
-          "id": "bottom-nav-link-watchlist",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-watchlist",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-watchlist",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-watchlist",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-link-post",
+          "id": "bottom-nav-link-sell",
           "tagName": "A",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-item-post",
+          "id": "bottom-nav-item-sell",
           "tagName": "DIV",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-icon-post",
+          "id": "bottom-nav-icon-sell",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-post",
+          "id": "bottom-nav-text-sell",
           "tagName": "SPAN",
-          "text": "Post"
+          "text": "Sell"
         },
         {
           "id": "bottom-nav-link-inbox",
@@ -1546,28 +1436,28 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dash",
+          "id": "bottom-nav-link-analytics",
           "tagName": "A",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-item-dash",
+          "id": "bottom-nav-item-analytics",
           "tagName": "DIV",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-icon-dash",
+          "id": "bottom-nav-icon-analytics",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dash",
+          "id": "bottom-nav-text-analytics",
           "tagName": "SPAN",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"KH7MlP3IAxhYDnCYoSUgP\""
+          "text": "self.__next_r=\"ubKrQeDWp_PGHglAyglqt\""
         },
         {
           "id": "devtools-indicator",
@@ -1577,8 +1467,7 @@
         {
           "id": "next-logo",
           "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
+          "text": ""
         },
         {
           "id": "next_logo_paint0_linear_1357_10853",
@@ -1606,17 +1495,17 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nMes"
+          "text": "بولیاں\nBOLIYAN\nMessages\nAll\nSelling\nBuying\n\nNo act"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -1659,13 +1548,12 @@
           "id": "navbar-search-input",
           "tagName": "INPUT",
           "text": "",
-          "type": "text",
           "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "YOUR LOCATION\nKarachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -1695,27 +1583,38 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Messages\nAll\nOffers\nBids\n\nNo active conversations\n"
+          "text": "Messages\nAll\nSelling\nBuying\n\nNo active conversatio"
         },
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Messages\nAll\nOffers\nBids\n\nNo active conversations\n"
+          "text": "Messages\nAll\nSelling\nBuying\n\nNo active conversatio"
         },
         {
           "id": "inbox-container",
           "tagName": "DIV",
-          "text": "Messages\nAll\nOffers\nBids\n\nNo active conversations\n"
+          "text": "Messages\nAll\nSelling\nBuying\n\nNo active conversatio"
         },
         {
           "id": "inbox-sidebar",
           "tagName": "DIV",
-          "text": "Messages\nAll\nOffers\nBids\n\nNo active conversations\n"
+          "text": "Messages\nAll\nSelling\nBuying\n\nNo active conversatio"
+        },
+        {
+          "id": "inbox-search",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "inbox-search-input",
+          "tagName": "INPUT",
+          "text": "",
+          "placeholder": "Search people, listings, or notes"
         },
         {
           "id": "inbox-tabs-list",
           "tagName": "DIV",
-          "text": "All\nOffers\nBids"
+          "text": "All\nSelling\nBuying"
         },
         {
           "id": "inbox-all-tab",
@@ -1726,13 +1625,13 @@
         {
           "id": "inbox-offers-tab",
           "tagName": "BUTTON",
-          "text": "Offers",
+          "text": "Selling",
           "type": "button"
         },
         {
           "id": "inbox-bids-tab",
           "tagName": "BUTTON",
-          "text": "Bids",
+          "text": "Buying",
           "type": "button"
         },
         {
@@ -1753,17 +1652,17 @@
         {
           "id": "chat-window-container",
           "tagName": "DIV",
-          "text": "Speak Your Price\n\nChoose a chat from the left to a"
+          "text": "Speak Your PriceChoose a chat from the left to arr"
         },
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-link-market",
@@ -1785,42 +1684,42 @@
           "text": "Market"
         },
         {
-          "id": "bottom-nav-link-watchlist",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-watchlist",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-watchlist",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-watchlist",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-link-post",
+          "id": "bottom-nav-link-sell",
           "tagName": "A",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-item-post",
+          "id": "bottom-nav-item-sell",
           "tagName": "DIV",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-icon-post",
+          "id": "bottom-nav-icon-sell",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-post",
+          "id": "bottom-nav-text-sell",
           "tagName": "SPAN",
-          "text": "Post"
+          "text": "Sell"
         },
         {
           "id": "bottom-nav-link-inbox",
@@ -1842,28 +1741,28 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dash",
+          "id": "bottom-nav-link-analytics",
           "tagName": "A",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-item-dash",
+          "id": "bottom-nav-item-analytics",
           "tagName": "DIV",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-icon-dash",
+          "id": "bottom-nav-icon-analytics",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dash",
+          "id": "bottom-nav-text-analytics",
           "tagName": "SPAN",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"IgRQKQg-GISQnmtOnlBWv\""
+          "text": "self.__next_r=\"9GTHYKVTQs_ok8Hy6hSwG\""
         },
         {
           "id": "devtools-indicator",
@@ -1873,8 +1772,7 @@
         {
           "id": "next-logo",
           "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
+          "text": ""
         },
         {
           "id": "next_logo_paint0_linear_1357_10853",
@@ -1896,23 +1794,23 @@
       ]
     },
     {
-      "route": "/dashboard",
+      "route": "/dashboard/seller",
       "title": "Boliyan - Speak Your Price",
       "interactiveElements": [
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item\nDas"
+          "text": "بولیاں\nBOLIYAN\nAnalytics\nBuyer\nSeller\nListing Perf"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN\nYOUR LOCATION\nKarachi\nSell Item"
+          "text": "بولیاں\nBOLIYAN"
         },
         {
           "id": "navbar-left-section-03",
@@ -1955,13 +1853,12 @@
           "id": "navbar-search-input",
           "tagName": "INPUT",
           "text": "",
-          "type": "text",
           "placeholder": "Search items, categories..."
         },
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": "YOUR LOCATION\nKarachi\nSell Item"
+          "text": ""
         },
         {
           "id": "location-selector-root",
@@ -1991,134 +1888,59 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+          "text": "Analytics\nBuyer\nSeller\nListing Performance\nLoading"
         },
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+          "text": "Analytics\nBuyer\nSeller\nListing Performance\nLoading"
         },
         {
-          "id": "dashboard-root",
+          "id": "analytics-page",
           "tagName": "DIV",
-          "text": "Dashboard\n\nManage your marketplace activity.\n\nMess"
+          "text": "Analytics\nBuyer\nSeller\nListing Performance\nLoading"
         },
         {
-          "id": "dashboard-title",
+          "id": "analytics-title",
           "tagName": "H1",
-          "text": "Dashboard"
+          "text": "Analytics"
         },
         {
-          "id": "dashboard-subtitle",
-          "tagName": "P",
-          "text": "Manage your marketplace activity."
-        },
-        {
-          "id": "dashboard-messages-btn",
-          "tagName": "A",
-          "text": "Messages"
-        },
-        {
-          "id": "dashboard-new-listing-btn",
-          "tagName": "A",
-          "text": "Post New"
-        },
-        {
-          "id": "dashboard-new-listing-plus",
-          "tagName": "svg"
-        },
-        {
-          "id": "dashboard-tabs",
+          "id": "analytics-tabs",
           "tagName": "DIV",
-          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0\nNo activ"
+          "text": "Buyer\nSeller"
         },
         {
-          "id": "dashboard-tabs-list",
+          "id": "analytics-buyer-tab",
+          "tagName": "BUTTON",
+          "text": "Buyer",
+          "type": "button"
+        },
+        {
+          "id": "analytics-seller-tab",
+          "tagName": "BUTTON",
+          "text": "Seller",
+          "type": "button"
+        },
+        {
+          "id": "analytics-buyer-panel",
           "tagName": "DIV",
-          "text": "OffersBidsListingsWatchlist"
+          "text": ""
         },
         {
-          "id": "tab-trigger-active-bids-mobile",
-          "tagName": "BUTTON",
-          "text": "Offers",
-          "type": "button"
-        },
-        {
-          "id": "tab-trigger-my-bids-mobile",
-          "tagName": "BUTTON",
-          "text": "Bids",
-          "type": "button"
-        },
-        {
-          "id": "tab-trigger-my-listings-mobile",
-          "tagName": "BUTTON",
-          "text": "Listings",
-          "type": "button"
-        },
-        {
-          "id": "tab-trigger-watchlist-mobile",
-          "tagName": "BUTTON",
-          "text": "Watchlist",
-          "type": "button"
-        },
-        {
-          "id": "dashboard-tabs-list-desktop",
+          "id": "analytics-seller-panel",
           "tagName": "DIV",
-          "text": "Offers\n0\nBids\n0\nMy Listings\n0\nWatchlist\n0"
-        },
-        {
-          "id": "tab-trigger-active-bids",
-          "tagName": "BUTTON",
-          "text": "Offers\n0",
-          "type": "button"
-        },
-        {
-          "id": "tab-badge-active-bids",
-          "tagName": "SPAN",
-          "text": "0"
-        },
-        {
-          "id": "tab-trigger-my-bids",
-          "tagName": "BUTTON",
-          "text": "Bids\n0",
-          "type": "button"
-        },
-        {
-          "id": "tab-badge-my-bids",
-          "tagName": "SPAN",
-          "text": "0"
-        },
-        {
-          "id": "tab-trigger-my-listings",
-          "tagName": "BUTTON",
-          "text": "My Listings\n0",
-          "type": "button"
-        },
-        {
-          "id": "tab-badge-my-listings",
-          "tagName": "SPAN",
-          "text": "0"
-        },
-        {
-          "id": "tab-trigger-watchlist",
-          "tagName": "BUTTON",
-          "text": "Watchlist\n0",
-          "type": "button"
-        },
-        {
-          "id": "tab-badge-watchlist",
-          "tagName": "SPAN",
-          "text": "0"
+          "text": "Listing Performance\nLoading listings..."
         },
         {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-wrapper-02",
           "tagName": "DIV",
-          "text": "MarketWatchlistPostInboxDash"
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
         },
         {
           "id": "bottom-nav-link-market",
@@ -2140,42 +1962,42 @@
           "text": "Market"
         },
         {
-          "id": "bottom-nav-link-watchlist",
+          "id": "bottom-nav-link-dash",
           "tagName": "A",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-item-watchlist",
+          "id": "bottom-nav-item-dash",
           "tagName": "DIV",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-icon-watchlist",
+          "id": "bottom-nav-icon-dash",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-watchlist",
+          "id": "bottom-nav-text-dash",
           "tagName": "SPAN",
-          "text": "Watchlist"
+          "text": "Dash"
         },
         {
-          "id": "bottom-nav-link-post",
+          "id": "bottom-nav-link-sell",
           "tagName": "A",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-item-post",
+          "id": "bottom-nav-item-sell",
           "tagName": "DIV",
-          "text": "Post"
+          "text": "Sell"
         },
         {
-          "id": "bottom-nav-icon-post",
+          "id": "bottom-nav-icon-sell",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-post",
+          "id": "bottom-nav-text-sell",
           "tagName": "SPAN",
-          "text": "Post"
+          "text": "Sell"
         },
         {
           "id": "bottom-nav-link-inbox",
@@ -2197,28 +2019,28 @@
           "text": "Inbox"
         },
         {
-          "id": "bottom-nav-link-dash",
+          "id": "bottom-nav-link-analytics",
           "tagName": "A",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-item-dash",
+          "id": "bottom-nav-item-analytics",
           "tagName": "DIV",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
-          "id": "bottom-nav-icon-dash",
+          "id": "bottom-nav-icon-analytics",
           "tagName": "svg"
         },
         {
-          "id": "bottom-nav-text-dash",
+          "id": "bottom-nav-text-analytics",
           "tagName": "SPAN",
-          "text": "Dash"
+          "text": "Analytics"
         },
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"dfR6xs6IFBObW-fWHYYLu\""
+          "text": "self.__next_r=\"VwHKQKLRJ4aNXY-Rxc_oy\""
         },
         {
           "id": "devtools-indicator",
@@ -2228,8 +2050,7 @@
         {
           "id": "next-logo",
           "tagName": "BUTTON",
-          "text": "",
-          "type": "submit"
+          "text": ""
         },
         {
           "id": "next_logo_paint0_linear_1357_10853",

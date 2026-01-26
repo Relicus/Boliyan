@@ -1,0 +1,238 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - link:
+            - /url: /
+            - img
+            - generic:
+              - generic: بولیاں
+              - generic: Boliyan
+      - generic:
+        - generic:
+          - generic:
+            - img
+            - textbox:
+              - /placeholder: Search items, categories...
+      - generic:
+        - generic:
+          - generic:
+            - button:
+              - img
+              - generic: Notifications
+          - generic:
+            - img
+  - generic:
+    - main:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - combobox:
+                        - img
+                        - generic: Just
+                      - combobox:
+                        - img
+                        - generic: Categories
+                      - combobox:
+                        - img
+                        - generic: Type
+                      - button:
+                        - img
+                        - generic: View
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                            - generic: Karachi
+                      - generic:
+                        - button:
+                          - generic:
+                            - img
+                          - generic: Price
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img
+                        - generic:
+                          - generic:
+                            - img
+                            - generic: Karachi
+                          - button:
+                            - img
+                            - generic: Cameras
+                        - generic:
+                          - generic:
+                            - img
+                            - generic: 2d 23h
+                          - generic:
+                            - generic: 👌 Used
+                        - generic:
+                          - generic:
+                            - img
+                            - generic: 0.2km • 1min
+                        - generic:
+                          - button:
+                            - img
+                      - generic:
+                        - generic:
+                          - heading [level=3]: Test Item Camera
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                              - text: Asking
+                            - generic:
+                              - generic: 13,100
+                          - generic:
+                            - generic:
+                              - generic:
+                                - img
+                                - text: Highest
+                            - generic:
+                              - generic: (5)
+                              - generic: 12,000
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - button:
+                                  - img
+                                - generic:
+                                  - textbox: 13,100
+                                  - generic:
+                                    - generic: 13,100
+                                - button:
+                                  - img
+                            - button:
+                              - generic:
+                                - generic:
+                                  - img
+                                  - text: Place Bid
+  - generic:
+    - generic:
+      - link:
+        - /url: /
+        - generic:
+          - generic:
+            - generic:
+              - img
+            - generic: Market
+      - link:
+        - /url: /dashboard?tab=offers
+        - generic:
+          - generic:
+            - generic:
+              - img
+            - generic: Dash
+      - link:
+        - /url: /list
+        - generic:
+          - generic:
+            - generic:
+              - img
+            - generic: Sell
+      - link:
+        - /url: /inbox
+        - generic:
+          - generic:
+            - generic:
+              - img
+            - generic: Inbox
+      - link:
+        - /url: /dashboard/seller
+        - generic:
+          - generic:
+            - generic:
+              - img
+            - generic: Analytics
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e6] [cursor=pointer]:
+    - img [ref=e7]
+  - alert
+  - dialog "Test Item Camera" [ref=e11]:
+    - heading "Test Item Camera" [level=2] [ref=e12]
+    - button [active] [ref=e13]:
+      - img [ref=e14]
+    - generic [ref=e17]:
+      - img "Test Item Camera" [ref=e20] [cursor=pointer]
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - generic [ref=e25]:
+            - heading "Test Item Camera" [level=3] [ref=e26]
+            - generic [ref=e27]:
+              - generic [ref=e29]: 👌 Used
+              - generic [ref=e30]:
+                - img [ref=e31]
+                - generic [ref=e34]: Cameras
+              - generic [ref=e35]:
+                - img [ref=e36]
+                - generic [ref=e39]: 2d 23h
+          - generic [ref=e42]:
+            - img "Demo Seller" [ref=e44]
+            - generic [ref=e45]:
+              - generic [ref=e46]:
+                - generic [ref=e47]: Demo Seller
+                - generic [ref=e48]:
+                  - img [ref=e49]
+                  - generic [ref=e51]:
+                    - generic [ref=e52]: "4.8"
+                    - generic [ref=e53]: (12)
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - generic [ref=e58]: Karachi
+                - generic [ref=e59]: 1 min (0.2 km)
+          - generic [ref=e60]:
+            - heading "Description" [level=4] [ref=e61]
+            - paragraph [ref=e62]: A great camera
+        - generic [ref=e64]:
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - img [ref=e69]
+                - text: Asking
+              - generic [ref=e73]: 13,100
+            - generic [ref=e74]:
+              - generic [ref=e76]:
+                - img [ref=e77]
+                - text: Highest
+              - generic [ref=e83]:
+                - generic [ref=e84]: (5)
+                - generic [ref=e85]: 12,000
+          - generic [ref=e87]:
+            - generic [ref=e89]:
+              - button [ref=e90]:
+                - img [ref=e91]
+              - generic [ref=e92]:
+                - textbox [ref=e93]: 13,100
+                - generic:
+                  - generic: 13,100
+              - button [ref=e94]:
+                - img [ref=e95]
+            - button "Place Bid" [ref=e97]:
+              - generic [ref=e99]:
+                - img [ref=e100]
+                - text: Place Bid
+          - generic [ref=e114]:
+            - link "Full Page" [ref=e115] [cursor=pointer]:
+              - /url: /product/00000000-0000-0000-0000-000000000023
+              - img [ref=e116]
+              - generic [ref=e120]: Full Page
+            - button "Watch" [ref=e121]:
+              - img [ref=e122]
+              - generic [ref=e124]: Watch
+```

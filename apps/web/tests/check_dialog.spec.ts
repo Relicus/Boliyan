@@ -1,6 +1,11 @@
 import { test } from '@playwright/test';
 
+import { loginUser } from './helpers/auth';
+import { mockSupabaseNetwork } from './helpers/mock-network';
+
 test('check dialog close button', async ({ page }) => {
+  await mockSupabaseNetwork(page);
+  await loginUser(page);
   await page.goto('/');
   
   // Wait for item cards to load

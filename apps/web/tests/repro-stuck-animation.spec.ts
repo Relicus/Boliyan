@@ -1,4 +1,3 @@
-
 import { test, expect } from '@playwright/test';
 import { loginUser } from './helpers/auth';
 import { mockSupabaseNetwork } from './helpers/mock-network';

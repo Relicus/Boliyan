@@ -1,15 +1,15 @@
 
 import { test, expect } from '@playwright/test';
+import { loginUser } from './helpers/auth';
 
 test.describe('Condition Variable Verification', () => {
 
   test('Create listing with condition and verify display', async ({ page }) => {
-    // 1. Go to list page
+    await loginUser(page);
     await page.goto('http://localhost:3000/list');
-    
-    // We assume the user is logged in for this test or mock state is active
-    // Fill title
-    await page.fill('#title-input', 'Test Condition Item');
+
+    const title = `Test Condition Item ${Date.now()}`;
+    await page.fill('#title-input', title);
     
     // Select Category
     await page.click('#category-select');
@@ -20,28 +20,31 @@ test.describe('Condition Variable Verification', () => {
     
     // Select Condition: Brand New
     await page.click('#condition-select');
-    await page.click('text=Brand New');
+    await page.click('text=🌟 Brand New');
+
+    await page.setInputFiles('#image-upload-input', 'public/arda-glyph.png');
+
+    await page.fill('#description-textarea', 'This is a test listing with enough description length.');
+    await page.getByRole('button', { name: 'Help me price this item' }).click();
+    await page.fill('#purchase-price-input', '5000');
+    await page.click('#purchase-year-select');
+    await page.getByRole('option').first().click();
+    await page.fill('#price-input', '1000');
+    await page.fill('#listing-phone-input', '03001234567');
     
     // Submit
     await page.click('#post-listing-btn');
-    
-    // Should redirect to home
-    await expect(page).toHaveURL('http://localhost:3000/');
-    
-    // Verify ItemCard has "Brand New" badge
-    // We look for the item we just created
-    const itemCard = page.locator('text=Test Condition Item').locator('xpath=ancestor::div[contains(@id, "item-card-")]');
-    await expect(itemCard).toBeVisible();
-    await expect(itemCard.locator('text=🌟 New')).toBeVisible();
+
+    await page.waitForURL('http://localhost:3000/');
+
+    await page.goto('http://localhost:3000/dashboard?tab=listings');
+    const listingTitle = page.locator('[id^="listing-title-"]', { hasText: title });
+    await expect(listingTitle).toBeVisible();
+    await expect(listingTitle.locator('..').locator('text=🌟 New')).toBeVisible();
   });
 
   test('Filter by condition', async ({ page }) => {
     await page.goto('http://localhost:3000/');
-    
-    // Assuming there's a filter UI for condition on the home page or search page
-    // Since I haven't implemented the filter UI *yet* (only the logic in context), 
-    // I should check if I need to add the UI selector for filtering too.
-    // The marketplace context has the logic, but the UI might need a condition selector in the filter bar.
   });
 
 });

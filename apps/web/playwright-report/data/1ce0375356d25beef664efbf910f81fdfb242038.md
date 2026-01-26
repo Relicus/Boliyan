@@ -1,0 +1,179 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: YOUR LOCATION
+          - button "Lahore" [expanded] [active] [ref=e24]:
+            - img
+            - generic [ref=e25]: Lahore
+        - link "Sell Item" [ref=e26] [cursor=pointer]:
+          - /url: /signin?redirect=%2Flist
+          - img
+          - generic [ref=e27]: Sell Item
+        - link "Sign In" [ref=e29] [cursor=pointer]:
+          - /url: /signin?redirect=%2F
+  - generic [ref=e30]:
+    - complementary [ref=e31]:
+      - generic [ref=e33]:
+        - button "All" [ref=e34]:
+          - generic [ref=e36]: All
+        - button "Public" [ref=e37]:
+          - generic [ref=e38]: Public
+        - button "Hidden" [ref=e39]:
+          - generic [ref=e40]: Hidden
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - heading "LIST LOCATION" [level=3] [ref=e46]
+          - button "Lahore ∞" [ref=e48]:
+            - generic [ref=e50]: Lahore
+            - generic [ref=e51]: ∞
+        - generic [ref=e52]:
+          - heading "Price Range" [level=3] [ref=e53]
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - generic [ref=e56]: ₨
+              - spinbutton [ref=e57]
+            - generic [ref=e58]:
+              - generic [ref=e59]: ₨
+              - spinbutton [ref=e60]
+        - generic [ref=e61]:
+          - heading "Condition" [level=3] [ref=e62]
+          - combobox [ref=e63]:
+            - generic: Any Condition
+            - img
+        - button "Reset All Filters" [ref=e65]:
+          - img
+          - text: Reset All Filters
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - generic [ref=e69]: Ad
+            - heading "Supercharge Your Workflow" [level=3] [ref=e70]
+            - paragraph [ref=e71]: Get 50% off professional tools this week only.
+          - button "Check Offer" [ref=e72]:
+            - text: Check Offer
+            - img
+    - main [ref=e74]:
+      - generic [ref=e77]:
+        - generic [ref=e80]:
+          - generic [ref=e82]:
+            - button "Trending" [ref=e83]:
+              - img [ref=e84]
+              - generic [ref=e86]: Trending
+            - button "Near Me" [ref=e87]:
+              - img [ref=e88]
+              - generic [ref=e91]: Near Me
+            - button "Ending Soon" [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e96]: Ending Soon
+            - button "High Value" [ref=e97]:
+              - img [ref=e98]
+              - generic [ref=e101]: High Value
+            - button "Just Listed" [ref=e102]:
+              - img [ref=e103]
+              - generic [ref=e106]: Just Listed
+            - button "Watchlist" [ref=e107]:
+              - img [ref=e108]
+              - generic [ref=e110]: Watchlist
+          - group [ref=e111]:
+            - radio "Compact View" [ref=e112]:
+              - img
+            - radio "Comfortable View" [checked] [ref=e113]:
+              - img
+            - radio "Spacious View" [ref=e114]:
+              - img
+        - generic [ref=e119]:
+          - button "All" [ref=e120]
+          - button "Mobiles" [ref=e121]:
+            - img
+            - text: Mobiles
+          - button "Electronics" [ref=e122]:
+            - img
+            - text: Electronics
+          - button "Appliances" [ref=e123]:
+            - img
+            - text: Appliances
+          - button "Furniture" [ref=e124]:
+            - img
+            - text: Furniture
+          - button "Fashion" [ref=e125]:
+            - img
+            - text: Fashion
+          - button "Sports" [ref=e126]:
+            - img
+            - text: Sports
+          - button "Gaming" [ref=e127]:
+            - img
+            - text: Gaming
+          - button "Watches" [ref=e128]:
+            - img
+            - text: Watches
+          - button "Audio" [ref=e129]:
+            - img
+            - text: Audio
+          - button "Cameras" [ref=e130]:
+            - img
+            - text: Cameras
+          - button "Hobbies" [ref=e131]:
+            - img
+            - text: Hobbies
+          - button "Community" [ref=e132]:
+            - img
+            - text: Community
+        - generic [ref=e194]:
+          - img [ref=e196]
+          - heading "No results found" [level=3] [ref=e201]
+          - paragraph [ref=e202]: We couldn't find any items matching your current filters. Try adjusting your search terms or category.
+          - button "Reset Filters" [ref=e203]
+  - region "Notifications alt+T"
+  - generic [ref=e208] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e209]:
+      - img [ref=e210]
+    - generic [ref=e213]:
+      - button "Open issues overlay" [ref=e214]:
+        - generic [ref=e215]:
+          - generic [ref=e216]: "1"
+          - generic [ref=e217]: "2"
+        - generic [ref=e218]:
+          - text: Issue
+          - generic [ref=e219]: s
+      - button "Collapse issues badge" [ref=e220]:
+        - img [ref=e221]
+  - alert [ref=e223]
+  - dialog [ref=e225]:
+    - generic [ref=e226]:
+      - generic [ref=e227]:
+        - generic [ref=e228]:
+          - generic [ref=e229]: Range
+          - generic [ref=e230]: ∞
+        - slider [ref=e235] [cursor=pointer]
+      - generic [ref=e237] [cursor=pointer]:
+        - img [ref=e238]
+        - generic [ref=e240]: Near Me
+      - generic [ref=e241]:
+        - generic [ref=e243]:
+          - img [ref=e244]
+          - generic [ref=e247]:
+            - img [ref=e248]
+            - combobox [expanded] [ref=e251]: Lahore
+        - listbox "Suggestions" [ref=e252]:
+          - generic [ref=e253]:
+            - generic [ref=e254]: Pakistan Cities
+            - group "Pakistan Cities" [ref=e255]:
+              - option "Lahore" [selected] [ref=e256] [cursor=pointer]:
+                - img
+                - generic [ref=e257]: Lahore
+                - img
+```

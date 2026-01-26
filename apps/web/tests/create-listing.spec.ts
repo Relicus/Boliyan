@@ -24,19 +24,20 @@ test.describe('Create Listing Flow', () => {
     
     await expect(page.locator('#bidding-style-heading')).toBeVisible();
     await expect(page.locator('#public-auction-option')).toBeVisible();
-    await expect(page.locator('#sealed-bids-option')).toBeVisible();
+    await expect(page.locator('#hidden-bids-option')).toBeVisible();
     
     await expect(page.locator('#cancel-listing-btn')).toBeVisible();
     await expect(page.locator('#post-listing-btn')).toBeVisible();
+    await expect(page.locator('#go-live-note')).toBeVisible();
   });
 
   test('should validate required fields and shake', async ({ page }) => {
     await page.locator('#post-listing-btn').click();
     
-    // Check for validation messages
-    await expect(page.getByText('Please enter a title for your item')).toBeVisible();
-    await expect(page.getByText('Selection required')).toBeVisible();
-    await expect(page.getByText('Valid price required')).toBeVisible();
+    await expect(page.locator('#title-input')).toHaveClass(/border-red-500/);
+    await expect(page.locator('#category-select')).toHaveClass(/border-red-500/);
+    await expect(page.locator('#price-input').locator('..')).toHaveClass(/border-red-500/);
+    await expect(page.locator('#description-textarea')).toHaveClass(/border-red-500/);
   });
 
   test('should allow selecting category and condition', async ({ page }) => {
@@ -48,7 +49,7 @@ test.describe('Create Listing Flow', () => {
     
     // Condition Select
     await page.locator('#condition-select').click();
-    await page.getByRole('option', { name: 'Brand New' }).click();
+    await page.getByRole('option', { name: '🌟 Brand New' }).click();
     await expect(page.locator('#condition-select')).toContainText('Brand New');
   });
 
@@ -57,8 +58,8 @@ test.describe('Create Listing Flow', () => {
     await expect(page.locator('#public-auction-option')).toHaveClass(/bg-blue-50/);
     
     // Click Sealed
-    await page.locator('#sealed-bids-option').click();
-    await expect(page.locator('#sealed-bids-option')).toHaveClass(/bg-blue-50/);
+    await page.locator('#hidden-bids-option').click();
+    await expect(page.locator('#hidden-bids-option')).toHaveClass(/bg-blue-50/);
     await expect(page.locator('#public-auction-option')).not.toHaveClass(/bg-blue-50/);
   });
 

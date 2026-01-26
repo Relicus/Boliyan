@@ -1,0 +1,514 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: YOUR LOCATION
+          - button "Karachi" [expanded] [ref=e24]:
+            - img
+            - generic [ref=e25]: Karachi
+        - link "Sell Item" [ref=e26] [cursor=pointer]:
+          - /url: /signin?redirect=%2Flist
+          - img
+          - generic [ref=e27]: Sell Item
+        - link "Sign In" [ref=e29] [cursor=pointer]:
+          - /url: /signin?redirect=%2F
+  - generic [ref=e30]:
+    - complementary [ref=e31]:
+      - generic [ref=e33]:
+        - button "All" [ref=e34]:
+          - generic [ref=e36]: All
+        - button "Public" [ref=e37]:
+          - generic [ref=e38]: Public
+        - button "Hidden" [ref=e39]:
+          - generic [ref=e40]: Hidden
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - heading "LIST LOCATION" [level=3] [ref=e46]
+          - button "Karachi ∞" [ref=e48]:
+            - generic [ref=e50]: Karachi
+            - generic [ref=e51]: ∞
+        - generic [ref=e52]:
+          - heading "Price Range" [level=3] [ref=e53]
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - generic [ref=e56]: ₨
+              - spinbutton [ref=e57]
+            - generic [ref=e58]:
+              - generic [ref=e59]: ₨
+              - spinbutton [ref=e60]
+        - generic [ref=e61]:
+          - heading "Condition" [level=3] [ref=e62]
+          - combobox [ref=e63]:
+            - generic: Any Condition
+            - img
+        - button "Reset All Filters" [ref=e65]:
+          - img
+          - text: Reset All Filters
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - generic [ref=e69]: Ad
+            - heading "Supercharge Your Workflow" [level=3] [ref=e70]
+            - paragraph [ref=e71]: Get 50% off professional tools this week only.
+          - button "Check Offer" [ref=e72]:
+            - text: Check Offer
+            - img
+    - main [ref=e74]:
+      - generic [ref=e77]:
+        - generic [ref=e80]:
+          - generic [ref=e82]:
+            - button "Trending" [ref=e83]:
+              - img [ref=e84]
+              - generic [ref=e86]: Trending
+            - button "Near Me" [ref=e87]:
+              - img [ref=e88]
+              - generic [ref=e91]: Near Me
+            - button "Ending Soon" [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e96]: Ending Soon
+            - button "High Value" [ref=e97]:
+              - img [ref=e98]
+              - generic [ref=e101]: High Value
+            - button "Just Listed" [ref=e102]:
+              - img [ref=e103]
+              - generic [ref=e106]: Just Listed
+            - button "Watchlist" [ref=e107]:
+              - img [ref=e108]
+              - generic [ref=e110]: Watchlist
+          - group [ref=e111]:
+            - radio "Compact View" [ref=e112]:
+              - img
+            - radio "Comfortable View" [checked] [ref=e113]:
+              - img
+            - radio "Spacious View" [ref=e114]:
+              - img
+        - generic [ref=e119]:
+          - button "All" [ref=e120]
+          - button "Mobiles" [ref=e121]:
+            - img
+            - text: Mobiles
+          - button "Electronics" [ref=e122]:
+            - img
+            - text: Electronics
+          - button "Appliances" [ref=e123]:
+            - img
+            - text: Appliances
+          - button "Furniture" [ref=e124]:
+            - img
+            - text: Furniture
+          - button "Fashion" [ref=e125]:
+            - img
+            - text: Fashion
+          - button "Sports" [ref=e126]:
+            - img
+            - text: Sports
+          - button "Gaming" [ref=e127]:
+            - img
+            - text: Gaming
+          - button "Watches" [ref=e128]:
+            - img
+            - text: Watches
+          - button "Audio" [ref=e129]:
+            - img
+            - text: Audio
+          - button "Cameras" [ref=e130]:
+            - img
+            - text: Cameras
+          - button "Hobbies" [ref=e131]:
+            - img
+            - text: Hobbies
+          - button "Community" [ref=e132]:
+            - img
+            - text: Community
+        - generic [ref=e194]:
+          - img [ref=e196]
+          - heading "No results found" [level=3] [ref=e201]
+          - paragraph [ref=e202]: We couldn't find any items matching your current filters. Try adjusting your search terms or category.
+          - button "Reset Filters" [ref=e203]
+  - region "Notifications alt+T"
+  - generic [ref=e208] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e209]:
+      - img [ref=e210]
+    - generic [ref=e213]:
+      - button "Open issues overlay" [ref=e214]:
+        - generic [ref=e215]:
+          - generic [ref=e216]: "1"
+          - generic [ref=e217]: "2"
+        - generic [ref=e218]:
+          - text: Issue
+          - generic [ref=e219]: s
+      - button "Collapse issues badge" [ref=e220]:
+        - img [ref=e221]
+  - alert [ref=e223]
+  - dialog [ref=e225]:
+    - generic [ref=e226]:
+      - generic [ref=e227]:
+        - generic [ref=e228]:
+          - generic [ref=e229]: Range
+          - generic [ref=e230]: ∞
+        - slider [active] [ref=e235] [cursor=pointer]
+      - generic [ref=e237] [cursor=pointer]:
+        - img [ref=e238]
+        - generic [ref=e240]: Near Me
+      - generic [ref=e241]:
+        - generic [ref=e243]:
+          - img [ref=e244]
+          - generic [ref=e247]:
+            - img [ref=e248]
+            - combobox [expanded] [ref=e251]
+        - listbox "Suggestions" [ref=e252]:
+          - generic [ref=e253]:
+            - generic [ref=e254]: Pakistan Cities
+            - group "Pakistan Cities" [ref=e255]:
+              - option "Karachi" [selected] [ref=e256] [cursor=pointer]:
+                - img
+                - generic [ref=e257]: Karachi
+              - option "Lahore" [ref=e258] [cursor=pointer]:
+                - img
+                - generic [ref=e259]: Lahore
+              - option "Faisalabad" [ref=e260] [cursor=pointer]:
+                - img
+                - generic [ref=e261]: Faisalabad
+              - option "Rawalpindi" [ref=e262] [cursor=pointer]:
+                - img
+                - generic [ref=e263]: Rawalpindi
+              - option "Gujranwala" [ref=e264] [cursor=pointer]:
+                - img
+                - generic [ref=e265]: Gujranwala
+              - option "Peshawar" [ref=e266] [cursor=pointer]:
+                - img
+                - generic [ref=e267]: Peshawar
+              - option "Multan" [ref=e268] [cursor=pointer]:
+                - img
+                - generic [ref=e269]: Multan
+              - option "Hyderabad" [ref=e270] [cursor=pointer]:
+                - img
+                - generic [ref=e271]: Hyderabad
+              - option "Islamabad" [ref=e272] [cursor=pointer]:
+                - img
+                - generic [ref=e273]: Islamabad
+              - option "Quetta" [ref=e274] [cursor=pointer]:
+                - img
+                - generic [ref=e275]: Quetta
+              - option "Sargodha" [ref=e276] [cursor=pointer]:
+                - img
+                - generic [ref=e277]: Sargodha
+              - option "Sialkot" [ref=e278] [cursor=pointer]:
+                - img
+                - generic [ref=e279]: Sialkot
+              - option "Bahawalpur" [ref=e280] [cursor=pointer]:
+                - img
+                - generic [ref=e281]: Bahawalpur
+              - option "Jhang" [ref=e282] [cursor=pointer]:
+                - img
+                - generic [ref=e283]: Jhang
+              - option "Gujrat" [ref=e284] [cursor=pointer]:
+                - img
+                - generic [ref=e285]: Gujrat
+              - option "Sheikhupura" [ref=e286] [cursor=pointer]:
+                - img
+                - generic [ref=e287]: Sheikhupura
+              - option "Mardan" [ref=e288] [cursor=pointer]:
+                - img
+                - generic [ref=e289]: Mardan
+              - option "Kasur" [ref=e290] [cursor=pointer]:
+                - img
+                - generic [ref=e291]: Kasur
+              - option "Rahim Yar Khan" [ref=e292] [cursor=pointer]:
+                - img
+                - generic [ref=e293]: Rahim Yar Khan
+              - option "Sahiwal" [ref=e294] [cursor=pointer]:
+                - img
+                - generic [ref=e295]: Sahiwal
+              - option "Okara" [ref=e296] [cursor=pointer]:
+                - img
+                - generic [ref=e297]: Okara
+              - option "Wah Cantonment" [ref=e298] [cursor=pointer]:
+                - img
+                - generic [ref=e299]: Wah Cantonment
+              - option "Dera Ghazi Khan" [ref=e300] [cursor=pointer]:
+                - img
+                - generic [ref=e301]: Dera Ghazi Khan
+              - option "Mingora" [ref=e302] [cursor=pointer]:
+                - img
+                - generic [ref=e303]: Mingora
+              - option "Mirpur Khas" [ref=e304] [cursor=pointer]:
+                - img
+                - generic [ref=e305]: Mirpur Khas
+              - option "Chiniot" [ref=e306] [cursor=pointer]:
+                - img
+                - generic [ref=e307]: Chiniot
+              - option "Nawabshah" [ref=e308] [cursor=pointer]:
+                - img
+                - generic [ref=e309]: Nawabshah
+              - option "Kamoke" [ref=e310] [cursor=pointer]:
+                - img
+                - generic [ref=e311]: Kamoke
+              - option "Burewala" [ref=e312] [cursor=pointer]:
+                - img
+                - generic [ref=e313]: Burewala
+              - option "Jhelum" [ref=e314] [cursor=pointer]:
+                - img
+                - generic [ref=e315]: Jhelum
+              - option "Sadiqabad" [ref=e316] [cursor=pointer]:
+                - img
+                - generic [ref=e317]: Sadiqabad
+              - option "Khanewal" [ref=e318] [cursor=pointer]:
+                - img
+                - generic [ref=e319]: Khanewal
+              - option "Hafizabad" [ref=e320] [cursor=pointer]:
+                - img
+                - generic [ref=e321]: Hafizabad
+              - option "Kohat" [ref=e322] [cursor=pointer]:
+                - img
+                - generic [ref=e323]: Kohat
+              - option "Jacobabad" [ref=e324] [cursor=pointer]:
+                - img
+                - generic [ref=e325]: Jacobabad
+              - option "Shikarpur" [ref=e326] [cursor=pointer]:
+                - img
+                - generic [ref=e327]: Shikarpur
+              - option "Muzaffargarh" [ref=e328] [cursor=pointer]:
+                - img
+                - generic [ref=e329]: Muzaffargarh
+              - option "Khanpur" [ref=e330] [cursor=pointer]:
+                - img
+                - generic [ref=e331]: Khanpur
+              - option "Gojra" [ref=e332] [cursor=pointer]:
+                - img
+                - generic [ref=e333]: Gojra
+              - option "Bahawalnagar" [ref=e334] [cursor=pointer]:
+                - img
+                - generic [ref=e335]: Bahawalnagar
+              - option "Muridke" [ref=e336] [cursor=pointer]:
+                - img
+                - generic [ref=e337]: Muridke
+              - option "Pakpattan" [ref=e338] [cursor=pointer]:
+                - img
+                - generic [ref=e339]: Pakpattan
+              - option "Abbottabad" [ref=e340] [cursor=pointer]:
+                - img
+                - generic [ref=e341]: Abbottabad
+              - option "Tando Adam" [ref=e342] [cursor=pointer]:
+                - img
+                - generic [ref=e343]: Tando Adam
+              - option "Jaranwala" [ref=e344] [cursor=pointer]:
+                - img
+                - generic [ref=e345]: Jaranwala
+              - option "Khairpur" [ref=e346] [cursor=pointer]:
+                - img
+                - generic [ref=e347]: Khairpur
+              - option "Chishtian" [ref=e348] [cursor=pointer]:
+                - img
+                - generic [ref=e349]: Chishtian
+              - option "Daska" [ref=e350] [cursor=pointer]:
+                - img
+                - generic [ref=e351]: Daska
+              - option "Mandi Bahauddin" [ref=e352] [cursor=pointer]:
+                - img
+                - generic [ref=e353]: Mandi Bahauddin
+              - option "Ahmadpur East" [ref=e354] [cursor=pointer]:
+                - img
+                - generic [ref=e355]: Ahmadpur East
+              - option "Sukkur" [ref=e356] [cursor=pointer]:
+                - img
+                - generic [ref=e357]: Sukkur
+              - option "Larkana" [ref=e358] [cursor=pointer]:
+                - img
+                - generic [ref=e359]: Larkana
+              - option "Chakwal" [ref=e360] [cursor=pointer]:
+                - img
+                - generic [ref=e361]: Chakwal
+              - option "Dera Ismail Khan" [ref=e362] [cursor=pointer]:
+                - img
+                - generic [ref=e363]: Dera Ismail Khan
+              - option "Gujranwala Cantonment" [ref=e364] [cursor=pointer]:
+                - img
+                - generic [ref=e365]: Gujranwala Cantonment
+              - option "Attock" [ref=e366] [cursor=pointer]:
+                - img
+                - generic [ref=e367]: Attock
+              - option "Vehari" [ref=e368] [cursor=pointer]:
+                - img
+                - generic [ref=e369]: Vehari
+              - option "Mansehra" [ref=e370] [cursor=pointer]:
+                - img
+                - generic [ref=e371]: Mansehra
+              - option "Mirpur" [ref=e372] [cursor=pointer]:
+                - img
+                - generic [ref=e373]: Mirpur
+              - option "Muzaffarabad" [ref=e374] [cursor=pointer]:
+                - img
+                - generic [ref=e375]: Muzaffarabad
+              - option "Gilgit" [ref=e376] [cursor=pointer]:
+                - img
+                - generic [ref=e377]: Gilgit
+              - option "Skardu" [ref=e378] [cursor=pointer]:
+                - img
+                - generic [ref=e379]: Skardu
+              - option "Turbat" [ref=e380] [cursor=pointer]:
+                - img
+                - generic [ref=e381]: Turbat
+              - option "Gwadar" [ref=e382] [cursor=pointer]:
+                - img
+                - generic [ref=e383]: Gwadar
+              - option "Khuzdar" [ref=e384] [cursor=pointer]:
+                - img
+                - generic [ref=e385]: Khuzdar
+              - option "Chaman" [ref=e386] [cursor=pointer]:
+                - img
+                - generic [ref=e387]: Chaman
+              - option "Zhob" [ref=e388] [cursor=pointer]:
+                - img
+                - generic [ref=e389]: Zhob
+              - option "Loralai" [ref=e390] [cursor=pointer]:
+                - img
+                - generic [ref=e391]: Loralai
+              - option "Bannu" [ref=e392] [cursor=pointer]:
+                - img
+                - generic [ref=e393]: Bannu
+              - option "Swabi" [ref=e394] [cursor=pointer]:
+                - img
+                - generic [ref=e395]: Swabi
+              - option "Nowshera" [ref=e396] [cursor=pointer]:
+                - img
+                - generic [ref=e397]: Nowshera
+              - option "Charsadda" [ref=e398] [cursor=pointer]:
+                - img
+                - generic [ref=e399]: Charsadda
+              - option "Haripur" [ref=e400] [cursor=pointer]:
+                - img
+                - generic [ref=e401]: Haripur
+              - option "Taxila" [ref=e402] [cursor=pointer]:
+                - img
+                - generic [ref=e403]: Taxila
+              - option "Wazirabad" [ref=e404] [cursor=pointer]:
+                - img
+                - generic [ref=e405]: Wazirabad
+              - option "Mianwali" [ref=e406] [cursor=pointer]:
+                - img
+                - generic [ref=e407]: Mianwali
+              - option "Khushab" [ref=e408] [cursor=pointer]:
+                - img
+                - generic [ref=e409]: Khushab
+              - option "Bhakkar" [ref=e410] [cursor=pointer]:
+                - img
+                - generic [ref=e411]: Bhakkar
+              - option "Layyah" [ref=e412] [cursor=pointer]:
+                - img
+                - generic [ref=e413]: Layyah
+              - option "Rajanpur" [ref=e414] [cursor=pointer]:
+                - img
+                - generic [ref=e415]: Rajanpur
+              - option "Toba Tek Singh" [ref=e416] [cursor=pointer]:
+                - img
+                - generic [ref=e417]: Toba Tek Singh
+              - option "Kamalia" [ref=e418] [cursor=pointer]:
+                - img
+                - generic [ref=e419]: Kamalia
+              - option "Mian Channu" [ref=e420] [cursor=pointer]:
+                - img
+                - generic [ref=e421]: Mian Channu
+              - option "Arifwala" [ref=e422] [cursor=pointer]:
+                - img
+                - generic [ref=e423]: Arifwala
+              - option "Mailsi" [ref=e424] [cursor=pointer]:
+                - img
+                - generic [ref=e425]: Mailsi
+              - option "Hasilpur" [ref=e426] [cursor=pointer]:
+                - img
+                - generic [ref=e427]: Hasilpur
+              - option "Yazman" [ref=e428] [cursor=pointer]:
+                - img
+                - generic [ref=e429]: Yazman
+              - option "Lodhran" [ref=e430] [cursor=pointer]:
+                - img
+                - generic [ref=e431]: Lodhran
+              - option "Dunyapur" [ref=e432] [cursor=pointer]:
+                - img
+                - generic [ref=e433]: Dunyapur
+              - option "Jatoi" [ref=e434] [cursor=pointer]:
+                - img
+                - generic [ref=e435]: Jatoi
+              - option "Alipur" [ref=e436] [cursor=pointer]:
+                - img
+                - generic [ref=e437]: Alipur
+              - option "Kot Addu" [ref=e438] [cursor=pointer]:
+                - img
+                - generic [ref=e439]: Kot Addu
+              - option "Kabirwala" [ref=e440] [cursor=pointer]:
+                - img
+                - generic [ref=e441]: Kabirwala
+              - option "Abdul Hakim" [ref=e442] [cursor=pointer]:
+                - img
+                - generic [ref=e443]: Abdul Hakim
+              - option "Pattoki" [ref=e444] [cursor=pointer]:
+                - img
+                - generic [ref=e445]: Pattoki
+              - option "Renala Khurd" [ref=e446] [cursor=pointer]:
+                - img
+                - generic [ref=e447]: Renala Khurd
+              - option "Chunian" [ref=e448] [cursor=pointer]:
+                - img
+                - generic [ref=e449]: Chunian
+              - option "Nankana Sahib" [ref=e450] [cursor=pointer]:
+                - img
+                - generic [ref=e451]: Nankana Sahib
+              - option "Sangla Hill" [ref=e452] [cursor=pointer]:
+                - img
+                - generic [ref=e453]: Sangla Hill
+              - option "Pindi Bhattian" [ref=e454] [cursor=pointer]:
+                - img
+                - generic [ref=e455]: Pindi Bhattian
+              - option "Shakargarh" [ref=e456] [cursor=pointer]:
+                - img
+                - generic [ref=e457]: Shakargarh
+              - option "Narowal" [ref=e458] [cursor=pointer]:
+                - img
+                - generic [ref=e459]: Narowal
+              - option "Pasrur" [ref=e460] [cursor=pointer]:
+                - img
+                - generic [ref=e461]: Pasrur
+              - option "Sambrial" [ref=e462] [cursor=pointer]:
+                - img
+                - generic [ref=e463]: Sambrial
+              - option "Gujjar Khan" [ref=e464] [cursor=pointer]:
+                - img
+                - generic [ref=e465]: Gujjar Khan
+              - option "Kahuta" [ref=e466] [cursor=pointer]:
+                - img
+                - generic [ref=e467]: Kahuta
+              - option "Fateh Jang" [ref=e468] [cursor=pointer]:
+                - img
+                - generic [ref=e469]: Fateh Jang
+              - option "Talagang" [ref=e470] [cursor=pointer]:
+                - img
+                - generic [ref=e471]: Talagang
+              - option "Pind Dadan Khan" [ref=e472] [cursor=pointer]:
+                - img
+                - generic [ref=e473]: Pind Dadan Khan
+              - option "Kharian" [ref=e474] [cursor=pointer]:
+                - img
+                - generic [ref=e475]: Kharian
+              - option "Dina" [ref=e476] [cursor=pointer]:
+                - img
+                - generic [ref=e477]: Dina
+              - option "Lala Musa" [ref=e478] [cursor=pointer]:
+                - img
+                - generic [ref=e479]: Lala Musa
+              - option "Sarai Alamgir" [ref=e480] [cursor=pointer]:
+                - img
+                - generic [ref=e481]: Sarai Alamgir
+```

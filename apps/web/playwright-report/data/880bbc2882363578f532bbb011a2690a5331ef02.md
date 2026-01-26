@@ -1,0 +1,166 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e11]: بولیاں
+          - generic [ref=e12]: Boliyan
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - textbox "Search items, categories..." [ref=e19]
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: YOUR LOCATION
+          - button "Karachi" [ref=e24]:
+            - img
+            - generic [ref=e25]: Karachi
+        - link "Sell Item" [ref=e26] [cursor=pointer]:
+          - /url: /signin?redirect=%2Flist
+          - img
+          - generic [ref=e27]: Sell Item
+        - link "Sign In" [ref=e29] [cursor=pointer]:
+          - /url: /signin?redirect=%2F
+  - generic [ref=e30]:
+    - complementary [ref=e31]:
+      - generic [ref=e33]:
+        - button "All" [ref=e34]:
+          - generic [ref=e36]: All
+        - button "Public" [ref=e37]:
+          - generic [ref=e38]: Public
+        - button "Hidden" [ref=e39]:
+          - generic [ref=e40]: Hidden
+      - generic [ref=e41]:
+        - heading "Active Filters" [level=3] [ref=e42]
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - img [ref=e46]
+            - generic [ref=e48]: Mobiles
+          - button "Remove Mobiles filter" [ref=e49]:
+            - img [ref=e50]
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - heading "LIST LOCATION" [level=3] [ref=e58]
+          - button "Karachi ∞" [ref=e60]:
+            - generic [ref=e62]: Karachi
+            - generic [ref=e63]: ∞
+        - generic [ref=e64]:
+          - heading "Price Range" [level=3] [ref=e65]
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - generic [ref=e68]: ₨
+              - spinbutton [ref=e69]
+            - generic [ref=e70]:
+              - generic [ref=e71]: ₨
+              - spinbutton [ref=e72]
+        - generic [ref=e73]:
+          - heading "Condition" [level=3] [ref=e74]
+          - combobox [ref=e75]:
+            - generic: Any Condition
+            - img
+        - button "Reset All Filters" [ref=e77]:
+          - img
+          - text: Reset All Filters
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e81]: Ad
+            - heading "Supercharge Your Workflow" [level=3] [ref=e82]
+            - paragraph [ref=e83]: Get 50% off professional tools this week only.
+          - button "Check Offer" [ref=e84]:
+            - text: Check Offer
+            - img
+    - main [ref=e86]:
+      - generic [ref=e89]:
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - button "Trending" [ref=e95]:
+                - generic [ref=e97]: Trending
+              - button "Near Me" [ref=e98]:
+                - img [ref=e99]
+                - generic [ref=e102]: Near Me
+              - button "Ending Soon" [ref=e103]:
+                - img [ref=e104]
+                - generic [ref=e107]: Ending Soon
+              - button "High Value" [ref=e108]:
+                - img [ref=e109]
+                - generic [ref=e112]: High Value
+              - button "Just Listed" [ref=e113]:
+                - img [ref=e114]
+                - generic [ref=e117]: Just Listed
+              - button "Watchlist" [ref=e118]:
+                - generic [ref=e120]: Watchlist
+            - generic [ref=e123]:
+              - text: Mobiles
+              - button [ref=e124]:
+                - img [ref=e125]
+          - group [ref=e128]:
+            - radio "Compact View" [ref=e129]:
+              - img
+            - radio "Comfortable View" [checked] [ref=e130]:
+              - img
+            - radio "Spacious View" [ref=e131]:
+              - img
+        - generic [ref=e136]:
+          - button "All" [ref=e137]
+          - button "Mobiles" [active] [ref=e138]:
+            - img
+            - text: Mobiles
+          - button "Electronics" [ref=e139]:
+            - img
+            - text: Electronics
+          - button "Appliances" [ref=e140]:
+            - img
+            - text: Appliances
+          - button "Furniture" [ref=e141]:
+            - img
+            - text: Furniture
+          - button "Fashion" [ref=e142]:
+            - img
+            - text: Fashion
+          - button "Sports" [ref=e143]:
+            - img
+            - text: Sports
+          - button "Gaming" [ref=e144]:
+            - img
+            - text: Gaming
+          - button "Watches" [ref=e145]:
+            - img
+            - text: Watches
+          - button "Audio" [ref=e146]:
+            - img
+            - text: Audio
+          - button "Cameras" [ref=e147]:
+            - img
+            - text: Cameras
+          - button "Hobbies" [ref=e148]:
+            - img
+            - text: Hobbies
+          - button "Community" [ref=e149]:
+            - img
+            - text: Community
+        - generic [ref=e212]:
+          - img [ref=e214]
+          - heading "No results found" [level=3] [ref=e219]
+          - paragraph [ref=e220]: We couldn't find any items matching your current filters. Try adjusting your search terms or category.
+          - button "Reset Filters" [ref=e221]
+  - region "Notifications alt+T"
+  - generic [ref=e226] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e227]:
+      - img [ref=e228]
+    - generic [ref=e231]:
+      - button "Open issues overlay" [ref=e232]:
+        - generic [ref=e233]:
+          - generic [ref=e234]: "1"
+          - generic [ref=e235]: "2"
+        - generic [ref=e236]:
+          - text: Issue
+          - generic [ref=e237]: s
+      - button "Collapse issues badge" [ref=e238]:
+        - img [ref=e239]
+  - alert [ref=e241]
+```
