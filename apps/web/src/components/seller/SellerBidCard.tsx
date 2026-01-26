@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, MessageSquare, Star, Check, X } from "lucide-react";
 import { calculatePrivacySafeDistance, getFuzzyLocationString, formatPrice, getWhatsAppUrl, cn } from "@/lib/utils";
 import { useApp } from "@/lib/store";
+import { useTime } from "@/context/TimeContext";
 import { useRouter } from "next/navigation";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { TimerBadge } from "@/components/common/TimerBadge";
@@ -19,6 +20,7 @@ interface SellerBidCardProps {
 
 export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const { rejectBid, acceptBid, conversations, user, itemsById } = useApp();
+  const { now } = useTime();
   const router = useRouter();
   
   const item = itemsById[bid.itemId];
@@ -35,7 +37,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
     bid.expiresAt ? new Date(bid.expiresAt) : new Date(new Date(bid.createdAt).getTime() + 24 * 60 * 60 * 1000)
   , [bid.expiresAt, bid.createdAt]);
 
-  const isExpired = bid.status === 'expired' || expiresAt.getTime() <= Date.now();
+  const isExpired = bid.status === 'expired' || expiresAt.getTime() <= now;
   
   const handleReject = () => {
     rejectBid(bid.id);

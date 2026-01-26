@@ -5,7 +5,7 @@ import { useApp } from '@/lib/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn, formatPrice, getWhatsAppUrl } from '@/lib/utils';
 import { Conversation } from '@/types';

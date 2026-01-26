@@ -68,9 +68,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     userBid,
     isSubmitting,
     cooldownRemaining,
-    derivedStatus,
-    minBid,
-    maxBid
+    derivedStatus
   } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
 
 

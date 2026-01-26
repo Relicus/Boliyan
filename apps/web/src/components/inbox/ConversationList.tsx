@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '@/lib/store';
+import { useTime } from '@/context/TimeContext';
 import { Conversation } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -21,7 +22,7 @@ interface ConversationListProps {
 
 export function ConversationList({ conversations, selectedId, onSelect, role, emptyTitle, emptyBody }: ConversationListProps) {
   const { user, refreshConversations, bids } = useApp();
-  const [now, setNow] = useState(0);
+  const { now } = useTime();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -31,13 +32,6 @@ export function ConversationList({ conversations, selectedId, onSelect, role, em
         setTimeout(() => setIsRefreshing(false), 500);
     }
   };
-
-  // Update timestamps every second for live countdown
-  useEffect(() => {
-    setNow(Date.now());
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Helper to find the "other" user in the conversation
   const getOtherUser = (conversation: Conversation) => {

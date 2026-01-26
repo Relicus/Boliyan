@@ -40,8 +40,6 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     pendingConfirmation,
     remainingAttempts,
     userBid,
-    minBid,
-    maxBid,
     derivedStatus
   } = useBidding(item, seller, () => {});
 
