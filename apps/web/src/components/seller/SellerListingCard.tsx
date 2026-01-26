@@ -9,7 +9,8 @@ import { Clock, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useTime } from "@/context/TimeContext";
 import { useApp } from "@/lib/store";
-import { formatCountdown } from "@/lib/utils";
+import { formatCountdown, formatPrice } from "@/lib/utils";
+import { TimerBadge } from "@/components/common/TimerBadge";
 
 interface SellerListingCardProps {
   item: Item;
@@ -35,28 +36,6 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
   const isEditCooldown = editCooldownUntil !== null && now < editCooldownUntil;
   const editCooldownCountdown = isEditCooldown && editCooldownUntil ? formatCountdown(editCooldownUntil, now) : null;
   
-  const getTimeLeft = (expiryAt: string) => {
-    if (!now) return { text: "--:--", color: "text-slate-500", isUrgent: false };
-    
-    const diff = new Date(expiryAt).getTime() - now;
-    const hours = Math.max(0, Math.floor(diff / 3600000));
-    const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    
-    let color = "text-slate-500";
-    let isUrgent = false;
-    if (hours < 2) { color = "text-red-600"; isUrgent = true; }
-    else if (hours < 6) { color = "text-orange-600"; }
-    else if (hours < 12) { color = "text-amber-600"; }
-
-    return {
-      text: hours >= 24 ? `${Math.floor(hours / 24)}d ${hours % 24}h` : `${hours}h ${mins}m`,
-      color,
-      isUrgent
-    };
-  };
-
-  const timeInfo = getTimeLeft(item.expiryAt);
-
   return (
     <div 
       id={`listing-card-${item.id}`} 
@@ -91,13 +70,21 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
             {/* Right: Timer & Slots */}
             <div className="flex flex-col items-end gap-1.5 shrink-0">
                 {/* Timer */}
-                <div
-                  id={`listing-timer-${item.id}`}
-                  className={isPendingGoLive ? "text-xs font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-md flex items-center gap-1" : "text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1"}
-                >
-                    <Clock className={isPendingGoLive ? "w-3 h-3 text-amber-600" : "w-3 h-3"} />
-                    {isPendingGoLive ? `Live in ${goLiveCountdown}` : timeInfo.text}
-                </div>
+                {isPendingGoLive ? (
+                   <div
+                     id={`listing-timer-${item.id}`}
+                     className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-md flex items-center gap-1"
+                   >
+                       <Clock className="w-3 h-3 text-amber-600" />
+                       Live in {goLiveCountdown}
+                   </div>
+                ) : (
+                  <TimerBadge 
+                    expiryAt={item.expiryAt} 
+                    variant="solid" 
+                    className="bg-red-600 text-white" 
+                  />
+                )}
                 {isPendingGoLive && (
                   <Badge
                     id={`listing-inactive-badge-${item.id}`}
@@ -128,7 +115,7 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
                   Asking
                 </span>
                 <span id={`listing-price-${item.id}`} className="font-outfit font-black text-[clamp(1rem,6cqi,1.5rem)] leading-none text-blue-600">
-                  Rs. {item.askPrice.toLocaleString()}
+                  Rs. {formatPrice(item.askPrice)}
                 </span>
             </div>
 

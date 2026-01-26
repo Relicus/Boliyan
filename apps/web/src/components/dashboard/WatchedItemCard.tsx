@@ -94,15 +94,16 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                   </div>
                </div>
 
-               {/* Right: Actions & Timer */}
-               <div className="flex flex-col items-end gap-1.5 shrink-0">
-                  {/* Timer */}
-                  <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
-                     {/* TimerBadge rendering logic manual for consistency or use component */}
-                      <TimerBadge expiryAt={item.expiryAt} variant="solid" className="p-0 h-auto bg-transparent text-white text-[10px]" />
-                  </div>
-                  
-                  {/* Action Buttons Row */}
+                {/* Right: Actions & Timer */}
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                   {/* Timer */}
+                   <TimerBadge 
+                     expiryAt={item.expiryAt} 
+                     variant="solid" 
+                     className="bg-red-600 text-white" 
+                   />
+                   
+                   {/* Action Buttons Row */}
                   <div className="flex items-center gap-1 mt-auto">
                     {canChat && (
                         <Button

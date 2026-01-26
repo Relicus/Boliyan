@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Clock, Tag, Activity, Trophy, Inbox, CheckCircle } from "lucide-react";
+import { X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Tag, Activity, Trophy, Inbox, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
-import { calculatePrivacySafeDistance, formatCountdown, getWhatsAppUrl, cn } from "@/lib/utils";
+import { calculatePrivacySafeDistance, formatCountdown, formatPrice, getWhatsAppUrl, cn } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
+import { TimerBadge } from "@/components/common/TimerBadge";
 
 interface ListingOffersCardProps {
   item: Item;
@@ -46,15 +47,6 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   const acceptedOffers = sortedOffers.filter(b => b.status === 'accepted');
   const totalOffers = sortedOffers.length;
   const bestPrice = sortedOffers[0]?.amount || 0;
-
-  const getTimeLeft = (expiryAt: string) => {
-    if (now === 0) return "...";
-    const diff = new Date(expiryAt).getTime() - now;
-    const hours = Math.max(0, Math.floor(diff / 3600000));
-    const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    if (hours >= 24) return `${Math.floor(hours / 24)}d`;
-    return `${hours}h ${mins}m`;
-  };
 
   const handleAccept = async (bidId: string) => {
     if (isPendingGoLive) return;
@@ -161,7 +153,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
               className={`font-black shrink-0 ${bid.amount >= item.askPrice ? 'text-green-600' : 'text-slate-900'}`}
               style={{ fontSize: 'clamp(1.125rem, 4vw, 1.5rem)' }}
             >
-              PKR {bid.amount.toLocaleString()}
+              Rs. {formatPrice(bid.amount)}
             </span>
           </div>
           </div>
@@ -282,7 +274,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 Asking
               </span>
               <span className="font-outfit font-bold text-slate-900 text-lg leading-none">
-                PKR {item.askPrice.toLocaleString()}
+                Rs. {formatPrice(item.askPrice)}
               </span>
             </div>
             
@@ -299,10 +291,11 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
 
         {/* Right Column */}
         <div className="p-2 flex flex-col items-end justify-evenly shrink-0 min-w-[120px]">
-           <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1 w-fit">
-             <Clock className="w-3 h-3 text-white" />
-             {getTimeLeft(item.expiryAt)}
-           </div>
+           <TimerBadge 
+             expiryAt={item.expiryAt} 
+             variant="solid" 
+             className="bg-red-600 text-white" 
+           />
            <div id={`offers-stat-${item.id}`} className="flex items-center gap-3 text-xs text-slate-500 mt-1 mb-0.5">
              <span className="flex items-center gap-1">
                 <Inbox className="w-3 h-3 text-slate-400" />
@@ -322,7 +315,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 Top Offer
               </span>
               <div id={`best-price-value-${item.id}`} className={`font-black leading-none ${bestPrice >= item.askPrice ? 'text-green-600' : 'text-slate-900'}`} style={{ fontSize: 'clamp(1.5rem, 5vw, 2.25rem)' }}>
-                {bestPrice > 0 ? `PKR ${bestPrice.toLocaleString()}` : '—'}
+                {bestPrice > 0 ? `Rs. ${formatPrice(bestPrice)}` : '—'}
               </div>
            </div>
            {/* Inline Toggle */}

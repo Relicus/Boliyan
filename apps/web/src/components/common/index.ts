@@ -4,7 +4,6 @@
  * Export all reusable bidding-related components from one location.
  */
 
-export { BiddingWidget } from './BiddingWidget';
 export { PriceDisplay } from './PriceDisplay';
 export { CategoryBadge } from './CategoryBadge';
 export { ConditionBadge } from './ConditionBadge';

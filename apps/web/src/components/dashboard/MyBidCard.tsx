@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Clock, Trophy, AlertTriangle, MessageSquare, Phone } from "lucide-react";
+import { Trophy, AlertTriangle, MessageSquare, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item, User } from "@/types";
 
@@ -10,11 +10,11 @@ import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
+import { TimerBadge } from "@/components/common/TimerBadge";
 import { createBiddingConfig } from "@/types/bidding";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 import { useApp } from "@/lib/store";
-import { useTime } from "@/context/TimeContext";
 import { getWhatsAppUrl, cn } from "@/lib/utils";
 
 interface MyBidCardProps {
@@ -25,7 +25,6 @@ interface MyBidCardProps {
 
 export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   const { user, bids, conversations } = useApp();
-  const { now } = useTime();
   
   const isLeading = user && item.isPublicBid && item.currentHighBidderId === user.id;
   const isOutbid = user && item.isPublicBid && item.currentHighBidderId !== user.id && (item.currentHighBid || 0) > userBid.amount;
@@ -37,16 +36,6 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
     createBiddingConfig(item, user, bids),
     [item, user, bids]
   );
-
-  const getTimeLeft = (expiryAt: string) => {
-    if (now === 0) return "Loading...";
-    const diff = new Date(expiryAt).getTime() - now;
-    const hours = Math.max(0, Math.floor(diff / 3600000));
-    const mins = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    
-    if (hours >= 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
-    return `${hours}h ${mins}m`;
-  };
 
   const acceptedConversation = useMemo(() => {
     if (!user) return undefined;
@@ -128,10 +117,11 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                      {/* Right: Timer & Status (New Column) */}
                      <div className="flex flex-col items-end gap-1.5 shrink-0">
                         {/* Timer */}
-                        <div id={`timer-${item.id}`} className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-white" />
-                            {getTimeLeft(item.expiryAt)}
-                        </div>
+                        <TimerBadge 
+                          expiryAt={item.expiryAt} 
+                          variant="solid" 
+                          className="bg-red-600 text-white" 
+                        />
                         {/* Badge */}
                         {badge}
                      </div>

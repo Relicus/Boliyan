@@ -164,13 +164,16 @@ export const PriceDisplay = memo(({
 
   
   const renderValue = () => (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <motion.span 
         key={safeShowUserBid ? 'user-bid' : (displayPrice !== null ? 'market-price' : 'text')}
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -5 }}
-        transition={{ duration: 0.2 }}
+        initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+        transition={{ 
+          duration: 0.3,
+          ease: [0.23, 1, 0.32, 1] // Apple-style ease-out
+        }}
         className={cn(getPriceClass(viewMode), "flex items-center gap-1 transition-colors duration-300", displayColor)}
         {...(displayPrice !== null ? highBidProps : bidCountProps)}
       >

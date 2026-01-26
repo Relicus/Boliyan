@@ -4,11 +4,12 @@ import { useMemo } from "react";
 import { Bid, User } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MapPin, MessageSquare, Star, Clock, Check, X } from "lucide-react";
-import { calculatePrivacySafeDistance, getFuzzyLocationString, getWhatsAppUrl, cn } from "@/lib/utils";
+import { MapPin, MessageSquare, Star, Check, X } from "lucide-react";
+import { calculatePrivacySafeDistance, getFuzzyLocationString, formatPrice, getWhatsAppUrl, cn } from "@/lib/utils";
 import { useApp } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
+import { TimerBadge } from "@/components/common/TimerBadge";
 
 interface SellerBidCardProps {
   bid: Bid;
@@ -29,14 +30,12 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
 
   // Calculate time remaining (24h from created_at + extensions?)
   // Actually, we use expires_at if available, else created_at + 24h
-  const expiresAt = bid.expiresAt ? new Date(bid.expiresAt) : new Date(new Date(bid.createdAt).getTime() + 24 * 60 * 60 * 1000);
-  const now = new Date();
-  const timeDiff = expiresAt.getTime() - now.getTime();
-  const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
-  const minsLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-  const isExpired = timeDiff <= 0 || bid.status === 'expired';
-  const isUrgent = timeDiff > 0 && hoursLeft < 2 && bid.status === 'pending';
+  const expiresAt = useMemo(() => 
+    bid.expiresAt ? new Date(bid.expiresAt) : new Date(new Date(bid.createdAt).getTime() + 24 * 60 * 60 * 1000)
+  , [bid.expiresAt, bid.createdAt]);
 
+  const isExpired = bid.status === 'expired' || expiresAt.getTime() <= Date.now();
+  
   const handleReject = () => {
     rejectBid(bid.id);
   };
@@ -101,12 +100,12 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
 
           <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right shrink-0 flex flex-col items-end">
             <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1">Bid Amount</span>
-            <p id={`bid-amount-mobile-${bid.id}`} className="price-font font-black text-blue-600 leading-none truncate text-[clamp(1rem,5cqi,1.25rem)]">Rs. {bid.amount.toLocaleString()}</p>
+            <p id={`bid-amount-mobile-${bid.id}`} className="price-font font-black text-blue-600 leading-none truncate text-[clamp(1rem,5cqi,1.25rem)]">Rs. {formatPrice(bid.amount)}</p>
             
             {/* Expiration Timer (Mobile) */}
             {!isExpired && (bid.status === 'pending' || bid.status === 'shortlisted') && (
-                 <div className={`text-[9px] font-bold mt-1 text-right flex items-center justify-end gap-1 ${isUrgent ? 'text-red-500' : 'text-slate-400'}`}>
-                    {hoursLeft}h {minsLeft}m left
+                 <div className="mt-1 flex justify-end">
+                    <TimerBadge expiryAt={expiresAt.toISOString()} variant="solid" className="bg-transparent text-slate-400 p-0 shadow-none animate-none" />
                  </div>
             )}
             
@@ -201,8 +200,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                         <MapPin className="h-3 w-3 text-red-400" />
                         {distance} km away
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 text-blue-400" />
+                      <div className="flex items-center gap-1 text-blue-400 font-medium">
                         {duration} mins drive
                       </div>
                     </>
@@ -215,13 +213,12 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
           <div id={`bid-card-desktop-right-${bid.id}`} className="flex flex-row items-center gap-6">
               <div className="text-right">
                 <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 block mb-1">Bid Amount</span>
-                <p id={`bid-amount-desktop-${bid.id}`} className="price-font text-[clamp(1.25rem,4cqi,1.75rem)] font-black text-blue-600 leading-none">Rs. {bid.amount.toLocaleString()}</p>
+                 <p id={`bid-amount-desktop-${bid.id}`} className="price-font text-[clamp(1.25rem,4cqi,1.75rem)] font-black text-blue-600 leading-none">Rs. {formatPrice(bid.amount)}</p>
                 
                 {/* Expiration Timer */}
                 {!isExpired && (bid.status === 'pending' || bid.status === 'shortlisted') && (
-                     <div className={`text-[10px] font-bold mt-1 text-right flex items-center justify-end gap-1 ${isUrgent ? 'text-red-500' : 'text-slate-400'}`}>
-                        <Clock className="w-3 h-3" />
-                        {hoursLeft}h {minsLeft}m left
+                     <div className="mt-1 flex justify-end">
+                        <TimerBadge expiryAt={expiresAt.toISOString()} variant="solid" className="bg-transparent text-slate-400 p-0 shadow-none animate-none" />
                      </div>
                 )}
                 {isExpired && bid.status !== 'accepted' && (
