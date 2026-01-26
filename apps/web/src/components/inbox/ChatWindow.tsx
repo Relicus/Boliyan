@@ -38,6 +38,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   // Vouch State
   const [vouchRating, setVouchRating] = useState(0);
   const [vouchSubmitted, setVouchSubmitted] = useState(false);
+  const [isConfirmingSeal, setIsConfirmingSeal] = useState(false);
+  const confirmTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const currentMessages = messages.filter(m => m.conversationId === conversationId);
   const prevMessageCountRef = useRef(currentMessages.length);
@@ -145,10 +147,29 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
   const handleConfirmExchange = async () => {
     if (!conversation) return;
+    if (!isConfirmingSeal) {
+      setIsConfirmingSeal(true);
+      sonic.tick();
+      // Revert after 4 seconds
+      if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
+      confirmTimeoutRef.current = setTimeout(() => setIsConfirmingSeal(false), 4000);
+      return;
+    }
+    
+    // Confirmed!
+    if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
+    setIsConfirmingSeal(false);
     await confirmExchange(conversation.id, myRole);
     sonic.click();
     toast.success("You confirmed the exchange!");
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
+    };
+  }, []);
 
   const handleQuickVouch = async () => {
     if (vouchRating === 0 || !otherUser || !item) return;
@@ -313,62 +334,167 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
       {/* Premium Header */}
       <header id="chat-header" className="flex flex-col border-b shrink-0 bg-white/80 backdrop-blur-xl z-30 sticky top-0">
-        <div className="flex flex-col gap-2 p-4 pb-3 md:flex-row md:items-center">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              {onBack && (
-              <Button id="chat-back-btn" variant="ghost" size="icon" onClick={onBack} className="md:hidden -ml-2 rounded-full">
-                  <ArrowLeft className="h-5 w-5" />
-              </Button>
-              )}
+        {/* Row 1: Identity & Price (Mobile) / Unified (Desktop) */}
+        <div className="flex items-center justify-between px-4 pt-4 pb-2 md:pb-3">
+            <div className="flex items-center gap-3 min-w-0">
               <div className="relative">
-              <Avatar className="h-10 w-10 border shadow-sm ring-2 ring-white">
-                  <AvatarImage src={otherUser?.avatar} />
-                  <AvatarFallback className="bg-slate-100 text-slate-400 font-black text-xs">{otherUser?.name?.[0] || "?"}</AvatarFallback>
-              </Avatar>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-white bg-emerald-500 shadow-sm" />
+                <Avatar className="h-10 w-10 border shadow-sm ring-2 ring-white">
+                    <AvatarImage src={otherUser?.avatar} />
+                    <AvatarFallback className="bg-slate-100 text-slate-400 font-black text-xs">{otherUser?.name?.[0] || "?"}</AvatarFallback>
+                </Avatar>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-white bg-emerald-500 shadow-sm" />
               </div>
               
               <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5 min-w-0">
-                  <h3 className="font-black text-[15px] text-slate-900 truncate tracking-tight">{otherUser?.name || "Unknown"}</h3>
-                  {otherUser?.isVerified && <VerifiedBadge size="sm" />}
-                  <span className={cn(
-                  "text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter shadow-sm shrink-0",
-                  isSeller ? "bg-slate-900 text-white" : "bg-blue-600 text-white"
-                  )}>
-                  {isSeller ? "Buyer" : "Seller"}
-                  </span>
-              </div>
-              
-              <div className="flex items-center gap-1.5 min-w-0">
-                  {item && (
-                  <div className="h-4 w-4 rounded-[4px] bg-slate-100 overflow-hidden flex-shrink-0 ring-1 ring-slate-200/50">
-                      <img src={item.images[0]} alt="" className="h-full w-full object-cover" />
-                  </div>
-                  )}
-                  <div className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-tight">
-                  {item?.title || "Product"}
-                  </div>
-              </div>
+                <div className="flex items-center gap-2 mb-0.5 min-w-0">
+                    <h3 className="font-black text-[15px] text-slate-900 truncate tracking-tight">{otherUser?.name || "Unknown"}</h3>
+                    {otherUser?.isVerified && <VerifiedBadge size="sm" />}
+                    <span className={cn(
+                    "text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter shadow-sm shrink-0",
+                    isSeller ? "bg-slate-900 text-white" : "bg-blue-600 text-white"
+                    )}>
+                    {isSeller ? "Buyer" : "Seller"}
+                    </span>
+                </div>
+                
+                <div className="flex items-center gap-1.5 min-w-0">
+                    {item && (
+                    <div className="h-4 w-4 rounded-[4px] bg-slate-100 overflow-hidden flex-shrink-0 ring-1 ring-slate-200/50">
+                        <img src={item.images[0]} alt="" className="h-full w-full object-cover" />
+                    </div>
+                    )}
+                    <div className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-tight">
+                    {item?.title || "Product"}
+                    </div>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 md:gap-3 justify-end ml-auto">
-              {(() => {
+            {/* Price Block - Desktop & Mobile Row 1 */}
+            <div className="hidden md:flex items-center gap-6">
+               {priceBlock}
+               <div className="flex items-center gap-2">
+                  {onBack && (
+                    <Button id="chat-back-btn-desktop" variant="ghost" size="icon" onClick={onBack} className="hidden md:flex rounded-full">
+                        <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                  )}
+               </div>
+            </div>
+
+            {/* Mobile Price Display Only */}
+            <div className="md:hidden">
+              {priceBlock}
+            </div>
+        </div>
+
+        {/* Row 2: Actions Cluster (Mobile) / Integrated in Row 1 logic for desktop is complex, 
+            let's just make this container hidden on md and have desktop buttons in row 1. */}
+        <div className="flex md:hidden items-center justify-between px-4 pb-3">
+            <div className="flex items-center flex-1">
+              {onBack && (
+                <Button id="chat-back-btn-mobile" variant="ghost" size="icon" onClick={onBack} className="mr-4 -ml-2 rounded-full h-9 w-9">
+                    <ArrowLeft className="h-5 w-5" />
+                </Button>
+              )}
+              
+              <div className="flex items-center gap-1.5 ml-auto">
+                {(() => {
+                  const listingPhone = !isSeller ? item?.contactPhone : undefined;
+                  const phone = listingPhone || otherUser?.phone;
+
+                  const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
+
+                  return (
+                    <>
+                      <Button
+                        id="chat-whatsapp-btn"
+                        size="sm"
+                        variant="outline"
+                        disabled={!phone}
+                        className={cn(
+                          "h-8 px-2 text-[10px] font-bold rounded-full border-slate-200 transition-colors shadow-sm",
+                          phone 
+                            ? "text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200" 
+                            : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
+                        )}
+                        onClick={() => {
+                          if (phone) window.open(getWhatsAppUrl(phone, waMessage), '_blank');
+                        }}
+                      >
+                        <WhatsAppIcon className="h-3.5 w-3.5 mr-1" />
+                        WhatsApp
+                      </Button>
+                      <Button
+                        id="chat-call-btn"
+                        size="sm"
+                        variant="outline"
+                        disabled={!phone}
+                        className={cn(
+                          "h-8 px-2 text-[10px] font-bold rounded-full border-slate-200 transition-colors shadow-sm",
+                          phone 
+                            ? "text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200" 
+                            : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
+                        )}
+                        onClick={() => {
+                          if (phone) window.location.href = `tel:${phone}`;
+                        }}
+                      >
+                        <Phone className="h-3.5 w-3.5 mr-1" />
+                        Call
+                      </Button>
+
+                      {!isSealed && (
+                        <Button 
+                          id="chat-seal-btn"
+                          size="sm" 
+                          onClick={handleConfirmExchange}
+                          className={cn(
+                            "h-8 px-2 text-[10px] font-bold rounded-full shadow-sm transition-all",
+                            iHaveConfirmed 
+                              ? "bg-emerald-50 text-emerald-600 border border-emerald-100 opacity-100"
+                              : isConfirmingSeal
+                                ? "bg-amber-500 text-white border-amber-600 animate-pulse"
+                                : theyHaveConfirmed 
+                                  ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
+                                  : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                          )}
+                          disabled={iHaveConfirmed && !isSealed}
+                        >
+                          {iHaveConfirmed ? (
+                            <Check className="h-3.5 w-3.5 mr-1" />
+                          ) : isConfirmingSeal ? (
+                            <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+                          ) : (
+                            <Handshake className="h-3.5 w-3.5 mr-1" />
+                          )}
+                          {iHaveConfirmed ? (theyHaveConfirmed ? "Sealing" : "Sent") : isConfirmingSeal ? "Confirm?" : "Done"}
+                        </Button>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+        </div>
+
+        {/* Desktop Actions Integrated Row (Only visible on md+) */}
+        <div className="hidden md:flex items-center gap-2 px-4 pb-3 justify-end border-t border-slate-50 pt-2">
+            {(() => {
                 const listingPhone = !isSeller ? item?.contactPhone : undefined;
                 const phone = listingPhone || otherUser?.phone;
-
                 const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
+                if (!phone && isSealed) return null;
 
                 return (
-                  <div className="flex items-center gap-1 md:gap-2 mr-1">
+                  <div className="flex items-center gap-2">
                     <Button
-                      id="chat-whatsapp-btn"
+                      id="chat-whatsapp-btn-desktop"
                       size="sm"
                       variant="outline"
                       disabled={!phone}
                       className={cn(
-                        "h-8 md:h-9 px-2 md:px-3 text-[10px] md:text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
+                        "h-9 px-3 text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
                         phone 
                           ? "text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200" 
                           : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
@@ -377,16 +503,16 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                         if (phone) window.open(getWhatsAppUrl(phone, waMessage), '_blank');
                       }}
                     >
-                      <WhatsAppIcon className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-1.5" />
+                      <WhatsAppIcon className="h-4 w-4 mr-1.5" />
                       WhatsApp
                     </Button>
                     <Button
-                      id="chat-call-btn"
+                      id="chat-call-btn-desktop"
                       size="sm"
                       variant="outline"
                       disabled={!phone}
                       className={cn(
-                        "h-8 md:h-9 px-2 md:px-3 text-[10px] md:text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
+                        "h-9 px-3 text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
                         phone 
                           ? "text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200" 
                           : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
@@ -395,62 +521,60 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                         if (phone) window.location.href = `tel:${phone}`;
                       }}
                     >
-                      <Phone className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-1" />
+                      <Phone className="h-4 w-4 mr-1" />
                       Call
                     </Button>
 
-                    {!isSealed && !iHaveConfirmed && (
+                    {!isSealed && (
                       <Button 
-                        id="chat-seal-btn"
+                        id="chat-seal-btn-desktop"
                         size="sm" 
                         onClick={handleConfirmExchange}
                         className={cn(
-                          "h-8 md:h-9 px-2 md:px-3 text-[10px] md:text-xs font-bold rounded-full shadow-sm transition-all",
-                          theyHaveConfirmed 
-                            ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
-                            : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                          "h-9 px-3 text-xs font-bold rounded-full shadow-sm transition-all",
+                          iHaveConfirmed 
+                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100 opacity-100"
+                            : isConfirmingSeal
+                              ? "bg-amber-500 text-white border-amber-600 animate-pulse"
+                              : theyHaveConfirmed 
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
+                                : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
                         )}
+                        disabled={iHaveConfirmed && !isSealed}
                       >
-                        <Handshake className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-1.5" />
-                        Done
-                      </Button>
-                    )}
-                    {iHaveConfirmed && !isSealed && (
-                      <Button 
-                        id="chat-seal-btn-confirmed"
-                        size="sm" 
-                        disabled
-                        className="h-8 md:h-9 px-2 md:px-3 text-[10px] md:text-xs font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 opacity-100 cursor-default"
-                      >
-                        <Check className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-1" />
-                        {theyHaveConfirmed ? "Sealing" : "Done"}
+                        {iHaveConfirmed ? (
+                          <Check className="h-4 w-4 mr-1.5" />
+                        ) : isConfirmingSeal ? (
+                          <ShieldCheck className="h-4 w-4 mr-1.5" />
+                        ) : (
+                          <Handshake className="h-4 w-4 mr-1.5" />
+                        )}
+                        {iHaveConfirmed ? (theyHaveConfirmed ? "Sealing Deal" : "Exchange Sent") : isConfirmingSeal ? "Confirm Completion?" : "Mark as Done"}
                       </Button>
                     )}
                   </div>
                 );
-              })()}
-              {priceBlock}
-            </div>
-
-            {/* Slot indicator shown on listing/dashboard only */}
-
-            {timeLeft && !isSealed && (
-            <div className={cn(
-                "flex flex-col items-end px-3 py-1.5 rounded-xl border transition-colors",
-                isLocked 
-                ? "bg-red-50 border-red-100 text-red-600" 
-                : "bg-white border-slate-100 shadow-sm text-blue-600"
-            )}>
-                <div className="flex items-center gap-1.5 text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-widest text-slate-500">
-                <Clock className="h-2.5 w-2.5" />
-                {isLocked ? (isCancelled ? "Cancelled" : (isCompleted ? "Sold" : "Expired")) : "Closing"}
-                </div>
-                <div className="text-[11px] font-black tabular-nums">
-                {isCancelled ? "N/A" : (isCompleted ? "Closed" : timeLeft)}
-                </div>
-            </div>
-            )}
+            })()}
         </div>
+
+        {/* Expiration Logic - Compact Footer of Header */}
+        {timeLeft && !isSealed && (
+            <div className={cn(
+                "px-4 py-1 flex items-center justify-end gap-2 border-t border-slate-50/50",
+                isLocked ? "bg-red-50/30" : "bg-white/50"
+            )}>
+                <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-slate-400">
+                    <Clock className="h-2.5 w-2.5" />
+                    {isLocked ? (isCancelled ? "Cancelled" : (isCompleted ? "Sold" : "Expired")) : "Closing in"}
+                </div>
+                <div className={cn(
+                    "text-[10px] font-black tabular-nums",
+                    isLocked ? "text-red-500" : "text-blue-600"
+                )}>
+                    {isCancelled ? "N/A" : (isCompleted ? "Closed" : timeLeft)}
+                </div>
+            </div>
+        )}
       </header>
 
       {/* Messages Area */}
