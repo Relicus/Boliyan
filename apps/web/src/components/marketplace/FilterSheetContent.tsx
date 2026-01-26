@@ -20,8 +20,7 @@ import {
   Star,
   ThumbsUp,
   Hammer,
-  Banknote,
-  MapPin
+  Banknote
 } from "lucide-react";
 
 type SortFilterId = typeof FILTERS[number]['id'];

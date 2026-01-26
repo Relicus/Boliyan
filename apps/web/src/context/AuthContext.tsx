@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         try {
             localStorage.setItem('boliyan_user_location', JSON.stringify(loc));
-        } catch (e) { /* ignore */ }
+        } catch { /* ignore */ }
     };
 
     const fetchIpLocation = async () => {
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
                 return;
             }
-        } catch (err) {
+        } catch {
             try {
                 const res = await fetchWithTimeout('https://ipwho.is/');
                 const data = await res.json();
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         saveLocation(parseFloat(data.latitude), parseFloat(data.longitude), data.city || "Unknown", false);
                     }
                 }
-            } catch (e) { /* ignore */ }
+            } catch { /* ignore */ }
         }
     };
 
@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             const data = await res.json();
                             const city = data.address?.city || data.address?.town || data.address?.village || data.address?.suburb || "Current Location";
                             saveLocation(latitude, longitude, city, true);
-                        } catch (e) {
+                        } catch {
                             saveLocation(latitude, longitude, "Current Location", true);
                         }
                     },
@@ -129,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     { timeout: 7000, maximumAge: 0 }
                 );
             }
-        } catch (e) { /* ignore */ }
+        } catch { /* ignore */ }
     };
 
     initializeLocation();
@@ -140,7 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setMyLocationState(loc);
     try {
         localStorage.setItem('boliyan_user_location', JSON.stringify(loc));
-    } catch (e) { /* ignore */ }
+    } catch { /* ignore */ }
   };
 
   // Fetch full profile data from Supabase 'profiles' table

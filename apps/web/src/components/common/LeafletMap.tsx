@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { MapPin } from "lucide-react";
 import L from "leaflet";
 
 // Fix for Leaflet icon issues in Next.js
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+// @ts-expect-error - Leaflet internals
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
@@ -18,13 +18,11 @@ interface LeafletMapProps {
   center: [number, number];
   zoom: number;
   onMoveEnd: (lat: number, lng: number) => void;
-  isGeocoding: boolean;
 }
 
 // Helper to center map when props change
 function MapUpdater({ center }: { center: [number, number] }) {
   const map = useMap();
-  const previousCenter = useRef<[number, number] | null>(null);
 
   useEffect(() => {
     if (map) {
@@ -59,7 +57,7 @@ function MapEvents({ onMoveEnd }: { onMoveEnd: (lat: number, lng: number) => voi
   return null;
 }
 
-export default function LeafletMap({ center, zoom, onMoveEnd, isGeocoding }: LeafletMapProps) {
+export default function LeafletMap({ center, zoom, onMoveEnd }: LeafletMapProps) {
   // Approximate bounds for Pakistan to prevent panning too far away
   // SouthWest: [23.0, 60.0], NorthEast: [37.5, 78.0]
   const pakistanBounds = L.latLngBounds(

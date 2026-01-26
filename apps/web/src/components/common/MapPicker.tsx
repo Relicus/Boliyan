@@ -36,6 +36,31 @@ interface MapPickerProps {
   required?: boolean;
 }
 
+interface NominatimResult {
+  place_id: number;
+  licence: string;
+  osm_type: string;
+  osm_id: number;
+  boundingbox: string[];
+  lat: string;
+  lon: string;
+  display_name: string;
+  class: string;
+  type: string;
+  importance: number;
+  icon?: string;
+  address?: {
+    city?: string;
+    town?: string;
+    village?: string;
+    county?: string;
+    state?: string;
+    postcode?: string;
+    country?: string;
+    country_code?: string;
+  };
+}
+
 export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange, className, required }: MapPickerProps) {
   // Default to Pakistan center if no location
   const DEFAULT_CENTER: [number, number] = [30.3753, 69.3451]; 
@@ -47,7 +72,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
   
   const [address, setAddress] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -165,7 +190,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
     return () => clearTimeout(timer);
   }, [center, onLocationSelect]); // Re-run when center changes (drag ends)
 
-  const handleSearchResultClick = (result: any) => {
+  const handleSearchResultClick = (result: NominatimResult) => {
     const lat = parseFloat(result.lat);
     const lng = parseFloat(result.lon);
     
@@ -271,7 +296,6 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
           center={center} 
           zoom={initialLocation ? 13 : DEFAULT_ZOOM} 
           onMoveEnd={handleMapMove}
-          isGeocoding={isGeocoding}
         />
         
         {/* GPS Button */}

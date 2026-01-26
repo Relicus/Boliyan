@@ -145,7 +145,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 initialSyncDone.current = true;
             }
         }
-    } catch (e) { /* ignore */ }
+    } catch { /* ignore */ }
   }, []);
 
   // 2. Initial Sync: If no saved filter, match user's physical location
