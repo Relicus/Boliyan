@@ -28,6 +28,9 @@ Core Tenet: "Subtract before you add. If a visual cue works, delete the text."
 
 - Space-first clarity: prioritize compact information density by layering badges/overlays/dots on existing elements, avoid adding rows unless unavoidable, use gentle state motion (swap/rotate/shift) instead of flashing, and preserve measured whitespace so the layout breathes without feeling empty.
 - Impact over Volume: use motion to convey state; keep one strong headline; let whitespace breathe.
+- **Device-Specific Layout Strategy**:
+  - **Desktop**: Minimize vertical space. Prioritize horizontal alignment ("in-line" as much as possible) to maximize content area.
+  - **Mobile (Phone)**: Prioritize horizontal breathing room. Avoid overcrowding the row; use vertical stacks (multiple rows) when necessary to maintain touch-friendly targets and legibility.
 
 ## CODE STYLE AND CONVENTIONS
 

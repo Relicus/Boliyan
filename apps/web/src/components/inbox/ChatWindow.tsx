@@ -5,7 +5,7 @@ import { useApp } from '@/lib/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake, ShieldCheck } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake, ShieldCheck, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn, formatPrice, getWhatsAppUrl } from '@/lib/utils';
 import { Conversation } from '@/types';
@@ -17,6 +17,14 @@ import { sonic } from '@/lib/sonic';
 import { DealSealAnimation } from '@/components/common/DealSealAnimation';
 import StarRating from '@/components/profile/StarRating';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ChatWindowProps {
   conversationId: string;
@@ -38,8 +46,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   // Vouch State
   const [vouchRating, setVouchRating] = useState(0);
   const [vouchSubmitted, setVouchSubmitted] = useState(false);
-  const [isConfirmingSeal, setIsConfirmingSeal] = useState(false);
-  const confirmTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isSealDialogOpen, setIsSealDialogOpen] = useState(false);
   
   const currentMessages = messages.filter(m => m.conversationId === conversationId);
   const prevMessageCountRef = useRef(currentMessages.length);
@@ -147,29 +154,11 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
   const handleConfirmExchange = async () => {
     if (!conversation) return;
-    if (!isConfirmingSeal) {
-      setIsConfirmingSeal(true);
-      sonic.tick();
-      // Revert after 4 seconds
-      if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
-      confirmTimeoutRef.current = setTimeout(() => setIsConfirmingSeal(false), 4000);
-      return;
-    }
-    
-    // Confirmed!
-    if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
-    setIsConfirmingSeal(false);
+    setIsSealDialogOpen(false);
     await confirmExchange(conversation.id, myRole);
     sonic.click();
     toast.success("You confirmed the exchange!");
   };
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
-    };
-  }, []);
 
   const handleQuickVouch = async () => {
     if (vouchRating === 0 || !otherUser || !item) return;
@@ -334,7 +323,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
       {/* Premium Header */}
       <header id="chat-header" className="flex flex-col border-b shrink-0 bg-white/80 backdrop-blur-xl z-30 sticky top-0">
-        {/* Row 1: Identity & Price (Mobile) / Unified (Desktop) */}
+        {/* Row 1: Identity & Context (Desktop Unified / Mobile Identity) */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2 md:pb-3">
             <div className="flex items-center gap-3 min-w-0">
               <div className="relative">
@@ -370,26 +359,91 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
               </div>
             </div>
 
-            {/* Price Block - Desktop & Mobile Row 1 */}
-            <div className="hidden md:flex items-center gap-6">
+            {/* Desktop Unified Actions + Price */}
+            <div className="hidden md:flex items-center gap-4">
+               {/* Actions in line on desktop */}
+               {(() => {
+                  const listingPhone = !isSeller ? item?.contactPhone : undefined;
+                  const phone = listingPhone || otherUser?.phone;
+                  const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
+                  if (!phone && isSealed) return null;
+
+                  return (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        id="chat-whatsapp-btn-desktop"
+                        size="sm"
+                        variant="outline"
+                        disabled={!phone}
+                        className={cn(
+                          "h-9 px-3 text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
+                          phone 
+                            ? "text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200" 
+                            : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
+                        )}
+                        onClick={() => {
+                          if (phone) window.open(getWhatsAppUrl(phone, waMessage), '_blank');
+                        }}
+                      >
+                        <WhatsAppIcon className="h-4 w-4 mr-1.5" />
+                        WhatsApp
+                      </Button>
+                      <Button
+                        id="chat-call-btn-desktop"
+                        size="sm"
+                        variant="outline"
+                        disabled={!phone}
+                        className={cn(
+                          "h-9 px-3 text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
+                          phone 
+                            ? "text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200" 
+                            : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
+                        )}
+                        onClick={() => {
+                          if (phone) window.location.href = `tel:${phone}`;
+                        }}
+                      >
+                        <Phone className="h-4 w-4 mr-1" />
+                        Call
+                      </Button>
+
+                      {!isSealed && (
+                        <Button 
+                          id="chat-seal-btn-desktop"
+                          size="sm" 
+                          onClick={() => setIsSealDialogOpen(true)}
+                          className={cn(
+                            "h-9 px-3 text-xs font-bold rounded-full shadow-sm transition-all",
+                            iHaveConfirmed 
+                              ? "bg-emerald-50 text-emerald-600 border border-emerald-100 opacity-100"
+                              : theyHaveConfirmed 
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
+                                : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                          )}
+                          disabled={iHaveConfirmed && !isSealed}
+                        >
+                          {iHaveConfirmed ? (
+                            <Check className="h-4 w-4 mr-1.5" />
+                          ) : (
+                            <Handshake className="h-4 w-4 mr-1.5" />
+                          )}
+                          {iHaveConfirmed ? (theyHaveConfirmed ? "Sealing Deal" : "Exchange Sent") : "Mark as Done"}
+                        </Button>
+                      )}
+                    </div>
+                  );
+               })()}
+               {/* Price in the same row on desktop */}
                {priceBlock}
-               <div className="flex items-center gap-2">
-                  {onBack && (
-                    <Button id="chat-back-btn-desktop" variant="ghost" size="icon" onClick={onBack} className="hidden md:flex rounded-full">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                  )}
-               </div>
             </div>
 
-            {/* Mobile Price Display Only */}
+            {/* Mobile Row 1 Price (Mobile only) */}
             <div className="md:hidden">
               {priceBlock}
             </div>
         </div>
 
-        {/* Row 2: Actions Cluster (Mobile) / Integrated in Row 1 logic for desktop is complex, 
-            let's just make this container hidden on md and have desktop buttons in row 1. */}
+        {/* Row 2: Navigation & Actions Cluster (Mobile only) */}
         <div className="flex md:hidden items-center justify-between px-4 pb-3">
             <div className="flex items-center flex-1">
               {onBack && (
@@ -454,27 +508,23 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                         <Button 
                           id="chat-seal-btn"
                           size="sm" 
-                          onClick={handleConfirmExchange}
+                          onClick={() => setIsSealDialogOpen(true)}
                           className={cn(
                             "h-8 px-2 text-[10px] font-bold rounded-full shadow-sm transition-all",
                             iHaveConfirmed 
                               ? "bg-emerald-50 text-emerald-600 border border-emerald-100 opacity-100"
-                              : isConfirmingSeal
-                                ? "bg-amber-500 text-white border-amber-600 animate-pulse"
-                                : theyHaveConfirmed 
-                                  ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
-                                  : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                              : theyHaveConfirmed 
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
+                                : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
                           )}
                           disabled={iHaveConfirmed && !isSealed}
                         >
                           {iHaveConfirmed ? (
                             <Check className="h-3.5 w-3.5 mr-1" />
-                          ) : isConfirmingSeal ? (
-                            <ShieldCheck className="h-3.5 w-3.5 mr-1" />
                           ) : (
                             <Handshake className="h-3.5 w-3.5 mr-1" />
                           )}
-                          {iHaveConfirmed ? (theyHaveConfirmed ? "Sealing" : "Sent") : isConfirmingSeal ? "Confirm?" : "Done"}
+                          {iHaveConfirmed ? (theyHaveConfirmed ? "Sealing" : "Sent") : "Done"}
                         </Button>
                       )}
                     </>
@@ -482,85 +532,6 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                 })()}
               </div>
             </div>
-        </div>
-
-        {/* Desktop Actions Integrated Row (Only visible on md+) */}
-        <div className="hidden md:flex items-center gap-2 px-4 pb-3 justify-end border-t border-slate-50 pt-2">
-            {(() => {
-                const listingPhone = !isSeller ? item?.contactPhone : undefined;
-                const phone = listingPhone || otherUser?.phone;
-                const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
-                if (!phone && isSealed) return null;
-
-                return (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      id="chat-whatsapp-btn-desktop"
-                      size="sm"
-                      variant="outline"
-                      disabled={!phone}
-                      className={cn(
-                        "h-9 px-3 text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
-                        phone 
-                          ? "text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200" 
-                          : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
-                      )}
-                      onClick={() => {
-                        if (phone) window.open(getWhatsAppUrl(phone, waMessage), '_blank');
-                      }}
-                    >
-                      <WhatsAppIcon className="h-4 w-4 mr-1.5" />
-                      WhatsApp
-                    </Button>
-                    <Button
-                      id="chat-call-btn-desktop"
-                      size="sm"
-                      variant="outline"
-                      disabled={!phone}
-                      className={cn(
-                        "h-9 px-3 text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
-                        phone 
-                          ? "text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200" 
-                          : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
-                      )}
-                      onClick={() => {
-                        if (phone) window.location.href = `tel:${phone}`;
-                      }}
-                    >
-                      <Phone className="h-4 w-4 mr-1" />
-                      Call
-                    </Button>
-
-                    {!isSealed && (
-                      <Button 
-                        id="chat-seal-btn-desktop"
-                        size="sm" 
-                        onClick={handleConfirmExchange}
-                        className={cn(
-                          "h-9 px-3 text-xs font-bold rounded-full shadow-sm transition-all",
-                          iHaveConfirmed 
-                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100 opacity-100"
-                            : isConfirmingSeal
-                              ? "bg-amber-500 text-white border-amber-600 animate-pulse"
-                              : theyHaveConfirmed 
-                                ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
-                                : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-                        )}
-                        disabled={iHaveConfirmed && !isSealed}
-                      >
-                        {iHaveConfirmed ? (
-                          <Check className="h-4 w-4 mr-1.5" />
-                        ) : isConfirmingSeal ? (
-                          <ShieldCheck className="h-4 w-4 mr-1.5" />
-                        ) : (
-                          <Handshake className="h-4 w-4 mr-1.5" />
-                        )}
-                        {iHaveConfirmed ? (theyHaveConfirmed ? "Sealing Deal" : "Exchange Sent") : isConfirmingSeal ? "Confirm Completion?" : "Mark as Done"}
-                      </Button>
-                    )}
-                  </div>
-                );
-            })()}
         </div>
 
         {/* Expiration Logic - Compact Footer of Header */}
@@ -766,6 +737,42 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
            </motion.div>
         )}
       </AnimatePresence>
+
+      <Dialog open={isSealDialogOpen} onOpenChange={setIsSealDialogOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <div className="mx-auto w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
+              <Handshake className="h-6 w-6 text-emerald-600" />
+            </div>
+            <DialogTitle className="text-center">Finalize Exchange?</DialogTitle>
+            <DialogDescription className="text-center">
+              Are you sure the exchange for <span className="font-bold text-slate-900">"{item?.title}"</span> is complete?
+              This will seal the deal and move the chat to your history.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 flex items-start gap-3">
+             <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+             <p className="text-[11px] text-slate-600 leading-relaxed">
+               Only confirm if you have already met and settled the payment. This action cannot be undone.
+             </p>
+          </div>
+          <DialogFooter className="sm:justify-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsSealDialogOpen(false)}
+              className="flex-1 rounded-xl"
+            >
+              Wait, not yet
+            </Button>
+            <Button
+              onClick={handleConfirmExchange}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-200"
+            >
+              Yes, it's done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
