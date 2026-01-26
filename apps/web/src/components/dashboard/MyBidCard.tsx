@@ -71,91 +71,106 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
 
   return (
     <>
-      <div 
-        onClick={() => setIsModalOpen(true)}
-        className="block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer relative"
-      >
-        {/* Status Badge */}
-        {isAccepted && (
-            <div className="absolute top-2 right-2 z-10 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+{/* Status Badge Logic */}
+        {(() => {
+          let badge = null;
+          if (isAccepted) {
+            badge = (
+              <div id={`status-${item.id}`} className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
                 <Trophy className="w-3 h-3" />
                 OFFER ACCEPTED
-            </div>
-        )}
-        {!isAccepted && isLeading && (
-           <div className="absolute top-2 right-2 z-10 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
-             <Trophy className="w-3 h-3" />
-             HIGHEST BIDDER
-           </div>
-        )}
-        {!isAccepted && isOutbid && (
-           <div className="absolute top-2 right-2 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 animate-pulse">
-             <AlertTriangle className="w-3 h-3" />
-             OUTBID
-           </div>
-        )}
-
-        <div className="flex p-3 gap-3">
-          {/* Image */}
-          <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden shrink-0">
-             {item.images[0] && (
-               <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
-             )}
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0 flex flex-col justify-between">
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                 <h3 className="font-bold text-sm text-slate-900 line-clamp-1">{item.title}</h3>
               </div>
-              
-              <div className="flex items-center gap-2 mt-1">
-                  <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
-                  <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
+            );
+          } else if (isLeading) {
+            badge = (
+              <div id={`status-${item.id}`} className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                <Trophy className="w-3 h-3" />
+                HIGHEST BIDDER
               </div>
-            </div>
-
-            <div className="flex items-end justify-between mt-2">
-               <PriceDisplay 
-                  config={biddingConfig}
-                  askPrice={item.askPrice}
-                  bidCount={item.bidCount}
-                  viewMode="compact"
-                  className="scale-90 origin-left -ml-1"
-                  userCurrentBid={userBid.amount}
-               />
-               
-               {/* Time Remaining */}
-               <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-white" />
-                  {getTimeLeft(item.expiryAt)}
-               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Footer (Only for Accepted Deals) */}
-        {isAccepted && (
-            <div className="px-3 py-2 bg-green-50 border-t border-green-100 flex items-center justify-between">
-                <span className="text-xs font-bold text-green-700">Deal Closed! Connect with Seller:</span>
-                <div className="flex gap-2">
-                    {canChat && (
-                        <Button size="sm" variant="default" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={handleChat}>
-                            <MessageSquare className="w-3 h-3 mr-1" />
-                            Chat
-                        </Button>
-                    )}
-                     {canCall && (
-                        <Button size="sm" variant="outline" className="h-7 text-xs border-green-200 text-green-700 hover:bg-green-100" onClick={handleCall}>
-                            <Phone className="w-3 h-3 mr-1" />
-                            Call
-                        </Button>
-                    )}
+            );
+          } else if (isOutbid) {
+            badge = (
+              <div id={`status-${item.id}`} className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 animate-pulse">
+                <AlertTriangle className="w-3 h-3" />
+                OUTBID
+              </div>
+            );
+          }
+          
+          return (
+            <div 
+              onClick={() => setIsModalOpen(true)}
+              className="block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer relative"
+            >
+              <div className="flex p-3 gap-3">
+                {/* Image */}
+                <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden shrink-0">
+                  {item.images[0] && (
+                    <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                  )}
                 </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                  {/* Top Section with Split Columns */}
+                  <div className="flex justify-between items-start gap-2">
+                     {/* Left: Title & Badges */}
+                     <div className="flex flex-col gap-1">
+                        <h3 className="font-bold text-sm text-slate-900 line-clamp-1 pr-1">{item.title}</h3>
+                        <div className="flex items-center gap-2">
+                            <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
+                            <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
+                        </div>
+                     </div>
+
+                     {/* Right: Timer & Status (New Column) */}
+                     <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        {/* Timer */}
+                        <div id={`timer-${item.id}`} className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-white" />
+                            {getTimeLeft(item.expiryAt)}
+                        </div>
+                        {/* Badge */}
+                        {badge}
+                     </div>
+                  </div>
+
+                  {/* Bottom: Price Display (Pushed Right) */}
+                  <PriceDisplay 
+                      config={biddingConfig}
+                      askPrice={item.askPrice}
+                      bidCount={item.bidCount}
+                      viewMode="compact"
+                      className="mt-2 pt-1"
+                      userCurrentBid={userBid.amount}
+                      itemId={item.id}
+                  />
+                </div>
+              </div>
+
+              {/* Action Footer (Only for Accepted Deals) */}
+              {isAccepted && (
+                  <div className="px-3 py-2 bg-green-50 border-t border-green-100 flex items-center justify-between">
+                      <span className="text-xs font-bold text-green-700">Deal Closed! Connect with Seller:</span>
+                      <div className="flex gap-2">
+                          {canChat && (
+                              <Button size="sm" variant="default" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={handleChat}>
+                                  <MessageSquare className="w-3 h-3 mr-1" />
+                                  Chat
+                              </Button>
+                          )}
+                          {canCall && (
+                              <Button size="sm" variant="outline" className="h-7 text-xs border-green-200 text-green-700 hover:bg-green-100" onClick={handleCall}>
+                                  <Phone className="w-3 h-3 mr-1" />
+                                  Call
+                              </Button>
+                          )}
+                      </div>
+                  </div>
+              )}
             </div>
-        )}
-      </div>
+          );
+        })()}
 
       <ProductDetailsModal 
         item={item} 

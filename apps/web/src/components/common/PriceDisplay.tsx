@@ -230,7 +230,7 @@ export const PriceDisplay = memo(({
 
   // ROW ORIENTATION (Default) - Minimalist/Typography Driven
   return (
-    <div className={`flex justify-between items-end w-full px-1 ${className}`}>
+    <div className={cn("flex justify-between items-end w-full px-1", className)}>
       {/* Asking Price - Left Aligned */}
       <div className="flex flex-col items-start">
         <span className={cn("text-[0.65rem] font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1", darkMode ? "text-slate-400" : "text-slate-400")}>

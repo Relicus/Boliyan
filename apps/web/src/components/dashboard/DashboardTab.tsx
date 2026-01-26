@@ -1,4 +1,5 @@
 import { TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -43,11 +44,16 @@ export function DashboardTab({
       </div>
       <span className="text-[10px] sm:text-xs md:text-sm truncate">{label}</span>
       {count !== undefined && count > 0 && (
-        <span className={cn(
-          "hidden md:flex min-w-5 h-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold bg-red-600 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)]"
-        )}>
+        <Badge 
+          variant="destructive" 
+          className={cn(
+            "hidden md:flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 py-0 text-[10px]",
+            // We can override background if destructive isn't red enough, but destructive is usually correct.
+            // Keeping it simple as requested "shadcn type"
+          )}
+        >
           {count}
-        </span>
+        </Badge>
       )}
     </TabsTrigger>
   );
