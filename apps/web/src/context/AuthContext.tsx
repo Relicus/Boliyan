@@ -7,8 +7,17 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
 import { useRouter } from "next/navigation";
 
+interface UserLocation {
+  lat: number;
+  lng: number;
+  city: string;
+  address: string;
+}
+
 interface AuthContextType {
   user: User | null;
+  myLocation: UserLocation | null;
+  setMyLocation: (location: UserLocation) => void;
   isLoggedIn: boolean;
   isLoading: boolean;
   login: () => Promise<void>;
@@ -24,9 +33,115 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [myLocation, setMyLocationState] = useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const router = useRouter();
+
+  // Robust Auto-Locate Logic (moved from MarketplaceContext)
+  useEffect(() => {
+    let mounted = true;
+    const locationSetRef = { current: false };
+
+    const saveLocation = (lat: number, lng: number, city: string, isHighAccuracy: boolean = false) => {
+        if (!mounted) return;
+        
+        // Don't downgrade accuracy: If we already have high accuracy (GPS), don't let IP overwrite it
+        if (locationSetRef.current && !isHighAccuracy) return;
+        
+        const loc = { lat, lng, city, address: city }; // Simple address fallback for myLocation
+        setMyLocationState(loc);
+        locationSetRef.current = true;
+        
+        try {
+            localStorage.setItem('boliyan_user_location', JSON.stringify(loc));
+        } catch (e) { /* ignore */ }
+    };
+
+    const fetchIpLocation = async () => {
+        if (locationSetRef.current) return;
+
+        const fetchWithTimeout = async (url: string, timeout = 8000) => {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            try {
+                const response = await fetch(url, { signal: controller.signal });
+                clearTimeout(id);
+                return response;
+            } catch (err) {
+                clearTimeout(id);
+                throw err;
+            }
+        };
+
+        try {
+            const res = await fetchWithTimeout('https://ipapi.co/json/');
+            if (!res.ok) throw new Error('IP API failed');
+            const data = await res.json();
+            if (data.latitude && data.longitude && data.country_code === 'PK') {
+                if (!locationSetRef.current) {
+                    saveLocation(parseFloat(data.latitude), parseFloat(data.longitude), data.city || "Unknown", false);
+                }
+                return;
+            }
+        } catch (err) {
+            try {
+                const res = await fetchWithTimeout('https://ipwho.is/');
+                const data = await res.json();
+                if (data.success && data.country_code === 'PK') {
+                    if (!locationSetRef.current) {
+                        saveLocation(parseFloat(data.latitude), parseFloat(data.longitude), data.city || "Unknown", false);
+                    }
+                }
+            } catch (e) { /* ignore */ }
+        }
+    };
+
+    const initializeLocation = async () => {
+        try {
+            // 1. Try localStorage
+            const saved = localStorage.getItem('boliyan_user_location');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.city && parsed.lat && parsed.lng) {
+                    setMyLocationState(parsed);
+                    locationSetRef.current = true;
+                }
+            }
+
+            // 2. Race IP and GPS
+            fetchIpLocation();
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        if (!mounted) return;
+                        const { latitude, longitude } = position.coords;
+                        try {
+                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
+                            const data = await res.json();
+                            const city = data.address?.city || data.address?.town || data.address?.village || data.address?.suburb || "Current Location";
+                            saveLocation(latitude, longitude, city, true);
+                        } catch (e) {
+                            saveLocation(latitude, longitude, "Current Location", true);
+                        }
+                    },
+                    () => {},
+                    { timeout: 7000, maximumAge: 0 }
+                );
+            }
+        } catch (e) { /* ignore */ }
+    };
+
+    initializeLocation();
+    return () => { mounted = false; };
+  }, []);
+
+  const setMyLocation = (loc: UserLocation) => {
+    setMyLocationState(loc);
+    try {
+        localStorage.setItem('boliyan_user_location', JSON.stringify(loc));
+    } catch (e) { /* ignore */ }
+  };
 
   // Fetch full profile data from Supabase 'profiles' table
     type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -202,6 +317,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ 
       user, 
+      myLocation,
+      setMyLocation,
       isLoggedIn: !!user, 
       isLoading,
       login, 

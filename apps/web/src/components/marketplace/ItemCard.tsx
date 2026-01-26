@@ -35,7 +35,7 @@ interface ItemCardProps {
 }
 
 const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) => {
-  const { user, bids, watchedItemIds, toggleWatch, setFilter } = useApp();
+  const { user, bids, watchedItemIds, toggleWatch, setFilter, myLocation } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
   const visibilityRef = useTrackVisibility(item.id);
 
@@ -113,14 +113,14 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     // However, transform puts everything in `location`, so let's check `item.location`.
     const itemLocation = item.location || seller?.location;
     
-    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(user?.location, itemLocation);
+    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(myLocation || undefined, itemLocation);
 
     return { 
       distance: dist, 
       duration: dur, 
       isOutside: outside
     };
-  }, [user, seller, item.location]);
+  }, [myLocation, seller, item.location]);
 
 
   const handleInputClick = (e: React.MouseEvent) => {

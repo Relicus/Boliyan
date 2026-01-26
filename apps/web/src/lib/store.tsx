@@ -169,6 +169,8 @@ export function useApp() {
 
   return useMemo(() => ({
     ...auth,
+    myLocation: auth.myLocation,
+    setMyLocation: auth.setMyLocation,
     ...marketplace,
     items: marketplace.items,
     bids: marketplace.bids,

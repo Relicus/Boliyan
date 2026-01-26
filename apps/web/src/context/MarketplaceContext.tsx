@@ -65,7 +65,7 @@ type ListingUpdate = Database['public']['Tables']['listings']['Update'];
 type WatchlistRow = Database['public']['Tables']['watchlist']['Row'];
 
 export function MarketplaceProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, myLocation } = useAuth();
   const { visibleIds } = useViewport();
 
   const [itemsById, setItemsById] = useState<Record<string, Item>>({});
@@ -79,6 +79,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const itemsByIdRef = useRef(itemsById);
   const bidsByIdRef = useRef(bidsById);
   const watchedItemIdsRef = useRef(watchedItemIds);
+  const initialSyncDone = useRef(false);
 
   useEffect(() => { itemsByIdRef.current = itemsById; }, [itemsById]);
   useEffect(() => { bidsByIdRef.current = bidsById; }, [bidsById]);
@@ -113,7 +114,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     search: "",
     radius: 500,
     locationMode: 'country',
-    city: "", // Changed from 'Karachi' to empty
+    city: "", 
     currentCoords: null,
     sortBy: 'trending',
     minPrice: null,
@@ -122,169 +123,45 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     listingType: 'all',
   });
 
-  // Load persistence & Auto-Locate on mount
+  // 1. Initial Load: Restore saved browsing filters
   useEffect(() => {
-    let mounted = true;
-    const locationSetRef = { current: false };
+    try {
+        const saved = localStorage.getItem('boliyan_filters');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            const isValidCity = parsed.city && 
+                                parsed.city !== "" && 
+                                parsed.city !== "Set Location" &&
+                                parsed.city !== "Locating...";
 
-    const setLocation = (lat: number, lng: number, city: string, isHighAccuracy: boolean = false) => {
-        if (!mounted) return;
-        
-        // Don't downgrade accuracy: If we already have high accuracy (GPS), don't let IP overwrite it
-        if (locationSetRef.current && !isHighAccuracy) {
-             return;
-        }
-        
-        setFilters(prev => ({
-            ...prev,
-            locationMode: 'current',
-            currentCoords: { lat, lng },
-            city: city
-        }));
-        
-        locationSetRef.current = true;
-        
-        try {
-            localStorage.setItem('boliyan_filters', JSON.stringify({
-                radius: 500,
-                locationMode: 'current',
-                city: city,
-                currentCoords: { lat, lng }
-            }));
-        } catch (e) { /* ignore */ }
-    };
-
-    const fetchIpLocation = async () => {
-        // If GPS already set location, don't bother with IP
-        if (locationSetRef.current) return;
-
-        // Increased timeout to 8s for slower networks/APIs
-        const fetchWithTimeout = async (url: string, timeout = 8000) => {
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), timeout);
-            try {
-                const response = await fetch(url, { signal: controller.signal });
-                clearTimeout(id);
-                return response;
-            } catch (err) {
-                clearTimeout(id);
-                throw err;
-            }
-        };
-
-        try {
-            // Primary: ipapi.co
-            const res = await fetchWithTimeout('https://ipapi.co/json/');
-            if (!res.ok) throw new Error('IP API failed');
-            const data = await res.json();
-            
-            if (data.latitude && data.longitude && data.country_code === 'PK') {
-                // Only update if GPS hasn't beaten us to it
-                if (!locationSetRef.current) {
-                    setLocation(parseFloat(data.latitude), parseFloat(data.longitude), data.city || "Unknown", false);
-                }
-                return;
-            }
-            throw new Error('Invalid IP location');
-        } catch (err) {
-            console.warn("Primary IP failed, trying backup...", err);
-            // Backup: ipwho.is
-            try {
-                const res = await fetchWithTimeout('https://ipwho.is/');
-                const data = await res.json();
-                if (data.success && data.country_code === 'PK') {
-                    if (!locationSetRef.current) {
-                        setLocation(parseFloat(data.latitude), parseFloat(data.longitude), data.city || "Unknown", false);
-                    }
-                    return; // Success
-                }
-            } catch (e) {
-                console.warn("All auto-locate methods failed");
+            if (isValidCity) {
+                setFilters(prev => ({
+                    ...prev,
+                    radius: parsed.radius ?? prev.radius,
+                    locationMode: parsed.locationMode ?? prev.locationMode,
+                    city: parsed.city,
+                    currentCoords: parsed.currentCoords ?? prev.currentCoords
+                }));
+                initialSyncDone.current = true;
             }
         }
-    };
-
-    const initializeLocation = async () => {
-        try {
-            const saved = localStorage.getItem('boliyan_filters');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                
-                // VALIDATION: Only restore if city is valid (not empty, not "Set Location")
-                // If invalid, we ignore the saved state and proceed to auto-locate
-                const isValidCity = parsed.city && 
-                                    parsed.city !== "" && 
-                                    parsed.city !== "Set Location" &&
-                                    parsed.city !== "Locating...";
-
-                if (isValidCity && mounted) {
-                    setFilters(prev => ({
-                        ...prev,
-                        radius: parsed.radius ?? prev.radius,
-                        locationMode: parsed.locationMode ?? prev.locationMode,
-                        city: parsed.city,
-                        currentCoords: parsed.currentCoords ?? prev.currentCoords
-                    }));
-                    locationSetRef.current = true;
-                    // Intentionally NOT returning here.
-                    // We restore the cached location for instant UI, but we CONTINUING to run auto-locate
-                    // in the background to verify/update it if the user moved.
-                }
-            }
-
-            // --- Parallel Strategy: Race IP and GPS ---
-            
-            // 1. Trigger IP fetch immediately (don't await)
-            fetchIpLocation();
-
-            // 2. Trigger GPS immediately
-            if ('geolocation' in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        if (!mounted) return;
-                        const { latitude, longitude } = position.coords;
-                        
-                        // Reverse geocode to get city name
-                        try {
-                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
-                            const data = await res.json();
-                            const city = data.address?.city || data.address?.town || data.address?.village || data.address?.suburb || "Current Location";
-                            
-                            // GPS always overrides IP (pass true for isHighAccuracy)
-                            setLocation(latitude, longitude, city, true);
-                            locationSetRef.current = true;
-                        } catch (e) {
-                            setLocation(latitude, longitude, "Current Location", true);
-                        }
-                    },
-                    (error) => {
-                        console.log("GPS denied/unavailable", error);
-                        // Do nothing, IP fetch is already running or finished
-                    },
-                    { timeout: 7000, maximumAge: 0 }
-                );
-            }
-
-            // 3. Fail-safe timeout
-            // If after 5 seconds neither has set location, default to "Set Location" prompt
-            setTimeout(() => {
-                if (mounted && !locationSetRef.current) {
-                    console.log("Location initialization timed out, forcing default.");
-                    setFilters(prev => ({ ...prev, city: 'Set Location', locationMode: 'country' }));
-                }
-            }, 5000);
-
-        } catch (e) {
-            console.warn("Failed to init filters", e);
-        }
-    };
-
-    initializeLocation();
-
-    return () => { mounted = false; };
+    } catch (e) { /* ignore */ }
   }, []);
 
-  // Save persistence on change
+  // 2. Initial Sync: If no saved filter, match user's physical location
+  useEffect(() => {
+    if (!initialSyncDone.current && myLocation && !filters.currentCoords) {
+      setFilters(prev => ({
+        ...prev,
+        city: myLocation.city,
+        currentCoords: { lat: myLocation.lat, lng: myLocation.lng },
+        locationMode: 'current'
+      }));
+      initialSyncDone.current = true;
+    }
+  }, [myLocation, filters.currentCoords]);
+
+  // 3. Persist browsing filters on change
   useEffect(() => {
       try {
           const toSave = {

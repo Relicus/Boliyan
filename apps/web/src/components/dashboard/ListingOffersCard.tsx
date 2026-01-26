@@ -18,7 +18,7 @@ interface ListingOffersCardProps {
 }
 
 export default function ListingOffersCard({ item, offers }: ListingOffersCardProps) {
-  const { user, conversations, acceptBid, rejectBid, startConversation } = useApp();
+  const { user, conversations, acceptBid, rejectBid, startConversation, myLocation } = useApp();
   const { now } = useTime();
   
   const [isExpanded, setIsExpanded] = useState(false);
@@ -36,11 +36,11 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
       if (b.amount !== a.amount) return b.amount - a.amount;
       
       // Secondary: Closer distance first
-      const distA = calculatePrivacySafeDistance(user?.location, a.bidder?.location).distance;
-      const distB = calculatePrivacySafeDistance(user?.location, b.bidder?.location).distance;
+      const distA = calculatePrivacySafeDistance(myLocation || undefined, a.bidder?.location).distance;
+      const distB = calculatePrivacySafeDistance(myLocation || undefined, b.bidder?.location).distance;
       return distA - distB;
     });
-  }, [offers, user?.location]);
+  }, [offers, myLocation]);
 
   const acceptedOffers = sortedOffers.filter(b => b.status === 'accepted');
   const totalOffers = sortedOffers.length;
@@ -122,7 +122,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
     const canCall = canChat && !!bidder.phone;
     const isProcessing = processingBidId === bid.id;
     const actionsDisabled = isPendingGoLive || isProcessing;
-    const locationInfo = calculatePrivacySafeDistance(user?.location, bidder.location);
+    const locationInfo = calculatePrivacySafeDistance(myLocation || undefined, bidder.location);
 
     return (
       <div 

@@ -209,7 +209,7 @@ export function MapPicker({ initialLocation, onLocationSelect, className, requir
   return (
     <div className={cn("flex flex-col gap-3 w-full h-full min-h-[400px]", className)}>
       {/* Search Bar */}
-      <div className="relative z-[500]">
+      <div className="relative z-[500] px-1 pt-1">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input 

@@ -144,7 +144,7 @@ export default function Navbar() {
           {/* Desktop Location Selector */}
           <div className="hidden md:flex flex-col items-end mr-2">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-[2px] pr-1 leading-none">YOUR LOCATION</span>
-            <LocationSelector align="end" />
+            <LocationSelector align="end" mode="user" />
           </div>
 
           <Button id="navbar-sell-btn-12" asChild className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 sm:px-4 shadow-lg shadow-blue-100 border-0">

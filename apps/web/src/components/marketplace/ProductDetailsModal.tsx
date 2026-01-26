@@ -24,7 +24,7 @@ interface ProductDetailsModalProps {
 }
 
 export default function ProductDetailsModal({ item, seller, isOpen, onClose }: ProductDetailsModalProps) {
-  const { user, bids, toggleWatch, watchedItemIds } = useApp();
+  const { user, bids, toggleWatch, watchedItemIds, myLocation } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
 
 
@@ -79,14 +79,14 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   const { distance, duration, isOutside } = useMemo(() => {
     // Distance Logic - Needs User
     const itemLocation = item.location || seller.location;
-    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(user?.location, itemLocation);
+    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(myLocation || undefined, itemLocation);
 
     return { 
       distance: dist, 
       duration: dur, 
       isOutside: outside
     };
-  }, [user, seller.location, item.location]);
+  }, [myLocation, seller.location, item.location]);
 
 
   return (
