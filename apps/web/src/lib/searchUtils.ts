@@ -18,12 +18,11 @@ function toRad(deg: number): number {
 export function sortByDistance(items: Item[], userLat: number, userLng: number): Item[] {
   // Items without location are pushed to bottom
   return [...items].sort((a, b) => {
-    // Handling cases where location might be missing on seller/item (defaults to 0 or null checks)
-    // Note: Type definition for Item -> Seller currently has location mandatory, but good to be safe
-    const latA = a.seller?.location?.lat;
-    const lngA = a.seller?.location?.lng;
-    const latB = b.seller?.location?.lat;
-    const lngB = b.seller?.location?.lng;
+    // Prefer explicit item location, fallback to seller location
+    const latA = a.location?.lat ?? a.seller?.location?.lat;
+    const lngA = a.location?.lng ?? a.seller?.location?.lng;
+    const latB = b.location?.lat ?? b.seller?.location?.lat;
+    const lngB = b.location?.lng ?? b.seller?.location?.lng;
 
     if (latA === undefined || lngA === undefined) return 1;
     if (latB === undefined || lngB === undefined) return -1;

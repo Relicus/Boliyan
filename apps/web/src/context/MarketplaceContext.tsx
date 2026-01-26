@@ -11,6 +11,7 @@ import { sonic } from "@/lib/sonic";
 import type { Database } from "@/types/database.types";
 import { normalize, upsertEntities, upsertEntity, removeEntity } from "@/lib/store-helpers";
 import { useViewport } from "./ViewportContext";
+import { calculateDistance, sortByDistance } from "@/lib/searchUtils";
 
 interface MarketplaceFilters {
 
@@ -455,12 +456,33 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
            let fetchedItems: Item[] = [];
             if (listingsData) {
-                fetchedItems = (listingsData as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
-            }
+                let items = (listingsData as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
 
-           // --- CLIENT-SIDE SORTING OVERRIDES ---
-           // If 'watchlist' sort is selected, we might need to fetch more or re-sort client side 
-           // since we can't easily join user specific watchlist state in simple query.
+                // --- CLIENT-SIDE LOCATION FILTERING ---
+                // Since we don't have PostGIS yet, we filter by radius client-side
+                if (filters.currentCoords && filters.radius < 500) {
+                    items = items.filter(item => {
+                        const itemLat = item.location?.lat;
+                        const itemLng = item.location?.lng;
+                        if (itemLat === undefined || itemLng === undefined) return false;
+                        
+                        const dist = calculateDistance(
+                            filters.currentCoords!.lat, 
+                            filters.currentCoords!.lng, 
+                            itemLat, 
+                            itemLng
+                        );
+                        return dist <= filters.radius;
+                    });
+                }
+
+                // --- CLIENT-SIDE SORTING OVERRIDES ---
+                if (filters.sortBy === 'nearest' && filters.currentCoords) {
+                    items = sortByDistance(items, filters.currentCoords.lat, filters.currentCoords.lng);
+                }
+
+                fetchedItems = items;
+            }
 
             // --- UPDATE STATE ---
             if (reset) {

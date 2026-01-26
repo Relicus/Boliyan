@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from './AuthContext';
 import type { Item, Bid } from '@/types';
 import type { SearchFilters, Category, SearchSuggestion } from '@/types';
-import { sortByDistance } from '@/lib/searchUtils';
+import { sortByDistance, calculateDistance } from '@/lib/searchUtils';
 import { generateCacheKey, getFromCache, setCache } from '@/lib/cache';
 import { useBidRealtime } from '@/hooks/useBidRealtime';
 import { useViewport } from './ViewportContext';
@@ -199,6 +199,23 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Need to cast to unknown first to match ListingWithSeller interface structure expectations
         // Transform database rows to items
         let items = (data as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
+
+        // --- CLIENT-SIDE LOCATION FILTERING ---
+        if (filters.location && filters.location.radiusKm < 500) {
+          items = items.filter(item => {
+              const itemLat = item.location?.lat;
+              const itemLng = item.location?.lng;
+              if (itemLat === undefined || itemLng === undefined) return false;
+              
+              const dist = calculateDistance(
+                  filters.location!.lat, 
+                  filters.location!.lng, 
+                  itemLat, 
+                  itemLng
+              );
+              return dist <= filters.location!.radiusKm;
+          });
+        }
 
         // --- PHASE 4 OPTIMIZATION: REMOVED SEPARATE BIDS FETCH ---
         // Bid stats are now included in the 'marketplace_listings' view.
