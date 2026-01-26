@@ -72,102 +72,83 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
       <div 
         id={`watched-item-card-${item.id}`} 
         onClick={() => setIsModalOpen(true)}
-        className="group relative overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer"
+        className="group relative overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer bg-white shadow-sm border border-slate-200"
       >
         
-        <div className="relative z-10 bg-white rounded-[calc(0.75rem-3px)] p-4 flex gap-4 h-full">
-          <div className="relative shrink-0">
-            <img id={`watched-item-img-${item.id}`} src={item.images[0]} alt="" className="h-20 w-20 rounded-lg object-cover bg-slate-100" />
-            <div className="absolute -top-2 -right-2 bg-blue-600 text-white p-1 rounded-full border-2 border-white shadow-sm">
-              <Bookmark className="h-3 w-3 fill-current" />
-            </div>
+        <div className="flex p-3 gap-3">
+          {/* Image */}
+          <div className="h-20 w-20 relative shrink-0">
+             <img id={`watched-item-img-${item.id}`} src={item.images[0]} alt="" className="h-full w-full rounded-lg object-cover bg-slate-100" />
+             <div className="absolute -top-1 -right-1 bg-blue-600 text-white p-0.5 rounded-full border-2 border-white shadow-sm">
+               <Bookmark className="h-2.5 w-2.5 fill-current" />
+             </div>
           </div>
           
+          {/* Content */}
           <div id={`watched-item-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-start">
-                <h3 id={`watched-item-title-${item.id}`} className="font-bold text-slate-900 truncate mr-2 text-[clamp(1rem,5cqi,1.25rem)]">{item.title}</h3>
-              </div>
-              
-              {/* Centralized Price Row */}
-              <div className="mt-1 mb-2">
-                <PriceDisplay 
-                    config={biddingConfig}
-                    askPrice={item.askPrice}
-                    bidCount={item.bidCount}
-                    viewMode="compact"
-                    remainingAttempts={remainingAttempts}
-                    showAttempts={!!activeBid}
-                    userCurrentBid={activeBid?.amount}
-                />
-              </div>
-
-              <div className="flex items-center gap-2 mt-1">
-                <ConditionBadge condition={item.condition} variant="outline" className="h-5 py-0 px-1.5" />
-                <CategoryBadge category={item.category} variant="outline" className="h-5 py-0 px-1.5" />
-              </div>
-
-              <div className="flex items-center gap-2 mt-1.5">
-                <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                  <MapPin className="h-3 w-3 text-red-400" />
-                  <span className="truncate">{seller.location.address}</span>
-                </div>
-                <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                  <TimerBadge expiryAt={item.expiryAt} variant="outline" className="h-4 py-0 px-1 text-[8px] bg-red-600 text-white border-transparent hover:bg-red-700" />
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-2 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
-                  {item.bidCount} Bids
-                </Badge>
-                {item.isPublicBid && item.currentHighBid && (
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-blue-600">
-                    <Gavel className="h-3 w-3" />
-                     Highest: {item.currentHighBid.toLocaleString()}
+            {/* Top Section */}
+            <div className="flex justify-between items-start gap-2">
+               {/* Left: Title & Meta */}
+               <div className="flex flex-col gap-1 min-w-0">
+                  <h3 id={`watched-item-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-1 pr-1">{item.title}</h3>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
+                    <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
                   </div>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5">
-                {canChat && (
-                  <div className="flex items-center gap-1">
-                    {canCall && (
-                      <Button
-                        id={`watched-item-call-btn-${item.id}`}
-                        size="sm"
-                        variant="outline"
-                        className="h-7 px-2 text-[10px] font-bold border-slate-200 text-slate-500 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50"
-                        onClick={handleCall}
-                      >
-                        <Phone className="h-3 w-3 mr-1" />
-                        Call
-                      </Button>
+                  {/* Location (Optional - if space permits) */}
+                  <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5 line-clamp-1">
+                    <MapPin className="h-3 w-3" />
+                    <span className="truncate">{seller.location.address}</span>
+                  </div>
+               </div>
+
+               {/* Right: Actions & Timer */}
+               <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  {/* Timer */}
+                  <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
+                     {/* TimerBadge rendering logic manual for consistency or use component */}
+                      <TimerBadge expiryAt={item.expiryAt} variant="default" className="p-0 h-auto bg-transparent text-white text-[10px]" />
+                  </div>
+                  
+                  {/* Action Buttons Row */}
+                  <div className="flex items-center gap-1 mt-auto">
+                    {canChat && (
+                        <Button
+                          id={`watched-item-chat-btn-${item.id}`}
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6 text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+                          onClick={handleChat}
+                        >
+                          <MessageSquare className="h-3.5 w-3.5" />
+                        </Button>
                     )}
-                    <Button
-                      id={`watched-item-chat-btn-${item.id}`}
-                      size="icon"
-                      variant="outline"
-                      className="h-7 w-7 border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
-                      onClick={handleChat}
+                    <Button 
+                      id={`watched-item-remove-btn-${item.id}`}
+                      size="sm" 
+                      variant="ghost" 
+                      className="h-7 px-2 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                      onClick={handleRemove}
                     >
-                      <MessageSquare className="h-3 w-3" />
+                      <Trash2 className="h-3.5 w-3.5 mr-1" />
+                      <span className="text-[10px] font-bold">Remove</span>
                     </Button>
                   </div>
-                )}
-                <Button 
-                  id={`watched-item-remove-btn-${item.id}`}
-                  size="sm" 
-                  variant="ghost" 
-                  className="h-7 px-2 text-slate-400 hover:text-red-500 hover:bg-red-50 -mr-1"
-                  onClick={handleRemove}
-                >
-                  <Trash2 className="h-3.5 w-3.5 mr-1" />
-                  <span className="text-[10px] font-bold">Remove</span>
-                </Button>
-              </div>
+               </div>
             </div>
+
+            {/* Bottom: Price Display */}
+            <PriceDisplay 
+                config={biddingConfig}
+                askPrice={item.askPrice}
+                bidCount={item.bidCount}
+                viewMode="compact"
+                remainingAttempts={remainingAttempts}
+                showAttempts={!!activeBid}
+                userCurrentBid={activeBid?.amount}
+                className="mt-2 pt-1"
+                itemId={item.id}
+            />
           </div>
         </div>
       </div>
