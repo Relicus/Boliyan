@@ -222,7 +222,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
               {/* Bottom Floating Badges - Replaces old full-width bar */}
               
-              {/* Bottom Left: Distance/Duration */}
+              {/* Bottom Left: Distance/Duration (Floating) */}
               {!isOutside && (
                 <div className="absolute bottom-2 left-2 z-20 flex items-center gap-1">
                   <DistanceBadge 
@@ -377,6 +377,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       size={viewMode === 'spacious' ? 'md' : 'sm'}
                       darkMode={false}
                     />
+
                     {seller?.sellerSuccessRate !== undefined && (
                       <div className={cn(
                         "flex items-center gap-0.5 px-1.5 py-0.5 rounded-md border shadow-sm",

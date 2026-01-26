@@ -10,6 +10,7 @@ import { useApp } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { TimerBadge } from "@/components/common/TimerBadge";
+import { DistanceBadge } from "@/components/common/DistanceBadge";
 
 interface SellerBidCardProps {
   bid: Bid;
@@ -117,12 +118,13 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             
             {!isOutside && (
               <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-1 text-[10px] text-muted-foreground font-medium whitespace-nowrap">
-                <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
-                    {distance} km
-                </span>
-                <span className="flex items-center gap-0.5 bg-slate-100 px-1 py-0.5 rounded">
-                  {duration} min
-                </span>
+                <DistanceBadge 
+                  distance={distance} 
+                  duration={duration} 
+                  variant="inline" 
+                  className="bg-slate-100 px-1.5 py-0.5 rounded text-muted-foreground"
+                  iconClassName="h-2.5 w-2.5"
+                />
               </div>
             )}
           </div>
@@ -195,15 +197,14 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                     {location}
                   </div>
                   {!isOutside && (
-                    <>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3 text-red-400" />
-                        {distance} km away
-                      </div>
-                      <div className="flex items-center gap-1 text-blue-400 font-medium">
-                        {duration} mins drive
-                      </div>
-                    </>
+                    <div className="flex items-center gap-3">
+                      <DistanceBadge 
+                        distance={distance} 
+                        duration={duration} 
+                        variant="inline" 
+                        className="text-muted-foreground font-medium"
+                      />
+                    </div>
                   )}
                 </div>
 

@@ -135,7 +135,22 @@ export function calculatePrivacySafeDistance(
 }
 
 /**
+ * Logic to determine if a distance should be considered "Far".
+ * Returns formatting info and the appropriate icon.
+ */
+export function getDistanceDisplayInfo(distance: number, duration: number) {
+  const isFar = distance > 100;
+  return {
+    isFar,
+    label: isFar ? "Far" : `${distance}km • ${duration}min`,
+    distanceLabel: isFar ? "Far" : `${distance} km`,
+    durationLabel: isFar ? "Far" : `${duration} mins`,
+  };
+}
+
+/**
  * Centered Price Formatting Utility (Hybrid Lakh/Standard)
+
  * 
  * Rules:
  * 1. Below 1M: Standard localized number (e.g., 150,000).

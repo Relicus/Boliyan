@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Item, User, Bid } from "@/types";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import { Button } from "@/components/ui/button";
+import { CardShell, CardBody } from "@/components/common/CardShell";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { TimerBadge } from "@/components/common/TimerBadge";
@@ -61,17 +62,15 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
 
   return (
     <>
-      <div 
+      <CardShell 
         id={`watched-item-card-${item.id}`} 
         onClick={() => setIsModalOpen(true)}
-        className="group relative overflow-hidden rounded-xl transition-all hover:shadow-md cursor-pointer bg-white shadow-sm border border-slate-200"
       >
-        
-        <div className="flex p-3 gap-3">
+        <CardBody id={`watched-item-body-${item.id}`}>
           {/* Image */}
-          <div className="h-20 w-20 relative shrink-0">
+          <div id={`watched-item-img-container-${item.id}`} className="h-20 w-20 relative shrink-0">
              <img id={`watched-item-img-${item.id}`} src={item.images[0]} alt="" className="h-full w-full rounded-lg object-cover bg-slate-100" />
-             <div className="absolute -top-1 -right-1 bg-blue-600 text-white p-0.5 rounded-full border-2 border-white shadow-sm">
+             <div id={`watched-item-bookmark-${item.id}`} className="absolute -top-1 -right-1 bg-blue-600 text-white p-0.5 rounded-full border-2 border-white shadow-sm">
                <Bookmark className="h-2.5 w-2.5 fill-current" />
              </div>
           </div>
@@ -88,7 +87,7 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                     <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
                   </div>
                   {/* Location (Optional - if space permits) */}
-                  <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5 line-clamp-1">
+                  <div id={`watched-item-location-${item.id}`} className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5 line-clamp-1">
                     <MapPin className="h-3 w-3" />
                     <span className="truncate">{seller.location.address}</span>
                   </div>
@@ -104,7 +103,7 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                    />
                    
                    {/* Action Buttons Row */}
-                  <div className="flex items-center gap-1 mt-auto">
+                  <div id={`watched-item-actions-${item.id}`} className="flex items-center gap-1 mt-auto">
                     {canChat && (
                         <Button
                           id={`watched-item-chat-btn-${item.id}`}
@@ -143,8 +142,8 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                 itemId={item.id}
             />
           </div>
-        </div>
-      </div>
+        </CardBody>
+      </CardShell>
       
       <ProductDetailsModal 
         item={item} 

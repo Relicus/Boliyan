@@ -7,6 +7,7 @@ import { Bid, Item, User } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
+import { CardShell, CardBody } from "@/components/common/CardShell";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
@@ -89,25 +90,25 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
           }
           
           return (
-            <div 
+            <CardShell 
+              id={`my-bid-card-${item.id}`}
               onClick={() => setIsModalOpen(true)}
-              className="block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer relative"
             >
-              <div className="flex p-3 gap-3">
+              <CardBody id={`my-bid-body-${item.id}`}>
                 {/* Image */}
-                <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden shrink-0">
+                <div id={`my-bid-img-container-${item.id}`} className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden shrink-0">
                   {item.images[0] && (
-                    <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                    <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                <div id={`my-bid-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
                   {/* Top Section with Split Columns */}
                   <div className="flex justify-between items-start gap-2">
                      {/* Left: Title & Badges */}
                      <div className="flex flex-col gap-1">
-                        <h3 className="font-bold text-sm text-slate-900 line-clamp-1 pr-1">{item.title}</h3>
+                        <h3 id={`my-bid-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-1 pr-1">{item.title}</h3>
                         <div className="flex items-center gap-2">
                             <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
                             <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
@@ -123,7 +124,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                           className="bg-red-600 text-white" 
                         />
                         {/* Badge */}
-                        {badge}
+                        <div id={`my-bid-status-${item.id}`}>{badge}</div>
                      </div>
                   </div>
 
@@ -138,20 +139,21 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                       itemId={item.id}
                   />
                 </div>
-              </div>
+              </CardBody>
 
               {/* Action Footer (Only for Accepted Deals) */}
               {isAccepted && (
-                  <div className="px-3 py-2 bg-green-50 border-t border-green-100 flex items-center justify-between">
+                  <div id={`my-bid-footer-${item.id}`} className="px-3 py-2 bg-green-50 border-t border-green-100 flex items-center justify-between">
                       <span className="text-xs font-bold text-green-700">Offer Accepted! Coordinate:</span>
                       <div className="flex gap-2">
                           {canChat && (
-                              <Button size="sm" variant="default" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={handleChat}>
+                              <Button id={`my-bid-chat-btn-${item.id}`} size="sm" variant="default" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={handleChat}>
                                   <MessageSquare className="w-3 h-3 mr-1" />
                                   Chat
                               </Button>
                           )}
                           <Button 
+                            id={`my-bid-whatsapp-btn-${item.id}`}
                             size="sm" 
                             variant="outline" 
                             disabled={!listingPhone}
@@ -172,6 +174,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                               WhatsApp
                           </Button>
                           <Button 
+                            id={`my-bid-call-btn-${item.id}`}
                             size="sm" 
                             variant="outline" 
                             disabled={!canCall}
@@ -189,7 +192,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                       </div>
                   </div>
               )}
-            </div>
+            </CardShell>
           );
         })()}
 

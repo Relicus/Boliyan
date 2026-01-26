@@ -258,7 +258,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
   };
 
   return (
-    <div className={cn("flex flex-col gap-3 w-full h-full min-h-[400px]", className)}>
+    <div className={cn("flex flex-col gap-2 w-full h-full", className)}>
       {/* Search Bar */}
       <div className="relative z-[500] px-2 pt-2">
         <div className="relative">

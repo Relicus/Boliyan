@@ -1,18 +1,19 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Tag, Activity, Trophy, Inbox, CheckCircle } from "lucide-react";
+import { X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Tag, Activity, Trophy, Inbox, CheckCircle, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
-
+import { CardShell } from "@/components/common/CardShell";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
 import { calculatePrivacySafeDistance, formatCountdown, formatPrice, getWhatsAppUrl, cn } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { TimerBadge } from "@/components/common/TimerBadge";
+import { DistanceBadge } from "@/components/common/DistanceBadge";
 
 interface ListingOffersCardProps {
   item: Item;
@@ -145,7 +146,13 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                   <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                   <span className="text-xs text-slate-600">{bidder.rating.toFixed(1)}</span>
                   {locationInfo.distance > 0 && !locationInfo.isOutside && (
-                    <span className="text-xs text-slate-500">• {locationInfo.distance} km</span>
+                    <span className="text-xs text-slate-500 flex items-center gap-1">
+                      • <DistanceBadge 
+                          distance={locationInfo.distance} 
+                          duration={locationInfo.duration} 
+                          variant="inline" 
+                        />
+                    </span>
                   )}
                 </div>
               </div>
@@ -244,12 +251,13 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   };
 
   return (
-    <div 
+    <CardShell 
       id={`listing-offers-card-${item.id}`}
-      className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"
+      className="border-slate-100"
     >
       {/* Header - clickable to toggle */}
       <div 
+        id={`listing-offers-header-${item.id}`}
         className="flex cursor-pointer hover:bg-slate-50/50 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -358,6 +366,6 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </CardShell>
   );
 }

@@ -228,7 +228,7 @@ function LocationSelectorContent({ onSelect, mode }: { onSelect: () => void, mod
       )}
 
       {/* Map Picker */}
-      <div className="h-[350px] p-1 pt-0">
+      <div className="h-[320px] md:h-[350px] p-1 pt-0 overflow-hidden">
         <MapPicker 
           initialLocation={initialMapLocation}
           onLocationSelect={handleLocationSelect}

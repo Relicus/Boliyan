@@ -6,6 +6,7 @@ import { getFuzzyLocationString } from "@/lib/utils";
 import { ListingBadges } from "@/components/marketplace/ListingBadges";
 import { RatingBadge } from "@/components/common/RatingBadge";
 import { memo } from "react";
+import { DistanceBadge } from "@/components/common/DistanceBadge";
 
 
 interface ProductInfoProps {
@@ -53,12 +54,16 @@ export const ProductInfo = memo(function ProductInfo({
                   )}
                 </div>
 
-                <div className="text-[11px] text-slate-500 flex items-center gap-1 leading-none mt-1">
+                 <div className="text-[11px] text-slate-500 flex items-center gap-1 leading-none mt-1">
                   <MapPin className="h-3 w-3 text-red-500" />
                   <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
                   {!isOutside && (
-                     <span className="font-medium text-slate-600 border-l border-slate-300 pl-1 ml-1">
-                       {duration} min ({distance} km)
+                     <span className="font-medium text-slate-600 border-l border-slate-300 pl-1 ml-1 flex items-center gap-1">
+                       <DistanceBadge 
+                          distance={distance} 
+                          duration={duration} 
+                          variant="inline" 
+                        />
                      </span>
                   )}
                 </div>
