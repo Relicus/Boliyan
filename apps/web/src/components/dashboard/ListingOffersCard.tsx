@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
-import { calculatePrivacySafeDistance, formatCountdown, getWhatsAppUrl } from "@/lib/utils";
+import { calculatePrivacySafeDistance, formatCountdown, getWhatsAppUrl, cn } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 interface ListingOffersCardProps {
@@ -200,12 +200,18 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 id={`whatsapp-btn-${bid.id}`}
                 variant="outline"
                 size="icon"
-                className="h-9 w-full md:w-8 md:h-8 text-emerald-600 border-emerald-200 hover:bg-emerald-50 rounded-lg"
+                disabled={!bidder.phone || actionsDisabled}
+                className={cn(
+                  "h-9 w-full md:w-8 md:h-8 rounded-lg transition-all",
+                  bidder.phone && !actionsDisabled
+                    ? "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                    : "opacity-40 grayscale cursor-not-allowed bg-slate-50 border-slate-200"
+                )}
                  onClick={() => {
+                   if (!bidder.phone) return;
                    const msg = `Hi ${bidder.name.split(' ')[0]}, I've accepted your bid for "${item.title}" on Boliyan. When can we meet? ${window.location.origin}/product/${item.slug || item.id}`;
                    window.open(getWhatsAppUrl(bidder.phone!, msg), '_blank');
                  }}
-                 disabled={!bidder.phone || actionsDisabled}
                  title="WhatsApp"
               >
                 <WhatsAppIcon className="w-4 h-4" />
@@ -215,9 +221,14 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 id={`call-btn-${bid.id}`}
                 variant="outline"
                 size="icon"
-                className="h-9 w-full md:w-8 md:h-8 text-blue-600 border-blue-200 hover:bg-blue-50 rounded-lg"
-                 onClick={() => handleCall(bidder.phone!)}
-                 disabled={!canCall || actionsDisabled}
+                disabled={!canCall || actionsDisabled}
+                className={cn(
+                  "h-9 w-full md:w-8 md:h-8 rounded-lg transition-all",
+                  canCall && !actionsDisabled
+                    ? "text-blue-600 border-blue-200 hover:bg-blue-50"
+                    : "opacity-40 grayscale cursor-not-allowed bg-slate-50 border-slate-200"
+                )}
+                 onClick={() => bidder.phone && handleCall(bidder.phone)}
                  title="Call"
               >
                 <Phone className="w-4 h-4" />

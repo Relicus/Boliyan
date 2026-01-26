@@ -43,6 +43,7 @@ export function transformProfileToUser(profile: ProfileRow): User {
     id: profile.id,
     name: profile.full_name || 'Anonymous',
     avatar: profile.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + profile.id,
+    phone: profile.phone || undefined,
     rating: profile.rating || 0,
     reviewCount: profile.rating_count || 0,
     location: {

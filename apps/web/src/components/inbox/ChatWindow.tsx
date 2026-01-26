@@ -100,7 +100,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     : undefined;
   const offerPrice = offerBid?.amount ?? item?.currentHighBid;
   const priceBlock = item ? (
-    <div className="flex flex-col items-start">
+    <div className="flex flex-col items-end">
       <span className="price-font text-[9px] md:text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">
         Ask {formatPrice(item.askPrice)}
       </span>
@@ -353,50 +353,55 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 justify-between md:justify-end">
-              {priceBlock}
-              {!isLocked && (() => {
+            <div className="flex items-center gap-2 md:gap-3 justify-end ml-auto">
+              {(() => {
                 const listingPhone = !isSeller ? item?.contactPhone : undefined;
                 const phone = listingPhone || otherUser?.phone;
-                if (!phone) return null;
-
-                return (
-                  <Button
-                    id="chat-call-btn"
-                    size="sm"
-                    variant="outline"
-                    className="h-9 px-3 text-xs font-bold rounded-full border-slate-200 text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-colors shadow-sm"
-                    onClick={() => {
-                      window.location.href = `tel:${phone}`;
-                    }}
-                  >
-                    <Phone className="h-4 w-4 mr-1" />
-                    Call
-                  </Button>
-                );
-              })()}
-              {!isLocked && (() => {
-                const listingPhone = !isSeller ? item?.contactPhone : undefined;
-                const phone = listingPhone || otherUser?.phone;
-                if (!phone) return null;
 
                 const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
 
                 return (
-                  <Button
-                    id="chat-whatsapp-btn"
-                    size="sm"
-                    variant="outline"
-                    className="h-9 px-3 text-xs font-bold rounded-full border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-sm"
-                    onClick={() => {
-                      window.open(getWhatsAppUrl(phone, waMessage), '_blank');
-                    }}
-                  >
-                    <WhatsAppIcon className="h-4 w-4 mr-1.5" />
-                    WhatsApp
-                  </Button>
+                  <div className="flex items-center gap-1.5 md:gap-2 mr-1">
+                    <Button
+                      id="chat-whatsapp-btn"
+                      size="sm"
+                      variant="outline"
+                      disabled={!phone}
+                      className={cn(
+                        "h-8 md:h-9 px-2 md:px-3 text-[10px] md:text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
+                        phone 
+                          ? "text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200" 
+                          : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
+                      )}
+                      onClick={() => {
+                        if (phone) window.open(getWhatsAppUrl(phone, waMessage), '_blank');
+                      }}
+                    >
+                      <WhatsAppIcon className="h-3.5 w-3.5 md:h-4 md:w-4 sm:mr-1.5" />
+                      <span className="hidden sm:inline">WhatsApp</span>
+                    </Button>
+                    <Button
+                      id="chat-call-btn"
+                      size="sm"
+                      variant="outline"
+                      disabled={!phone}
+                      className={cn(
+                        "h-8 md:h-9 px-2 md:px-3 text-[10px] md:text-xs font-bold rounded-full border-slate-200 transition-colors shadow-sm",
+                        phone 
+                          ? "text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200" 
+                          : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
+                      )}
+                      onClick={() => {
+                        if (phone) window.location.href = `tel:${phone}`;
+                      }}
+                    >
+                      <Phone className="h-3.5 w-3.5 md:h-4 md:w-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Call</span>
+                    </Button>
+                  </div>
                 );
               })()}
+              {priceBlock}
             </div>
 
             {/* Slot indicator shown on listing/dashboard only */}

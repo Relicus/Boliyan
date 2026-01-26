@@ -15,7 +15,7 @@ import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
-import { getWhatsAppUrl } from "@/lib/utils";
+import { getWhatsAppUrl, cn } from "@/lib/utils";
 
 interface MyBidCardProps {
   item: Item;
@@ -161,27 +161,41 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                                   Chat
                               </Button>
                           )}
-                          {listingPhone && (
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="h-7 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-100" 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const msg = `Hi ${seller.name.split(' ')[0]}, you accepted my bid for "${item.title}" on Boliyan. Let's coordinate the pickup! ${window.location.origin}/product/${item.slug || item.id}`;
-                                  window.open(getWhatsAppUrl(listingPhone, msg), '_blank');
-                                }}
-                              >
-                                  <WhatsAppIcon className="w-3 h-3 mr-1" />
-                                  WhatsApp
-                              </Button>
-                          )}
-                          {canCall && (
-                              <Button size="sm" variant="outline" className="h-7 text-xs border-green-200 text-green-700 hover:bg-green-100" onClick={handleCall}>
-                                  <Phone className="w-3 h-3 mr-1" />
-                                  Call
-                              </Button>
-                          )}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            disabled={!listingPhone}
+                            className={cn(
+                                "h-7 text-xs transition-all",
+                                listingPhone 
+                                    ? "border-emerald-200 text-emerald-700 hover:bg-emerald-100" 
+                                    : "opacity-40 grayscale cursor-not-allowed bg-slate-50 border-slate-200"
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!listingPhone) return;
+                              const msg = `Hi ${seller.name.split(' ')[0]}, you accepted my bid for "${item.title}" on Boliyan. Let's coordinate the pickup! ${window.location.origin}/product/${item.slug || item.id}`;
+                              window.open(getWhatsAppUrl(listingPhone, msg), '_blank');
+                            }}
+                          >
+                              <WhatsAppIcon className="w-3 h-3 mr-1" />
+                              WhatsApp
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            disabled={!canCall}
+                            className={cn(
+                                "h-7 text-xs transition-all",
+                                canCall 
+                                    ? "border-green-200 text-green-700 hover:bg-green-100" 
+                                    : "opacity-40 grayscale cursor-not-allowed bg-slate-50 border-slate-200"
+                            )}
+                            onClick={handleCall}
+                          >
+                              <Phone className="w-3 h-3 mr-1" />
+                              Call
+                          </Button>
                       </div>
                   </div>
               )}
