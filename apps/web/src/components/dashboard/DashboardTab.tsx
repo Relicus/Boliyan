@@ -36,12 +36,19 @@ export function DashboardTab({
       <div className="relative">
         <Icon className="w-6 h-6 sm:w-5 sm:h-5" />
         {count !== undefined && count > 0 && (
-          <span className={cn(iconBadgeBase, badgeClassName)}>
+          <span className={cn(iconBadgeBase, "md:hidden", badgeClassName)}>
             {count}
           </span>
         )}
       </div>
       <span className="text-[10px] sm:text-xs md:text-sm truncate">{label}</span>
+      {count !== undefined && count > 0 && (
+        <span className={cn(
+          "hidden md:flex min-w-5 h-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold bg-red-600 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)]"
+        )}>
+          {count}
+        </span>
+      )}
     </TabsTrigger>
   );
 }

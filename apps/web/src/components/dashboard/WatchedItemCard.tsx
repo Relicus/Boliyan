@@ -113,7 +113,7 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                   <span className="truncate">{seller.location.address}</span>
                 </div>
                 <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                  <TimerBadge expiryAt={item.expiryAt} variant="outline" className="h-4 py-0 px-1 text-[8px]" />
+                  <TimerBadge expiryAt={item.expiryAt} variant="outline" className="h-4 py-0 px-1 text-[8px] bg-red-600 text-white border-transparent hover:bg-red-700" />
                 </div>
               </div>
             </div>

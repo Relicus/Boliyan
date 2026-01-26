@@ -38,7 +38,7 @@ export default function BottomNav() {
       href: "/dashboard?tab=offers",
     },
     {
-      label: "Sell.",
+      label: "Sell",
       icon: PlusCircle,
       href: "/list",
     },
@@ -71,7 +71,7 @@ export default function BottomNav() {
             isActive = item.href ? pathname === item.href : false;
           }
 
-          const isPost = item.label === "Sell.";
+          const isPost = item.label === "Sell";
           const Icon = item.icon;
 
           const content = (

@@ -136,6 +136,12 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
         {getDisplayLabel().split(' ')[0]}
       </span>
     </Button>
+  );
+});
+LocationSelectorTrigger.displayName = "LocationSelectorTrigger";
+
+function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
+  const { filters, setFilter, updateFilters, user } = useApp();
   const [isLocating, setIsLocating] = useState(false);
   const [locError, setLocError] = useState<string | null>(null);
 

@@ -201,6 +201,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 <TimerBadge 
                   expiryAt={item.expiryAt} 
                   variant="glass-light" 
+                  className="bg-red-600 text-white border-transparent"
                 />
                 
                 {/* 2. Condition State */}

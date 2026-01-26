@@ -258,8 +258,8 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
 
         {/* Right Column */}
         <div className="p-2 flex flex-col items-end justify-evenly shrink-0 min-w-[120px]">
-           <div className="text-lg font-bold text-slate-900 flex items-center gap-1">
-             <Clock className="w-4 h-4 text-slate-400" />
+           <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1 w-fit">
+             <Clock className="w-3 h-3 text-white" />
              {getTimeLeft(item.expiryAt)}
            </div>
            <div className="text-xs text-slate-500 mt-1 mb-0.5">

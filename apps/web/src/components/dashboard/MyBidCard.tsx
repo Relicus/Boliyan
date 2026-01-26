@@ -127,8 +127,8 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                />
                
                {/* Time Remaining */}
-               <div className="flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded-md border border-slate-100">
-                  <Clock className="w-3 h-3" />
+               <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-white" />
                   {getTimeLeft(item.expiryAt)}
                </div>
             </div>

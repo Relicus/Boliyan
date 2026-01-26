@@ -166,6 +166,21 @@ export function useApp() {
       }
   }, [marketplace, search]);
 
+  const resetFilters = useCallback(() => {
+        // Reset Marketplace Filters matches Sidebar reset logic
+        marketplace.updateFilters({
+            category: null,
+            search: "",
+            minPrice: null,
+            maxPrice: null,
+            listingType: 'all',
+            condition: 'all',
+            sortBy: 'trending',
+            // We keep location settings as they are usually persistent user preferences
+        });
+        search.clearFilters();
+    }, [marketplace, search]);
+
   return useMemo(() => ({
     ...auth,
     ...marketplace,
@@ -192,18 +207,6 @@ export function useApp() {
     
     // Override setFilter to sync both contexts for shared filters
     setFilter: setFilterCompat,
-    resetFilters: useCallback(() => {
-        // Reset Marketplace Filters matches Sidebar reset logic
-        marketplace.updateFilters({
-            category: null,
-            search: "",
-            minPrice: null,
-            maxPrice: null,
-            listingType: 'all',
-            condition: 'all',
-            // We keep location settings as they are usually persistent user preferences
-        });
-        search.clearFilters();
-    }, [marketplace, search])
-  }), [auth, marketplace, search, chat, time, reviews, acceptBidCompat, setFilterCompat]);
+    resetFilters
+  }), [auth, marketplace, search, chat, time, reviews, acceptBidCompat, setFilterCompat, resetFilters]);
 }

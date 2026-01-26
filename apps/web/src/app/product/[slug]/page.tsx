@@ -148,7 +148,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                 <TimerBadge 
                   expiryAt={item.expiryAt} 
                   variant="glass" 
-                  className="px-3 py-1.5"
+                  className="px-3 py-1.5 bg-red-600 text-white border-transparent"
                 />
                 <ConditionBadge 
                   condition={item.condition} 

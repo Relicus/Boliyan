@@ -20,7 +20,7 @@ export function ListingBadges({ item, seller, showTimer = true, className }: Lis
       {/* Primary Status Row */}
       <ConditionBadge condition={item.condition} variant="outline" className={badgeStyle} />
       <CategoryBadge category={item.category} variant="outline" className={badgeStyle} />
-      {showTimer && <TimerBadge expiryAt={item.expiryAt} variant="outline" className={badgeStyle} />}
+      {showTimer && <TimerBadge expiryAt={item.expiryAt} variant="outline" className={`${badgeStyle} bg-red-600 text-white border-transparent hover:bg-red-700`} />}
 
       {/* Verified Badge */}
 

@@ -94,8 +94,8 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
             >
               Slots {displayChatCount}/{maxSlots}
             </Badge>
-            <div className={`text-[10px] font-bold flex items-center gap-1 ${timeInfo.color}`}>
-              <Clock className={`h-2.5 w-2.5 ${timeInfo.isUrgent ? 'animate-pulse' : ''}`} />
+            <div className="text-[10px] font-bold flex items-center gap-1 bg-red-600 text-white px-2 py-0.5 rounded-md">
+              <Clock className="h-2.5 w-2.5" />
               {timeInfo.text}
             </div>
           </div>
