@@ -5,6 +5,7 @@ import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
 import { Item, User } from "@/types";
 import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, MAX_BID_ATTEMPTS, roundToReasonablePrice } from "@/lib/bidding";
+import { formatPrice } from "@/lib/utils";
 import { sonic } from "@/lib/sonic";
 
 // Cooldown between bids (must match server trigger)
@@ -60,20 +61,33 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize with Smart Anchor Logic
+  const minBid = useMemo(() => getMinimumAllowedBid(item.askPrice), [item.askPrice]);
+  const maxBid = useMemo(() => getMaximumAllowedBid(item.askPrice), [item.askPrice]);
+
+  const formatBoundMessage = useCallback((bound: 'min' | 'max') => {
+    const value = bound === 'min' ? minBid : maxBid;
+    return `${bound === 'min' ? 'Min' : 'Max'} Rs. ${formatPrice(value)}`;
+  }, [minBid, maxBid]);
+
+  const clampBid = useCallback((amount: number) => {
+    const rounded = roundToReasonablePrice(amount);
+    return Math.min(maxBid, Math.max(minBid, rounded));
+  }, [minBid, maxBid]);
+
   const initialBid = useMemo(() => {
     if (userBid) {
         const nextStep = getSmartStep(userBid.amount);
         const aggressiveAnchor = userBid.amount + nextStep;
-        return Math.min(aggressiveAnchor, getMaximumAllowedBid(item.askPrice));
+        return Math.min(aggressiveAnchor, maxBid);
     }
 
     if (item.isPublicBid) {
         const anchor = Math.max(item.askPrice, item.currentHighBid || 0);
-        return Math.min(anchor, getMaximumAllowedBid(item.askPrice));
+        return Math.min(anchor, maxBid);
     }
 
     return item.askPrice;
-  }, [item.askPrice, item.isPublicBid, item.currentHighBid, userBid]);
+  }, [item.askPrice, item.isPublicBid, item.currentHighBid, userBid, maxBid]);
 
   const [bidAmount, setBidAmount] = useState<string>(initialBid.toLocaleString());
   const [error, setError] = useState<boolean>(false);
@@ -99,7 +113,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     }
     
     const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
-    const maxBid = getMaximumAllowedBid(item.askPrice);
     
     if (current >= maxBid || (userBid && userBid.amount >= maxBid)) {
        return { type: 'error', message: "Max Reached" } as const;
@@ -110,7 +123,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     }
 
     return null;
-  }, [remainingAttempts, bidAmount, userBid, item.askPrice]);
+  }, [remainingAttempts, bidAmount, userBid, maxBid]);
 
   const setTemporaryError = useCallback((msg: string, duration: number = 2000) => {
     if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
@@ -132,8 +145,6 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
     if (amount === userBid.amount) {
         const step = getSmartStep(amount);
-        const maxBid = getMaximumAllowedBid(item.askPrice);
-        
         if (amount + step <= maxBid) {
             setBidAmount((amount + step).toLocaleString());
             setAnimTrigger(prev => prev + 1);
@@ -142,7 +153,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     if (derivedStatus && pendingConfirmation) {
         setPendingConfirmation(null);
     }
-  }, [bidAmount, userBid, item.askPrice, derivedStatus, pendingConfirmation]);
+  }, [bidAmount, userBid, maxBid, derivedStatus, pendingConfirmation]);
 
   useEffect(() => {
     return () => {
@@ -159,20 +170,28 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     const step = getSmartStep(current);
     const delta = step * direction;
     
-    const minBid = getMinimumAllowedBid(item.askPrice);
-    const maxBid = getMaximumAllowedBid(item.askPrice);
-
-    if (current + delta < minBid) {
-      setTemporaryError("Below Min", 1000);
+    const target = current + delta;
+    if (target < minBid) {
+      const clamped = clampBid(target);
+      if (clamped !== current) {
+        setBidAmount(clamped.toLocaleString());
+        setAnimTrigger(prev => prev + 1);
+      }
+      setTemporaryError(formatBoundMessage('min'), 1200);
       return;
     }
 
-    if (current + delta > maxBid) {
-       setTemporaryError("Max Reached", 1000);
-       return;
+    if (target > maxBid) {
+      const clamped = clampBid(target);
+      if (clamped !== current) {
+        setBidAmount(clamped.toLocaleString());
+        setAnimTrigger(prev => prev + 1);
+      }
+      setTemporaryError(formatBoundMessage('max'), 1200);
+      return;
     }
     
-    const newValue = Math.max(0, current + delta);
+    const newValue = Math.max(0, target);
     sonic.tick();
     
     setLastDelta(delta);
@@ -183,7 +202,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
 
     setBidAmount(newValue.toLocaleString());
     setAnimTrigger(prev => prev + 1);
-  }, [bidAmount, item.askPrice, setTemporaryError]);
+  }, [bidAmount, clampBid, formatBoundMessage, maxBid, minBid, setTemporaryError]);
 
   type BidEvent = React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
 
@@ -280,11 +299,10 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
         setBidAmount(amount.toLocaleString());
     }
 
-    const minBid = getMinimumAllowedBid(item.askPrice);
-    const maxBid = getMaximumAllowedBid(item.askPrice);
-
     if (amount < minBid || amount > maxBid) {
-      setTemporaryError(amount < minBid ? "Below Min" : "Above Max", 2000);
+      const clamped = clampBid(amount);
+      setBidAmount(clamped.toLocaleString());
+      setTemporaryError(amount < minBid ? formatBoundMessage('min') : formatBoundMessage('max'), 2000);
       return;
     }
 
@@ -317,7 +335,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       setPendingConfirmation(null);
     }, 3000);
 
-  }, [bidAmount, item.askPrice, user, userBid, executeBid, pendingConfirmation, isSubmitting, cooldownRemaining, derivedStatus, setTemporaryError, openAuthModal]);
+  }, [bidAmount, clampBid, formatBoundMessage, item.askPrice, maxBid, minBid, user, userBid, executeBid, pendingConfirmation, isSubmitting, cooldownRemaining, derivedStatus, setTemporaryError, openAuthModal]);
 
   const clearPendingConfirmation = useCallback(() => {
     if (confirmationTimeoutRef.current) {
@@ -344,20 +362,39 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return;
     }
     if (/^\d+$/.test(raw)) {
-      setBidAmount(parseInt(raw, 10).toLocaleString());
+      const numeric = parseInt(raw, 10);
+      if (numeric < minBid) {
+        const clamped = clampBid(numeric);
+        if (clamped.toLocaleString() !== bidAmount) {
+          setBidAmount(clamped.toLocaleString());
+        }
+        setTemporaryError(formatBoundMessage('min'), 1200);
+        setError(false);
+        return;
+      }
+      if (numeric > maxBid) {
+        const clamped = clampBid(numeric);
+        if (clamped.toLocaleString() !== bidAmount) {
+          setBidAmount(clamped.toLocaleString());
+        }
+        setTemporaryError(formatBoundMessage('max'), 1200);
+        setError(false);
+        return;
+      }
+      setBidAmount(numeric.toLocaleString());
       setError(false);
     }
-  }, []);
+  }, [bidAmount, clampBid, formatBoundMessage, maxBid, minBid, setTemporaryError]);
 
   const handleInputBlur = useCallback(() => {
     const amount = parseFloat(bidAmount.replace(/,/g, ''));
     if (!isNaN(amount) && amount > 0) {
-      const rounded = roundToReasonablePrice(amount);
-      if (rounded !== amount) {
-        setBidAmount(rounded.toLocaleString());
+      const clamped = clampBid(amount);
+      if (clamped !== amount) {
+        setBidAmount(clamped.toLocaleString());
       }
     }
-  }, [bidAmount]);
+  }, [bidAmount, clampBid]);
 
   return {
     bidAmount,
