@@ -5,7 +5,7 @@ import { useApp } from "@/lib/store";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Globe, Navigation, Map, Loader2 } from "lucide-react";
+import { MapPin, Globe, Navigation, Map, Loader2, Radar } from "lucide-react";
 import { cn, isLocationInCountry } from "@/lib/utils";
 import { MapPicker } from "@/components/common/MapPicker";
 
@@ -112,13 +112,14 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
         id="location-sidebar-trigger"
         variant="outline"
         className={cn(
-          "w-full justify-between px-3 h-9 bg-white border-slate-200 focus:ring-blue-500/20 text-slate-700 font-medium shadow-none transition-all group",
+          "w-full justify-between px-3 h-9 bg-white border-slate-200 focus:ring-blue-500/20 text-slate-700 font-medium shadow-none transition-all group rounded-xl",
           isOpen && "border-blue-500 ring-2 ring-blue-500/10",
           className
         )}
         {...props}
       >
         <span className="flex items-center gap-2 truncate">
+           <MapPin className="h-3.5 w-3.5 text-blue-600 shrink-0" />
            <span className="truncate text-xs">{getDisplayLabel()}</span>
         </span>
         {mode === "filter" && (
@@ -200,7 +201,10 @@ function LocationSelectorContent({ onSelect, mode }: { onSelect: () => void, mod
       {mode === "filter" && !isOutside && (
         <div className="p-3 pb-2 border-b bg-slate-50/30">
           <div className="flex items-center justify-between mb-1.5 px-0.5">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Range</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight flex items-center gap-1.5">
+              <Radar className="h-3 w-3" />
+              Range
+            </span>
             <span className="text-[10px] font-black text-blue-600 bg-blue-50/50 px-1.5 py-0.5 rounded">
               {tempRadius >= 200 ? "∞" : `${tempRadius}km`}
             </span>

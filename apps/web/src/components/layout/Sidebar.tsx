@@ -1,6 +1,20 @@
 "use client";
 
-import { RefreshCcw } from "lucide-react";
+import { 
+  RefreshCcw, 
+  LayoutGrid, 
+  Globe, 
+  Lock, 
+  MapPin, 
+  Banknote, 
+  Sparkles,
+  Layers,
+  Star,
+  ThumbsUp,
+  Hammer,
+  ArrowDownWideNarrow,
+  ArrowUpNarrowWide
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useApp } from "@/lib/store";
@@ -77,7 +91,10 @@ export default function Sidebar() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            <span className="relative z-20">All</span>
+            <span className="relative z-20 flex items-center gap-1.5">
+              <LayoutGrid className="h-3.5 w-3.5" />
+              All
+            </span>
           </button>
 
           {/* Public Toggle */}
@@ -95,7 +112,10 @@ export default function Sidebar() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            <span className="relative z-20">Public</span>
+            <span className="relative z-20 flex items-center gap-1.5">
+              <Globe className="h-3.5 w-3.5" />
+              Public
+            </span>
           </button>
 
           {/* Hidden Toggle */}
@@ -113,7 +133,10 @@ export default function Sidebar() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            <span className="relative z-20">Hidden</span>
+            <span className="relative z-20 flex items-center gap-1.5">
+              <Lock className="h-3.5 w-3.5" />
+              Hidden
+            </span>
           </button>
         </div>
       </div>
@@ -126,34 +149,46 @@ export default function Sidebar() {
           
           {/* Location (Standalone Dropdown) */}
           <div className="px-1">
-            <h3 className="mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">LIST LOCATION</h3>
+            <h3 className="mb-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] pl-1 flex items-center gap-2">
+              <MapPin className="h-3.5 w-3.5 text-slate-400" />
+              List Location
+            </h3>
             <LocationSelector variant="sidebar-compact" className="shadow-none border-slate-200" mode="filter" />
           </div>
 
           {/* Price Range */}
           <div className="px-1">
-            <h3 className="mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Price Range</h3>
+            <h3 className="mb-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] pl-1 flex items-center gap-2">
+              <Banknote className="h-3.5 w-3.5 text-slate-400" />
+              Price Range
+            </h3>
             <div className="grid grid-cols-2 gap-2">
-              <div className="relative">
-                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-medium">₨</span>
+              <div className="relative group">
+                 <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <ArrowDownWideNarrow className="h-3 w-3 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
+                    <span className="text-slate-400 text-[10px] font-bold">₨</span>
+                 </div>
                  <Input 
                   id="sidebar-min-price-input"
                   type="number" 
                   placeholder="Min" 
                   value={filters.minPrice || ''}
                   onChange={(e) => setFilter('minPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="pl-7 bg-white border-slate-200 focus-visible:ring-blue-500/20"
+                  className="pl-12 bg-white border-slate-200 focus-visible:ring-blue-500/20 rounded-xl text-xs font-bold"
                 />
               </div>
-              <div className="relative">
-                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-medium">₨</span>
+              <div className="relative group">
+                 <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <ArrowUpNarrowWide className="h-3 w-3 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
+                    <span className="text-slate-400 text-[10px] font-bold">₨</span>
+                 </div>
                  <Input 
                   id="sidebar-max-price-input"
                   type="number" 
                   placeholder="Max" 
                   value={filters.maxPrice || ''}
                   onChange={(e) => setFilter('maxPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="pl-7 bg-white border-slate-200 focus-visible:ring-blue-500/20"
+                  className="pl-12 bg-white border-slate-200 focus-visible:ring-blue-500/20 rounded-xl text-xs font-bold"
                 />
               </div>
             </div>
@@ -161,20 +196,48 @@ export default function Sidebar() {
 
           {/* Condition */}
           <div className="px-1">
-            <h3 className="mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Condition</h3>
+            <h3 className="mb-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] pl-1 flex items-center gap-2">
+              <Sparkles className="h-3.5 w-3.5 text-slate-400" />
+              Condition
+            </h3>
             <Select 
               value={filters.condition || 'all'} 
               onValueChange={(val) => setFilter('condition', val)}
             >
-              <SelectTrigger id="sidebar-condition-select" className="w-full bg-white border-slate-200 focus:ring-blue-500/20">
+              <SelectTrigger id="sidebar-condition-select" className="w-full bg-white border-slate-200 focus:ring-blue-500/20 rounded-xl">
                 <SelectValue placeholder="Any Condition" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Any Condition</SelectItem>
-                <SelectItem value="new">Brand New</SelectItem>
-                <SelectItem value="like_new">Like New</SelectItem>
-                <SelectItem value="used">Used (Good)</SelectItem>
-                <SelectItem value="fair">Fair</SelectItem>
+              <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                <SelectItem value="all" className="rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Layers className="h-4 w-4 text-slate-400" />
+                    <span className="font-medium">Any Condition</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="new" className="rounded-lg text-blue-600 font-bold">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    <span>Brand New</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="like_new" className="rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-amber-500" />
+                    <span>Like New</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="used" className="rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <ThumbsUp className="h-4 w-4 text-slate-500" />
+                    <span>Used (Good)</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="fair" className="rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Hammer className="h-4 w-4 text-slate-500" />
+                    <span>Fair</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

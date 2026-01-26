@@ -9,7 +9,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Check } from "lucide-react";
+import { 
+  Check, 
+  ArrowDownWideNarrow, 
+  ArrowUpNarrowWide,
+  LayoutGrid,
+  Filter,
+  Sparkles,
+  Layers,
+  Star,
+  ThumbsUp,
+  Hammer,
+  Banknote,
+  MapPin
+} from "lucide-react";
 
 type SortFilterId = typeof FILTERS[number]['id'];
 type ConditionFilter = 'all' | 'new' | 'like_new' | 'used' | 'fair';
@@ -40,7 +53,10 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
         <div className="p-4 flex flex-col gap-8 pb-24">
           {/* Sorting Section */}
           <section id="filter-section-sort">
-            <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Sort By</Label>
+            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
+              <Filter className="h-3.5 w-3.5" />
+              Sort By
+            </Label>
             <div className="grid grid-cols-2 gap-2">
               {FILTERS.map((f) => {
                 const Icon = f.icon;
@@ -68,7 +84,10 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
 
           {/* Categories Section */}
           <section id="filter-section-categories">
-            <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Categories</Label>
+            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
+              <LayoutGrid className="h-3.5 w-3.5" />
+              Categories
+            </Label>
             <div className="grid grid-cols-1 gap-1.5">
               {CATEGORIES.map((cat) => {
                 const Icon = cat.icon;
@@ -102,25 +121,36 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
 
           {/* Price Range Section */}
           <section id="filter-section-price">
-            <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Price Range</Label>
+            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
+              <Banknote className="h-3.5 w-3.5" />
+              Price Range
+            </Label>
             <div className="flex items-center gap-2">
-              <div className="flex-1">
+              <div className="flex-1 relative group">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                   <ArrowDownWideNarrow className="h-3 w-3 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
+                   <span className="text-slate-400 text-[10px] font-bold">₨</span>
+                </div>
                 <Input
                   type="number"
                   placeholder="Min"
                   value={filters.minPrice || ''}
                   onChange={(e) => setFilter('minPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="rounded-xl border-slate-200 focus:ring-blue-100 h-10"
+                  className="rounded-xl border-slate-200 focus:ring-blue-100 h-10 pl-12 font-bold text-sm"
                 />
               </div>
               <div className="w-4 h-px bg-slate-200 shrink-0" />
-              <div className="flex-1">
+              <div className="flex-1 relative group">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                   <ArrowUpNarrowWide className="h-3 w-3 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
+                   <span className="text-slate-400 text-[10px] font-bold">₨</span>
+                </div>
                 <Input
                   type="number"
                   placeholder="Max"
                   value={filters.maxPrice || ''}
                   onChange={(e) => setFilter('maxPrice', e.target.value ? Number(e.target.value) : null)}
-                  className="rounded-xl border-slate-200 focus:ring-blue-100 h-10"
+                  className="rounded-xl border-slate-200 focus:ring-blue-100 h-10 pl-12 font-bold text-sm"
                 />
               </div>
             </div>
@@ -130,28 +160,35 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
 
           {/* Condition Section */}
           <section id="filter-section-condition">
-            <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Condition</Label>
+            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
+              <Sparkles className="h-3.5 w-3.5" />
+              Condition
+            </Label>
             <div className="grid grid-cols-2 gap-2">
               {([
-                { id: 'all', label: 'All Items' },
-                { id: 'new', label: '🌟 New' },
-                { id: 'like_new', label: '✨ Like New' },
-                { id: 'used', label: '👌 Used' },
-                { id: 'fair', label: '🔨 Fair' }
-              ] as const).map((c) => (
+                { id: 'all', label: 'Any Condition', icon: Layers },
+                { id: 'new', label: 'Brand New', icon: Sparkles },
+                { id: 'like_new', label: 'Like New', icon: Star },
+                { id: 'used', label: 'Used (Good)', icon: ThumbsUp },
+                { id: 'fair', label: 'Fair', icon: Hammer }
+              ] as const).map((c) => {
+                  const Icon = c.icon;
+                  return (
                   <button
                     key={c.id}
                     onClick={() => setFilter('condition', c.id as ConditionFilter)}
                     className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200",
+                    "flex items-center gap-2 p-3 rounded-xl border transition-all duration-200",
                     filters.condition === c.id 
                       ? "bg-slate-900 border-slate-900 text-white shadow-md" 
                       : "bg-white border-slate-100 text-slate-600 hover:border-slate-200"
                   )}
                 >
+                  <Icon className={cn("h-4 w-4", filters.condition === c.id ? "text-white" : "text-slate-400")} />
                   <span className="text-sm font-bold">{c.label}</span>
                 </button>
-              ))}
+                );
+              })}
             </div>
           </section>
 
@@ -159,7 +196,10 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
 
           {/* Listing Type Section */}
           <section id="filter-section-type">
-            <Label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">Listing Type</Label>
+            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
+              <Filter className="h-3.5 w-3.5" />
+              Listing Type
+            </Label>
             <div className="flex p-1 bg-slate-100 rounded-xl">
               {(['all', 'public', 'hidden'] as const).map((type) => (
                 <button
