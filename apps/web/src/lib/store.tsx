@@ -103,20 +103,6 @@ export function useApp() {
     // Start conversation via ChatContext
     const convId = await chat.startConversation(bidId, bid.itemId, bid.bidderId, item.sellerId);
 
-    // 3-Chat Rule: Hide listing if 3rd chat is unlocked
-    // Count unique conversations for this item
-    // We filter from 'chat.conversations' which contains all chats for this user (Seller)
-    const activeChats = chat.conversations.filter(c => c.itemId === item.id);
-    
-    // Safety check: Ensure we count the new one if not yet in state
-    const isNew = !activeChats.some(c => c.bidderId === bid.bidderId);
-    const count = activeChats.length + (isNew ? 1 : 0);
-
-    if (count >= 3 && item.status !== 'hidden') {
-        // Auto-hide the listing
-        await marketplace.updateItem(item.id, { status: 'hidden' });
-    }
-
     return convId;
   }, [marketplace, chat]);
 
