@@ -64,6 +64,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [totalResults, setTotalResults] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const lastQueryRef = useRef<string>("");
 
   const setFilters = useCallback((newFilters: SearchFilters) => {
     setFiltersState(newFilters);
@@ -413,6 +414,22 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  useEffect(() => {
+    const normalizedQuery = filters.query?.trim() ?? "";
+    if (!normalizedQuery) {
+      if (lastQueryRef.current) {
+        setSearchResults([]);
+        setTotalResults(0);
+      }
+      setIsSearching(false);
+      lastQueryRef.current = "";
+      return;
+    }
+
+    lastQueryRef.current = normalizedQuery;
+    executeSearch();
+  }, [filters, executeSearch]);
 
   const contextValue = useMemo(() => ({
     filters,

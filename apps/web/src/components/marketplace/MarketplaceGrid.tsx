@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect, useSyncExternalStore } from "react";
+import type { SearchFilters } from "@/types";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useSearch } from "@/context/SearchContext";
 import ItemCard from "./ItemCard";
@@ -34,11 +35,27 @@ const LISTING_TYPES = [
 ] as const;
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
+type FilterId = typeof FILTERS[number]['id'];
 
 const subscribeToViewport = (callback: () => void) => {
   if (typeof window === "undefined") return () => {};
   window.addEventListener("resize", callback);
   return () => window.removeEventListener("resize", callback);
+};
+
+const getSearchSortFilterId = (sort?: SearchFilters['sortBy']): FilterId => {
+  if (sort === 'price_high') return 'luxury';
+  if (sort === 'ending_soon') return 'ending_soon';
+  if (sort === 'nearest') return 'nearest';
+  return 'newest';
+};
+
+const mapFilterToSearchSort = (id: FilterId): SearchFilters['sortBy'] | null => {
+  if (id === 'luxury') return 'price_high';
+  if (id === 'ending_soon') return 'ending_soon';
+  if (id === 'nearest') return 'nearest';
+  if (id === 'watchlist') return null;
+  return 'newest';
 };
 
 const getViewportSnapshot = () => (typeof window !== "undefined" ? window.innerWidth >= 768 : false);
@@ -57,8 +74,9 @@ export default function MarketplaceGrid() {
   // Decide which items to show
   // Only switch to search mode when there's an actual TEXT query
   // Category filtering should use MarketplaceContext to avoid double-fetching
-  const isSearchActive = !!searchFilters.query;
+  const isSearchActive = (searchFilters.query?.trim().length ?? 0) > 0;
   const displayItems = isSearchActive ? searchResults : marketplaceItems;
+  const currentSortId = isSearchActive ? getSearchSortFilterId(searchFilters.sortBy) : mpFilters.sortBy;
   
   // Effective loading state: 
   // We want to show skeletons if we're REALLY loading or if we're briefly transitioning viewMode
@@ -147,12 +165,20 @@ export default function MarketplaceGrid() {
               <div className="grid grid-cols-4 gap-2">
                 {/* 1. Sort Tab */}
                 <Select 
-                  value={searchFilters.sortBy} 
-                  onValueChange={(value) => setSearchFilters({ ...searchFilters, sortBy: value as typeof searchFilters.sortBy })}
+                  value={currentSortId}
+                  onValueChange={(value) => {
+                    if (isSearchActive) {
+                      const mappedSort = mapFilterToSearchSort(value as FilterId);
+                      if (!mappedSort) return;
+                      setSearchFilters({ ...searchFilters, sortBy: mappedSort });
+                    } else {
+                      setMpFilter('sortBy', value as typeof mpFilters.sortBy);
+                    }
+                  }}
                 >
                   <SelectTrigger id="mobile-sort-select" className="!h-auto w-full flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 border-slate-200 rounded-xl hover:bg-slate-100 active:scale-y-95 active:bg-slate-200 transition-all duration-200 ease-in-out [&>span]:w-full [&_svg.lucide-chevron-down]:hidden shadow-sm hover:shadow-md">
                      {(() => {
-                        const activeFilter = FILTERS.find(f => f.id === searchFilters.sortBy) || FILTERS[0];
+                        const activeFilter = FILTERS.find(f => f.id === currentSortId) || FILTERS[0];
                         const Icon = activeFilter.icon;
                         return (
                           <>

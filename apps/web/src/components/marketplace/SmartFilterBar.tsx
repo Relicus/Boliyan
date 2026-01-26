@@ -24,7 +24,7 @@ function SmartFilterBar() {
 
   // Only switch to search mode when there's an actual search QUERY (not category)
   // Category from FilterSheet should use MarketplaceContext
-  const isSearchMode = !!searchFilters.query;
+  const isSearchMode = (searchFilters.query?.trim().length ?? 0) > 0;
 
   const handleFilterClick = useCallback((id: FilterId) => {
     if (isSearchMode) {
