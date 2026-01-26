@@ -44,3 +44,7 @@ coverage/
 apps/web/playwright-report/
 test-results/
 apps/web/test-results/
+apps/web/tsconfig.tsbuildinfo
+apps/web/lint-output.json
+apps/web/lint-output2.json
+apps/web/*.txt

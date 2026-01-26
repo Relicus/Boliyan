@@ -24,8 +24,8 @@ Expand the **"Environment Variables"** section and add the following:
 | Key | Value | Notes |
 |-----|-------|-------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://wxdehgjadxlkhvfwjfxd.supabase.co` | Your Supabase Project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUz...` | Your Supabase Anon Key |
-| `SITE_PASSWORD` | `799698` | (Optional) Defaults to '799698' if not set |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `[YOUR_ANON_KEY]` | Your Supabase Anon Key |
+| `SITE_PASSWORD` | `[YOUR_SECRET_PASSWORD]` | Secure password for private testing |
 
 ## 4. Deploy
 Click **"Deploy"**. Vercel will build your site.
@@ -50,7 +50,7 @@ Once the site is live (e.g., `https://boliyan-xyz.vercel.app`):
 Visit your Vercel URL.
 1.  **Password Prompt:** You should see a browser popup asking for username/password.
     *   **User:** `admin` (or anything)
-    *   **Password:** `799698`
+    *   **Password:** `[YOUR_SECRET_PASSWORD]`
 2.  **OAuth:** Try logging in with Google. It should redirect properly.
 
 ## 7. Using Your Cloudflare Domain (Recommended)

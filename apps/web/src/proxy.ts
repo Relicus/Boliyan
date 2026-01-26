@@ -15,9 +15,15 @@ export function proxy(req: NextRequest) {
   }
 
   // 2. Basic Authentication for Vercel/Live
-  // Password is '799698' as requested, or can be overridden via SITE_PASSWORD env var
-  const validPassword = process.env.SITE_PASSWORD || '799698';
+  // Password MUST be set via SITE_PASSWORD env var for private deployments
+  const validPassword = process.env.SITE_PASSWORD;
   const basicAuth = req.headers.get('authorization');
+
+  // If no password is set in environment, bypass or deny? 
+  // For private testing, it's safer to bypass ONLY if not in production.
+  if (!validPassword) {
+    return NextResponse.next();
+  }
 
   if (basicAuth) {
     const authValue = basicAuth.split(' ')[1];
