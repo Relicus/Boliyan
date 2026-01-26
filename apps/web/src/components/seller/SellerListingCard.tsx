@@ -9,6 +9,7 @@ import { Clock, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useTime } from "@/context/TimeContext";
 import { useApp } from "@/lib/store";
+import { formatCountdown } from "@/lib/utils";
 
 interface SellerListingCardProps {
   item: Item;
@@ -24,6 +25,15 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
     conversations.filter(c => c.itemId === item.id).length,
     maxSlots
   );
+
+  const goLiveAt = item.goLiveAt ? new Date(item.goLiveAt).getTime() : null;
+  const isPendingGoLive = goLiveAt !== null && now < goLiveAt;
+  const goLiveCountdown = isPendingGoLive && goLiveAt ? formatCountdown(goLiveAt, now) : null;
+
+  const lastEditedAt = item.lastEditedAt ? new Date(item.lastEditedAt).getTime() : null;
+  const editCooldownUntil = lastEditedAt ? lastEditedAt + 60 * 60 * 1000 : null;
+  const isEditCooldown = editCooldownUntil !== null && now < editCooldownUntil;
+  const editCooldownCountdown = isEditCooldown && editCooldownUntil ? formatCountdown(editCooldownUntil, now) : null;
   
   const getTimeLeft = (expiryAt: string) => {
     if (!now) return { text: "--:--", color: "text-slate-500", isUrgent: false };
@@ -81,10 +91,22 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
             {/* Right: Timer & Slots */}
             <div className="flex flex-col items-end gap-1.5 shrink-0">
                 {/* Timer */}
-                <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {timeInfo.text}
+                <div
+                  id={`listing-timer-${item.id}`}
+                  className={isPendingGoLive ? "text-xs font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-md flex items-center gap-1" : "text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1"}
+                >
+                    <Clock className={isPendingGoLive ? "w-3 h-3 text-amber-600" : "w-3 h-3"} />
+                    {isPendingGoLive ? `Live in ${goLiveCountdown}` : timeInfo.text}
                 </div>
+                {isPendingGoLive && (
+                  <Badge
+                    id={`listing-inactive-badge-${item.id}`}
+                    variant="outline"
+                    className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-amber-200 text-amber-700"
+                  >
+                    Inactive
+                  </Badge>
+                )}
                 {/* Slots Badge */}
                  <div className="flex items-center gap-1">
                     <Badge
@@ -122,18 +144,31 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
                     <Eye className="h-3 w-3 mr-1" />
                     View
                   </Button>
-                  <Button 
-                    id={`listing-edit-btn-${item.id}`} 
-                    variant="outline"  
-                    size="sm" 
-                    className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
-                    asChild
-                  >
-                    <Link href={`/list?id=${item.id}`}>
-                      <Edit className="h-3 w-3 mr-1" />
-                      Edit
-                    </Link>
-                  </Button>
+                  {isEditCooldown ? (
+                    <Button
+                      id={`listing-edit-btn-${item.id}`}
+                      variant="outline"
+                      size="sm"
+                      className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold text-slate-400 border-slate-200"
+                      disabled
+                    >
+                      <Clock className="h-3 w-3 mr-1" />
+                      {editCooldownCountdown ? `Edit in ${editCooldownCountdown}` : "Edit"}
+                    </Button>
+                  ) : (
+                    <Button 
+                      id={`listing-edit-btn-${item.id}`} 
+                      variant="outline"  
+                      size="sm" 
+                      className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
+                      asChild
+                    >
+                      <Link href={`/list?id=${item.id}`}>
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Link>
+                    </Button>
+                  )}
                   <Button 
                     id={`listing-delete-btn-${item.id}`} 
                     variant="outline"  

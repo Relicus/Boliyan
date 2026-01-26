@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCcw, Lock } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useApp } from "@/lib/store";

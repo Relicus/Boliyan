@@ -65,6 +65,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         description: item.description || '', // Ensure string
         condition: isValidCondition(item.condition) ? item.condition : 'used',
         status: isValidStatus(item.status) ? item.status : 'active',
+        goLiveAt: item.go_live_at || undefined,
+        lastEditedAt: item.last_edited_at || undefined,
         slug: item.slug ?? undefined,
         
         images: item.images || [], // Ensure array

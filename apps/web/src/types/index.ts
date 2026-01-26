@@ -53,6 +53,8 @@ export interface Item {
   expiryAt: string;
   listingDuration: 24 | 48 | 72;
   status: 'active' | 'completed' | 'cancelled' | 'hidden';
+  goLiveAt?: string;
+  lastEditedAt?: string;
 }
 
 export interface Bid {

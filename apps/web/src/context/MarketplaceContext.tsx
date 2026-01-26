@@ -173,6 +173,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 auction_mode,
                 created_at,
                 ends_at,
+                go_live_at,
                 search_vector,
                 status,
                 seller_name,
@@ -187,6 +188,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 slug,
                 contact_phone
             `, { count: 'exact' }).eq('status', 'active');
+
+            query = query.lte('go_live_at', new Date().toISOString());
 
             // --- APPLY FILTERS ---
           if (filters.category && filters.category !== "All Items") {

@@ -379,6 +379,8 @@ export default function ProductPage({ params }: { params: Promise<{ id?: string;
             query = query.eq('slug', slugOrId);
         }
 
+        query = query.lte('go_live_at', new Date().toISOString());
+
         const { data, error } = await query.single();
 
         if (error || !data) {

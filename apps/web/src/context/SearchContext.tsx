@@ -102,7 +102,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      let query = supabase
+            let query = supabase
         .from('marketplace_listings')
         .select(`
             id,
@@ -115,6 +115,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             auction_mode,
             created_at,
             ends_at,
+            go_live_at,
             search_vector,
             status,
             seller_name,
@@ -137,6 +138,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
           // Default filters say status: 'active'.
           // If user selects 'all', we skip this. If 'active', we filter 'active'.
       }
+
+      query = query.lte('go_live_at', new Date().toISOString());
 
       // Hybrid ranked search: exact matches first, fuzzy matches second
       if (filters.query) {

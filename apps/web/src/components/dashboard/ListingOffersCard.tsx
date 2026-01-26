@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Check, X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Clock, Tag, Activity, Trophy, Inbox, CheckCircle } from "lucide-react";
+import { X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Clock, Tag, Activity, Trophy, Inbox, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
-import { calculatePrivacySafeDistance } from "@/lib/utils";
+import { calculatePrivacySafeDistance, formatCountdown } from "@/lib/utils";
 
 interface ListingOffersCardProps {
   item: Item;
@@ -24,6 +24,10 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   const [isExpanded, setIsExpanded] = useState(false);
   const [processingBidId, setProcessingBidId] = useState<string | null>(null);
   const router = useRouter();
+
+  const goLiveAt = item.goLiveAt ? new Date(item.goLiveAt).getTime() : null;
+  const isPendingGoLive = goLiveAt !== null && now < goLiveAt;
+  const goLiveCountdown = isPendingGoLive && goLiveAt ? formatCountdown(goLiveAt, now) : null;
 
   // Sort offers: highest amount first, then by closest distance
   const sortedOffers = useMemo(() => {
@@ -56,6 +60,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   };
 
   const handleAccept = async (bidId: string) => {
+    if (isPendingGoLive) return;
     if (processingBidId) return;
     setProcessingBidId(bidId);
     try {
@@ -70,6 +75,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   };
 
   const handleReject = async (bidId: string) => {
+    if (isPendingGoLive) return;
     if (processingBidId) return;
     setProcessingBidId(bidId);
     try {
@@ -85,6 +91,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   };
 
   const handleChat = async (bidderId: string) => {
+    if (isPendingGoLive) return;
     // First check if conversation already exists
     const conv = getConversation(bidderId);
     
@@ -118,6 +125,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
     const canChat = isAccepted && !!conv;
     const canCall = canChat && !!bidder.phone;
     const isProcessing = processingBidId === bid.id;
+    const actionsDisabled = isPendingGoLive || isProcessing;
     const locationInfo = bidder.location 
       ? calculatePrivacySafeDistance(user?.location, bidder.location)
       : null;
@@ -173,9 +181,9 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 variant="ghost"
                 size="icon"
                 className="h-9 w-full md:w-8 md:h-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg md:rounded-full border border-red-100 md:border-transparent bg-white md:bg-transparent"
-                onClick={() => handleReject(bid.id)}
-                disabled={isProcessing}
-                title="Decline"
+                 onClick={() => handleReject(bid.id)}
+                 disabled={actionsDisabled}
+                 title="Decline"
               >
                 <X className="w-4 h-4" />
                 <span className="md:hidden ml-2 text-sm font-medium">Decline</span>
@@ -184,8 +192,8 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 id={`accept-btn-${bid.id}`}
                 size="sm"
                 className="h-9 w-full md:w-auto px-3 text-xs font-bold bg-green-600 hover:bg-green-700 rounded-lg shadow-sm"
-                onClick={() => handleAccept(bid.id)}
-                disabled={isProcessing}
+                 onClick={() => handleAccept(bid.id)}
+                 disabled={actionsDisabled}
               >
                 Accept
               </Button>
@@ -198,9 +206,9 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 variant="outline"
                 size="icon"
                 className="h-9 w-full md:w-8 md:h-8 text-blue-600 border-blue-200 hover:bg-blue-50 rounded-lg"
-                onClick={() => handleCall(bidder.phone!)}
-                disabled={!canCall}
-                title="Call"
+                 onClick={() => handleCall(bidder.phone!)}
+                 disabled={!canCall || actionsDisabled}
+                 title="Call"
               >
                 <Phone className="w-4 h-4" />
                 <span className="md:hidden ml-2 text-sm font-medium">Call</span>
@@ -209,7 +217,8 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 id={`chat-btn-${bid.id}`}
                 size="sm"
                 className="h-9 w-full md:w-auto px-3 text-xs font-bold bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm"
-                onClick={() => handleChat(bid.bidderId)}
+                 onClick={() => handleChat(bid.bidderId)}
+                 disabled={actionsDisabled}
               >
                 <MessageSquare className="w-3 h-3 mr-1.5" />
                 Chat
@@ -257,9 +266,12 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
             </div>
             
             {/* Status Badge */}
-            <div id={`status-badge-${item.id}`} className="inline-flex items-center gap-1 text-[10px] uppercase font-bold text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full w-fit">
-               <Activity className="w-3 h-3" />
-               Active Listing
+            <div
+              id={`status-badge-${item.id}`}
+              className={isPendingGoLive ? "inline-flex items-center gap-1 text-[10px] uppercase font-bold text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full w-fit" : "inline-flex items-center gap-1 text-[10px] uppercase font-bold text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full w-fit"}
+            >
+               <Activity className={isPendingGoLive ? "w-3 h-3 text-amber-600" : "w-3 h-3"} />
+               {isPendingGoLive ? `Inactive · Live in ${goLiveCountdown || "1h"}` : "Active Listing"}
              </div>
           </div>
         </div>

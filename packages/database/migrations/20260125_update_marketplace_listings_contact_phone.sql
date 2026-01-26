@@ -22,6 +22,7 @@ SELECT
   s.high_bidder_id,
   l.slug,
   l.ends_at,
+  l.go_live_at,
   l.contact_phone
 FROM listings l
 LEFT JOIN profiles p ON l.seller_id = p.id

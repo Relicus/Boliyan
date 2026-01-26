@@ -189,6 +189,8 @@ export type Database = {
           created_at: string | null
           description: string | null
           ends_at: string | null
+          go_live_at: string | null
+          last_edited_at: string | null
           final_buyer_id: string | null
           id: string
           images: string[] | null
@@ -207,6 +209,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           ends_at?: string | null
+          go_live_at?: string | null
+          last_edited_at?: string | null
           final_buyer_id?: string | null
           id?: string
           images?: string[] | null
@@ -225,6 +229,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           ends_at?: string | null
+          go_live_at?: string | null
+          last_edited_at?: string | null
           final_buyer_id?: string | null
           id?: string
           images?: string[] | null
@@ -540,6 +546,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           ends_at: string | null
+          go_live_at: string | null
           high_bid: number | null
           high_bidder_id: string | null
           id: string | null
@@ -568,6 +575,21 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_bids: { Args: never; Returns: undefined }
+      edit_listing_with_cooldown: {
+        Args: {
+          p_listing_id: string
+          p_title: string
+          p_description: string
+          p_category: string
+          p_asked_price: number
+          p_contact_phone: string
+          p_auction_mode: string
+          p_images: string[]
+          p_condition: string
+          p_ends_at: string
+        }
+        Returns: string
+      }
       expire_old_bids: { Args: never; Returns: undefined }
     }
     Enums: {

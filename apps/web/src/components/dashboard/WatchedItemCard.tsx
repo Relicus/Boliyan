@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { MapPin, Bookmark, Gavel, Trash2, MessageSquare, Phone } from "lucide-react";
+import { MapPin, Bookmark, Trash2, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Item, User, Bid } from "@/types";
-import { Badge } from "@/components/ui/badge";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import { Button } from "@/components/ui/button";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
@@ -52,8 +51,6 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
 
   const biddingConfig = createBiddingConfig(item, user, bids);
   const canChat = activeBid?.status === 'accepted' && !!acceptedConversation;
-  const listingPhone = item.contactPhone || seller.phone;
-  const canCall = canChat && !!listingPhone;
 
   const handleChat = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -61,11 +58,6 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
     router.push(`/inbox?id=${acceptedConversation.id}`);
   };
 
-  const handleCall = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    if (!listingPhone) return;
-    window.location.href = `tel:${listingPhone}`;
-  };
 
   return (
     <>
@@ -107,7 +99,7 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                   {/* Timer */}
                   <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
                      {/* TimerBadge rendering logic manual for consistency or use component */}
-                      <TimerBadge expiryAt={item.expiryAt} variant="default" className="p-0 h-auto bg-transparent text-white text-[10px]" />
+                      <TimerBadge expiryAt={item.expiryAt} variant="solid" className="p-0 h-auto bg-transparent text-white text-[10px]" />
                   </div>
                   
                   {/* Action Buttons Row */}

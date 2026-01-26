@@ -159,6 +159,18 @@ export function formatShortTimestamp(date: Date): string {
   return format(date, "d/M/yyyy");
 }
 
+export function formatCountdown(targetMs: number, nowMs: number): string {
+  const diff = Math.max(0, targetMs - nowMs);
+  const totalMins = Math.ceil(diff / 60000);
+  const days = Math.floor(totalMins / (60 * 24));
+  const hours = Math.floor((totalMins % (60 * 24)) / 60);
+  const mins = totalMins % 60;
+
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${mins}m`;
+  return `${mins}m`;
+}
+
 /**
  * Maps database condition strings to UI display labels.
  * 

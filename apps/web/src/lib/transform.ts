@@ -22,6 +22,8 @@ export type ListingWithSeller = ListingRow & {
   high_bidder_id?: string | null;
   
   slug?: string | null;
+  go_live_at?: string | null;
+  last_edited_at?: string | null;
 };
 
 export function transformProfileToUser(profile: ProfileRow): User {
@@ -126,7 +128,9 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     createdAt: listing.created_at || new Date().toISOString(),
     expiryAt: expiryAt,
     listingDuration: 72,
-    status: isValidStatus(listing.status) ? listing.status : 'active'
+    status: isValidStatus(listing.status) ? listing.status : 'active',
+    goLiveAt: listing.go_live_at || undefined,
+    lastEditedAt: listing.last_edited_at || undefined
   };
 }
 export type BidWithProfile = Database['public']['Tables']['bids']['Row'] & {

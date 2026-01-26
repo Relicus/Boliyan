@@ -22,24 +22,39 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { uploadListingImage } from "@/lib/uploadImage";
 import { supabase } from "@/lib/supabase";
-import { generateSlug, formatPrice } from "@/lib/utils";
+import { generateSlug, formatPrice, formatCountdown } from "@/lib/utils";
 import { Database } from "@/types/database.types";
 import { toast } from "sonner";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { Item } from "@/types";
 import { roundToReasonablePrice } from "@/lib/bidding";
 import { calculateDepreciation, formatPriceEstimate, getPurchaseYearOptions, getPurchaseMonthOptions, DepreciationResult } from "@/lib/depreciation";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useTime } from "@/context/TimeContext";
+
+const EDIT_WARNING_TITLE = "Editing resets bids";
+const EDIT_WARNING_DESCRIPTION = "Saving changes will delete all bids and relaunch this listing in 1 hour.";
+const EDIT_WARNING_CONFIRM = "Save & Reset Bids";
+const EDIT_WARNING_CANCEL = "Keep Editing";
+const GO_LIVE_NOTE = "Goes live in 1 hour after saving.";
+const EDIT_COOLDOWN_TOAST = "You can edit this listing again in";
 
 function ListForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("id");
   const { items, user } = useApp();
+  const { now } = useTime();
   
   const [fetchedItem, setFetchedItem] = useState<Item | null>(null);
   const [isLoadingItem, setIsLoadingItem] = useState(!!editId);
   
   const editingItem = (editId ? items.find(i => i.id === editId) : null) || fetchedItem;
+
+  const lastEditedAtMs = editingItem?.lastEditedAt ? new Date(editingItem.lastEditedAt).getTime() : null;
+  const editCooldownUntil = lastEditedAtMs ? lastEditedAtMs + 60 * 60 * 1000 : null;
+  const isEditCooldown = editCooldownUntil !== null && now < editCooldownUntil;
+  const editCooldownLabel = isEditCooldown && editCooldownUntil ? formatCountdown(editCooldownUntil, now) : null;
 
   // Fetch Item details if not in global state
   useEffect(() => {
@@ -112,6 +127,7 @@ function ListForm() {
 
   const [imageEntries, setImageEntries] = useState<ImageEntry[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [showEditWarning, setShowEditWarning] = useState(false);
 
   const [errors, setErrors] = useState<{
     title?: boolean;
@@ -204,7 +220,7 @@ function ListForm() {
     moveImage(index, 0);
   };
 
-  const handleSubmit = async () => {
+  const submitListing = async () => {
     if (!user) {
         router.push('/signin');
         return;
@@ -270,11 +286,30 @@ function ListForm() {
 
         if (editingItem) {
           const { error } = await supabase
-            .from('listings')
-            .update(listingPayload)
-            .eq('id', editingItem.id);
+            .rpc('edit_listing_with_cooldown', {
+              p_listing_id: editingItem.id,
+              p_title: listingPayload.title,
+              p_description: listingPayload.description,
+              p_category: listingPayload.category,
+              p_asked_price: listingPayload.asked_price,
+              p_contact_phone: listingPayload.contact_phone,
+              p_auction_mode: listingPayload.auction_mode,
+              p_images: listingPayload.images,
+              p_condition: listingPayload.condition,
+              p_ends_at: listingPayload.ends_at
+            });
 
-          if (error) throw error;
+          if (error) {
+            if (error.message?.includes('COOLDOWN_ACTIVE')) {
+              const label = editCooldownLabel ? ` ${editCooldownLabel}` : '';
+              toast.error(`${EDIT_COOLDOWN_TOAST}${label}`);
+              return;
+            }
+            throw error;
+          }
+          toast.success("Listing updated", {
+            description: GO_LIVE_NOTE
+          });
           router.push("/");
         } else {
           const insertPayload: Database['public']['Tables']['listings']['Insert'] = {
@@ -287,6 +322,9 @@ function ListForm() {
           const { error } = await supabase.from('listings').insert([insertPayload]);
 
           if (error) throw error;
+          toast.success("Listing created", {
+            description: GO_LIVE_NOTE
+          });
           router.push("/");
         }
 
@@ -298,6 +336,20 @@ function ListForm() {
     } finally {
         setIsUploading(false);
     }
+  };
+
+  const handleSubmit = () => {
+    if (editingItem) {
+      if (isEditCooldown) {
+        const label = editCooldownLabel ? ` ${editCooldownLabel}` : '';
+        toast.error(`${EDIT_COOLDOWN_TOAST}${label}`);
+        return;
+      }
+      setShowEditWarning(true);
+      return;
+    }
+
+    submitListing();
   };
 
   return (
@@ -312,6 +364,37 @@ function ListForm() {
           </CardDescription>
         </CardHeader>
         <CardContent id="list-item-form" className="space-y-6">
+          <Dialog open={showEditWarning} onOpenChange={setShowEditWarning}>
+            <DialogContent id="edit-warning-dialog">
+              <DialogHeader id="edit-warning-header">
+                <DialogTitle id="edit-warning-title">{EDIT_WARNING_TITLE}</DialogTitle>
+                <DialogDescription id="edit-warning-description">
+                  {EDIT_WARNING_DESCRIPTION}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter id="edit-warning-footer">
+                <Button
+                  id="edit-warning-cancel-btn"
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowEditWarning(false)}
+                >
+                  {EDIT_WARNING_CANCEL}
+                </Button>
+                <Button
+                  id="edit-warning-confirm-btn"
+                  type="button"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() => {
+                    setShowEditWarning(false);
+                    submitListing();
+                  }}
+                >
+                  {EDIT_WARNING_CONFIRM}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           {isLoadingItem ? (
             <div className="flex flex-col items-center justify-center py-12 gap-4">
               <Loader2 className="h-12 w-12 animate-spin text-blue-600 opacity-20" />
@@ -842,7 +925,7 @@ function ListForm() {
               id="post-listing-btn"
               className="flex-[2] bg-blue-600 hover:bg-blue-700 h-14 text-lg font-bold"
               onClick={handleSubmit}
-              disabled={isUploading || isLoadingItem}
+              disabled={isUploading || isLoadingItem || isEditCooldown}
             >
               {isUploading ? (
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
@@ -851,8 +934,13 @@ function ListForm() {
               ) : (
                   <Check className="h-5 w-5 mr-2" />
               )}
-              {isUploading ? "Uploading..." : editingItem ? "Save" : "Post Listing"}
+              {isUploading ? "Uploading..." : editingItem ? (isEditCooldown ? `Edit in ${editCooldownLabel || "1h"}` : "Save") : "Post Listing"}
             </Button>
+          </div>
+          <div id="go-live-note" className="flex justify-center">
+            <div className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-semibold text-amber-800">
+              {GO_LIVE_NOTE}
+            </div>
           </div>
         </CardContent>
       </Card>

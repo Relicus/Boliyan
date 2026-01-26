@@ -26,6 +26,8 @@ CREATE TABLE listings (
   auction_mode TEXT CHECK (auction_mode IN ('hidden', 'visible', 'sealed')) DEFAULT 'visible',
   status TEXT CHECK (status IN ('active', 'completed', 'cancelled', 'hidden')) DEFAULT 'active',
   ends_at TIMESTAMP WITH TIME ZONE,
+  go_live_at TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '1 hour'),
+  last_edited_at TIMESTAMP WITH TIME ZONE,
   search_vector TSVECTOR,
   slug TEXT UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

@@ -6,7 +6,7 @@ import SellerListingCard from "@/components/seller/SellerListingCard";
 import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
 import ListingOffersCard from "@/components/dashboard/ListingOffersCard";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList } from "@/components/ui/tabs";
 import { DashboardTab } from "@/components/dashboard/DashboardTab";
 import { Bookmark, Gavel, Tag, Inbox } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
