@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useApp } from "@/lib/store";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Globe, Navigation, Map } from "lucide-react";
+import { MapPin, Globe, Navigation, Map, Loader2 } from "lucide-react";
 import { cn, isLocationInCountry } from "@/lib/utils";
 import { MapPicker } from "@/components/common/MapPicker";
 
@@ -151,15 +151,17 @@ LocationSelectorTrigger.displayName = "LocationSelectorTrigger";
 function LocationSelectorContent({ onSelect, mode }: { onSelect: () => void, mode: "user" | "filter" }) {
   const { filters, setFilter, updateFilters, user, myLocation, setMyLocation } = useApp();
   const [tempLocation, setTempLocation] = useState<{ lat: number; lng: number; address: string; city?: string } | null>(null);
+  const [isMapLoading, setIsMapLoading] = useState(false);
   // Initialize tempRadius from current filter
   const [tempRadius, setTempRadius] = useState(filters.radius);
   
   const isOutside = mode === "user" ? !isLocationInCountry(myLocation?.address) : !isLocationInCountry(user?.location.address);
 
   // Called whenever map moves or search selected - only updates local state
-  const handleLocationSelect = (loc: { lat: number; lng: number; address: string; city?: string }) => {
+  // STABILIZED: useCallback breaks the infinite loop with MapPicker
+  const handleLocationSelect = useCallback((loc: { lat: number; lng: number; address: string; city?: string }) => {
     setTempLocation(loc);
-  };
+  }, []);
 
   const handleConfirm = () => {
     if (tempLocation) {
@@ -219,6 +221,7 @@ function LocationSelectorContent({ onSelect, mode }: { onSelect: () => void, mod
         <MapPicker 
           initialLocation={initialMapLocation}
           onLocationSelect={handleLocationSelect}
+          onGeocodingChange={setIsMapLoading}
           className="h-full border-none rounded-none"
         />
       </div>
@@ -227,10 +230,16 @@ function LocationSelectorContent({ onSelect, mode }: { onSelect: () => void, mod
       <div className="p-2 border-t bg-slate-50 flex justify-end">
         <Button 
           size="sm" 
-          className="h-8 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5"
+          disabled={isMapLoading}
+          className="h-8 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 disabled:opacity-70 disabled:bg-slate-400"
           onClick={handleConfirm}
         >
-          {mode === "user" ? (
+          {isMapLoading ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Calculating...
+            </>
+          ) : mode === "user" ? (
             <>
               <Navigation className="h-3.5 w-3.5 fill-current" />
               Set My Location

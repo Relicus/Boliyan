@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Search, MapPin, Loader2, Navigation, Crosshair } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -31,11 +31,12 @@ interface LocationResult {
 interface MapPickerProps {
   initialLocation?: { lat: number; lng: number } | null;
   onLocationSelect: (location: LocationResult) => void;
+  onGeocodingChange?: (isGeocoding: boolean) => void;
   className?: string;
   required?: boolean;
 }
 
-export function MapPicker({ initialLocation, onLocationSelect, className, required }: MapPickerProps) {
+export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange, className, required }: MapPickerProps) {
   // Default to Pakistan center if no location
   const DEFAULT_CENTER: [number, number] = [30.3753, 69.3451]; 
   const DEFAULT_ZOOM = 5;
@@ -50,6 +51,11 @@ export function MapPicker({ initialLocation, onLocationSelect, className, requir
   const [isSearching, setIsSearching] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [showResults, setShowResults] = useState(false);
+
+  // Sync geocoding state with parent
+  useEffect(() => {
+    onGeocodingChange?.(isGeocoding);
+  }, [isGeocoding, onGeocodingChange]);
   
   // Ref to prevent geocoding loop when location is manually set
   const skipGeocodeRef = useRef(false);
@@ -87,21 +93,38 @@ export function MapPicker({ initialLocation, onLocationSelect, className, requir
   }, [searchQuery]);
 
   // Reverse Geocode on pin move
-  const handleMapMove = async (lat: number, lng: number) => {
+  // STABILIZED: useCallback avoids unnecessary re-renders in LeafletMap
+  const handleMapMove = useCallback((lat: number, lng: number) => {
     // Only update center if significantly different to avoid loops?
     // Actually, we must update center to keep pin in center of map view logic 
     // (though pin is CSS absolute center, map center is what matters).
     setCenter([lat, lng]);
     
     // We don't trigger geocode here directly, useEffect does it.
-  };
+  }, []);
+
+  // Ref to store the last geocoded coordinates to prevent loops
+  const lastGeocodedCoords = useRef<[number, number] | null>(null);
 
   // We need a debounced effect for the address fetching based on center
   useEffect(() => {
     // If we just manually set the location (e.g. from search), skip this reverse geocode
     if (skipGeocodeRef.current) {
         skipGeocodeRef.current = false;
+        lastGeocodedCoords.current = [...center];
         return;
+    }
+
+    // Check if we have moved significantly before triggering a new fetch
+    if (lastGeocodedCoords.current) {
+        const [lastLat, lastLng] = lastGeocodedCoords.current;
+        const latDiff = Math.abs(lastLat - center[0]);
+        const lngDiff = Math.abs(lastLng - center[1]);
+        
+        // Approx 10 meters threshold
+        if (latDiff < 0.0001 && lngDiff < 0.0001) {
+            return;
+        }
     }
 
     const timer = setTimeout(async () => {
@@ -122,6 +145,8 @@ export function MapPicker({ initialLocation, onLocationSelect, className, requir
             address: addr,
             city
           });
+          
+          lastGeocodedCoords.current = [...center];
         } catch (err) {
           console.error("Reverse geocode failed", err);
           setAddress(`${center[0].toFixed(4)}, ${center[1].toFixed(4)}`);
@@ -131,10 +156,11 @@ export function MapPicker({ initialLocation, onLocationSelect, className, requir
             address: `${center[0].toFixed(4)}, ${center[1].toFixed(4)}`,
             city: undefined
           });
+          lastGeocodedCoords.current = [...center];
         } finally {
           setIsGeocoding(false);
         }
-    }, 800); // 800ms debounce on drag end
+    }, 1200); // Increased debounce to 1200ms to avoid flicker during fine map adjustments
 
     return () => clearTimeout(timer);
   }, [center, onLocationSelect]); // Re-run when center changes (drag ends)
