@@ -77,7 +77,6 @@ export default function Sidebar() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            <Layers className="h-4 w-4 relative z-20" />
             <span className="relative z-20">All</span>
           </button>
 
@@ -96,7 +95,6 @@ export default function Sidebar() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            <Globe className="h-4 w-4 relative z-20" />
             <span className="relative z-20">Public</span>
           </button>
 
@@ -115,7 +113,6 @@ export default function Sidebar() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            <Lock className="h-4 w-4 relative z-20" />
             <span className="relative z-20">Hidden</span>
           </button>
         </div>

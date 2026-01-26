@@ -18,6 +18,7 @@ function InboxContent() {
   const [activeTab, setActiveTab] = useState<'all' | 'offers' | 'bids' | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const countBadgeBase = "ml-2 inline-flex min-w-5 h-4 items-center justify-center rounded-full px-1.5 text-[10px] font-extrabold backdrop-blur-md bg-white/70 border border-white/70 shadow-[0_4px_10px_rgba(15,23,42,0.12)]";
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -108,7 +109,7 @@ function InboxContent() {
         )}
       >
         <div className="p-4 border-b shrink-0">
-          <h1 className="font-black text-xl mb-4 text-slate-900">Messages</h1>
+          <h1 className="sr-only">Messages</h1>
           <div id="inbox-search" className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
@@ -129,7 +130,7 @@ function InboxContent() {
                 <MessageSquare className="mr-2 h-3.5 w-3.5" />
                 All
                 {displayedAllConversations.length > 0 && (
-                  <span className="ml-2 bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded-md text-[10px]">
+                  <span className={`${countBadgeBase} text-slate-700`}>
                     {displayedAllConversations.length}
                   </span>
                 )}
@@ -142,7 +143,7 @@ function InboxContent() {
                 <Store className="mr-2 h-3.5 w-3.5" />
                 Selling
                 {displayedOfferConversations.length > 0 && (
-                  <span className="ml-2 bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-md text-[10px]">
+                  <span className={`${countBadgeBase} text-indigo-700`}>
                     {displayedOfferConversations.length}
                   </span>
                 )}
@@ -155,7 +156,7 @@ function InboxContent() {
                 <ShoppingBag className="mr-2 h-3.5 w-3.5" />
                 Buying
                 {displayedBidConversations.length > 0 && (
-                  <span className="ml-2 bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-md text-[10px]">
+                  <span className={`${countBadgeBase} text-blue-700`}>
                     {displayedBidConversations.length}
                   </span>
                 )}

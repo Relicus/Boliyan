@@ -7,7 +7,6 @@ import { Bid, Item } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
@@ -45,11 +44,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
 
   const acceptedOffers = sortedOffers.filter(b => b.status === 'accepted');
   const totalOffers = sortedOffers.length;
-  const expandedOfferCount = Math.max(0, totalOffers - 1);
-  const hasOverflow = expandedOfferCount > 3;
-  const offerSummary = acceptedOffers.length > 0
-    ? `${totalOffers} offers • ${acceptedOffers.length} accepted`
-    : `${totalOffers} offers`;
+  const bestPrice = sortedOffers[0]?.amount || 0;
 
   const getTimeLeft = (expiryAt: string) => {
     if (now === 0) return "...";
@@ -113,7 +108,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
     window.location.href = `tel:${phone}`;
   };
 
-  const renderOfferRow = (bid: Bid, condensed: boolean) => {
+  const renderOfferRow = (bid: Bid) => {
     const bidder = bid.bidder;
     if (!bidder) return null;
 
@@ -131,59 +126,67 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
       <div 
         key={bid.id} 
         id={`offer-row-${bid.id}`}
-        className={condensed ? "p-4" : "p-4 bg-slate-50/50"}
+        className="bg-slate-50 rounded-lg p-3 mb-3 flex flex-col md:flex-row md:items-center gap-3"
       >
-        <div className="flex items-start gap-3">
-          <div className="w-11 h-11 rounded-full bg-slate-200 overflow-hidden shrink-0 ring-2 ring-white shadow-sm">
+        {/* Top Section: Avatar + Info */}
+        <div className="flex items-center gap-3 w-full md:w-auto md:flex-1 min-w-0">
+          {/* Avatar */}
+          <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden shrink-0 ring-1 ring-white shadow-sm">
             {bidder.avatar ? (
               <img src={bidder.avatar} alt={bidder.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
+              <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
                 {bidder.name.charAt(0)}
               </div>
             )}
           </div>
 
+          {/* Info - Name + Rating stacked, Price on right */}
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm text-slate-900 truncate">{bidder.name}</p>
-            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-              <div className="flex items-center gap-0.5">
-                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                <span className="text-xs text-amber-600 font-bold">{bidder.rating.toFixed(1)}</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <span className="font-bold text-sm text-slate-900 truncate block">{bidder.name}</span>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                  <span className="text-xs text-slate-600">{bidder.rating.toFixed(1)}</span>
+                  {locationInfo && locationInfo.distance > 0 && (
+                    <span className="text-xs text-slate-500">• {locationInfo.distance} km</span>
+                  )}
+                </div>
               </div>
-              {locationInfo && locationInfo.distance > 0 && locationInfo.distance < 500 && (
-                <span className="text-[10px] text-slate-500">
-                  {locationInfo.distance} km • {locationInfo.duration} min
-                </span>
-              )}
-            </div>
+            <span 
+              className={`font-black shrink-0 ${bid.amount >= item.askPrice ? 'text-green-600' : 'text-slate-900'}`}
+              style={{ fontSize: 'clamp(1.125rem, 4vw, 1.5rem)' }}
+            >
+              PKR {bid.amount.toLocaleString()}
+            </span>
           </div>
-
-          <div className="text-right shrink-0">
-            <p className="price-font text-2xl font-black text-green-600">PKR {bid.amount.toLocaleString()}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mt-3">
+        {/* Actions */}
+        <div className="w-full grid grid-cols-2 gap-2 mt-2 md:mt-0 md:w-auto md:flex md:items-center md:gap-2 shrink-0">
           {isPending && (
             <>
-              <Button 
+               <Button
                 id={`reject-btn-${bid.id}`}
-                variant="outline" 
-                className="h-11 text-sm font-bold border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl" 
+                variant="ghost"
+                size="icon"
+                className="h-9 w-full md:w-8 md:h-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg md:rounded-full border border-red-100 md:border-transparent bg-white md:bg-transparent"
                 onClick={() => handleReject(bid.id)}
                 disabled={isProcessing}
+                title="Decline"
               >
-                <X className="w-4 h-4 mr-1.5" />
-                Decline
+                <X className="w-4 h-4" />
+                <span className="md:hidden ml-2 text-sm font-medium">Decline</span>
               </Button>
               <Button 
                 id={`accept-btn-${bid.id}`}
-                className="h-11 text-sm font-bold bg-green-600 hover:bg-green-700 rounded-xl shadow-lg shadow-green-500/30" 
+                size="sm"
+                className="h-9 w-full md:w-auto px-3 text-xs font-bold bg-green-600 hover:bg-green-700 rounded-lg shadow-sm"
                 onClick={() => handleAccept(bid.id)}
                 disabled={isProcessing}
               >
-                <Check className="w-4 h-4 mr-1.5" />
                 Accept
               </Button>
             </>
@@ -193,19 +196,22 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
               <Button 
                 id={`call-btn-${bid.id}`}
                 variant="outline"
-                className="h-11 text-sm font-bold border-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl disabled:opacity-50 disabled:hover:bg-transparent" 
+                size="icon"
+                className="h-9 w-full md:w-8 md:h-8 text-blue-600 border-blue-200 hover:bg-blue-50 rounded-lg"
                 onClick={() => handleCall(bidder.phone!)}
                 disabled={!canCall}
+                title="Call"
               >
-                <Phone className="w-4 h-4 mr-1.5" />
-                Call
+                <Phone className="w-4 h-4" />
+                <span className="md:hidden ml-2 text-sm font-medium">Call</span>
               </Button>
               <Button 
                 id={`chat-btn-${bid.id}`}
-                className="h-11 text-sm font-bold bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-500/30"
+                size="sm"
+                className="h-9 w-full md:w-auto px-3 text-xs font-bold bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm"
                 onClick={() => handleChat(bid.bidderId)}
               >
-                <MessageSquare className="w-4 h-4 mr-1.5" />
+                <MessageSquare className="w-3 h-3 mr-1.5" />
                 Chat
               </Button>
             </>
@@ -218,78 +224,84 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   return (
     <div 
       id={`listing-offers-card-${item.id}`}
-      className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden"
+      className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"
     >
-      {/* Listing Header */}
+      {/* Header - clickable to toggle */}
       <div 
-        id={`listing-offers-header-${item.id}`}
-        className="p-4 flex items-center gap-4"
+        className="flex cursor-pointer hover:bg-slate-50/50 transition-colors"
+        onClick={() => setIsExpanded(!isExpanded)}
       >
-        {/* Item Thumbnail */}
-        <div className="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-sm">
-          {item.images[0] && (
-            <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
-          )}
-        </div>
-
-        {/* Listing Info */}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-base text-slate-900 truncate">{item.title}</h3>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="price-font text-sm font-bold text-slate-600">Ask: PKR {item.askPrice.toLocaleString()}</span>
-            <span className="text-slate-300">•</span>
-            <div className="flex items-center gap-1 text-xs text-slate-500">
-              <Clock className="w-3 h-3" />
-              {getTimeLeft(item.expiryAt)}
+        {/* Left Column */}
+        <div className="flex-1 p-2 flex flex-col justify-evenly min-w-0">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-md bg-slate-100 overflow-hidden shrink-0">
+              {item.images[0] && (
+                <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+              )}
             </div>
+            <div className="flex flex-col min-w-0">
+              <h3 className="font-bold text-sm text-slate-900 truncate">{item.title}</h3>
+              <p className="text-xs text-slate-500 truncate">{item.description}</p>
+            </div>
+          </div>
+          <div className="text-sm font-medium text-slate-500 mt-1 mb-0.5">
+            <p>
+              Ask: <span className="font-semibold text-slate-900">PKR {item.askPrice.toLocaleString()}</span>
+            </p>
+          </div>
+          <div className="text-xs text-slate-500 mt-1 mb-0.5">
+            <p>
+              Status: <span className="text-green-600 font-medium">Active</span>
+            </p>
           </div>
         </div>
 
-        {/* Offer Count + Expand Toggle */}
-        <div className="flex items-center gap-2">
-          <Badge id={`offer-summary-${item.id}`} className="bg-slate-100 text-slate-600 hover:bg-slate-200">
-            {offerSummary}
-          </Badge>
+        {/* Right Column */}
+        <div className="p-2 flex flex-col items-end justify-evenly shrink-0 min-w-[120px]">
+           <div className="text-lg font-bold text-slate-900 flex items-center gap-1">
+             <Clock className="w-4 h-4 text-slate-400" />
+             {getTimeLeft(item.expiryAt)}
+           </div>
+           <div className="text-xs text-slate-500 mt-1 mb-0.5">
+             {totalOffers} Offers • {acceptedOffers.length} Accepted
+           </div>
+           <div className={`font-black ${bestPrice >= item.askPrice ? 'text-green-600' : 'text-slate-900'}`} style={{ fontSize: 'clamp(1.5rem, 5vw, 2.25rem)' }}>
+             {bestPrice > 0 ? `PKR ${bestPrice.toLocaleString()}` : '—'}
+           </div>
+           {/* Inline Toggle */}
+           <button
+             type="button"
+             onClick={(e) => {
+               e.stopPropagation();
+               setIsExpanded(!isExpanded);
+             }}
+             className="mt-1 flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+           >
+             {isExpanded ? (
+               <>Hide offers <ChevronUp className="w-3 h-3" /></>
+             ) : (
+               <>Show {totalOffers} offers <ChevronDown className="w-3 h-3" /></>
+             )}
+           </button>
         </div>
       </div>
 
-      {sortedOffers[0] && (
-        <div className="border-t border-slate-100">
-          {renderOfferRow(sortedOffers[0], true)}
-        </div>
-      )}
-
-      <button
-        id={`offers-expand-btn-${item.id}`}
-        type="button"
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full border-t border-slate-100 px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-between"
-      >
-        {isExpanded ? `Hide offers` : `View all offers (${totalOffers})`}
-        {isExpanded ? (
-          <ChevronUp className="w-4 h-4 text-slate-400" />
-        ) : (
-          <ChevronDown className="w-4 h-4 text-slate-400" />
-        )}
-      </button>
-
       {/* Offers List */}
       <AnimatePresence>
-        {isExpanded && sortedOffers.length > 1 && (
+        {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden"
+            className="overflow-hidden bg-white"
           >
-            <div className="relative">
-              <div className={`border-t border-slate-100 divide-y divide-slate-100 ${hasOverflow ? 'max-h-[420px] overflow-y-auto' : ''}`}>
-                {sortedOffers.slice(1).map(bid => renderOfferRow(bid, false))}
-              </div>
-              {hasOverflow && (
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/80 to-transparent flex items-end justify-center pb-2">
-                  <span className="text-[10px] font-semibold tracking-wide uppercase text-slate-500">Scroll for more</span>
+            <div className="p-4 pt-6">
+              {sortedOffers.length > 0 ? (
+                sortedOffers.map(bid => renderOfferRow(bid))
+              ) : (
+                <div className="text-center py-6 text-slate-400 text-sm">
+                  No offers yet
                 </div>
               )}
             </div>

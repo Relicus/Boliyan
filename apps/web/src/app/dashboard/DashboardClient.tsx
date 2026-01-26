@@ -7,8 +7,8 @@ import MyBidCard from "@/components/dashboard/MyBidCard";
 import WatchedItemCard from "@/components/dashboard/WatchedItemCard";
 import ListingOffersCard from "@/components/dashboard/ListingOffersCard";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Bookmark, Gavel, Tag, Inbox } from "lucide-react";
+import { DashboardTab } from "@/components/dashboard/DashboardTab";
+import { Bookmark, Gavel, Tag, Inbox } from "lucide-react";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import { supabase } from "@/lib/supabase";
 function DashboardContent() {
   const { itemsById, bids, user, deleteItem, watchedItemIds } = useApp();
   const [myItems, setMyItems] = useState<Item[]>([]);
+
   
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -114,46 +115,42 @@ function DashboardContent() {
     <div className="flex flex-col gap-6 p-4 md:p-6 max-w-7xl mx-auto w-full">
       
       {/* Header with Add Button */}
-      <div className="flex items-center justify-between">
-         <h1 className="text-3xl font-black font-outfit text-slate-900 tracking-tight">Dashboard</h1>
-         <Link href="/sell">
-            <Button className="font-bold gap-1.5 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all">
-                <Plus className="w-4 h-4" />
-                Sell Item
-            </Button>
-         </Link>
-      </div>
+      <h1 className="sr-only">Dashboard</h1>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl">
-          <TabsTrigger id="dashboard-offers-tab" value="offers" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
-             <Inbox className="w-4 h-4" />
-              <span className="hidden sm:inline">Selling</span>
-             {totalOfferCount > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-700 hover:bg-amber-200 h-5 px-1.5">{totalOfferCount}</Badge>
-             )}
-          </TabsTrigger>
-          <TabsTrigger id="dashboard-bids-tab" value="active-bids" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
-             <Gavel className="w-4 h-4" />
-              <span className="hidden sm:inline">Buying</span>
-             {myBids.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myBids.length}</Badge>
-             )}
-          </TabsTrigger>
-          <TabsTrigger id="dashboard-watchlist-tab" value="watchlist" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
-             <Bookmark className="w-4 h-4" />
-             <span className="hidden sm:inline">Watchlist</span>
-             {watchedItems.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{watchedItems.length}</Badge>
-             )}
-          </TabsTrigger>
-          <TabsTrigger id="dashboard-listings-tab" value="listings" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm gap-1.5">
-             <Tag className="w-4 h-4" />
-             <span className="hidden sm:inline">Listings</span>
-             {myItems.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-slate-200 text-slate-700 hover:bg-slate-300 h-5 px-1.5">{myItems.length}</Badge>
-             )}
-          </TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl h-auto">
+          <DashboardTab
+             id="dashboard-offers-tab"
+             value="offers"
+             icon={Inbox}
+             label="Selling"
+             count={totalOfferCount}
+             badgeClassName="text-amber-700"
+          />
+          <DashboardTab
+             id="dashboard-bids-tab"
+             value="active-bids"
+             icon={Gavel}
+             label="Buying"
+             count={myBids.length}
+             badgeClassName="text-slate-700"
+          />
+          <DashboardTab
+             id="dashboard-watchlist-tab"
+             value="watchlist"
+             icon={Bookmark}
+             label="Watchlist"
+             count={watchedItems.length}
+             badgeClassName="text-slate-700"
+          />
+          <DashboardTab
+             id="dashboard-listings-tab"
+             value="listings"
+             icon={Tag}
+             label="Listings"
+             count={myItems.length}
+             badgeClassName="text-slate-700"
+          />
         </TabsList>
 
         <AnimatePresence mode="wait">

@@ -191,6 +191,19 @@ export function useApp() {
     isMarketplaceLoading: marketplace.isLoading, // Expose specific loading state if needed
     
     // Override setFilter to sync both contexts for shared filters
-    setFilter: setFilterCompat
+    setFilter: setFilterCompat,
+    resetFilters: useCallback(() => {
+        // Reset Marketplace Filters matches Sidebar reset logic
+        marketplace.updateFilters({
+            category: null,
+            search: "",
+            minPrice: null,
+            maxPrice: null,
+            listingType: 'all',
+            condition: 'all',
+            // We keep location settings as they are usually persistent user preferences
+        });
+        search.clearFilters();
+    }, [marketplace, search])
   }), [auth, marketplace, search, chat, time, reviews, acceptBidCompat, setFilterCompat]);
 }

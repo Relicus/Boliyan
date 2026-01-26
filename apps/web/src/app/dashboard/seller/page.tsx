@@ -5,8 +5,9 @@ import { SellerStats } from '@/components/dashboard/SellerStats';
 import BuyerStats from '@/components/dashboard/BuyerStats';
 import { MyListingsTable } from '@/components/dashboard/MyListingsTable';
 import MyBidCard from '@/components/dashboard/MyBidCard';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { BarChart3, Gavel, Plus, Store, UserCircle } from 'lucide-react';
+import { Tabs, TabsList, TabsContent } from '@/components/ui/tabs';
+import { DashboardTab } from '@/components/dashboard/DashboardTab';
+import { BarChart3, Gavel, Store, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/lib/store';
 import Link from 'next/link';
@@ -17,32 +18,23 @@ export default function SellerDashboardPage() {
 
   return (
     <DashboardProvider>
-      <div id="analytics-page" className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 max-w-7xl space-y-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1 id="analytics-title" className="text-3xl font-bold tracking-tight text-foreground">Analytics</h1>
-            <p id="analytics-subtitle" className="text-muted-foreground mt-1">
-              Combined performance for buying and selling activity.
-            </p>
-          </div>
-          <Button asChild className="shrink-0 gap-2">
-            <Link href="/list">
-              <Plus className="h-4 w-4" />
-              New Listing
-            </Link>
-          </Button>
-        </div>
+      <div id="analytics-page" className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <h1 id="analytics-title" className="sr-only">Analytics</h1>
 
         <Tabs defaultValue="seller" className="space-y-6">
-          <TabsList id="analytics-tabs" className="grid w-full grid-cols-2 max-w-md bg-muted/60 p-1 rounded-xl">
-            <TabsTrigger id="analytics-buyer-tab" value="buyer" className="rounded-lg font-bold gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <UserCircle className="h-4 w-4" />
-              Buyer
-            </TabsTrigger>
-            <TabsTrigger id="analytics-seller-tab" value="seller" className="rounded-lg font-bold gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Store className="h-4 w-4" />
-              Seller
-            </TabsTrigger>
+          <TabsList id="analytics-tabs" className="grid w-full grid-cols-2 mb-6 bg-slate-100 p-1 rounded-xl h-auto">
+            <DashboardTab
+              id="analytics-buyer-tab"
+              value="buyer"
+              icon={UserCircle}
+              label="Buyer"
+            />
+            <DashboardTab
+              id="analytics-seller-tab"
+              value="seller"
+              icon={Store}
+              label="Seller"
+            />
           </TabsList>
 
           <TabsContent id="analytics-buyer-panel" value="buyer" className="space-y-6">

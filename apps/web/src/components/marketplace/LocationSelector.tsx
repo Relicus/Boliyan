@@ -113,7 +113,6 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
         {...props}
       >
         <span className="flex items-center gap-2 truncate">
-           <MapPin className={cn("h-3.5 w-3.5 text-slate-400 group-hover:text-blue-500 transition-colors", filters.locationMode === 'current' && 'text-blue-500')} />
            <span className="truncate text-xs">{getDisplayLabel()}</span>
         </span>
         <div className="flex items-center gap-1 text-[10px] text-slate-400 font-normal bg-slate-50 px-1.5 py-0.5 rounded-md border border-slate-100">
@@ -137,12 +136,6 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
         {getDisplayLabel().split(' ')[0]}
       </span>
     </Button>
-  );
-});
-LocationSelectorTrigger.displayName = "LocationSelectorTrigger";
-
-function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
-  const { filters, setFilter, updateFilters, user } = useApp();
   const [isLocating, setIsLocating] = useState(false);
   const [locError, setLocError] = useState<string | null>(null);
 

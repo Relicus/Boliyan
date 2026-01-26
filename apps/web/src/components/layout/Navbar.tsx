@@ -26,7 +26,7 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
 
 export default function Navbar() {
-  const { user, isLoggedIn, logout, items, bids, messages, isLoading } = useApp();
+  const { user, isLoggedIn, logout, items, bids, messages, isLoading, resetFilters } = useApp();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab');
@@ -147,9 +147,9 @@ export default function Navbar() {
             <LocationSelector align="end" />
           </div>
 
-          <Button id="navbar-sell-btn-12" asChild variant="outline" className="hidden sm:flex items-center gap-2 border-blue-100 hover:bg-blue-50 text-blue-600 px-3 sm:px-4">
+          <Button id="navbar-sell-btn-12" asChild className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 sm:px-4 shadow-lg shadow-blue-100 border-0">
             <Link href={isLoggedIn ? "/list" : `/signin?redirect=${encodeURIComponent("/list")}`}>
-              <Plus id="navbar-sell-plus-icon-13" className="h-4 w-4" />
+              <Plus id="navbar-sell-plus-icon-13" className="h-4 w-4 text-white" />
               <span className="hidden lg:inline">Sell Item</span>
             </Link>
           </Button>
@@ -184,7 +184,7 @@ export default function Navbar() {
                   "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
                   pathname === '/' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
                 )}>
-                  <Link href="/">
+                  <Link href="/" onClick={resetFilters}>
                     <Store id="navbar-market-icon" className={cn("h-5 w-5", pathname === '/' && "stroke-[2.5]")} strokeWidth={pathname === '/' ? 2.5 : 1.5} />
                     <span>Market</span>
                   </Link>
