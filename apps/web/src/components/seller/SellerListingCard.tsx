@@ -57,82 +57,94 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
           id={`listing-img-${item.id}`} 
           src={item.images[0]} 
           alt="" 
-          className="h-16 w-16 md:h-20 md:w-20 rounded-lg object-cover bg-slate-100" 
+          className="h-20 w-20 rounded-lg object-cover bg-slate-100" 
           loading="lazy"
         />
         {item.images.length > 1 && (
-          <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-blue-600 text-[10px] font-bold border-2 border-white">
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-blue-600 text-[10px] font-bold border-2 border-white">
             {item.images.length}
           </Badge>
         )}
       </div>
       <div id={`listing-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
-        <div>
-          <h3 id={`listing-title-${item.id}`} className="font-bold text-slate-900 truncate mb-1 text-[clamp(0.875rem,5cqi,1.125rem)] leading-none">
-            {item.title}
-          </h3>
-          <div id={`listing-title-row-${item.id}`} className="flex flex-col mb-2">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <ConditionBadge condition={item.condition} variant="outline" className="h-4 py-0 px-1 text-[8px]" />
-              <CategoryBadge category={item.category} variant="outline" className="h-4 py-0 px-1 text-[8px]" />
+        {/* Top Section */}
+        <div className="flex justify-between items-start gap-2">
+            {/* Left: Title & Meta */}
+            <div className="flex flex-col gap-1 min-w-0">
+                <h3 id={`listing-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-1 pr-1">{item.title}</h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                    <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
+                    <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
+                </div>
             </div>
-            <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-0.5">
-              Asking Price
-            </span>
-            <p id={`listing-price-${item.id}`} className="price-font text-[clamp(0.75rem,4cqi,1rem)] text-blue-600 font-black leading-none">
-              Rs. {item.askPrice.toLocaleString()}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 mb-2">
-            <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400">
-              {item.listingDuration}h
-            </Badge>
-            <Badge
-              id={`listing-slots-${item.id}`}
-              variant="outline"
-              className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400"
-            >
-              Slots {displayChatCount}/{maxSlots}
-            </Badge>
-            <div className="text-[10px] font-bold flex items-center gap-1 bg-red-600 text-white px-2 py-0.5 rounded-md">
-              <Clock className="h-2.5 w-2.5" />
-              {timeInfo.text}
+
+            {/* Right: Timer & Slots */}
+            <div className="flex flex-col items-end gap-1.5 shrink-0">
+                {/* Timer */}
+                <div className="text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-md flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {timeInfo.text}
+                </div>
+                {/* Slots Badge */}
+                 <div className="flex items-center gap-1">
+                    <Badge
+                        id={`listing-slots-${item.id}`}
+                        variant="outline"
+                        className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 border-slate-200 text-slate-400"
+                    >
+                        Slots {displayChatCount}/{maxSlots}
+                    </Badge>
+                 </div>
             </div>
-          </div>
         </div>
-        <div id={`listing-actions-${item.id}`} className="flex gap-1.5 md:gap-2">
-          <Button 
-            id={`listing-view-btn-${item.id}`} 
-            variant="outline"  
-            size="sm" 
-            className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
-            onClick={onView}
-          >
-            <Eye className="h-3 w-3 mr-1" />
-            View
-          </Button>
-          <Button 
-            id={`listing-edit-btn-${item.id}`} 
-            variant="outline"  
-            size="sm" 
-            className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
-            asChild
-          >
-            <Link href={`/list?id=${item.id}`}>
-              <Edit className="h-3 w-3 mr-1" />
-              Edit
-            </Link>
-          </Button>
-          <Button 
-            id={`listing-delete-btn-${item.id}`} 
-            variant="outline"  
-            size="sm" 
-            className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all"
-            onClick={onDelete}
-          >
-            <Trash2 className="h-3 w-3 mr-1" />
-            Delete
-          </Button>
+
+        {/* Bottom Section: Price & Actions */}
+        <div className="flex items-end justify-between mt-2 pt-1 border-t border-slate-100/50">
+             {/* Asking Price - Left Aligned */}
+             <div id={`listing-price-container-${item.id}`} className="flex flex-col items-start min-w-0">
+                <span className="text-[0.65rem] font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1 text-slate-400">
+                  Asking
+                </span>
+                <span id={`listing-price-${item.id}`} className="font-outfit font-black text-[clamp(1rem,6cqi,1.5rem)] leading-none text-blue-600">
+                  Rs. {item.askPrice.toLocaleString()}
+                </span>
+            </div>
+
+            {/* Actions - Right Aligned */}
+            <div id={`listing-actions-${item.id}`} className="flex items-center gap-1.5 md:gap-2">
+                  <Button 
+                    id={`listing-view-btn-${item.id}`} 
+                    variant="outline"  
+                    size="sm" 
+                    className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
+                    onClick={onView}
+                  >
+                    <Eye className="h-3 w-3 mr-1" />
+                    View
+                  </Button>
+                  <Button 
+                    id={`listing-edit-btn-${item.id}`} 
+                    variant="outline"  
+                    size="sm" 
+                    className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold transition-all hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100"
+                    asChild
+                  >
+                    <Link href={`/list?id=${item.id}`}>
+                      <Edit className="h-3 w-3 mr-1" />
+                      Edit
+                    </Link>
+                  </Button>
+                  <Button 
+                    id={`listing-delete-btn-${item.id}`} 
+                    variant="outline"  
+                    size="sm" 
+                    className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-bold text-red-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all"
+                    onClick={onDelete}
+                  >
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    Delete
+                  </Button>
+            </div>
         </div>
       </div>
     </div>

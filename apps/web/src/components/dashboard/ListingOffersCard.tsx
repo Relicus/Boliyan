@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Check, X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Clock } from "lucide-react";
+import { Check, X, MessageSquare, Phone, Star, ChevronDown, ChevronUp, Clock, Tag, Activity, Trophy, Inbox, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Bid, Item } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -244,15 +244,23 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
               <p className="text-xs text-slate-500 truncate">{item.description}</p>
             </div>
           </div>
-          <div className="text-sm font-medium text-slate-500 mt-1 mb-0.5">
-            <p>
-              Ask: <span className="font-semibold text-slate-900">PKR {item.askPrice.toLocaleString()}</span>
-            </p>
-          </div>
-          <div className="text-xs text-slate-500 mt-1 mb-0.5">
-            <p>
-              Status: <span className="text-green-600 font-medium">Active</span>
-            </p>
+          <div className="flex flex-col gap-2 mt-1">
+            {/* Ask Price */}
+            <div id={`ask-price-${item.id}`} className="flex flex-col items-start">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1 mb-0.5">
+                <Tag className="w-3 h-3" />
+                Asking
+              </span>
+              <span className="font-outfit font-bold text-slate-900 text-lg leading-none">
+                PKR {item.askPrice.toLocaleString()}
+              </span>
+            </div>
+            
+            {/* Status Badge */}
+            <div id={`status-badge-${item.id}`} className="inline-flex items-center gap-1 text-[10px] uppercase font-bold text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full w-fit">
+               <Activity className="w-3 h-3" />
+               Active Listing
+             </div>
           </div>
         </div>
 
@@ -262,11 +270,27 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
              <Clock className="w-3 h-3 text-white" />
              {getTimeLeft(item.expiryAt)}
            </div>
-           <div className="text-xs text-slate-500 mt-1 mb-0.5">
-             {totalOffers} Offers • {acceptedOffers.length} Accepted
+           <div id={`offers-stat-${item.id}`} className="flex items-center gap-3 text-xs text-slate-500 mt-1 mb-0.5">
+             <span className="flex items-center gap-1">
+                <Inbox className="w-3 h-3 text-slate-400" />
+                {totalOffers} Offers
+             </span>
+             {acceptedOffers.length > 0 && (
+                <span className="flex items-center gap-1 text-green-600 font-medium">
+                    <CheckCircle className="w-3 h-3" />
+                    {acceptedOffers.length} Accepted
+                </span>
+             )}
            </div>
-           <div className={`font-black ${bestPrice >= item.askPrice ? 'text-green-600' : 'text-slate-900'}`} style={{ fontSize: 'clamp(1.5rem, 5vw, 2.25rem)' }}>
-             {bestPrice > 0 ? `PKR ${bestPrice.toLocaleString()}` : '—'}
+
+           <div id={`top-offer-${item.id}`} className="flex flex-col items-end">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                <Trophy className="w-3 h-3 text-amber-500" />
+                Top Offer
+              </span>
+              <div id={`best-price-value-${item.id}`} className={`font-black leading-none ${bestPrice >= item.askPrice ? 'text-green-600' : 'text-slate-900'}`} style={{ fontSize: 'clamp(1.5rem, 5vw, 2.25rem)' }}>
+                {bestPrice > 0 ? `PKR ${bestPrice.toLocaleString()}` : '—'}
+              </div>
            </div>
            {/* Inline Toggle */}
            <button

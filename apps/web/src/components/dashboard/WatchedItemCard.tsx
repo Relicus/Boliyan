@@ -126,8 +126,8 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
                     <Button 
                       id={`watched-item-remove-btn-${item.id}`}
                       size="sm" 
-                      variant="ghost" 
-                      className="h-7 px-2 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                      variant="outline" 
+                      className="h-7 px-2 bg-slate-50 border-slate-200 text-slate-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100"
                       onClick={handleRemove}
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-1" />
