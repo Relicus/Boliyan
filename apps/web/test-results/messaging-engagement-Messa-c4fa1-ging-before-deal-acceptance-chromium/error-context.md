@@ -16,9 +16,9 @@
       - generic [ref=e20]:
         - generic [ref=e21]:
           - generic [ref=e22]: YOUR LOCATION
-          - button "Karachi" [ref=e24]:
+          - button "Islamabad" [ref=e24]:
             - img
-            - generic [ref=e25]: Karachi
+            - generic [ref=e25]: Islamabad
         - link "Sell Item" [ref=e26] [cursor=pointer]:
           - /url: /list
           - img
@@ -57,8 +57,8 @@
       - generic [ref=e57]:
         - generic [ref=e58]:
           - heading "LIST LOCATION" [level=3] [ref=e59]
-          - button "Karachi ∞" [ref=e61]:
-            - generic [ref=e63]: Karachi
+          - button "Islamabad ∞" [ref=e61]:
+            - generic [ref=e63]: Islamabad
             - generic [ref=e64]: ∞
         - generic [ref=e65]:
           - heading "Price Range" [level=3] [ref=e66]
@@ -218,7 +218,16 @@
                   - img [ref=e238]
                   - text: Place Bid
   - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e257] [cursor=pointer]:
-    - img [ref=e258]
-  - alert [ref=e261]
+  - generic [ref=e256] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e257]:
+      - img [ref=e258]
+    - generic [ref=e261]:
+      - button "Open issues overlay" [ref=e262]:
+        - generic [ref=e263]:
+          - generic [ref=e264]: "0"
+          - generic [ref=e265]: "1"
+        - generic [ref=e266]: Issue
+      - button "Collapse issues badge" [ref=e267]:
+        - img [ref=e268]
+  - alert [ref=e270]
 ```

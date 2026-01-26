@@ -25,6 +25,7 @@ export interface User {
     lat: number;
     lng: number;
     address: string;
+    city?: string;
   };
   badges: Badge[];
   stats: UserStats;
@@ -55,6 +56,12 @@ export interface Item {
   status: 'active' | 'completed' | 'cancelled' | 'hidden';
   goLiveAt?: string;
   lastEditedAt?: string;
+  location?: {
+    lat: number;
+    lng: number;
+    address: string;
+    city?: string;
+  };
 }
 
 export interface Bid {

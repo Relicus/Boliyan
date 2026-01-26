@@ -41,3 +41,6 @@ git_status.txt
 # Testing
 .nyc_output
 coverage/
+apps/web/playwright-report/
+test-results/
+apps/web/test-results/

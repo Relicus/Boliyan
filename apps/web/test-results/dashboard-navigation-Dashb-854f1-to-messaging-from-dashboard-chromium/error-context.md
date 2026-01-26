@@ -16,9 +16,9 @@
       - generic [ref=e20]:
         - generic [ref=e21]:
           - generic [ref=e22]: YOUR LOCATION
-          - button "Karachi" [ref=e24]:
+          - button "Islamabad" [ref=e24]:
             - img
-            - generic [ref=e25]: Karachi
+            - generic [ref=e25]: Islamabad
         - link "Sell Item" [ref=e26] [cursor=pointer]:
           - /url: /list
           - img
@@ -29,95 +29,85 @@
               - /url: /
               - img
               - generic [ref=e31]: Market
-            - link "Dash" [ref=e32] [cursor=pointer]:
+            - link "Dash 1" [ref=e32] [cursor=pointer]:
               - /url: /dashboard?tab=offers
               - img
               - generic [ref=e33]: Dash
-            - link "Analytics" [ref=e34] [cursor=pointer]:
+              - generic [ref=e34]: "1"
+            - link "Analytics" [ref=e35] [cursor=pointer]:
               - /url: /dashboard/seller
               - img
-              - generic [ref=e35]: Analytics
-            - link "Chat" [ref=e36] [cursor=pointer]:
+              - generic [ref=e36]: Analytics
+            - link "Chat" [ref=e37] [cursor=pointer]:
               - /url: /inbox
               - img
-              - generic [ref=e37]: Chat
-          - button "Notifications" [ref=e39]:
+              - generic [ref=e38]: Chat
+          - button "Notifications" [ref=e40]:
             - img
-            - generic [ref=e43]: Notifications
-          - img [ref=e45] [cursor=pointer]
-  - main [ref=e47]:
-    - generic [ref=e49]:
-      - heading "Dashboard" [level=1] [ref=e50]
-      - generic [ref=e51]:
-        - tablist [ref=e52]:
-          - tab "Selling 4" [selected] [ref=e53]:
-            - generic [ref=e54]:
+            - generic [ref=e44]: Notifications
+          - img [ref=e46] [cursor=pointer]
+  - main [ref=e48]:
+    - generic [ref=e50]:
+      - heading "Dashboard" [level=1] [ref=e51]
+      - generic [ref=e52]:
+        - tablist [ref=e53]:
+          - tab "Selling 4" [selected] [ref=e54]:
+            - generic [ref=e55]:
               - img
-            - generic [ref=e55]: Selling
-            - generic [ref=e56]: "4"
-          - tab "Buying 13" [ref=e57]:
-            - generic [ref=e58]:
+            - generic [ref=e56]: Selling
+            - generic [ref=e57]: "4"
+          - tab "Buying 14" [ref=e58]:
+            - generic [ref=e59]:
               - img
-            - generic [ref=e59]: Buying
-            - generic [ref=e60]: "13"
-          - tab "Watchlist 14" [ref=e61]:
-            - generic [ref=e62]:
+            - generic [ref=e60]: Buying
+            - generic [ref=e61]: "14"
+          - tab "Watchlist 15" [ref=e62]:
+            - generic [ref=e63]:
               - img
-            - generic [ref=e63]: Watchlist
-            - generic [ref=e64]: "14"
-          - tab "Listings 1" [ref=e65]:
-            - generic [ref=e66]:
+            - generic [ref=e64]: Watchlist
+            - generic [ref=e65]: "15"
+          - tab "Listings 1" [ref=e66]:
+            - generic [ref=e67]:
               - img
-            - generic [ref=e67]: Listings
-            - generic [ref=e68]: "1"
-        - generic [ref=e71] [cursor=pointer]:
-          - generic [ref=e72]:
-            - generic [ref=e73]:
-              - img "My Cloud" [ref=e75]
-              - generic [ref=e76]:
-                - heading "My Cloud" [level=3] [ref=e77]
-                - paragraph [ref=e78]: It's gud
-            - generic [ref=e79]:
-              - generic [ref=e80]:
-                - generic [ref=e81]:
-                  - img [ref=e82]
+            - generic [ref=e68]: Listings
+            - generic [ref=e69]: "1"
+        - generic [ref=e72] [cursor=pointer]:
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - img "My Cloud" [ref=e76]
+              - generic [ref=e77]:
+                - heading "My Cloud" [level=3] [ref=e78]
+                - paragraph [ref=e79]: It's gud
+            - generic [ref=e80]:
+              - generic [ref=e81]:
+                - generic [ref=e82]:
+                  - img [ref=e83]
                   - text: Asking
-                - generic [ref=e85]: PKR 50,000
-              - generic [ref=e86]:
-                - img [ref=e87]
+                - generic [ref=e86]: PKR 50,000
+              - generic [ref=e87]:
+                - img [ref=e88]
                 - text: Active Listing
-          - generic [ref=e89]:
-            - generic [ref=e90]:
-              - img [ref=e91]
-              - text: 3h 8m
-            - generic [ref=e94]:
-              - generic [ref=e95]:
-                - img [ref=e96]
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - img [ref=e92]
+              - text: 0h 38m
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - img [ref=e97]
                 - text: 4 Offers
-              - generic [ref=e99]:
-                - img [ref=e100]
+              - generic [ref=e100]:
+                - img [ref=e101]
                 - text: 4 Accepted
-            - generic [ref=e103]:
-              - generic [ref=e104]:
-                - img [ref=e105]
+            - generic [ref=e104]:
+              - generic [ref=e105]:
+                - img [ref=e106]
                 - text: Top Offer
-              - generic [ref=e111]: PKR 54,000
-            - button "Show 4 offers" [ref=e112]:
+              - generic [ref=e112]: PKR 54,000
+            - button "Show 4 offers" [ref=e113]:
               - text: Show 4 offers
-              - img [ref=e113]
+              - img [ref=e114]
   - region "Notifications alt+T"
-  - generic [ref=e119] [cursor=pointer]:
-    - button "Open Next.js Dev Tools" [ref=e120]:
-      - img [ref=e121]
-    - generic [ref=e124]:
-      - button "Open issues overlay" [ref=e125]:
-        - generic [ref=e126]:
-          - generic [ref=e127]: "1"
-          - generic [ref=e128]: "2"
-        - generic [ref=e129]:
-          - text: Issue
-          - generic [ref=e130]: s
-      - button "Collapse issues badge" [ref=e131]:
-        - img [ref=e132]
-  - alert [ref=e134]
+  - button "Open Next.js Dev Tools" [ref=e121] [cursor=pointer]:
+    - img [ref=e122]
+  - alert [ref=e125]
 ```

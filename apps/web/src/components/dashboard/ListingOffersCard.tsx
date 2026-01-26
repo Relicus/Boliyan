@@ -36,12 +36,8 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
       if (b.amount !== a.amount) return b.amount - a.amount;
       
       // Secondary: Closer distance first
-      const distA = a.bidder?.location 
-        ? calculatePrivacySafeDistance(user?.location, a.bidder.location).distance 
-        : 9999;
-      const distB = b.bidder?.location 
-        ? calculatePrivacySafeDistance(user?.location, b.bidder.location).distance 
-        : 9999;
+      const distA = calculatePrivacySafeDistance(user?.location, a.bidder?.location).distance;
+      const distB = calculatePrivacySafeDistance(user?.location, b.bidder?.location).distance;
       return distA - distB;
     });
   }, [offers, user?.location]);
@@ -126,9 +122,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
     const canCall = canChat && !!bidder.phone;
     const isProcessing = processingBidId === bid.id;
     const actionsDisabled = isPendingGoLive || isProcessing;
-    const locationInfo = bidder.location 
-      ? calculatePrivacySafeDistance(user?.location, bidder.location)
-      : null;
+    const locationInfo = calculatePrivacySafeDistance(user?.location, bidder.location);
 
     return (
       <div 
@@ -157,7 +151,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 <div className="flex items-center gap-1 mt-0.5">
                   <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                   <span className="text-xs text-slate-600">{bidder.rating.toFixed(1)}</span>
-                  {locationInfo && locationInfo.distance > 0 && (
+                  {locationInfo.distance > 0 && !locationInfo.isOutside && (
                     <span className="text-xs text-slate-500">• {locationInfo.distance} km</span>
                   )}
                 </div>

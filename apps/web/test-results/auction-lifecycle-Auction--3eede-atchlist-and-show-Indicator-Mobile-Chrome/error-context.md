@@ -38,7 +38,7 @@
                     - generic:
                       - combobox:
                         - img
-                        - generic: Just
+                        - generic: Trending
                       - combobox:
                         - img
                         - generic: Categories
@@ -54,7 +54,7 @@
                           - button:
                             - generic:
                               - img
-                            - generic: Karachi
+                            - generic: Islamabad
                       - generic:
                         - button:
                           - generic:
@@ -161,78 +161,87 @@
               - img
             - generic: Analytics
   - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e6] [cursor=pointer]:
-    - img [ref=e7]
+  - generic [ref=e5] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e6]:
+      - img [ref=e7]
+    - generic [ref=e10]:
+      - button "Open issues overlay" [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]: "0"
+          - generic [ref=e14]: "1"
+        - generic [ref=e15]: Issue
+      - button "Collapse issues badge" [ref=e16]:
+        - img [ref=e17]
   - alert
-  - dialog "Test Item Camera" [ref=e11]:
-    - heading "Test Item Camera" [level=2] [ref=e12]
-    - button [active] [ref=e13]:
-      - img [ref=e14]
-    - generic [ref=e17]:
-      - img "Test Item Camera" [ref=e20] [cursor=pointer]
-      - generic [ref=e22]:
-        - generic [ref=e23]:
-          - generic [ref=e25]:
-            - heading "Test Item Camera" [level=3] [ref=e26]
-            - generic [ref=e27]:
-              - generic [ref=e29]: 👌 Used
-              - generic [ref=e30]:
-                - img [ref=e31]
-                - generic [ref=e34]: Cameras
-              - generic [ref=e35]:
-                - img [ref=e36]
-                - generic [ref=e39]: 2d 23h
-          - generic [ref=e42]:
-            - img "Demo Seller" [ref=e44]
-            - generic [ref=e45]:
-              - generic [ref=e46]:
-                - generic [ref=e47]: Demo Seller
-                - generic [ref=e48]:
-                  - img [ref=e49]
-                  - generic [ref=e51]:
-                    - generic [ref=e52]: "4.8"
-                    - generic [ref=e53]: (12)
-              - generic [ref=e54]:
-                - img [ref=e55]
-                - generic [ref=e58]: Karachi
-                - generic [ref=e59]: 1 min (0.2 km)
-          - generic [ref=e60]:
-            - heading "Description" [level=4] [ref=e61]
-            - paragraph [ref=e62]: A great camera
-        - generic [ref=e64]:
-          - generic [ref=e66]:
-            - generic [ref=e67]:
-              - generic [ref=e68]:
-                - img [ref=e69]
+  - dialog "Test Item Camera" [ref=e20]:
+    - heading "Test Item Camera" [level=2] [ref=e21]
+    - button [active] [ref=e22]:
+      - img [ref=e23]
+    - generic [ref=e26]:
+      - img "Test Item Camera" [ref=e29] [cursor=pointer]
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e34]:
+            - heading "Test Item Camera" [level=3] [ref=e35]
+            - generic [ref=e36]:
+              - generic [ref=e38]: 👌 Used
+              - generic [ref=e39]:
+                - img [ref=e40]
+                - generic [ref=e43]: Cameras
+              - generic [ref=e44]:
+                - img [ref=e45]
+                - generic [ref=e48]: 2d 23h
+          - generic [ref=e51]:
+            - img "Demo Seller" [ref=e53]
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - generic [ref=e56]: Demo Seller
+                - generic [ref=e57]:
+                  - img [ref=e58]
+                  - generic [ref=e60]:
+                    - generic [ref=e61]: "4.8"
+                    - generic [ref=e62]: (12)
+              - generic [ref=e63]:
+                - img [ref=e64]
+                - generic [ref=e67]: Karachi
+                - generic [ref=e68]: 1 min (0.2 km)
+          - generic [ref=e69]:
+            - heading "Description" [level=4] [ref=e70]
+            - paragraph [ref=e71]: A great camera
+        - generic [ref=e73]:
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - img [ref=e78]
                 - text: Asking
-              - generic [ref=e73]: 13,100
-            - generic [ref=e74]:
-              - generic [ref=e76]:
-                - img [ref=e77]
+              - generic [ref=e82]: 13,100
+            - generic [ref=e83]:
+              - generic [ref=e85]:
+                - img [ref=e86]
                 - text: Highest
-              - generic [ref=e83]:
-                - generic [ref=e84]: (5)
-                - generic [ref=e85]: 12,000
-          - generic [ref=e87]:
-            - generic [ref=e89]:
-              - button [ref=e90]:
-                - img [ref=e91]
               - generic [ref=e92]:
-                - textbox [ref=e93]: 13,100
+                - generic [ref=e93]: (5)
+                - generic [ref=e94]: 12,000
+          - generic [ref=e96]:
+            - generic [ref=e98]:
+              - button [ref=e99]:
+                - img [ref=e100]
+              - generic [ref=e101]:
+                - textbox [ref=e102]: 13,100
                 - generic:
                   - generic: 13,100
-              - button [ref=e94]:
-                - img [ref=e95]
-            - button "Place Bid" [ref=e97]:
-              - generic [ref=e99]:
-                - img [ref=e100]
+              - button [ref=e103]:
+                - img [ref=e104]
+            - button "Place Bid" [ref=e106]:
+              - generic [ref=e108]:
+                - img [ref=e109]
                 - text: Place Bid
-          - generic [ref=e114]:
-            - link "Full Page" [ref=e115] [cursor=pointer]:
+          - generic [ref=e123]:
+            - link "Full Page" [ref=e124] [cursor=pointer]:
               - /url: /product/00000000-0000-0000-0000-000000000023
-              - img [ref=e116]
-              - generic [ref=e120]: Full Page
-            - button "Watch" [ref=e121]:
-              - img [ref=e122]
-              - generic [ref=e124]: Watch
+              - img [ref=e125]
+              - generic [ref=e129]: Full Page
+            - button "Watch" [ref=e130]:
+              - img [ref=e131]
+              - generic [ref=e133]: Watch
 ```

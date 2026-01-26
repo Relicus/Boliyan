@@ -29,8 +29,10 @@ import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { Item } from "@/types";
 import { roundToReasonablePrice } from "@/lib/bidding";
 import { calculateDepreciation, formatPriceEstimate, getPurchaseYearOptions, getPurchaseMonthOptions, DepreciationResult } from "@/lib/depreciation";
+import { MapPicker } from "@/components/common/MapPicker";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useTime } from "@/context/TimeContext";
+import { MapPin } from "lucide-react";
 
 const EDIT_WARNING_TITLE = "Editing resets bids";
 const EDIT_WARNING_DESCRIPTION = "Saving changes will delete all bids and relaunch this listing in 1 hour.";
@@ -100,6 +102,7 @@ function ListForm() {
   const [currentNewPrice, setCurrentNewPrice] = useState<string>("");
   const [contactPhone, setContactPhone] = useState("");
   const [showPriceEstimator, setShowPriceEstimator] = useState(false);
+  const [location, setLocation] = useState<{lat: number, lng: number, address: string, city?: string} | null>(null);
   
   // Computed price estimate
   const priceEstimate: DepreciationResult | null = React.useMemo(() => {
@@ -136,6 +139,7 @@ function ListForm() {
     description?: boolean;
     contactPhone?: boolean;
     images?: boolean;
+    location?: boolean;
     purchasePrice?: boolean;
     purchaseYear?: boolean;
   }>({});
@@ -147,6 +151,9 @@ function ListForm() {
       setAskPrice(editingItem.askPrice.toString());
       setDescription(editingItem.description || "");
       setIsPublic(editingItem.isPublicBid);
+      if (editingItem.location) {
+        setLocation(editingItem.location);
+      }
       setImageEntries(
         editingItem.images.map((url: string, index: number) => ({
           id: `existing-${index}`,
@@ -236,6 +243,7 @@ function ListForm() {
       description: description.length < LISTING_LIMITS.DESCRIPTION.MIN || description.length > LISTING_LIMITS.DESCRIPTION.MAX,
       contactPhone: !isValidPhone(contactPhone),
       images: imageEntries.length < 1,
+      location: !location,
       purchasePrice: !purchasePrice || isNaN(parseFloat(purchasePrice)) || parseFloat(purchasePrice) <= 0,
       purchaseYear: !purchaseYear
     };
@@ -244,6 +252,7 @@ function ListForm() {
 
     if (Object.values(newErrors).some(Boolean)) {
       if (newErrors.images) toast.error("At least one image is required");
+      if (newErrors.location) toast.error("Location is required");
       return;
     }
 
@@ -281,7 +290,10 @@ function ListForm() {
           auction_mode: (isPublic ? 'visible' : 'hidden') as 'visible' | 'hidden',
           images: orderedUrls,
           condition: condition,
-          ends_at: endsAt
+          ends_at: endsAt,
+          location_lat: location!.lat,
+          location_lng: location!.lng,
+          location_address: location!.address
         };
 
         if (editingItem) {
@@ -298,6 +310,22 @@ function ListForm() {
               p_condition: listingPayload.condition,
               p_ends_at: listingPayload.ends_at
             });
+            
+          // NOTE: edit_listing_with_cooldown RPC might not accept location params yet.
+          // We need to update location separately or update the RPC. 
+          // For now, let's update location via direct update if RPC succeeds or just ignore location update in edit mode for this specific RPC path if risk is high.
+          // Better approach: Direct update for non-critical fields if we want to support location edit.
+          // However, since we are doing a "reset bids" edit, we might as well update everything.
+          // But RPC signature is fixed. I should update the RPC signature or do a separate update call.
+          // Let's do a separate update call for location immediately after RPC if successful.
+          
+          if (!error) {
+             await supabase.from('listings').update({
+               location_lat: location!.lat,
+               location_lng: location!.lng,
+               location_address: location!.address
+             }).eq('id', editingItem.id);
+          }
 
           if (error) {
             if (error.message?.includes('COOLDOWN_ACTIVE')) {
@@ -316,7 +344,10 @@ function ListForm() {
             ...listingPayload,
             seller_id: user.id,
             status: 'active',
-            slug: generateSlug(title)
+            slug: generateSlug(title),
+            location_lat: location!.lat,
+            location_lng: location!.lng,
+            location_address: location!.address
           };
 
           const { error } = await supabase.from('listings').insert([insertPayload]);
@@ -470,6 +501,22 @@ function ListForm() {
                     </label>
                   )}
                 </div>
+              </div>
+
+              {/* Location Map Section */}
+              <div className="space-y-4">
+                <Label className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-slate-500" />
+                  Item Location <span className="text-red-500">*</span>
+                </Label>
+                <div className={`h-[300px] rounded-xl overflow-hidden border ${errors.location ? 'border-red-500' : 'border-slate-200'} shadow-sm`}>
+                  <MapPicker 
+                    initialLocation={location}
+                    onLocationSelect={setLocation}
+                    required
+                  />
+                </div>
+                {errors.location && <p className="text-[10px] font-bold text-red-500">Location is required</p>}
               </div>
 
               <div className="space-y-2">

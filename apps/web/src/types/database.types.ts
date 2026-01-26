@@ -199,6 +199,9 @@ export type Database = {
           slug: string | null
           status: string | null
           title: string
+          location_lat: number | null
+          location_lng: number | null
+          location_address: string | null
         }
         Insert: {
           asked_price: number
@@ -219,6 +222,9 @@ export type Database = {
           slug?: string | null
           status?: string | null
           title: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_address?: string | null
         }
         Update: {
           asked_price?: number
@@ -239,6 +245,9 @@ export type Database = {
           slug?: string | null
           status?: string | null
           title?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_address?: string | null
         }
         Relationships: [
           {
@@ -350,6 +359,8 @@ export type Database = {
           rating: number | null
           rating_count: number | null
           seller_success_rate: number | null
+          location_lat: number | null
+          location_lng: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -365,6 +376,8 @@ export type Database = {
           rating?: number | null
           rating_count?: number | null
           seller_success_rate?: number | null
+          location_lat?: number | null
+          location_lng?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -380,6 +393,8 @@ export type Database = {
           rating?: number | null
           rating_count?: number | null
           seller_success_rate?: number | null
+          location_lat?: number | null
+          location_lng?: number | null
         }
         Relationships: []
       }
@@ -561,6 +576,9 @@ export type Database = {
           slug: string | null
           status: string | null
           title: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_address: string | null
         }
         Relationships: [
           {

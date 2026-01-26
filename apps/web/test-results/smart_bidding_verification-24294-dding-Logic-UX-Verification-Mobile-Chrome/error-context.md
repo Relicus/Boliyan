@@ -16,77 +16,462 @@
       - generic [ref=e21]:
         - button "Notifications" [ref=e23]:
           - img
-          - generic [ref=e27]: Notifications
-        - img [ref=e29] [cursor=pointer]
-  - main [ref=e31]:
-    - generic [ref=e34]:
-      - generic [ref=e38]:
-        - generic [ref=e39]:
-          - combobox [ref=e40]:
+          - generic [ref=e24]: Notifications
+        - img [ref=e26] [cursor=pointer]
+  - main [ref=e28]:
+    - generic [ref=e31]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - combobox [ref=e37]:
             - img
-            - generic [ref=e41]: Just
-          - combobox [ref=e42]:
+            - generic [ref=e38]: Trending
+          - combobox [ref=e39]:
             - img
-            - generic [ref=e43]: Categories
-          - combobox [ref=e44]:
+            - generic [ref=e40]: Categories
+          - combobox [ref=e41]:
             - img
-            - generic [ref=e45]: Type
-          - button "View" [ref=e46]:
+            - generic [ref=e42]: Type
+          - button "View" [ref=e43]:
             - img
-            - generic [ref=e47]: View
-        - generic [ref=e48]:
-          - button "Karachi" [ref=e51]:
-            - generic [ref=e52]:
+            - generic [ref=e44]: View
+        - generic [ref=e45]:
+          - button "Islamabad" [ref=e48]:
+            - generic [ref=e49]:
               - img
-            - generic [ref=e53]: Karachi
-          - button "Price" [ref=e55]:
-            - generic [ref=e56]:
+            - generic [ref=e50]: Islamabad
+          - button "Price" [ref=e52]:
+            - generic [ref=e53]:
               - img
-            - generic [ref=e57]: Price
-      - generic [ref=e119]:
-        - img [ref=e121]
-        - heading "No results found" [level=3] [ref=e126]
-        - paragraph [ref=e127]: We couldn't find any items matching your current filters. Try adjusting your search terms or category.
-        - button "Reset Filters" [ref=e128]
-  - generic [ref=e131]:
-    - link "Market" [ref=e132] [cursor=pointer]:
+            - generic [ref=e54]: Price
+      - generic [ref=e55]:
+        - generic [ref=e59]:
+          - generic [ref=e60] [cursor=pointer]:
+            - img "My Cloud main image" [ref=e62]
+            - generic [ref=e63]:
+              - generic [ref=e64]:
+                - img [ref=e65]
+                - generic [ref=e68]: Islamabad
+              - button "Appliances" [ref=e69]:
+                - img [ref=e70]
+                - generic [ref=e73]: Appliances
+            - generic [ref=e74]:
+              - generic [ref=e75]:
+                - img [ref=e76]
+                - generic [ref=e79]: 0h 25m 27s
+              - generic [ref=e81]: 👌 Used
+            - button [ref=e83]:
+              - img [ref=e84]
+          - generic [ref=e86]:
+            - heading "My Cloud" [level=3] [ref=e88] [cursor=pointer]
+            - generic [ref=e89]:
+              - generic [ref=e90]:
+                - generic [ref=e91]:
+                  - img [ref=e92]
+                  - text: Asking
+                - generic [ref=e96]: 50,000
+              - generic [ref=e97]:
+                - generic [ref=e99]:
+                  - img [ref=e100]
+                  - text: Highest
+                - generic [ref=e106]:
+                  - generic [ref=e107]: (4)
+                  - generic [ref=e108]: 54,000
+            - generic [ref=e110]:
+              - generic [ref=e111]:
+                - generic:
+                  - button:
+                    - img
+                  - generic:
+                    - textbox: 54,000
+                    - generic:
+                      - generic: 54,000
+                  - button:
+                    - img
+              - button "Edit Listing" [ref=e112]:
+                - generic [ref=e114]:
+                  - img [ref=e115]
+                  - text: Edit Listing
+        - generic [ref=e121]:
+          - generic [ref=e122] [cursor=pointer]:
+            - img "Keychron K2 Mechanical Keyboard main image" [ref=e124]
+            - generic [ref=e125]:
+              - generic [ref=e126]:
+                - img [ref=e127]
+                - generic [ref=e130]: Karachi
+              - button "Electronics" [ref=e131]:
+                - img [ref=e132]
+                - generic [ref=e134]: Electronics
+            - generic [ref=e135]:
+              - generic [ref=e136]:
+                - img [ref=e137]
+                - generic [ref=e140]: 0h 0m 0s
+              - generic [ref=e142]: 👌 Used
+            - generic [ref=e143]:
+              - button [ref=e144]:
+                - img [ref=e145]
+              - img [ref=e148]
+          - generic [ref=e151]:
+            - heading "Keychron K2 Mechanical Keyboard" [level=3] [ref=e153] [cursor=pointer]
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - generic [ref=e156]:
+                  - img [ref=e157]
+                  - text: Asking
+                - generic [ref=e161]: 18,000
+              - generic [ref=e162]:
+                - generic [ref=e164]:
+                  - img [ref=e165]
+                  - text: Hidden
+                - generic [ref=e168]: 3 Bids
+            - generic [ref=e170]:
+              - generic [ref=e172]:
+                - button [ref=e173]:
+                  - img [ref=e174]
+                - generic [ref=e175]:
+                  - textbox [ref=e176]: 18,000
+                  - generic:
+                    - generic: 18,000
+                - button [ref=e177]:
+                  - img [ref=e178]
+              - button "Place Bid" [ref=e180]:
+                - generic [ref=e182]:
+                  - img [ref=e183]
+                  - text: Place Bid
+        - generic [ref=e199]:
+          - generic [ref=e200] [cursor=pointer]:
+            - img "Rolex Submariner Date (Replica High End) main image" [ref=e202]
+            - generic [ref=e203]:
+              - generic [ref=e204]:
+                - img [ref=e205]
+                - generic [ref=e208]: Karachi
+              - button "Watches" [ref=e209]:
+                - img [ref=e210]
+                - generic [ref=e215]: Watches
+            - generic [ref=e216]:
+              - generic [ref=e217]:
+                - img [ref=e218]
+                - generic [ref=e221]: 0h 0m 0s
+              - generic [ref=e223]: 👌 Used
+            - button [ref=e225]:
+              - img [ref=e226]
+          - generic [ref=e228]:
+            - heading "Rolex Submariner Date (Replica High End)" [level=3] [ref=e230] [cursor=pointer]
+            - generic [ref=e231]:
+              - generic [ref=e232]:
+                - generic [ref=e233]:
+                  - img [ref=e234]
+                  - text: Asking
+                - generic [ref=e238]: 25,000
+              - generic [ref=e239]:
+                - generic [ref=e241]:
+                  - img [ref=e242]
+                  - text: Highest
+                - generic [ref=e248]:
+                  - generic [ref=e249]: (2)
+                  - generic [ref=e250]: 27,000
+            - generic [ref=e252]:
+              - generic [ref=e254]:
+                - button [ref=e255]:
+                  - img [ref=e256]
+                - generic [ref=e257]:
+                  - textbox [ref=e258]: 27,000
+                  - generic:
+                    - generic: 27,000
+                - button [ref=e259]:
+                  - img [ref=e260]
+              - button "Place Bid" [ref=e262]:
+                - generic [ref=e264]:
+                  - img [ref=e265]
+                  - text: Place Bid
+        - generic [ref=e282]:
+          - generic [ref=e283] [cursor=pointer]:
+            - img "MacBook Pro M1 13-inch 2020 main image" [ref=e285]
+            - generic [ref=e286]:
+              - generic [ref=e287]:
+                - img [ref=e288]
+                - generic [ref=e291]: Karachi
+              - button "Electronics" [ref=e292]:
+                - img [ref=e293]
+                - generic [ref=e295]: Electronics
+            - generic [ref=e296]:
+              - generic [ref=e297]:
+                - img [ref=e298]
+                - generic [ref=e301]: 0h 0m 0s
+              - generic [ref=e303]: 👌 Used
+            - button [ref=e305]:
+              - img [ref=e306]
+          - generic [ref=e308]:
+            - heading "MacBook Pro M1 13-inch 2020" [level=3] [ref=e310] [cursor=pointer]
+            - generic [ref=e311]:
+              - generic [ref=e312]:
+                - generic [ref=e313]:
+                  - img [ref=e314]
+                  - text: Asking
+                - generic [ref=e318]: 220,000
+              - generic [ref=e319]:
+                - generic [ref=e321]:
+                  - img [ref=e322]
+                  - text: Highest
+                - generic [ref=e328]:
+                  - generic [ref=e329]: (2)
+                  - generic [ref=e330]: 329,000
+            - generic [ref=e332]:
+              - generic [ref=e334]:
+                - button [ref=e335]:
+                  - img [ref=e336]
+                - generic [ref=e337]:
+                  - textbox [ref=e338]: 329,000
+                  - generic:
+                    - generic: 329,000
+                - button [ref=e339]:
+                  - img [ref=e340]
+              - button "Place Bid" [ref=e342]:
+                - generic [ref=e344]:
+                  - img [ref=e345]
+                  - text: Place Bid
+        - generic [ref=e362]:
+          - generic [ref=e363] [cursor=pointer]:
+            - img "Vintage Nikon F3 main image" [ref=e365]
+            - generic [ref=e366]:
+              - generic [ref=e367]:
+                - img [ref=e368]
+                - generic [ref=e371]: Karachi
+              - button "Cameras" [ref=e372]:
+                - img [ref=e373]
+                - generic [ref=e376]: Cameras
+            - generic [ref=e377]:
+              - generic [ref=e378]:
+                - img [ref=e379]
+                - generic [ref=e382]: 0h 0m 0s
+              - generic [ref=e384]: 👌 Used
+            - button [ref=e386]:
+              - img [ref=e387]
+          - generic [ref=e389]:
+            - heading "Vintage Nikon F3" [level=3] [ref=e391] [cursor=pointer]
+            - generic [ref=e392]:
+              - generic [ref=e393]:
+                - generic [ref=e394]:
+                  - img [ref=e395]
+                  - text: Asking
+                - generic [ref=e399]: 45,000
+              - generic [ref=e400]:
+                - generic [ref=e402]:
+                  - img [ref=e403]
+                  - text: Highest
+                - generic [ref=e409]:
+                  - generic [ref=e410]: (2)
+                  - generic [ref=e411]: 67,000
+            - generic [ref=e413]:
+              - generic [ref=e415]:
+                - button [ref=e416]:
+                  - img [ref=e417]
+                - generic [ref=e418]:
+                  - textbox [ref=e419]: 67,000
+                  - generic:
+                    - generic: 67,000
+                - button [ref=e420]:
+                  - img [ref=e421]
+              - button "Place Bid" [ref=e423]:
+                - generic [ref=e425]:
+                  - img [ref=e426]
+                  - text: Place Bid
+        - generic [ref=e440]:
+          - generic [ref=e443]:
+            - generic [ref=e444] [cursor=pointer]:
+              - img "PlayStation 5 Disc Edition main image" [ref=e446]
+              - generic [ref=e447]:
+                - generic [ref=e448]:
+                  - img [ref=e449]
+                  - generic [ref=e452]: Karachi
+                - button "Gaming" [ref=e453]:
+                  - img [ref=e454]
+                  - generic [ref=e456]: Gaming
+              - generic [ref=e457]:
+                - generic [ref=e458]:
+                  - img [ref=e459]
+                  - generic [ref=e462]: 0h 0m 0s
+                - generic [ref=e464]: 👌 Used
+              - button [ref=e466]:
+                - img [ref=e467]
+            - generic [ref=e469]:
+              - heading "PlayStation 5 Disc Edition" [level=3] [ref=e471] [cursor=pointer]
+              - generic [ref=e472]:
+                - generic [ref=e473]:
+                  - generic [ref=e474]:
+                    - img [ref=e475]
+                    - text: Asking
+                  - generic [ref=e479]: 140,000
+                - generic [ref=e480]:
+                  - generic [ref=e482]:
+                    - img [ref=e483]
+                    - text: Highest
+                  - generic [ref=e489]:
+                    - generic [ref=e490]: (2)
+                    - generic [ref=e491]: 200,000
+              - generic [ref=e493]:
+                - generic [ref=e495]:
+                  - button [ref=e496]:
+                    - img [ref=e497]
+                  - generic [ref=e498]:
+                    - textbox [ref=e499]: 200,000
+                    - generic:
+                      - generic: 200,000
+                  - button [ref=e500]:
+                    - img [ref=e501]
+                - button "Place Bid" [ref=e503]:
+                  - generic [ref=e505]:
+                    - img [ref=e506]
+                    - text: Place Bid
+          - generic [ref=e521]:
+            - generic [ref=e522]:
+              - img "Ad Content" [ref=e523]
+              - generic [ref=e525]: Sponsored
+            - generic [ref=e526]:
+              - heading "Unlimited Entertainment" [level=3] [ref=e528]
+              - generic [ref=e529]:
+                - generic [ref=e530]:
+                  - generic [ref=e531]: Starting
+                  - generic [ref=e532]: Free Trial
+                - generic [ref=e533]:
+                  - generic [ref=e534]: Then
+                  - generic [ref=e535]: $9.99/mo
+              - generic [ref=e536]:
+                - generic [ref=e539]: Watch anytime, anywhere
+                - link "Learn More" [ref=e540] [cursor=pointer]:
+                  - /url: "#"
+                  - text: Learn More
+                  - img [ref=e541]
+        - generic [ref=e548]:
+          - generic [ref=e549] [cursor=pointer]:
+            - img "Richard RM 123456 main image" [ref=e551]
+            - generic [ref=e552]:
+              - generic [ref=e553]:
+                - img [ref=e554]
+                - generic [ref=e557]: Unknown
+              - button "Fashion" [ref=e558]:
+                - img [ref=e559]
+                - generic [ref=e561]: Fashion
+            - generic [ref=e562]:
+              - generic [ref=e563]:
+                - img [ref=e564]
+                - generic [ref=e567]: 0h 0m 0s
+              - generic [ref=e569]: 🔨 Fair
+            - button [ref=e571]:
+              - img [ref=e572]
+          - generic [ref=e574]:
+            - heading "Richard RM 123456" [level=3] [ref=e576] [cursor=pointer]
+            - generic [ref=e577]:
+              - generic [ref=e578]:
+                - generic [ref=e579]:
+                  - img [ref=e580]
+                  - text: Asking
+                - generic [ref=e584]: 4,998
+              - generic [ref=e585]:
+                - generic [ref=e587]:
+                  - img [ref=e588]
+                  - text: Highest
+                - generic [ref=e594]:
+                  - generic [ref=e595]: (1)
+                  - generic [ref=e596]: 5,800
+            - generic [ref=e598]:
+              - generic [ref=e600]:
+                - button [ref=e601]:
+                  - img [ref=e602]
+                - generic [ref=e603]:
+                  - textbox [ref=e604]: 5,800
+                  - generic:
+                    - generic: 5,800
+                - button [ref=e605]:
+                  - img [ref=e606]
+              - button "Place Bid" [ref=e608]:
+                - generic [ref=e610]:
+                  - img [ref=e611]
+                  - text: Place Bid
+        - generic [ref=e628]:
+          - generic [ref=e629] [cursor=pointer]:
+            - img "Nike Air Jordan 1 High OG main image" [ref=e631]
+            - generic [ref=e632]:
+              - generic [ref=e633]:
+                - img [ref=e634]
+                - generic [ref=e637]: Karachi
+              - button "Fashion" [ref=e638]:
+                - img [ref=e639]
+                - generic [ref=e641]: Fashion
+            - generic [ref=e642]:
+              - generic [ref=e643]:
+                - img [ref=e644]
+                - generic [ref=e647]: 2h 46m 21s
+              - generic [ref=e649]: 👌 Used
+            - button [ref=e651]:
+              - img [ref=e652]
+          - generic [ref=e654]:
+            - heading "Nike Air Jordan 1 High OG" [level=3] [ref=e656] [cursor=pointer]
+            - generic [ref=e657]:
+              - generic [ref=e658]:
+                - generic [ref=e659]:
+                  - img [ref=e660]
+                  - text: Asking
+                - generic [ref=e664]: 35,000
+              - generic [ref=e665]:
+                - generic [ref=e667]:
+                  - img [ref=e668]
+                  - text: Highest
+                - generic [ref=e674]:
+                  - generic [ref=e675]: (1)
+                  - generic [ref=e676]: 51,500
+            - generic [ref=e678]:
+              - generic [ref=e680]:
+                - button [ref=e681]:
+                  - img [ref=e682]
+                - generic [ref=e683]:
+                  - textbox [ref=e684]: 51,500
+                  - generic:
+                    - generic: 51,500
+                - button [ref=e685]:
+                  - img [ref=e686]
+              - button "Place Bid" [ref=e688]:
+                - generic [ref=e690]:
+                  - img [ref=e691]
+                  - text: Place Bid
+  - generic [ref=e767]:
+    - link "Market" [ref=e768] [cursor=pointer]:
       - /url: /
-      - generic [ref=e134]:
-        - img [ref=e136]
-        - generic [ref=e140]: Market
-    - link "Dash" [ref=e141] [cursor=pointer]:
+      - generic [ref=e770]:
+        - img [ref=e772]
+        - generic [ref=e776]: Market
+    - link "Dash" [ref=e777] [cursor=pointer]:
       - /url: /dashboard?tab=offers
-      - generic [ref=e143]:
-        - img [ref=e145]
-        - generic [ref=e150]: Dash
-    - link "Sell" [ref=e151] [cursor=pointer]:
+      - generic [ref=e779]:
+        - img [ref=e781]
+        - generic [ref=e786]: Dash
+    - link "Sell" [ref=e787] [cursor=pointer]:
       - /url: /list
-      - generic [ref=e153]:
-        - img [ref=e155]
-        - generic [ref=e157]: Sell
-    - link "Inbox" [ref=e158] [cursor=pointer]:
+      - generic [ref=e789]:
+        - img [ref=e791]
+        - generic [ref=e793]: Sell
+    - link "Inbox" [ref=e794] [cursor=pointer]:
       - /url: /inbox
-      - generic [ref=e160]:
-        - img [ref=e162]
-        - generic [ref=e164]: Inbox
-    - link "Analytics" [ref=e165] [cursor=pointer]:
+      - generic [ref=e796]:
+        - img [ref=e798]
+        - generic [ref=e800]: Inbox
+    - link "Analytics" [ref=e801] [cursor=pointer]:
       - /url: /dashboard/seller
-      - generic [ref=e167]:
-        - img [ref=e169]
-        - generic [ref=e171]: Analytics
+      - generic [ref=e803]:
+        - img [ref=e805]
+        - generic [ref=e807]: Analytics
   - region "Notifications alt+T"
-  - generic [ref=e176] [cursor=pointer]:
-    - button "Open Next.js Dev Tools" [ref=e177]:
-      - img [ref=e178]
-    - generic [ref=e181]:
-      - button "Open issues overlay" [ref=e182]:
-        - generic [ref=e183]:
-          - generic [ref=e184]: "1"
-          - generic [ref=e185]: "2"
-        - generic [ref=e186]:
+  - generic [ref=e812] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e813]:
+      - img [ref=e814]
+    - generic [ref=e817]:
+      - button "Open issues overlay" [ref=e818]:
+        - generic [ref=e819]:
+          - generic [ref=e820]: "1"
+          - generic [ref=e821]: "2"
+        - generic [ref=e822]:
           - text: Issue
-          - generic [ref=e187]: s
-      - button "Collapse issues badge" [ref=e188]:
-        - img [ref=e189]
-  - alert [ref=e191]
+          - generic [ref=e823]: s
+      - button "Collapse issues badge" [ref=e824]:
+        - img [ref=e825]
+  - alert [ref=e827]
 ```

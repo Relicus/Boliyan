@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-26T13:39:48.556Z",
+  "timestamp": "2026-01-26T16:16:55.978Z",
   "routes": [
     "/",
     "/signin?redirect=%2Flist",
@@ -16,7 +16,7 @@
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nJust\nCategories\nType\nView\nKarachi\nP"
+          "text": "بولیاں\nBOLIYAN\nTrending\nCategories\nType\nView\nLocat"
         },
         {
           "id": "navbar-01",
@@ -79,12 +79,12 @@
         {
           "id": "location-selector-root",
           "tagName": "DIV",
-          "text": "Karachi"
+          "text": "Locating..."
         },
         {
           "id": "location-popover-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi",
+          "text": "Locating...",
           "type": "button"
         },
         {
@@ -104,7 +104,7 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
+          "text": "Trending\nCategories\nType\nView\nLocating...\nPrice"
         },
         {
           "id": "sidebar-01",
@@ -119,12 +119,12 @@
         {
           "id": "location-selector-sidebar-compact",
           "tagName": "DIV",
-          "text": "Karachi∞"
+          "text": "Locating...∞"
         },
         {
           "id": "location-sidebar-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi∞",
+          "text": "Locating...∞",
           "type": "button"
         },
         {
@@ -160,22 +160,22 @@
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
+          "text": "Trending\nCategories\nType\nView\nLocating...\nPrice"
         },
         {
           "id": "marketplace-grid-root",
           "tagName": "DIV",
-          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
+          "text": "Trending\nCategories\nType\nView\nLocating...\nPrice"
         },
         {
           "id": "mobile-search-filter-container",
           "tagName": "DIV",
-          "text": "Just\nCategories\nType\nView\nKarachi\nPrice"
+          "text": "Trending\nCategories\nType\nView\nLocating...\nPrice"
         },
         {
           "id": "mobile-sort-select",
           "tagName": "BUTTON",
-          "text": "Just",
+          "text": "Trending",
           "type": "button"
         },
         {
@@ -198,12 +198,12 @@
         {
           "id": "location-selector-root",
           "tagName": "DIV",
-          "text": "Karachi"
+          "text": "Locating..."
         },
         {
           "id": "location-popover-trigger-mobile",
           "tagName": "BUTTON",
-          "text": "Karachi",
+          "text": "Locating...",
           "type": "button"
         },
         {
@@ -499,7 +499,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"UOaSYcdFuLdZGKZ7mWdse\""
+          "text": "self.__next_r=\"4NoLsDxQmZ9mDnbdizll4\""
         },
         {
           "id": "devtools-indicator",
@@ -595,12 +595,12 @@
         {
           "id": "location-selector-root",
           "tagName": "DIV",
-          "text": "Karachi"
+          "text": "Locating..."
         },
         {
           "id": "location-popover-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi",
+          "text": "Locating...",
           "type": "button"
         },
         {
@@ -807,7 +807,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"9b-8pirgck3k90SSUd1u8\""
+          "text": "self.__next_r=\"NT8tF-QC8tdJjAMdC_ECn\""
         },
         {
           "id": "devtools-indicator",
@@ -908,12 +908,12 @@
         {
           "id": "location-selector-root",
           "tagName": "DIV",
-          "text": "Karachi"
+          "text": "Locating..."
         },
         {
           "id": "location-popover-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi",
+          "text": "Locating...",
           "type": "button"
         },
         {
@@ -1072,7 +1072,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"49zZFQ1ZihsBcHSXDzAPS\""
+          "text": "self.__next_r=\"2AyYWL9QzCRMHV3wM8uKq\""
         },
         {
           "id": "devtools-indicator",
@@ -1173,12 +1173,12 @@
         {
           "id": "location-selector-root",
           "tagName": "DIV",
-          "text": "Karachi"
+          "text": "Locating..."
         },
         {
           "id": "location-popover-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi",
+          "text": "Locating...",
           "type": "button"
         },
         {
@@ -1233,7 +1233,7 @@
         {
           "id": "list-item-form",
           "tagName": "DIV",
-          "text": "Product Images (Max 5)\nAdd Photo\nItem Title\n*\n0 / "
+          "text": "Product Images (Max 5)\nAdd Photo\nItem Location\n*\n+"
         },
         {
           "id": "images-label",
@@ -1457,7 +1457,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"ubKrQeDWp_PGHglAyglqt\""
+          "text": "self.__next_r=\"wZiF-2CkIrKkQbobXuxFe\""
         },
         {
           "id": "devtools-indicator",
@@ -1558,12 +1558,12 @@
         {
           "id": "location-selector-root",
           "tagName": "DIV",
-          "text": "Karachi"
+          "text": "Locating..."
         },
         {
           "id": "location-popover-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi",
+          "text": "Locating...",
           "type": "button"
         },
         {
@@ -1762,12 +1762,12 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"9GTHYKVTQs_ok8Hy6hSwG\""
+          "text": "self.__next_r=\"rrA2FoftBH-dbtrUUTyuJ\""
         },
         {
           "id": "devtools-indicator",
           "tagName": "DIV",
-          "text": ""
+          "text": "1\n2\nIssues"
         },
         {
           "id": "next-logo",
@@ -1863,12 +1863,12 @@
         {
           "id": "location-selector-root",
           "tagName": "DIV",
-          "text": "Karachi"
+          "text": "Locating..."
         },
         {
           "id": "location-popover-trigger",
           "tagName": "BUTTON",
-          "text": "Karachi",
+          "text": "Locating...",
           "type": "button"
         },
         {
@@ -2040,7 +2040,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"VwHKQKLRJ4aNXY-Rxc_oy\""
+          "text": "self.__next_r=\"55pCZ-JkAzQUFGVYeD2Ij\""
         },
         {
           "id": "devtools-indicator",

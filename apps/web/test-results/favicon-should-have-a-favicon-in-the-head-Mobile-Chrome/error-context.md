@@ -18,7 +18,7 @@
       - generic [ref=e32]:
         - combobox [ref=e33]:
           - img
-          - generic [ref=e34]: Just
+          - generic [ref=e34]: Trending
         - combobox [ref=e35]
         - combobox [ref=e36]:
           - img
@@ -32,10 +32,10 @@
           - img
           - generic [ref=e43]: View
       - generic [ref=e44]:
-        - button "Karachi" [ref=e47]:
+        - button "Locating..." [ref=e47]:
           - generic [ref=e48]:
             - img
-          - generic [ref=e49]: Karachi
+          - generic [ref=e49]: Locating...
         - button "Price" [ref=e51]:
           - generic [ref=e52]:
             - img

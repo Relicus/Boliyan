@@ -129,7 +129,10 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             high_bidder_id,
             condition,
             slug,
-            contact_phone
+            contact_phone,
+            location_lat,
+            location_lng,
+            location_address
         `, { count: 'exact' });
         
       if (filters.status !== 'all') {
@@ -195,7 +198,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Transform
         // Need to cast to unknown first to match ListingWithSeller interface structure expectations
         // Transform database rows to items
-        let items = data.map((row: MarketplaceListingRow) => transformListingToItem(row as unknown as ListingWithSeller));
+        let items = (data as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
 
         // --- PHASE 4 OPTIMIZATION: REMOVED SEPARATE BIDS FETCH ---
         // Bid stats are now included in the 'marketplace_listings' view.

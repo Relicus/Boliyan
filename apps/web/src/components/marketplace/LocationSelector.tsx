@@ -4,12 +4,10 @@ import React, { useState } from "react";
 import { useApp } from "@/lib/store";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Slider } from "@/components/ui/slider";
-import { PAKISTAN_CITIES, CITY_COORDINATES } from "@/lib/constants/locations";
-import { Check, MapPin, Globe, Navigation, Search } from "lucide-react";
+import { MapPin, Globe, Navigation } from "lucide-react";
 import { cn, isLocationInCountry } from "@/lib/utils";
-
+import { MapPicker } from "@/components/common/MapPicker";
 
 interface LocationSelectorProps {
   className?: string;
@@ -36,7 +34,7 @@ export function LocationSelector({ className, triggerClassName, align = "end", v
           <PopoverTrigger asChild>
             <LocationSelectorTrigger variant={variant} isOpen={isOpen} />
           </PopoverTrigger>
-          <PopoverContent className="w-[280px] p-0 shadow-lg border-slate-200 rounded-xl overflow-hidden" align="start" sideOffset={8}>
+          <PopoverContent className="w-[320px] p-0 shadow-lg border-slate-200 rounded-xl overflow-hidden" align="start" sideOffset={8}>
             <LocationSelectorContent onSelect={() => setIsOpen(false)} />
           </PopoverContent>
         </Popover>
@@ -50,7 +48,7 @@ export function LocationSelector({ className, triggerClassName, align = "end", v
         <PopoverTrigger asChild>
           <LocationSelectorTrigger variant={variant} isOpen={isOpen} className={triggerClassName} />
         </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0 shadow-2xl border-slate-200 rounded-2xl overflow-hidden" align={align} sideOffset={8}>
+        <PopoverContent className="w-[340px] p-0 shadow-2xl border-slate-200 rounded-2xl overflow-hidden" align={align} sideOffset={8}>
           <LocationSelectorContent onSelect={() => setIsOpen(false)} />
         </PopoverContent>
       </Popover>
@@ -63,8 +61,15 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
   const { filters } = useApp();
   
   const getDisplayLabel = () => {
-    if (filters.locationMode === "current") return "Near Me";
-    return filters.city;
+    // If we have a specific city, show it.
+    if (filters.city && filters.city !== "Unknown") return filters.city;
+    // If we have coords but no name yet, show "Near Me" or "Locating..." if strictly empty?
+    // Actually Context initializes city to "", so if it's "" we are likely still locating or unset.
+    if (filters.currentCoords) return "Current Location";
+    // Default empty state - change to "Locating..." to imply activity if we assume auto-locate runs
+    // But if auto-locate failed and we are in default state, "Set Location" is safer.
+    // However, user complained about "Set Location". Let's use a neutral "Location".
+    return "Locating...";
   };
 
   if (variant === "mobile-grid") {
@@ -93,7 +98,7 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
           "text-[10px] font-medium leading-none truncate w-full text-center",
           filters.locationMode !== "country" ? "text-blue-700 font-bold" : "text-slate-600"
         )}>
-          {(getDisplayLabel() || "Everywhere").split(' ')[0]}
+          {(getDisplayLabel() || "Everywhere").split(',')[0]}
         </span>
       </Button>
     );
@@ -133,7 +138,7 @@ const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonP
     >
       <MapPin className="h-4 w-4 text-red-600 stroke-[2.5]" />
       <span className="text-xs font-bold text-slate-700 max-w-[120px] truncate hidden lg:inline">
-        {getDisplayLabel().split(' ')[0]}
+        {getDisplayLabel().split(',')[0]}
       </span>
     </Button>
   );
@@ -142,69 +147,54 @@ LocationSelectorTrigger.displayName = "LocationSelectorTrigger";
 
 function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
   const { filters, setFilter, updateFilters, user } = useApp();
-  const [isLocating, setIsLocating] = useState(false);
-  const [locError, setLocError] = useState<string | null>(null);
-
+  const [tempLocation, setTempLocation] = useState<{ lat: number; lng: number; address: string; city?: string } | null>(null);
+  // Initialize tempRadius from current filter
+  const [tempRadius, setTempRadius] = useState(filters.radius);
+  
   const isOutside = !isLocationInCountry(user?.location.address);
 
-  const handleCurrentLocation = async (e?: React.MouseEvent | React.PointerEvent) => {
+  // Called whenever map moves or search selected - only updates local state
+  const handleLocationSelect = (loc: { lat: number; lng: number; address: string; city?: string }) => {
+    setTempLocation(loc);
+  };
 
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
+  // Auto-locate effect when opening the map IF no specific location is set yet
+  // This bridges the gap if auto-locate failed on mount or if user wants to re-center
+  // But wait, user said "only when I open it, that it locates me". 
+  // If the context auto-locate worked, filters.currentCoords should already be set.
+  // If filters.currentCoords is set, MapPicker initializes with it.
+  
+  const handleConfirm = () => {
+    if (tempLocation) {
+        updateFilters({
+          currentCoords: { lat: tempLocation.lat, lng: tempLocation.lng },
+          locationMode: "current",
+          city: tempLocation.city || tempLocation.address.split(',')[0] || "Unknown",
+          sortBy: "nearest",
+          radius: tempRadius >= 200 ? 500 : tempRadius // Include radius update here
+        });
+    } else if (tempRadius !== filters.radius) {
+        // If location wasn't moved but radius was changed
+        setFilter("radius", tempRadius >= 200 ? 500 : tempRadius);
     }
-
-    setLocError(null);
-    setIsLocating(true);
-
-    if (!window.isSecureContext && window.location.hostname !== "localhost") {
-      setLocError("Needs HTTPS");
-      setIsLocating(false);
-      return;
-    }
-
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          updateFilters({
-            currentCoords: { lat: latitude, lng: longitude },
-            locationMode: "current",
-            city: "Near Me",
-            sortBy: "nearest"
-          });
-          setIsLocating(false);
-          onSelect();
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          setLocError(error.code === 1 ? "Permission Denied" : "Search Failed");
-          setIsLocating(false);
-        },
-        { timeout: 10000 }
-      );
-    } else {
-      setLocError("Not Supported");
-      setIsLocating(false);
-    }
+    onSelect(); // Close popover
   };
 
   const handleRadiusChange = (vals: number[]) => {
-    const val = vals[0];
-    setFilter("radius", val >= 200 ? 500 : val);
+    setTempRadius(vals[0]);
   };
 
-  const displayRadius = filters.radius >= 200 ? 200 : filters.radius;
+  const displayRadius = tempRadius >= 200 ? 200 : tempRadius;
 
   return (
-    <div className="flex flex-col w-full">
-      {/* Search Radius Section - Ultra Compact */}
+    <div className="flex flex-col w-full bg-white">
+      {/* Search Radius Section */}
       {!isOutside && (
         <div className="p-3 pb-2 border-b bg-slate-50/30">
           <div className="flex items-center justify-between mb-1.5 px-0.5">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Range</span>
             <span className="text-[10px] font-black text-blue-600 bg-blue-50/50 px-1.5 py-0.5 rounded">
-              {filters.radius >= 500 ? "∞" : `${filters.radius}km`}
+              {tempRadius >= 500 ? "∞" : `${tempRadius}km`}
             </span>
           </div>
           <Slider
@@ -218,70 +208,25 @@ function LocationSelectorContent({ onSelect }: { onSelect: () => void }) {
         </div>
       )}
 
-      {/* Current Location Button */}
-
-      <div className="p-1 border-b bg-white">
-         <div
-            onPointerDown={handleCurrentLocation}
-            className={cn(
-              "flex items-center w-full px-2 py-1.5 rounded-md cursor-pointer transition-all active:scale-[0.96]",
-              isLocating ? "bg-slate-50 opacity-70" : "hover:bg-slate-50",
-              locError ? "bg-red-50 text-red-600 border border-red-100" : "text-sm"
-            )}
-            id="loc-option-near-me-direct"
-         >
-            <Navigation className={cn("mr-2 h-3.5 w-3.5", isLocating ? "animate-pulse text-blue-500" : (locError ? "text-red-500" : "text-blue-500"))} />
-            <span className="font-bold flex-1 text-left text-xs">
-              {isLocating ? "Locating..." : (locError || "Near Me")}
-            </span>
-            {filters.locationMode === "current" && !locError && <Check className="ml-auto h-3.5 w-3.5 text-blue-600" />}
-         </div>
-         {locError === "Needs HTTPS" && (
-            <div className="mt-1 px-2 text-[8px] text-red-400 leading-tight">
-              Needs HTTPS for GPS. Pick a city below.
-            </div>
-         )}
+      {/* Map Picker */}
+      <div className="h-[350px]">
+        <MapPicker 
+          initialLocation={filters.currentCoords}
+          onLocationSelect={handleLocationSelect}
+          className="h-full border-none rounded-none"
+        />
       </div>
-
-      {/* Cities Search Section */}
-      <Command className="border-none flex-1 flex flex-col min-h-0">
-        <div className="flex items-center px-2 border-b shrink-0 h-9">
-          <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-40" />
-          <CommandInput placeholder="Search city..." className="h-full border-none focus:ring-0 shadow-none bg-transparent text-xs" />
-        </div>
-        
-        <CommandList className="flex-1 max-h-[300px] overflow-y-auto scrollbar-thin">
-          <CommandEmpty className="py-2 text-xs text-slate-400 text-center">No city found.</CommandEmpty>
-          <CommandGroup heading="Pakistan Cities" className="p-1 px-1">
-            {Array.from(new Set(PAKISTAN_CITIES)).map((city) => (
-              <CommandItem
-                key={city}
-                value={city}
-                onSelect={() => {
-                  updateFilters({
-                    city: city,
-                    locationMode: "city",
-                    currentCoords: CITY_COORDINATES[city] || filters.currentCoords,
-                    sortBy: "nearest"
-                  });
-                  onSelect();
-                }}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                className="rounded-md py-1.5 cursor-pointer hover:bg-slate-50"
-              >
-                <MapPin className="mr-2 h-3 w-3 text-slate-400 opacity-40" />
-                <span className="text-xs font-semibold text-slate-600">{city}</span>
-                {filters.locationMode === "city" && filters.city === city && (
-                  <Check className="ml-auto h-3 w-3 text-blue-600" />
-                )}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
-      </Command>
+      
+      {/* Footer / Confirm */}
+      <div className="p-2 border-t bg-slate-50 flex justify-end">
+        <Button 
+          size="sm" 
+          className="h-8 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white"
+          onClick={handleConfirm}
+        >
+          Confirm Selected Location
+        </Button>
+      </div>
     </div>
   );
 }

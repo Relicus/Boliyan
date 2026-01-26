@@ -78,22 +78,15 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, isOutside } = useMemo(() => {
     // Distance Logic - Needs User
-    if (!user) {
-        return { 
-            distance: 0, 
-            duration: 0, 
-            isOutside: false
-        };
-    }
-
-    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(user.location, seller.location);
+    const itemLocation = item.location || seller.location;
+    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(user?.location, itemLocation);
 
     return { 
       distance: dist, 
       duration: dur, 
       isOutside: outside
     };
-  }, [user, seller.location]);
+  }, [user, seller.location, item.location]);
 
 
   return (

@@ -28,15 +28,15 @@
               - img
               - generic [ref=e39]: "4"
             - generic [ref=e40]: Selling
-          - tab "13 Buying" [ref=e41]:
+          - tab "14 Buying" [ref=e41]:
             - generic [ref=e42]:
               - img
-              - generic [ref=e43]: "13"
+              - generic [ref=e43]: "14"
             - generic [ref=e44]: Buying
-          - tab "14 Watchlist" [ref=e45]:
+          - tab "15 Watchlist" [ref=e45]:
             - generic [ref=e46]:
               - img
-              - generic [ref=e47]: "14"
+              - generic [ref=e47]: "15"
             - generic [ref=e48]: Watchlist
           - tab "1 Listings" [ref=e49]:
             - generic [ref=e50]:
@@ -62,7 +62,7 @@
           - generic [ref=e73]:
             - generic [ref=e74]:
               - img [ref=e75]
-              - text: 3h 7m
+              - text: 0h 29m
             - generic [ref=e78]:
               - generic [ref=e79]:
                 - img [ref=e80]
@@ -84,39 +84,29 @@
       - generic [ref=e104]:
         - img [ref=e106]
         - generic [ref=e110]: Market
-    - link "Dash" [ref=e111] [cursor=pointer]:
+    - link "1 Dash" [ref=e111] [cursor=pointer]:
       - /url: /dashboard?tab=offers
       - generic [ref=e113]:
         - img [ref=e115]
-        - generic [ref=e120]: Dash
-    - link "Sell" [ref=e121] [cursor=pointer]:
+        - generic [ref=e120]: "1"
+        - generic [ref=e121]: Dash
+    - link "Sell" [ref=e122] [cursor=pointer]:
       - /url: /list
-      - generic [ref=e123]:
-        - img [ref=e125]
-        - generic [ref=e127]: Sell
-    - link "Inbox" [ref=e128] [cursor=pointer]:
+      - generic [ref=e124]:
+        - img [ref=e126]
+        - generic [ref=e128]: Sell
+    - link "Inbox" [ref=e129] [cursor=pointer]:
       - /url: /inbox
-      - generic [ref=e130]:
-        - img [ref=e132]
-        - generic [ref=e134]: Inbox
-    - link "Analytics" [ref=e135] [cursor=pointer]:
+      - generic [ref=e131]:
+        - img [ref=e133]
+        - generic [ref=e135]: Inbox
+    - link "Analytics" [ref=e136] [cursor=pointer]:
       - /url: /dashboard/seller
-      - generic [ref=e137]:
-        - img [ref=e139]
-        - generic [ref=e141]: Analytics
+      - generic [ref=e138]:
+        - img [ref=e140]
+        - generic [ref=e142]: Analytics
   - region "Notifications alt+T"
-  - generic [ref=e146] [cursor=pointer]:
-    - button "Open Next.js Dev Tools" [ref=e147]:
-      - img [ref=e148]
-    - generic [ref=e151]:
-      - button "Open issues overlay" [ref=e152]:
-        - generic [ref=e153]:
-          - generic [ref=e154]: "1"
-          - generic [ref=e155]: "2"
-        - generic [ref=e156]:
-          - text: Issue
-          - generic [ref=e157]: s
-      - button "Collapse issues badge" [ref=e158]:
-        - img [ref=e159]
-  - alert [ref=e161]
+  - button "Open Next.js Dev Tools" [ref=e148] [cursor=pointer]:
+    - img [ref=e149]
+  - alert [ref=e152]
 ```

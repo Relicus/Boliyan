@@ -16,9 +16,9 @@
       - generic [ref=e20]:
         - generic [ref=e21]:
           - generic [ref=e22]: YOUR LOCATION
-          - button "Karachi" [ref=e24]:
+          - button "Islamabad" [ref=e24]:
             - img
-            - generic [ref=e25]: Karachi
+            - generic [ref=e25]: Islamabad
         - link "Sell Item" [ref=e26] [cursor=pointer]:
           - /url: /list
           - img
@@ -29,163 +29,198 @@
               - /url: /
               - img
               - generic [ref=e31]: Market
-            - link "Dash" [ref=e32] [cursor=pointer]:
+            - link "Dash 1" [ref=e32] [cursor=pointer]:
               - /url: /dashboard?tab=offers
               - img
               - generic [ref=e33]: Dash
-            - link "Analytics" [ref=e34] [cursor=pointer]:
+              - generic [ref=e34]: "1"
+            - link "Analytics" [ref=e35] [cursor=pointer]:
               - /url: /dashboard/seller
               - img
-              - generic [ref=e35]: Analytics
-            - link "Chat" [ref=e36] [cursor=pointer]:
+              - generic [ref=e36]: Analytics
+            - link "Chat" [ref=e37] [cursor=pointer]:
               - /url: /inbox
               - img
-              - generic [ref=e37]: Chat
-          - button "Notifications" [ref=e39]:
+              - generic [ref=e38]: Chat
+          - button "Notifications" [ref=e40]:
             - img
-            - generic [ref=e43]: Notifications
-          - img [ref=e45] [cursor=pointer]
-  - main [ref=e47]:
-    - generic [ref=e50]:
-      - generic [ref=e51]:
-        - generic [ref=e52]: List an Item
-        - generic [ref=e53]: Minimalist listing. Set your price and choose your bidding style.
-      - generic [ref=e54]:
-        - generic [ref=e55]:
-          - generic [ref=e56]:
-            - generic [ref=e57]:
-              - img [ref=e58]
+            - generic [ref=e44]: Notifications
+          - img [ref=e46] [cursor=pointer]
+  - main [ref=e48]:
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]: List an Item
+        - generic [ref=e54]: Minimalist listing. Set your price and choose your bidding style.
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - img [ref=e59]
               - text: Product Images (Max 5)
-            - generic [ref=e62] [cursor=pointer]:
-              - img [ref=e63]
-              - generic [ref=e66]: Add Photo
-          - generic [ref=e67]:
-            - generic [ref=e68]:
-              - generic [ref=e69]:
-                - img [ref=e70]
+            - generic [ref=e63] [cursor=pointer]:
+              - img [ref=e64]
+              - generic [ref=e67]: Add Photo
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - img [ref=e70]
+              - text: Item Location
+              - generic [ref=e73]: "*"
+            - generic [ref=e75]:
+              - generic [ref=e77]:
+                - img [ref=e78]
+                - textbox "Search city, area, or place..." [ref=e81]
+              - generic [ref=e82]:
+                - generic [ref=e83]:
+                  - generic:
+                    - generic [ref=e84]:
+                      - button "Zoom in" [ref=e85] [cursor=pointer]: +
+                      - button "Zoom out" [ref=e86] [cursor=pointer]: −
+                    - generic [ref=e87]:
+                      - link "Leaflet" [ref=e88] [cursor=pointer]:
+                        - /url: https://leafletjs.com
+                        - img [ref=e89]
+                        - text: Leaflet
+                      - text: "| ©"
+                      - link "OSM" [ref=e93] [cursor=pointer]:
+                        - /url: https://www.openstreetmap.org/copyright
+                      - text: ©
+                      - link "CARTO" [ref=e94] [cursor=pointer]:
+                        - /url: https://carto.com/attributions
+                - button "Locate Me" [ref=e95]:
+                  - img
+                - generic:
+                  - generic:
+                    - img
+                - generic [ref=e97]:
+                  - img [ref=e99]
+                  - generic [ref=e101]:
+                    - paragraph [ref=e102]: Selected Location
+                    - paragraph [ref=e103]: D-Chowk, F-5, Blue Area, Zone 1, Islamabad Capital Territory, 04404, Pakistan
+              - generic [ref=e104]:
+                - button "Karachi" [ref=e105]
+                - button "Lahore" [ref=e106]
+                - button "Faisalabad" [ref=e107]
+                - button "Rawalpindi" [ref=e108]
+                - button "Gujranwala" [ref=e109]
+                - button "Peshawar" [ref=e110]
+                - button "Multan" [ref=e111]
+                - button "Hyderabad" [ref=e112]
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - img [ref=e116]
                 - text: Item Title
-                - generic [ref=e73]: "*"
-              - generic [ref=e74]: 33 / 80
-            - textbox "e.g. Sony Headphones, Wood Table..." [ref=e75]: Test Condition Item 1769434579865
-          - generic [ref=e76]:
-            - generic [ref=e77]:
-              - generic [ref=e78]:
-                - img [ref=e79]
+                - generic [ref=e119]: "*"
+              - generic [ref=e120]: 33 / 80
+            - textbox "e.g. Sony Headphones, Wood Table..." [ref=e121]: Test Condition Item 1769443581828
+          - generic [ref=e122]:
+            - generic [ref=e123]:
+              - generic [ref=e124]:
+                - img [ref=e125]
                 - text: Category
-                - generic [ref=e83]: "*"
-              - combobox [ref=e84]:
+                - generic [ref=e129]: "*"
+              - combobox [ref=e130]:
                 - generic:
                   - generic:
                     - img
                     - generic: Electronics
                 - img
-            - generic [ref=e85]:
-              - generic [ref=e86]:
-                - img [ref=e87]
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - img [ref=e133]
                 - text: Condition
-              - combobox [ref=e90]:
+              - combobox [ref=e136]:
                 - generic: 🌟 Brand New
                 - img
-          - generic [ref=e91]:
-            - button "Hide Price Estimator" [ref=e92]:
-              - img [ref=e93]
+          - generic [ref=e137]:
+            - button "Hide Price Estimator" [ref=e138]:
+              - img [ref=e139]
               - text: Hide Price Estimator
-            - generic [ref=e96]:
-              - generic [ref=e97]:
-                - generic [ref=e98]:
-                  - generic [ref=e99]:
-                    - img [ref=e100]
+            - generic [ref=e142]:
+              - generic [ref=e143]:
+                - generic [ref=e144]:
+                  - generic [ref=e145]:
+                    - img [ref=e146]
                     - text: Paid (Rs.)
-                  - spinbutton "Paid (Rs.)" [ref=e102]: "5000"
-                - generic [ref=e103]:
-                  - generic [ref=e104]:
-                    - img [ref=e105]
+                  - spinbutton "Paid (Rs.)" [ref=e148]: "5000"
+                - generic [ref=e149]:
+                  - generic [ref=e150]:
+                    - img [ref=e151]
                     - text: Date
-                  - generic [ref=e107]:
-                    - combobox [ref=e109]:
+                  - generic [ref=e153]:
+                    - combobox [ref=e155]:
                       - generic: Mo
                       - img
-                    - combobox [ref=e111]:
+                    - combobox [ref=e157]:
                       - generic: "2026"
                       - img
-              - generic [ref=e112]:
+              - generic [ref=e158]:
                 - generic:
                   - img
-                - spinbutton [ref=e113]
-          - generic [ref=e115]:
-            - generic [ref=e116]: 💡
-            - paragraph [ref=e117]: "Suggested: Rs. 4,500 – Rs. 5,000"
-            - generic [ref=e118]: 0.0 years old
-          - generic [ref=e119]:
-            - generic [ref=e121]:
-              - img [ref=e122]
+                - spinbutton [ref=e159]
+          - generic [ref=e161]:
+            - generic [ref=e162]: 💡
+            - paragraph [ref=e163]: "Suggested: Rs. 4,500 – Rs. 5,000"
+            - generic [ref=e164]: 0.0 years old
+          - generic [ref=e165]:
+            - generic [ref=e167]:
+              - img [ref=e168]
               - text: Your Ask Price (Rs.)
-              - generic [ref=e124]: "*"
-            - generic [ref=e125]:
-              - button [ref=e126]:
-                - img [ref=e127]
-              - spinbutton "Your Ask Price (Rs.) *" [ref=e128]: "1000"
-              - button [ref=e129]:
-                - img [ref=e130]
-          - generic [ref=e131]:
-            - generic [ref=e132]:
-              - generic [ref=e133]:
-                - img [ref=e134]
+              - generic [ref=e170]: "*"
+            - generic [ref=e171]:
+              - button [ref=e172]:
+                - img [ref=e173]
+              - spinbutton "Your Ask Price (Rs.) *" [ref=e174]: "1000"
+              - button [ref=e175]:
+                - img [ref=e176]
+          - generic [ref=e177]:
+            - generic [ref=e178]:
+              - generic [ref=e179]:
+                - img [ref=e180]
                 - text: Description
-                - generic [ref=e135]: "*"
-              - generic [ref=e136]: 54 / 2000
-            - textbox "Description * 54 / 2000" [ref=e137]:
+                - generic [ref=e181]: "*"
+              - generic [ref=e182]: 54 / 2000
+            - textbox "Description * 54 / 2000" [ref=e183]:
               - /placeholder: Tell buyers about condition, usage, and any defects...
               - text: This is a test listing with enough description length.
-          - generic [ref=e138]:
-            - generic [ref=e139]:
-              - img [ref=e140]
+          - generic [ref=e184]:
+            - generic [ref=e185]:
+              - img [ref=e186]
               - text: Phone for this listing
-              - generic [ref=e142]: "*"
-            - textbox "Phone for this listing *" [ref=e143]:
+              - generic [ref=e188]: "*"
+            - textbox "Phone for this listing *" [ref=e189]:
               - /placeholder: Enter phone number
               - text: "03001234567"
-          - generic [ref=e144]:
-            - heading "Bidding Style" [level=3] [ref=e145]
-            - generic [ref=e147] [cursor=pointer]:
-              - img [ref=e148]
-              - generic [ref=e154]:
-                - paragraph [ref=e155]: Public Auction
-                - paragraph [ref=e156]: Everyone can see the highest bid
-            - generic [ref=e159] [cursor=pointer]:
-              - img [ref=e160]
-              - generic [ref=e165]:
-                - paragraph [ref=e166]: Hidden Bids Only
-                - paragraph [ref=e167]: Only you see the bid amounts
-            - generic [ref=e169]:
-              - generic [ref=e170]:
-                - img [ref=e171]
+          - generic [ref=e190]:
+            - heading "Bidding Style" [level=3] [ref=e191]
+            - generic [ref=e193] [cursor=pointer]:
+              - img [ref=e194]
+              - generic [ref=e200]:
+                - paragraph [ref=e201]: Public Auction
+                - paragraph [ref=e202]: Everyone can see the highest bid
+            - generic [ref=e205] [cursor=pointer]:
+              - img [ref=e206]
+              - generic [ref=e211]:
+                - paragraph [ref=e212]: Hidden Bids Only
+                - paragraph [ref=e213]: Only you see the bid amounts
+            - generic [ref=e215]:
+              - generic [ref=e216]:
+                - img [ref=e217]
                 - text: Listing Duration
-              - generic [ref=e174]:
-                - button "24 Hours" [ref=e175]
-                - button "48 Hours" [ref=e176]
-                - button "72 Hours" [ref=e177]
-        - generic [ref=e178]:
-          - button "Cancel" [ref=e179]:
+              - generic [ref=e220]:
+                - button "24 Hours" [ref=e221]
+                - button "48 Hours" [ref=e222]
+                - button "72 Hours" [ref=e223]
+        - generic [ref=e224]:
+          - button "Cancel" [ref=e225]:
             - img
             - text: Cancel
-          - button "Post Listing" [active] [ref=e180]:
+          - button "Post Listing" [active] [ref=e226]:
             - img
             - text: Post Listing
-        - generic [ref=e182]: Goes live in 1 hour after saving.
+        - generic [ref=e228]: Goes live in 1 hour after saving.
   - region "Notifications alt+T"
-  - generic [ref=e187] [cursor=pointer]:
-    - button "Open Next.js Dev Tools" [ref=e188]:
-      - img [ref=e189]
-    - generic [ref=e192]:
-      - button "Open issues overlay" [ref=e193]:
-        - generic [ref=e194]:
-          - generic [ref=e195]: "3"
-          - generic [ref=e196]: "4"
-        - generic [ref=e197]:
-          - text: Issue
-          - generic [ref=e198]: s
-      - button "Collapse issues badge" [ref=e199]:
-        - img [ref=e200]
-  - alert [ref=e202]
+  - button "Open Next.js Dev Tools" [ref=e234] [cursor=pointer]:
+    - img [ref=e235]
+  - alert [ref=e238]
 ```

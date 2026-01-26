@@ -24,7 +24,7 @@
         - generic [ref=e36]:
           - combobox [ref=e37]:
             - img
-            - generic [ref=e38]: Just
+            - generic [ref=e38]: Trending
           - combobox [ref=e39]:
             - img
             - generic [ref=e40]: Categories
@@ -35,10 +35,10 @@
             - img
             - generic [ref=e44]: View
         - generic [ref=e45]:
-          - button "Karachi" [ref=e48]:
+          - button "Islamabad" [ref=e48]:
             - generic [ref=e49]:
               - img
-            - generic [ref=e50]: Karachi
+            - generic [ref=e50]: Islamabad
           - button "Price" [ref=e52]:
             - generic [ref=e53]:
               - img
@@ -125,12 +125,10 @@
     - generic [ref=e195]:
       - button "Open issues overlay" [ref=e196]:
         - generic [ref=e197]:
-          - generic [ref=e198]: "1"
-          - generic [ref=e199]: "2"
-        - generic [ref=e200]:
-          - text: Issue
-          - generic [ref=e201]: s
-      - button "Collapse issues badge" [ref=e202]:
-        - img [ref=e203]
-  - alert [ref=e205]
+          - generic [ref=e198]: "0"
+          - generic [ref=e199]: "1"
+        - generic [ref=e200]: Issue
+      - button "Collapse issues badge" [ref=e201]:
+        - img [ref=e202]
+  - alert [ref=e204]
 ```

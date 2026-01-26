@@ -17,6 +17,11 @@ export type ListingWithSeller = ListingRow & {
   seller_rating_count?: number | null;
   seller_location?: string | null;
   
+  // Listing specific location (from view)
+  location_lat?: number | null;
+  location_lng?: number | null;
+  location_address?: string | null;
+  
   bid_count?: number | null;
   high_bid?: number | null;
   high_bidder_id?: string | null;
@@ -29,6 +34,11 @@ export type ListingWithSeller = ListingRow & {
 export function transformProfileToUser(profile: ProfileRow): User {
   const cityCoords = profile.location ? CITY_COORDINATES[profile.location] : null;
   
+  // Prefer explicit lat/lng from DB, fallback to city map, fallback to default
+  const lat = profile.location_lat ?? cityCoords?.lat ?? 24.8607;
+  const lng = profile.location_lng ?? cityCoords?.lng ?? 67.0011;
+  const address = profile.location || 'Karachi';
+
   return {
     id: profile.id,
     name: profile.full_name || 'Anonymous',
@@ -36,9 +46,10 @@ export function transformProfileToUser(profile: ProfileRow): User {
     rating: profile.rating || 0,
     reviewCount: profile.rating_count || 0,
     location: {
-      lat: cityCoords?.lat || 24.8607, // Default to Karachi if unknown
-      lng: cityCoords?.lng || 67.0011,
-      address: profile.location || 'Karachi' // Default to Karachi instead of 'Unknown' for better UI
+      lat,
+      lng,
+      address,
+      city: profile.location || undefined // Historically 'location' was just city name
     },
     isVerified: false,
     badges: [],
@@ -69,7 +80,8 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
           location: {
               lat: cityCoords?.lat || 24.8607,
               lng: cityCoords?.lng || 67.0011,
-              address: listing.seller_location || 'Karachi'
+              address: listing.seller_location || 'Karachi',
+              city: listing.seller_location || undefined
           },
           isVerified: false,
           badges: [],
@@ -106,6 +118,11 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     return `${storageUrl}/${img}`;
   });
 
+  // Resolve item location: prefer item-specific location -> then seller location -> then default
+  const itemLat = listing.location_lat ?? seller?.location.lat ?? 24.8607;
+  const itemLng = listing.location_lng ?? seller?.location.lng ?? 67.0011;
+  const itemAddress = listing.location_address ?? seller?.location.address ?? 'Karachi';
+
   return {
     id: listing.id,
     slug: listing.slug || undefined,
@@ -130,7 +147,15 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     listingDuration: 72,
     status: isValidStatus(listing.status) ? listing.status : 'active',
     goLiveAt: listing.go_live_at || undefined,
-    lastEditedAt: listing.last_edited_at || undefined
+    lastEditedAt: listing.last_edited_at || undefined,
+    
+    // New Location Field
+    location: {
+        lat: itemLat,
+        lng: itemLng,
+        address: itemAddress,
+        city: listing.seller_location || undefined // Fallback to seller city if no explicit city field on item yet
+    }
   };
 }
 export type BidWithProfile = Database['public']['Tables']['bids']['Row'] & {

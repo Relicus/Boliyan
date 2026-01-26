@@ -16,9 +16,9 @@
       - generic [ref=e20]:
         - generic [ref=e21]:
           - generic [ref=e22]: YOUR LOCATION
-          - button "Karachi" [ref=e24]:
+          - button "Islamabad" [ref=e24]:
             - img
-            - generic [ref=e25]: Karachi
+            - generic [ref=e25]: Islamabad
         - link "Sell Item" [ref=e26] [cursor=pointer]:
           - /url: /list
           - img
@@ -103,11 +103,22 @@
                     - button [disabled] [ref=e115]:
                       - img [ref=e116]
                   - generic [ref=e118]: •
-                  - generic [ref=e119]: 6:40pm
+                  - generic [ref=e119]: 9:11pm
             - paragraph [ref=e120]: Great buyer!
             - generic [ref=e121]: "Item: Camera"
   - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e127] [cursor=pointer]:
-    - img [ref=e128]
-  - alert [ref=e131]
+  - generic [ref=e126] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e127]:
+      - img [ref=e128]
+    - generic [ref=e131]:
+      - button "Open issues overlay" [ref=e132]:
+        - generic [ref=e133]:
+          - generic [ref=e134]: "1"
+          - generic [ref=e135]: "2"
+        - generic [ref=e136]:
+          - text: Issue
+          - generic [ref=e137]: s
+      - button "Collapse issues badge" [ref=e138]:
+        - img [ref=e139]
+  - alert [ref=e141]
 ```

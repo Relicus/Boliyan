@@ -1,89 +1,77 @@
 # Page snapshot
 
 ```yaml
-- generic [active] [ref=e1]:
-  - navigation [ref=e2]:
+- generic:
+  - generic [active]:
     - generic [ref=e3]:
-      - link "بولیاں Boliyan" [ref=e6] [cursor=pointer]:
-        - /url: /
-        - img [ref=e7]
-        - generic [ref=e10]:
-          - generic [ref=e11]: بولیاں
-          - generic [ref=e12]: Boliyan
-      - generic [ref=e15]:
-        - img [ref=e16]
-        - textbox "Search items, categories..." [ref=e19]
-      - link "Sign In" [ref=e22] [cursor=pointer]:
-        - /url: /signin?redirect=%2F
-  - main [ref=e24]:
-    - generic [ref=e27]:
-      - generic [ref=e31]:
-        - generic [ref=e32]:
-          - combobox [ref=e33]:
-            - img
-            - generic [ref=e34]: Just
-          - combobox [ref=e35]:
-            - img
-            - generic [ref=e36]: Categories
-          - combobox [ref=e37]:
-            - img
-            - generic [ref=e38]: Type
-          - button "View" [ref=e39]:
-            - img
-            - generic [ref=e40]: View
-        - generic [ref=e41]:
-          - button "Karachi" [ref=e44]:
-            - generic [ref=e45]:
-              - img
-            - generic [ref=e46]: Karachi
-          - button "Price" [ref=e48]:
-            - generic [ref=e49]:
-              - img
-            - generic [ref=e50]: Price
-      - generic [ref=e112]:
-        - img [ref=e114]
-        - heading "No results found" [level=3] [ref=e119]
-        - paragraph [ref=e120]: We couldn't find any items matching your current filters. Try adjusting your search terms or category.
-        - button "Reset Filters" [ref=e121]
-  - generic [ref=e124]:
-    - link "Market" [ref=e125] [cursor=pointer]:
-      - /url: /
-      - generic [ref=e127]:
-        - img [ref=e129]
-        - generic [ref=e133]: Market
-    - link "Dash" [ref=e134] [cursor=pointer]:
-      - /url: /dashboard?tab=offers
-      - generic [ref=e136]:
-        - img [ref=e138]
-        - generic [ref=e143]: Dash
-    - link "Sell" [ref=e144] [cursor=pointer]:
-      - /url: /list
-      - generic [ref=e146]:
-        - img [ref=e148]
-        - generic [ref=e150]: Sell
-    - link "Inbox" [ref=e151] [cursor=pointer]:
-      - /url: /inbox
-      - generic [ref=e153]:
-        - img [ref=e155]
-        - generic [ref=e157]: Inbox
-    - link "Analytics" [ref=e158] [cursor=pointer]:
-      - /url: /dashboard/seller
-      - generic [ref=e160]:
-        - img [ref=e162]
-        - generic [ref=e164]: Analytics
-  - region "Notifications alt+T"
-  - generic [ref=e169] [cursor=pointer]:
-    - button "Open Next.js Dev Tools" [ref=e170]:
-      - img [ref=e171]
-    - generic [ref=e174]:
-      - button "Open issues overlay" [ref=e175]:
-        - generic [ref=e176]:
-          - generic [ref=e177]: "1"
-          - generic [ref=e178]: "2"
-        - generic [ref=e179]:
-          - text: Issue
-          - generic [ref=e180]: s
-      - button "Collapse issues badge" [ref=e181]:
-        - img [ref=e182]
-  - alert [ref=e184]
+      - generic [ref=e4]:
+        - navigation [ref=e6]:
+          - button "previous" [disabled] [ref=e7]:
+            - img "previous" [ref=e8]
+          - generic [ref=e10]:
+            - generic [ref=e11]: 1/
+            - text: "1"
+          - button "next" [disabled] [ref=e12]:
+            - img "next" [ref=e13]
+        - link "Next.js 16.1.1 (stale) Turbopack" [ref=e16] [cursor=pointer]:
+          - /url: https://nextjs.org/docs/messages/version-staleness
+          - img [ref=e17]
+          - generic "There is a newer version (16.1.4) available, upgrade recommended!" [ref=e19]: Next.js 16.1.1 (stale)
+          - generic [ref=e20]: Turbopack
+      - dialog "Build Error" [ref=e22]:
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e27]:
+              - generic [ref=e29]: Build Error
+              - generic [ref=e30]:
+                - button "Copy Error Info" [ref=e31] [cursor=pointer]:
+                  - img [ref=e32]
+                - button "No related documentation found" [disabled] [ref=e34]:
+                  - img [ref=e35]
+                - button "Attach Node.js inspector" [ref=e37] [cursor=pointer]:
+                  - img [ref=e38]
+            - generic [ref=e47]: Parsing ecmascript source code failed
+          - generic [ref=e49]:
+            - generic [ref=e51]:
+              - img [ref=e53]
+              - generic [ref=e56]: ./src/context/MarketplaceContext.tsx (276:4)
+              - button "Open in editor" [ref=e57] [cursor=pointer]:
+                - img [ref=e59]
+            - generic [ref=e62]:
+              - generic [ref=e63]: Parsing ecmascript source code failed
+              - generic [ref=e64]: 274 |
+              - generic [ref=e65]: 275 |
+              - text: return
+              - generic [ref=e66]: ()
+              - text: =>
+              - generic [ref=e67]: "{ mounted"
+              - text: = false;
+              - generic [ref=e68]: "}"
+              - text: ; >
+              - generic [ref=e69]: 276 |
+              - generic [ref=e70]: "}"
+              - text: ","
+              - generic [ref=e71]: "[])"
+              - text: ;
+              - generic [ref=e72]: "|"
+              - text: ^
+              - generic [ref=e73]: 277 |
+              - generic [ref=e74]: 278 |
+              - generic [ref=e75]: // Save persistence on change
+              - generic [ref=e76]: 279 |
+              - generic [ref=e77]: useEffect(()
+              - text: =>
+              - generic [ref=e78]: "{"
+              - generic [ref=e79]: "Expression expected Import traces: Client Component Browser: ./src/context/MarketplaceContext.tsx [Client Component Browser] ./src/lib/store.tsx [Client Component Browser] ./src/lib/store.tsx [Server Component] ./src/app/layout.tsx [Server Component] Client Component SSR: ./src/context/MarketplaceContext.tsx [Client Component SSR] ./src/lib/store.tsx [Client Component SSR] ./src/lib/store.tsx [Server Component] ./src/app/layout.tsx [Server Component]"
+        - generic [ref=e80]: "1"
+        - generic [ref=e81]: "2"
+    - generic [ref=e86] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e87]:
+        - img [ref=e88]
+      - button "Open issues overlay" [ref=e92]:
+        - generic [ref=e93]:
+          - generic [ref=e94]: "0"
+          - generic [ref=e95]: "1"
+        - generic [ref=e96]: Issue
+  - alert [ref=e97]
 ```

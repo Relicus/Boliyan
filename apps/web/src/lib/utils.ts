@@ -88,12 +88,18 @@ export function isLocationInCountry(address: string | undefined): boolean {
  */
 export function calculatePrivacySafeDistance(
   from: { lat: number; lng: number; address?: string } | undefined, 
-  to: { lat: number; lng: number; address?: string }
+  to: { lat: number; lng: number; address?: string } | undefined
 ): { distance: number; duration: number; isOutside: boolean } {
+  // If either location is missing, we cannot calculate distance.
+  // We return isOutside: true to ensure the distance badge is hidden.
+  if (!from || !to) {
+    return { distance: 0, duration: 0, isOutside: true };
+  }
+
   // If no user location, default to a generic "Far" distance or specific center
   // For this mock, we'll assume a fixed user location if undefined
-  const userLat = from?.lat ?? 24.8607; // Default to Karachi center
-  const userLng = from?.lng ?? 67.0011;
+  const userLat = from.lat;
+  const userLng = from.lng;
 
   const R = 6371; // Earth's radius in km
   const dLat = (to.lat - userLat) * Math.PI / 180;

@@ -107,16 +107,20 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     // 1. Distance Logic - Dependent on User
     // If user is missing, we default to 0/hidden. This is an unavoidable "pop-in" 
     // when location becomes available, but better than blocking the whole card state.
-    const { distance: dist, duration: dur, isOutside: outside } = (user?.location && seller?.location)
-      ? calculatePrivacySafeDistance(user.location, seller.location) 
-      : { distance: 0, duration: 0, isOutside: true }; // Default to 'outside' to hide badge if unknown
+    
+    // We pass item.location if available, otherwise fallback to seller.location
+    // But since transform already handles fallback, item.location should be enough if present.
+    // However, transform puts everything in `location`, so let's check `item.location`.
+    const itemLocation = item.location || seller?.location;
+    
+    const { distance: dist, duration: dur, isOutside: outside } = calculatePrivacySafeDistance(user?.location, itemLocation);
 
     return { 
       distance: dist, 
       duration: dur, 
       isOutside: outside
     };
-  }, [user, seller]); // Added safe navigation for seller
+  }, [user, seller, item.location]);
 
 
   const handleInputClick = (e: React.MouseEvent) => {

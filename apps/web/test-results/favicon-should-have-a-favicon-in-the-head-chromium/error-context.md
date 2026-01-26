@@ -16,9 +16,9 @@
       - generic [ref=e20]:
         - generic [ref=e21]:
           - generic [ref=e22]: YOUR LOCATION
-          - button "Karachi" [ref=e24]:
+          - button "Locating..." [ref=e24]:
             - img
-            - generic [ref=e25]: Karachi
+            - generic [ref=e25]: Locating...
         - link "Sell Item" [ref=e26] [cursor=pointer]:
           - /url: /signin?redirect=%2Flist
           - img
@@ -35,8 +35,8 @@
       - generic [ref=e44]:
         - generic [ref=e45]:
           - heading "LIST LOCATION" [level=3] [ref=e46]
-          - button "Karachi ∞" [ref=e48]:
-            - generic [ref=e50]: Karachi
+          - button "Locating... ∞" [ref=e48]:
+            - generic [ref=e50]: Locating...
             - generic [ref=e51]: ∞
         - generic [ref=e52]:
           - heading "Price Range" [level=3] [ref=e53]
