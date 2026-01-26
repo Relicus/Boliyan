@@ -103,11 +103,11 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const offerPrice = offerBid?.amount ?? item?.currentHighBid;
   const priceBlock = item ? (
     <div className="flex flex-col items-end shrink-0">
-      <span className="price-font text-[8px] md:text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase leading-none mb-0.5">
+      <span className="price-font text-[clamp(0.55rem,1.8vw,0.7rem)] font-black text-slate-400 tracking-[0.2em] uppercase leading-none mb-1">
         Ask {formatPrice(item.askPrice)}
       </span>
       {typeof offerPrice === 'number' && (
-        <span className="price-font text-[clamp(0.8rem,2.4cqi,1.1rem)] font-black text-emerald-600 leading-none tabular-nums">
+        <span className="price-font text-[clamp(1rem,4.5vw,1.5rem)] font-black text-emerald-600 leading-none tabular-nums">
           {formatPrice(offerPrice)}
         </span>
       )}
@@ -393,8 +393,14 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
         <div className="flex md:hidden items-center justify-between px-4 pb-3">
             <div className="flex items-center flex-1">
               {onBack && (
-                <Button id="chat-back-btn-mobile" variant="ghost" size="icon" onClick={onBack} className="mr-4 -ml-2 rounded-full h-9 w-9">
-                    <ArrowLeft className="h-5 w-5" />
+                <Button 
+                  id="chat-back-btn-mobile" 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={onBack} 
+                  className="mr-4 -ml-2 rounded-full h-9 w-9 bg-white border-slate-200 shadow-sm hover:bg-slate-50 transition-colors"
+                >
+                    <ArrowLeft className="h-5 w-5 text-slate-600" />
                 </Button>
               )}
               
