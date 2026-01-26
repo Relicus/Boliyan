@@ -17,10 +17,10 @@ export const ConditionBadge = memo(({
   const label = getConditionLabel(condition);
 
   const variants = {
-    glass: "bg-black/75 text-white border-white/10 shadow-lg",
-    "glass-light": "bg-white/85 text-slate-800 border-black/5 shadow-lg",
-    outline: "bg-white text-slate-700 border-slate-200 border",
-    solid: "bg-slate-800 text-white border-none shadow-sm"
+    glass: "bg-black/80 text-white border-white/10 shadow-sm ring-1 ring-inset ring-white/10",
+    "glass-light": "bg-white/90 text-slate-800 border-slate-200/50 shadow-sm ring-1 ring-inset ring-white/50",
+    outline: "bg-white text-slate-700 border-slate-200 border shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]",
+    solid: "bg-slate-800 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.1)]"
   };
 
   return (

@@ -60,8 +60,15 @@ export function LocationSelector({ className, triggerClassName, align = "end", v
 const LocationSelectorTrigger = React.forwardRef<HTMLButtonElement, Omit<ButtonProps, "variant"> & { variant: string, isOpen: boolean, mode: "user" | "filter" }>(
   ({ variant, isOpen, mode, className, ...props }, ref) => {
   const { filters, myLocation } = useApp();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const getDisplayLabel = () => {
+    if (!mounted) return "Locating...";
+
     if (mode === "user") {
         return myLocation?.city || "Locating...";
     }

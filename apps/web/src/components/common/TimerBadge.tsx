@@ -47,17 +47,17 @@ export const TimerBadge = memo(({
 
   const variants = {
     glass: isUrgent 
-      ? "bg-red-500/90 text-white border-white/10 shadow-[0_0_15px_rgba(239,68,68,0.4)]" 
-      : "bg-black/75 text-white border-white/10 shadow-lg",
+      ? "bg-red-500/95 text-white border-white/20 shadow-sm ring-1 ring-inset ring-white/10" 
+      : "bg-black/80 text-white border-white/10 shadow-sm ring-1 ring-inset ring-white/5",
     "glass-light": isUrgent
-      ? "bg-red-100/90 text-red-700 border-red-200/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
-      : "bg-white/85 text-slate-800 border-black/5 shadow-lg",
+      ? "bg-red-100/90 text-red-700 border-red-200/50 shadow-sm ring-1 ring-inset ring-red-200/20"
+      : "bg-white/90 text-slate-800 border-slate-200/50 shadow-sm ring-1 ring-inset ring-white/50",
     outline: isUrgent
-      ? "bg-red-50 text-red-600 border-red-200"
-      : "bg-white text-slate-700 border-slate-200",
+      ? "bg-red-50 text-red-600 border-red-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5)]"
+      : "bg-white text-slate-700 border-slate-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]",
     solid: isUrgent
-      ? "bg-red-600 text-white border-none shadow-[0_0_20px_rgba(220,38,38,0.5)]"
-      : "bg-slate-900 text-white border-none"
+      ? "bg-red-600 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
+      : "bg-slate-900 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.1)]"
   };
 
   return (
