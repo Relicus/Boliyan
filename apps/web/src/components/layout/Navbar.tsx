@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, LogOut, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3 } from "lucide-react";
+import { Plus, LogOut, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -84,11 +84,11 @@ export default function Navbar() {
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-6">
+      <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-0">
         <LayoutGroup>
         {/* ... existing navbar content ... */}
 
-        <div id="navbar-left-section-03" className="flex items-center gap-4 shrink-0">
+        <div id="navbar-left-section-03" className="flex items-center gap-4 shrink-0 lg:w-72 lg:justify-center">
           <div className="flex items-center gap-3">
             <Link id="navbar-logo-link-04" href="/" onClick={resetFilters} className="group flex items-center gap-2 select-none transition-transform duration-200 active:scale-y-95 active:opacity-80">
               {/* Geometric 'Ba' (ب) Logomark */}
@@ -130,7 +130,7 @@ export default function Navbar() {
         <motion.div 
           layout
           transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-          className="flex-1 px-3 md:px-6 max-w-4xl flex justify-center"
+          className="flex-1 px-3 md:px-6 lg:px-0 lg:pl-10 max-w-4xl flex justify-center lg:justify-start"
         >
           <SearchBar />
         </motion.div>
@@ -139,11 +139,14 @@ export default function Navbar() {
           layout
           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
           id="navbar-right-section-11" 
-          className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto"
+          className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto lg:pr-6"
         >
           {/* Desktop Location Selector */}
           <div className="hidden md:flex flex-col items-end mr-2">
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-[2px] pr-1 leading-none">YOUR LOCATION</span>
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-[2px] pr-1 leading-none flex items-center gap-1">
+              <MapPin className="h-2.5 w-2.5" />
+              YOUR LOCATION
+            </span>
             <LocationSelector align="end" mode="user" />
           </div>
 

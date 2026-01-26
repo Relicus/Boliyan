@@ -220,7 +220,7 @@ function InboxContent() {
               <MessageSquare className="h-10 w-10 text-slate-300" strokeWidth={1.5} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900 mb-2">Speak Your Price</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Sell Fast. Buy Fair.</h2>
               <p className="max-w-xs text-sm text-slate-500 font-medium">Choose a chat from the left to arrange pick-up and complete the deal.</p>
             </div>
           </div>

@@ -64,7 +64,7 @@ const notoUrdu = localFont({
 
 
 export const metadata: Metadata = {
-  title: "Boliyan - Speak Your Price",
+  title: "Boliyan - Sell Fast. Buy Fair.",
   description: "Bid smart, sell faster. The no-nonsense marketplace.",
   icons: {
     icon: "/logo.svg",

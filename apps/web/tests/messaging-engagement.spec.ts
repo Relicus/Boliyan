@@ -116,8 +116,8 @@ test.describe('Messaging & Engagement', () => {
       await expect(convLocator).toBeVisible({ timeout: 10000 });
       await convLocator.click();
       
-      // 4. Verify "Speak Your Price" (placeholder) is gone
-      await expect(page.locator('text=Speak Your Price')).not.toBeVisible();
+      // 4. Verify "Sell Fast. Buy Fair." (placeholder) is gone
+      await expect(page.locator('text=Sell Fast. Buy Fair.')).not.toBeVisible();
 
       // 5. Check for Chat Window
       await expect(page.locator('#chat-window')).toBeVisible({ timeout: 5000 });
