@@ -193,14 +193,20 @@ export const PriceDisplay = memo(({
   // STACKED ORIENTATION
   if (orientation === 'stacked') {
       return (
-        <div className={cn("grid grid-cols-2 gap-4 w-full", className)}>
+        <div 
+          id={itemId ? `price-display-stacked-${itemId}` : undefined}
+          className={cn("grid grid-cols-2 gap-4 w-full", className)}
+        >
              {/* Ask Price Block */}
              <div className="flex flex-col items-center justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20 min-w-0">
                 <span className={cn(getLabelClass(), "flex items-center gap-1.5 justify-center mb-0.5")}>
                     <Tag className="w-3 h-3 text-slate-400" />
                     Asking
                 </span>
-                <span className={cn(getPriceClass(viewMode), "text-slate-800")}>
+                <span 
+                  id={itemId ? `price-asking-value-stacked-${itemId}` : undefined}
+                  className={cn(getPriceClass(viewMode), "text-slate-800")}
+                >
                     <RollingPrice price={askPrice} />
                 </span>
              </div>
@@ -225,7 +231,9 @@ export const PriceDisplay = memo(({
                  </div>
                  
                  {/* Value Container */}
-                 {renderValue()}
+                 <div id={itemId ? `price-dynamic-value-stacked-${itemId}` : undefined}>
+                    {renderValue()}
+                 </div>
              </div>
         </div>
       );
@@ -233,27 +241,33 @@ export const PriceDisplay = memo(({
 
   // ROW ORIENTATION (Default) - Minimalist/Typography Driven
   return (
-    <div className={cn("flex justify-between items-end w-full px-1", className)}>
+    <div 
+      id={itemId ? `price-display-${itemId}` : undefined}
+      className={cn("flex justify-between items-end w-full px-1", className)}
+    >
       {/* Asking Price - Left Aligned */}
-      <div className="flex flex-col items-start">
-        <span className={cn("text-[0.65rem] font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1", darkMode ? "text-slate-400" : "text-slate-400")}>
-          <Tag className="w-3 h-3" />
-          Asking
-        </span>
-        <span className={cn(getPriceClass(viewMode), "leading-[0.9]", darkMode ? "text-white" : "text-slate-900")}>
+      <div className="flex flex-col items-start min-w-0">
+        <div className="h-4 w-full relative mb-0.5">
+          <span 
+            className={cn(
+              "text-[0.65rem] font-bold uppercase tracking-wider absolute left-0 bottom-0 whitespace-nowrap flex items-center gap-1", 
+              darkMode ? "text-slate-400" : "text-slate-400"
+            )}
+          >
+            <Tag className="w-3 h-3" />
+            Asking
+          </span>
+        </div>
+        <span 
+          id={itemId ? `price-asking-value-${itemId}` : undefined}
+          className={cn(getPriceClass(viewMode), "leading-[0.9] flex items-baseline gap-1", darkMode ? "text-white" : "text-slate-900")}
+        >
           <RollingPrice price={askPrice} />
         </span>
       </div>
 
-      {/* Attempt Dots (Removed per request - moved to button) */}
-      <div className="flex flex-col items-center justify-end h-[2.5em] pb-1.5 opacity-60">
-        {/* Dots moved to BiddingControls button */}
-      </div>
-
       {/* Dynamic Right Side - Right Aligned */}
-      <div 
-        className="flex flex-col items-end h-[2.5em] relative"
-      >
+      <div className="flex flex-col items-end min-w-0">
           {/* Label Container - Absolute to prevent layout jump during transition */}
           <div className="h-4 w-full relative mb-0.5">
              <AnimatePresence mode="wait">
@@ -277,7 +291,8 @@ export const PriceDisplay = memo(({
 
           {/* Value Container - Stable */}
           <span 
-            className={cn(getPriceClass(viewMode), "flex items-center gap-1 transition-colors duration-300 leading-[0.9]", displayColor)}
+            id={itemId ? `price-dynamic-value-${itemId}` : undefined}
+            className={cn(getPriceClass(viewMode), "flex items-baseline gap-1 transition-colors duration-300 leading-[0.9]", displayColor)}
             {...(displayPrice !== null ? highBidProps : bidCountProps)}
           >
               {/* Show Total Bids Count only when there are bids */}
