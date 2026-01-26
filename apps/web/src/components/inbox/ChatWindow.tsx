@@ -5,7 +5,7 @@ import { useApp } from '@/lib/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake } from 'lucide-react';
+import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake, ShieldCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn, formatPrice, getWhatsAppUrl } from '@/lib/utils';
 import { Conversation } from '@/types';
@@ -100,12 +100,12 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     : undefined;
   const offerPrice = offerBid?.amount ?? item?.currentHighBid;
   const priceBlock = item ? (
-    <div className="flex flex-col items-end">
-      <span className="price-font text-[9px] md:text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">
+    <div className="flex flex-col items-end shrink-0">
+      <span className="price-font text-[8px] md:text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase leading-none mb-0.5">
         Ask {formatPrice(item.askPrice)}
       </span>
       {typeof offerPrice === 'number' && (
-        <span className="price-font text-[clamp(0.9rem,2.6cqi,1.1rem)] font-black text-emerald-600 leading-none tabular-nums">
+        <span className="price-font text-[clamp(0.8rem,2.4cqi,1.1rem)] font-black text-emerald-600 leading-none tabular-nums">
           {formatPrice(offerPrice)}
         </span>
       )}
@@ -353,7 +353,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 md:gap-3 justify-end ml-auto">
+            <div className="flex items-center gap-1.5 md:gap-3 justify-end ml-auto">
               {(() => {
                 const listingPhone = !isSeller ? item?.contactPhone : undefined;
                 const phone = listingPhone || otherUser?.phone;
@@ -361,7 +361,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                 const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
 
                 return (
-                  <div className="flex items-center gap-1.5 md:gap-2 mr-1">
+                  <div className="flex items-center gap-1 md:gap-2 mr-1">
                     <Button
                       id="chat-whatsapp-btn"
                       size="sm"
@@ -377,8 +377,8 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                         if (phone) window.open(getWhatsAppUrl(phone, waMessage), '_blank');
                       }}
                     >
-                      <WhatsAppIcon className="h-3.5 w-3.5 md:h-4 md:w-4 sm:mr-1.5" />
-                      <span className="hidden sm:inline">WhatsApp</span>
+                      <WhatsAppIcon className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-1.5" />
+                      WhatsApp
                     </Button>
                     <Button
                       id="chat-call-btn"
@@ -395,9 +395,37 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                         if (phone) window.location.href = `tel:${phone}`;
                       }}
                     >
-                      <Phone className="h-3.5 w-3.5 md:h-4 md:w-4 sm:mr-1" />
-                      <span className="hidden sm:inline">Call</span>
+                      <Phone className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-1" />
+                      Call
                     </Button>
+
+                    {!isSealed && !iHaveConfirmed && (
+                      <Button 
+                        id="chat-seal-btn"
+                        size="sm" 
+                        onClick={handleConfirmExchange}
+                        className={cn(
+                          "h-8 md:h-9 px-2 md:px-3 text-[10px] md:text-xs font-bold rounded-full shadow-sm transition-all",
+                          theyHaveConfirmed 
+                            ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
+                            : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                        )}
+                      >
+                        <Handshake className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-1.5" />
+                        Done
+                      </Button>
+                    )}
+                    {iHaveConfirmed && !isSealed && (
+                      <Button 
+                        id="chat-seal-btn-confirmed"
+                        size="sm" 
+                        disabled
+                        className="h-8 md:h-9 px-2 md:px-3 text-[10px] md:text-xs font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 opacity-100 cursor-default"
+                      >
+                        <Check className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-1" />
+                        {theyHaveConfirmed ? "Sealing" : "Done"}
+                      </Button>
+                    )}
                   </div>
                 );
               })()}
@@ -423,46 +451,6 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
             </div>
             )}
         </div>
-
-        {/* --- HANDSHAKE BANNER --- */}
-        {!isSealed && (
-            <div className="bg-slate-50 border-t border-slate-100 px-4 py-2 flex items-center justify-between animate-in slide-in-from-top-2">
-               <div className="flex items-center gap-2">
-                  <Handshake className={cn("h-4 w-4", iHaveConfirmed ? "text-emerald-500" : "text-slate-400")} />
-                  <div className="flex flex-col">
-                      <span className="text-xs font-bold text-slate-700">
-                         {iHaveConfirmed 
-                            ? (theyHaveConfirmed ? "Sealing Deal..." : `Waiting for ${otherUser?.name?.split(' ')[0]}...`)
-                            : (theyHaveConfirmed ? `${otherUser?.name?.split(' ')[0]} confirmed exchange!` : "Exchange Complete?")
-                         }
-                      </span>
-                      {theyHaveConfirmed && !iHaveConfirmed && (
-                          <span className="text-[10px] text-emerald-600 font-medium">Tap confirm to seal & vouch</span>
-                      )}
-                  </div>
-               </div>
-               
-               {!iHaveConfirmed && (
-                   <Button 
-                     size="sm" 
-                     onClick={handleConfirmExchange}
-                     className={cn(
-                         "h-8 text-xs font-bold gap-1.5 shadow-sm transition-all",
-                         theyHaveConfirmed 
-                           ? "bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse" 
-                           : "bg-white text-slate-700 border hover:bg-slate-50"
-                     )}
-                   >
-                       {theyHaveConfirmed ? "Confirm & Seal" : "Deal Done"}
-                   </Button>
-               )}
-               {iHaveConfirmed && (
-                   <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
-                       Confirmed
-                   </div>
-               )}
-            </div>
-        )}
       </header>
 
       {/* Messages Area */}

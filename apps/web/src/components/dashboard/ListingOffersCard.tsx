@@ -199,10 +199,10 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
               <Button 
                 id={`whatsapp-btn-${bid.id}`}
                 variant="outline"
-                size="icon"
+                size="sm"
                 disabled={!bidder.phone || actionsDisabled}
                 className={cn(
-                  "h-9 w-full md:w-8 md:h-8 rounded-lg transition-all",
+                  "h-9 w-full md:w-auto px-3 text-[10px] md:text-xs font-bold rounded-lg transition-all",
                   bidder.phone && !actionsDisabled
                     ? "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
                     : "opacity-40 grayscale cursor-not-allowed bg-slate-50 border-slate-200"
@@ -214,16 +214,16 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                  }}
                  title="WhatsApp"
               >
-                <WhatsAppIcon className="w-4 h-4" />
-                <span className="md:hidden ml-2 text-sm font-medium">WhatsApp</span>
+                <WhatsAppIcon className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5" />
+                WhatsApp
               </Button>
               <Button 
                 id={`call-btn-${bid.id}`}
                 variant="outline"
-                size="icon"
+                size="sm"
                 disabled={!canCall || actionsDisabled}
                 className={cn(
-                  "h-9 w-full md:w-8 md:h-8 rounded-lg transition-all",
+                  "h-9 w-full md:w-auto px-3 text-[10px] md:text-xs font-bold rounded-lg transition-all",
                   canCall && !actionsDisabled
                     ? "text-blue-600 border-blue-200 hover:bg-blue-50"
                     : "opacity-40 grayscale cursor-not-allowed bg-slate-50 border-slate-200"
@@ -231,8 +231,8 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                  onClick={() => bidder.phone && handleCall(bidder.phone)}
                  title="Call"
               >
-                <Phone className="w-4 h-4" />
-                <span className="md:hidden ml-2 text-sm font-medium">Call</span>
+                <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1" />
+                Call
               </Button>
               <Button 
                 id={`chat-btn-${bid.id}`}
