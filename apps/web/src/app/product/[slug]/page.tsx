@@ -39,7 +39,10 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
     handleInputBlur,
     pendingConfirmation,
     remainingAttempts,
-    userBid
+    userBid,
+    minBid,
+    maxBid,
+    derivedStatus
   } = useBidding(item, seller, () => {});
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -291,6 +294,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                       onKeyDown={handleKeyDown}
                       onInputChange={handleInputChange}
                       onInputBlur={handleInputBlur}
+                      derivedStatus={derivedStatus}
                       showAttemptsDots={false}
                       showStatus={true}
                       isSecretBid={!item.isPublicBid}

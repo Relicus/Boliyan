@@ -21,7 +21,7 @@ interface ConversationListProps {
 
 export function ConversationList({ conversations, selectedId, onSelect, role, emptyTitle, emptyBody }: ConversationListProps) {
   const { user, refreshConversations, bids } = useApp();
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -34,6 +34,7 @@ export function ConversationList({ conversations, selectedId, onSelect, role, em
 
   // Update timestamps every second for live countdown
   useEffect(() => {
+    setNow(Date.now());
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, []);

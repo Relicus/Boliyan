@@ -31,6 +31,8 @@ interface BiddingDashboardProps {
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onInputBlur?: () => void;
   derivedStatus?: { type: 'error', message: string } | null;
+  minBid: number;
+  maxBid: number;
 }
 
 export const BiddingDashboard = memo(function BiddingDashboard({

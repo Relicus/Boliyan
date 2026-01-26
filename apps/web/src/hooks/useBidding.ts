@@ -112,18 +112,29 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       return { type: 'error', message: "Out of Bids" } as const;
     }
     
-    const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
+    const raw = bidAmount.replace(/[^0-9.]/g, '');
+    const current = parseFloat(raw) || 0;
     
-    if (current >= maxBid || (userBid && userBid.amount >= maxBid)) {
-       return { type: 'error', message: "Max Reached" } as const;
+    // Check bounds
+    if (current > maxBid) {
+       return { type: 'error', message: "Above Max" } as const;
     }
 
-    if (userBid && current <= userBid.amount) {
+    if (current < minBid && raw !== '') {
+       return { type: 'error', message: "Below Min" } as const;
+    }
+
+    if (userBid && current <= userBid.amount && raw !== '') {
       return { type: 'error', message: "Bid Higher" } as const;
     }
 
+    // Check rounding (10 Rs rule) - only show error if they've typed enough to be a real number
+    if (current > 0 && current % 10 !== 0 && !bidAmount.endsWith('.')) {
+      return { type: 'error', message: "Use 10s (e.g. 50, 60)" } as const;
+    }
+
     return null;
-  }, [remainingAttempts, bidAmount, userBid, maxBid]);
+  }, [remainingAttempts, bidAmount, userBid, maxBid, minBid]);
 
   const setTemporaryError = useCallback((msg: string, duration: number = 2000) => {
     if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
@@ -138,22 +149,18 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     }, duration);
   }, []);
 
-  // Auto-Step Up Logic
+  // Auto-Step Up Logic (Only when userBid changes, not while typing)
+  const lastUserBidAmountRef = useRef<number | null>(userBid?.amount || null);
   useEffect(() => {
-    if (!userBid) return;
-    
-    const amount = parseFloat(bidAmount.replace(/,/g, ''));
-    if (amount === userBid.amount) {
-        const step = getSmartStep(amount);
-        if (amount + step <= maxBid) {
-            setBidAmount((amount + step).toLocaleString());
-            setAnimTrigger(prev => prev + 1);
-        }
+    if (userBid && userBid.amount !== lastUserBidAmountRef.current) {
+        lastUserBidAmountRef.current = userBid.amount;
+        const step = getSmartStep(userBid.amount);
+        const nextAmount = Math.min(userBid.amount + step, maxBid);
+        // We use toLocaleString here as this is a programmatic update, not user typing
+        setBidAmount(nextAmount.toLocaleString());
+        setAnimTrigger(prev => prev + 1);
     }
-    if (derivedStatus && pendingConfirmation) {
-        setPendingConfirmation(null);
-    }
-  }, [bidAmount, userBid, maxBid, derivedStatus, pendingConfirmation]);
+  }, [userBid, maxBid]);
 
   useEffect(() => {
     return () => {
@@ -166,43 +173,50 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   const handleSmartAdjust = useCallback((e: React.MouseEvent | React.TouchEvent, direction: 1 | -1) => {
     e.stopPropagation();
     
-    const current = parseFloat(bidAmount.replace(/,/g, '')) || 0;
+    const raw = bidAmount.replace(/[^0-9.]/g, '');
+    const current = parseFloat(raw) || 0;
+    
+    // Programmatic adjustment logic (+/- buttons)
+    // 1. If we are currently below the floor (typed manually), jump straight to the floor
+    if (current < minBid && direction === 1) {
+       setBidAmount(minBid.toLocaleString());
+       setAnimTrigger(prev => prev + 1);
+       sonic.tick();
+       return;
+    }
+
+    // 2. Do not allow minus button to go below floor
+    if (current <= minBid && direction === -1) {
+       sonic.thud();
+       setTemporaryError(formatBoundMessage('min'), 1000);
+       return;
+    }
+
     const step = getSmartStep(current);
     const delta = step * direction;
-    
     const target = current + delta;
-    if (target < minBid) {
-      const clamped = clampBid(target);
-      if (clamped !== current) {
-        setBidAmount(clamped.toLocaleString());
-        setAnimTrigger(prev => prev + 1);
+    
+    // 3. Apply strict bounds to programmatic stepping
+    const clamped = Math.min(maxBid, Math.max(minBid, target));
+    const rounded = roundToReasonablePrice(clamped);
+    
+    if (rounded !== current) {
+      setBidAmount(rounded.toLocaleString());
+      setAnimTrigger(prev => prev + 1);
+      
+      if (target < minBid) setTemporaryError(formatBoundMessage('min'), 1200);
+      else if (target > maxBid) setTemporaryError(formatBoundMessage('max'), 1200);
+      else {
+        sonic.tick();
+        setLastDelta(delta);
+        setShowDelta(true);
+        if (deltaTimeoutRef.current) clearTimeout(deltaTimeoutRef.current);
+        deltaTimeoutRef.current = setTimeout(() => setShowDelta(false), 800);
       }
-      setTemporaryError(formatBoundMessage('min'), 1200);
-      return;
+    } else {
+       sonic.thud();
     }
-
-    if (target > maxBid) {
-      const clamped = clampBid(target);
-      if (clamped !== current) {
-        setBidAmount(clamped.toLocaleString());
-        setAnimTrigger(prev => prev + 1);
-      }
-      setTemporaryError(formatBoundMessage('max'), 1200);
-      return;
-    }
-    
-    const newValue = Math.max(0, target);
-    sonic.tick();
-    
-    setLastDelta(delta);
-    setShowDelta(true);
-    
-    if (deltaTimeoutRef.current) clearTimeout(deltaTimeoutRef.current);
-    deltaTimeoutRef.current = setTimeout(() => setShowDelta(false), 800);
-
-    setBidAmount(newValue.toLocaleString());
-    setAnimTrigger(prev => prev + 1);
-  }, [bidAmount, clampBid, formatBoundMessage, maxBid, minBid, setTemporaryError]);
+  }, [bidAmount, formatBoundMessage, maxBid, minBid, setTemporaryError]);
 
   type BidEvent = React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
 
@@ -239,6 +253,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       setIsSuccess(true);
       sonic.chime();
 
+      // Setup next suggested bid
       const nextAmount = amount + getSmartStep(amount);
       if (nextAmount <= getMaximumAllowedBid(item.askPrice)) {
           setBidAmount(nextAmount.toLocaleString());
@@ -283,27 +298,22 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
         return;
     }
 
-    if (derivedStatus) {
-        sonic.thud();
-        return; 
-    }
-
-    const rawAmount = parseFloat(bidAmount.replace(/,/g, ''));
+    const raw = bidAmount.replace(/[^0-9.]/g, '');
+    const rawAmount = parseFloat(raw);
     if (isNaN(rawAmount)) return;
 
-    // Enforce reasonable rounding on attempt (handles edge case where blur hasn't fired)
-    const amount = roundToReasonablePrice(rawAmount);
+    // Smart Finalization on Bid Attempt
+    const amount = clampBid(rawAmount);
     
-    // Sync UI if rounding adjusted the value
-    if (amount !== rawAmount) {
+    // If the amount was invalid and we had to clamp it, 
+    // update the UI and show an error instead of placing the bid immediately.
+    // This prevents accidental bids of "7,000" when the user typed "1".
+    if (amount !== rawAmount || rawAmount % 10 !== 0) {
         setBidAmount(amount.toLocaleString());
-    }
-
-    if (amount < minBid || amount > maxBid) {
-      const clamped = clampBid(amount);
-      setBidAmount(clamped.toLocaleString());
-      setTemporaryError(amount < minBid ? formatBoundMessage('min') : formatBoundMessage('max'), 2000);
-      return;
+        if (rawAmount < minBid) setTemporaryError(formatBoundMessage('min'));
+        else if (rawAmount > maxBid) setTemporaryError(formatBoundMessage('max'));
+        else if (rawAmount % 10 !== 0) setTemporaryError("Rounded to nearest 10");
+        return;
     }
 
     if (!user) {
@@ -335,7 +345,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       setPendingConfirmation(null);
     }, 3000);
 
-  }, [bidAmount, clampBid, formatBoundMessage, maxBid, minBid, user, userBid, executeBid, pendingConfirmation, isSubmitting, cooldownRemaining, derivedStatus, setTemporaryError, openAuthModal]);
+  }, [bidAmount, clampBid, formatBoundMessage, maxBid, minBid, user, userBid, executeBid, pendingConfirmation, isSubmitting, cooldownRemaining, setTemporaryError, openAuthModal]);
 
   const clearPendingConfirmation = useCallback(() => {
     if (confirmationTimeoutRef.current) {
@@ -355,46 +365,30 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   }, [attemptBid]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/,/g, '');
-    if (raw === '') {
-      setBidAmount('');
-      setError(false);
-      return;
-    }
-    if (/^\d+$/.test(raw)) {
-      const numeric = parseInt(raw, 10);
-      if (numeric < minBid) {
-        const clamped = clampBid(numeric);
-        if (clamped.toLocaleString() !== bidAmount) {
-          setBidAmount(clamped.toLocaleString());
-        }
-        setTemporaryError(formatBoundMessage('min'), 1200);
-        setError(false);
-        return;
-      }
-      if (numeric > maxBid) {
-        const clamped = clampBid(numeric);
-        if (clamped.toLocaleString() !== bidAmount) {
-          setBidAmount(clamped.toLocaleString());
-        }
-        setTemporaryError(formatBoundMessage('max'), 1200);
-        setError(false);
-        return;
-      }
-      setBidAmount(numeric.toLocaleString());
-      setError(false);
-    }
-  }, [bidAmount, clampBid, formatBoundMessage, maxBid, minBid, setTemporaryError]);
+    // Completely dumb input - let the user type whatever they want.
+    // We will sanitize and format it only on Blur or Action (Enter/Bid).
+    setBidAmount(e.target.value);
+    setError(false);
+  }, []);
 
   const handleInputBlur = useCallback(() => {
-    const amount = parseFloat(bidAmount.replace(/,/g, ''));
+    const raw = bidAmount.replace(/[^0-9.]/g, '');
+    const amount = parseFloat(raw);
+    
     if (!isNaN(amount) && amount > 0) {
       const clamped = clampBid(amount);
+      // Format with commas and clamp only on blur
+      setBidAmount(clamped.toLocaleString());
+      
       if (clamped !== amount) {
-        setBidAmount(clamped.toLocaleString());
+        if (clamped === minBid) setTemporaryError(formatBoundMessage('min'), 1200);
+        else if (clamped === maxBid) setTemporaryError(formatBoundMessage('max'), 1200);
       }
+    } else {
+      // Revert to initial bid if empty or invalid
+      setBidAmount(initialBid.toLocaleString());
     }
-  }, [bidAmount, clampBid]);
+  }, [bidAmount, clampBid, initialBid, minBid, maxBid, formatBoundMessage, setTemporaryError]);
 
   return {
     bidAmount,
@@ -420,6 +414,8 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     isQuotaReached,
     userBid,
     initialBid,
-    derivedStatus
+    derivedStatus,
+    minBid,
+    maxBid
   };
 }

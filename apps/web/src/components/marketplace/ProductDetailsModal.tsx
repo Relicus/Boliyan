@@ -47,7 +47,9 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
     initialBid,
     isSubmitting,
     cooldownRemaining,
-    derivedStatus
+    derivedStatus,
+    minBid,
+    maxBid
   } = useBidding(item, seller); // Removed auto-close callback
 
   const [currentImg, setCurrentImg] = useState(0);
@@ -152,6 +154,8 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     onKeyDown={handleKeyDown}
                     onInputChange={handleInputChange}
                     onInputBlur={handleInputBlur}
+                    minBid={minBid}
+                    maxBid={maxBid}
                     derivedStatus={derivedStatus}
                   />
               </div>

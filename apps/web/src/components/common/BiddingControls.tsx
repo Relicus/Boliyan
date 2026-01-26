@@ -377,8 +377,10 @@ export const BiddingControls = memo(({
       {/* Stepper Input Row */}
       <div className={`flex w-full ${getInputHeight(viewMode)} relative`} ref={inputContainerRef}>
         <div className={cn(
-          "flex flex-1 rounded-xl shadow-sm overflow-hidden",
-          darkMode ? "border border-slate-600 bg-slate-800" : "border border-slate-300 bg-white",
+          "flex flex-1 rounded-xl shadow-sm overflow-hidden transition-colors duration-300",
+          (error || derivedStatus?.type === 'error') 
+            ? (darkMode ? "border-red-500 bg-red-900/20" : "border-red-400 bg-red-50")
+            : (darkMode ? "border-slate-600 bg-slate-800" : "border-slate-300 bg-white"),
           (isOwner || isQuotaReached) && 'opacity-50 grayscale pointer-events-none'
         )}>
           
@@ -428,7 +430,7 @@ export const BiddingControls = memo(({
               className={cn(
                 `w-full h-full text-center ${getTextSize(viewMode)} font-black font-outfit focus:outline-none px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300`,
                 darkMode ? "text-white" : "text-slate-900",
-                error ? (darkMode ? 'bg-red-900/50 text-red-200' : 'bg-red-50 text-red-900') : 'bg-transparent',
+                (error || derivedStatus?.type === 'error') ? (darkMode ? 'bg-red-900/50 text-red-200' : 'bg-red-50 text-red-900') : 'bg-transparent',
                 isFocused ? 'opacity-100' : 'opacity-0'
               )}
             />

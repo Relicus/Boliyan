@@ -68,8 +68,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     userBid,
     isSubmitting,
     cooldownRemaining,
-    derivedStatus
+    derivedStatus,
+    minBid,
+    maxBid
   } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
+
 
   
   // Watch for outbid events (only if user has an existing bid)
@@ -459,6 +462,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     darkMode={false}
                     isSecretBid={!item.isPublicBid}
                   />
+
               </div>
 
             </CardContent>

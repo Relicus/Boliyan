@@ -799,10 +799,11 @@ function ListForm() {
                       if (errors.askPrice) setErrors(prev => ({ ...prev, askPrice: false }));
                     }}
                     onBlur={() => {
-                      const num = parseFloat(askPrice);
-                      if (!isNaN(num) && num > 0) {
-                        const rounded = roundToReasonablePrice(num);
-                        if (rounded !== num) setAskPrice(rounded.toString());
+                      if (errors.askPrice) {
+                        const num = parseFloat(askPrice);
+                        if (!isNaN(num) && num >= LISTING_LIMITS.PRICE.MIN && num <= LISTING_LIMITS.PRICE.MAX) {
+                          setErrors(prev => ({ ...prev, askPrice: false }));
+                        }
                       }
                     }}
                     className="flex-1 h-full border-none shadow-none focus-visible:ring-0 text-center text-2xl font-bold bg-transparent"
