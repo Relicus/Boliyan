@@ -163,39 +163,36 @@ export const PriceDisplay = memo(({
       }
     : {};
 
-  const renderValue = () => (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.span 
-        key={safeShowUserBid ? 'user-bid' : (displayPrice !== null ? 'market-price' : 'text')}
-        initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-        transition={{ 
-          duration: 0.3,
-          ease: [0.23, 1, 0.32, 1] // Apple-style ease-out
-        }}
-        className={cn(getPriceClass(viewMode), "flex items-center gap-1 transition-colors duration-300", displayColor)}
-      >
-          {/* Show Total Bids Count only when there are bids AND we are showing a price */}
-          {(showTotalBids && config.variant === 'public' && effectiveBidCount > 0 && displayPrice !== null) ? (
-               <span 
-                 {...(itemId && !safeShowUserBid ? { 'data-rt-item-id': itemId, 'data-rt-bid-count-small': 'true' } : {})}
-                 className="text-[0.8em] font-bold text-slate-400"
-               >
-                 ({effectiveBidCount})
-               </span>
-          ) : null}
-          {displayPrice !== null ? (
-              <span {...highBidProps} className="flex items-center">
-                <RollingPrice price={displayPrice} />
-              </span>
-          ) : (
-              <span {...bidCountProps} className="flex items-center">
-                {displayText}
-              </span>
-          )}
-      </motion.span>
-    </AnimatePresence>
+  // Shared price value renderer - used by both orientations
+  const renderPriceValue = (alignment: 'center' | 'baseline' = 'center') => (
+    <span 
+      id={itemId ? `price-dynamic-value-${orientation === 'stacked' ? 'stacked-' : ''}${itemId}` : undefined}
+      className={cn(
+        getPriceClass(viewMode), 
+        `flex items-${alignment} gap-1 transition-colors duration-300`,
+        alignment === 'baseline' && 'leading-[0.9]',
+        displayColor
+      )}
+    >
+        {/* Show Total Bids Count only when there are bids AND we are showing a price */}
+        {(showTotalBids && config.variant === 'public' && effectiveBidCount > 0 && displayPrice !== null) ? (
+             <span 
+               {...(itemId && !safeShowUserBid ? { 'data-rt-item-id': itemId, 'data-rt-bid-count-small': 'true' } : {})}
+               className="text-[0.8em] font-bold text-slate-400"
+             >
+               ({effectiveBidCount})
+             </span>
+        ) : null}
+        {displayPrice !== null ? (
+            <span {...highBidProps} className={`flex items-${alignment}`}>
+              <RollingPrice key="stable-price-display" price={displayPrice} />
+            </span>
+        ) : (
+            <span {...bidCountProps} className={`flex items-${alignment}`}>
+              {displayText}
+            </span>
+        )}
+    </span>
   );
 
   // STACKED ORIENTATION
@@ -226,9 +223,9 @@ export const PriceDisplay = memo(({
                      <AnimatePresence mode="wait">
                         <motion.span 
                             key={labelText}
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -5 }}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
                             transition={{ duration: 0.2 }}
                             className={cn(getLabelClass(), "flex items-center gap-1.5 justify-center absolute inset-x-0", labelColor)}
                         >
@@ -239,9 +236,7 @@ export const PriceDisplay = memo(({
                  </div>
                  
                  {/* Value Container */}
-                 <div id={itemId ? `price-dynamic-value-stacked-${itemId}` : undefined}>
-                    {renderValue()}
-                 </div>
+                 {renderPriceValue('center')}
              </div>
         </div>
       );
@@ -297,30 +292,8 @@ export const PriceDisplay = memo(({
              </AnimatePresence>
           </div>
 
-          {/* Value Container - Stable */}
-          <span 
-            id={itemId ? `price-dynamic-value-${itemId}` : undefined}
-            className={cn(getPriceClass(viewMode), "flex items-baseline gap-1 transition-colors duration-300 leading-[0.9]", displayColor)}
-          >
-              {/* Show Total Bids Count only when there are bids AND we are showing a price */}
-              {(showTotalBids && config.variant === 'public' && effectiveBidCount > 0 && displayPrice !== null) ? (
-                   <span 
-                     {...(itemId && !safeShowUserBid ? { 'data-rt-item-id': itemId, 'data-rt-bid-count-small': 'true' } : {})}
-                     className="text-[0.8em] font-bold text-slate-400"
-                   >
-                     ({effectiveBidCount})
-                   </span>
-              ) : null}
-              {displayPrice !== null ? (
-                  <span {...highBidProps} className="flex items-baseline">
-                    <RollingPrice key="stable-price-display" price={displayPrice} />
-                  </span>
-              ) : (
-                  <span {...bidCountProps} className="flex items-baseline">
-                    {displayText}
-                  </span>
-              )}
-          </span>
+          {/* Value Container */}
+          {renderPriceValue('baseline')}
       </div>
     </div>
   );
