@@ -137,7 +137,7 @@ export default function MarketplaceGrid() {
         return "grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
       case 'compact':
       default:
-        return "grid-cols-[repeat(auto-fill,minmax(165px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]";
+        return "grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(165px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]";
     }
   };
 
