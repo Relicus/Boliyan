@@ -67,34 +67,49 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
         onClick={() => setIsModalOpen(true)}
       >
         <CardBody id={`watched-item-body-${item.id}`}>
-          {/* Image */}
-          <div id={`watched-item-img-container-${item.id}`} className="h-20 w-20 relative shrink-0">
-             <img id={`watched-item-img-${item.id}`} src={item.images[0]} alt="" className="h-full w-full rounded-lg object-cover bg-slate-100" />
-             <div id={`watched-item-bookmark-${item.id}`} className="absolute -top-1 -right-1 bg-blue-600 text-white p-0.5 rounded-full border-2 border-white shadow-sm">
-               <Bookmark className="h-2.5 w-2.5 fill-current" />
-             </div>
+          {/* Image + Seller Info Column */}
+          <div className="flex flex-col gap-1.5 shrink-0">
+            {/* Image */}
+            <div id={`watched-item-img-container-${item.id}`} className="h-20 w-20 relative">
+               <img id={`watched-item-img-${item.id}`} src={item.images[0]} alt="" className="h-full w-full rounded-lg object-cover bg-slate-100" />
+               <div id={`watched-item-bookmark-${item.id}`} className="absolute -top-1 -right-1 bg-blue-600 text-white p-0.5 rounded-full border-2 border-white shadow-sm">
+                 <Bookmark className="h-2.5 w-2.5 fill-current" />
+               </div>
+            </div>
+            {/* Seller Info - Inset Style */}
+            <div className="flex flex-col items-center w-20 gap-0.5 py-1.5 px-1 rounded-lg bg-slate-50/50 shadow-inner border border-slate-50">
+              <span className="text-[10px] font-semibold text-slate-600 truncate max-w-full text-center leading-tight">
+                {seller?.name || 'Seller'}
+              </span>
+              {seller?.rating !== undefined && seller.rating > 0 && (
+                <div className="flex items-center gap-0.5">
+                  <span className="text-amber-500 text-[9px]">★</span>
+                  <span className="text-[9px] font-bold text-slate-500">
+                    {seller.rating.toFixed(1)}
+                    {seller.reviewCount !== undefined && seller.reviewCount > 0 && (
+                      <span className="text-slate-400 font-medium"> ({seller.reviewCount})</span>
+                    )}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
           
           {/* Content */}
           <div id={`watched-item-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
-            {/* Top Section */}
-            <div className="flex justify-between items-start gap-2">
+            {/* Top Section - Column on mobile, row on lg+ */}
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-1 lg:gap-2">
                {/* Left: Title & Meta */}
-               <div className="flex flex-col gap-1 min-w-0">
-                  <h3 id={`watched-item-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-1 pr-1">{item.title}</h3>
+               <div className="flex flex-col gap-1 min-w-0 flex-1">
+                  <h3 id={`watched-item-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-2 lg:line-clamp-1">{item.title}</h3>
                   <div className="flex items-center gap-2 flex-wrap">
                     <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
                     <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
                   </div>
-                  {/* Location (Optional - if space permits) */}
-                  <div id={`watched-item-location-${item.id}`} className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5 line-clamp-1">
-                    <MapPin className="h-3 w-3" />
-                    <span className="truncate">{seller.location.address}</span>
-                  </div>
                </div>
 
-                {/* Right: Actions & Timer */}
-                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                {/* Right: Actions & Timer - Inline on mobile, column on lg+ */}
+                <div className="flex flex-wrap items-center gap-1.5 lg:flex-col lg:items-end">
                    {/* Timer */}
                    <TimerBadge 
                      expiryAt={item.expiryAt} 

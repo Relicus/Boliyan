@@ -246,10 +246,10 @@ export const PriceDisplay = memo(({
   return (
     <div 
       id={itemId ? `price-display-${itemId}` : undefined}
-      className={cn("flex justify-between items-end w-full px-1", className)}
+      className={cn("flex flex-wrap justify-between items-end gap-x-3 gap-y-1 w-full px-1", className)}
     >
       {/* Asking Price - Left Aligned */}
-      <div className="flex flex-col items-start min-w-0">
+      <div className="flex flex-col items-start min-w-0 shrink-0">
         <div className="h-4 w-full relative mb-0.5">
           <span 
             className={cn(

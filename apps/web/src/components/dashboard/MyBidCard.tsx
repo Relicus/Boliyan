@@ -113,28 +113,48 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
               onClick={() => setIsModalOpen(true)}
             >
               <CardBody id={`my-bid-body-${item.id}`}>
-                {/* Image */}
-                <div id={`my-bid-img-container-${item.id}`} className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden shrink-0">
-                  {item.images[0] && (
-                    <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
-                  )}
+                {/* Image + Seller Info Column */}
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  {/* Image */}
+                  <div id={`my-bid-img-container-${item.id}`} className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden">
+                    {item.images[0] && (
+                      <img id={`my-bid-img-${item.id}`} src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  {/* Seller Info - Inset Style */}
+                  <div className="flex flex-col items-center w-20 gap-0.5 py-1.5 px-1 rounded-lg bg-slate-50/50 shadow-inner border border-slate-50">
+                    <span className="text-[10px] font-semibold text-slate-600 truncate max-w-full text-center leading-tight">
+                      {seller?.name || 'Seller'}
+                    </span>
+                    {seller?.rating !== undefined && seller.rating > 0 && (
+                      <div className="flex items-center gap-0.5">
+                        <span className="text-amber-500 text-[9px]">★</span>
+                        <span className="text-[9px] font-bold text-slate-500">
+                          {seller.rating.toFixed(1)}
+                          {seller.reviewCount !== undefined && seller.reviewCount > 0 && (
+                            <span className="text-slate-400 font-medium"> ({seller.reviewCount})</span>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Content */}
                 <div id={`my-bid-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
-                  {/* Top Section with Split Columns */}
-                  <div className="flex justify-between items-start gap-2">
+                  {/* Top Section - Column on mobile, row on lg+ */}
+                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-1 lg:gap-2">
                      {/* Left: Title & Badges */}
-                     <div className="flex flex-col gap-1">
-                        <h3 id={`my-bid-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-1 pr-1">{item.title}</h3>
-                        <div className="flex items-center gap-2">
+                     <div className="flex flex-col gap-1 min-w-0 flex-1">
+                        <h3 id={`my-bid-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-2 lg:line-clamp-1">{item.title}</h3>
+                        <div className="flex items-center gap-2 flex-wrap">
                             <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
                             <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
                         </div>
                      </div>
 
-                     {/* Right: Timer & Status (New Column) */}
-                     <div className="flex flex-col items-end gap-1.5 shrink-0">
+                     {/* Right: Timer & Status - Inline on mobile, column on lg+ */}
+                     <div className="flex flex-wrap items-center gap-1.5 lg:flex-col lg:items-end">
                         {/* Timer */}
                         <TimerBadge 
                           expiryAt={item.expiryAt} 
@@ -162,9 +182,9 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
 
               {/* Action Footer (Only for Accepted Deals) */}
               {isAccepted && (
-                  <div id={`my-bid-footer-${item.id}`} className="px-3 py-2 bg-green-50 border-t border-green-100 flex items-center justify-between">
-                      <span className="text-xs font-bold text-green-700">Offer Accepted! Coordinate:</span>
-                      <div className="flex gap-2">
+                  <div id={`my-bid-footer-${item.id}`} className="px-3 py-2 bg-green-50 border-t border-green-100 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs font-bold text-green-700 shrink-0">Offer Accepted! Coordinate:</span>
+                      <div className="flex flex-wrap gap-2">
                           {canChat && (
                               <Button id={`my-bid-chat-btn-${item.id}`} size="sm" variant="default" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={handleChat}>
                                   <MessageSquare className="w-3 h-3 mr-1" />

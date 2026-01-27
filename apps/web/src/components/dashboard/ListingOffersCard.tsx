@@ -280,7 +280,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
         onClick={() => setIsExpanded(!isExpanded)}
       >
         {/* Left Column */}
-        <div className="flex-1 p-2 flex flex-col justify-evenly min-w-0">
+        <div className="flex-1 p-4 flex flex-col justify-evenly min-w-0">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-md bg-slate-100 overflow-hidden shrink-0">
               {item.images[0] && (

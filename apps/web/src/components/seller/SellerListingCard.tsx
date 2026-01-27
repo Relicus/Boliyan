@@ -57,19 +57,19 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
           )}
         </div>
         <div id={`listing-content-${item.id}`} className="flex-1 min-w-0 flex flex-col justify-between">
-          {/* Top Section */}
-          <div className="flex justify-between items-start gap-2">
+          {/* Top Section - Column on mobile, row on lg+ */}
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-1 lg:gap-2">
               {/* Left: Title & Meta */}
-              <div className="flex flex-col gap-1 min-w-0">
-                  <h3 id={`listing-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-1 pr-1">{item.title}</h3>
+              <div className="flex flex-col gap-1 min-w-0 flex-1">
+                  <h3 id={`listing-title-${item.id}`} className="font-bold text-sm text-slate-900 line-clamp-2 lg:line-clamp-1">{item.title}</h3>
                   <div className="flex items-center gap-2 flex-wrap">
                       <ConditionBadge condition={item.condition} className="text-[9px] px-1.5 py-0.5" />
                       <CategoryBadge category={item.category} className="text-[9px] px-1.5 py-0.5" />
                   </div>
               </div>
 
-              {/* Right: Timer & Slots */}
-              <div className="flex flex-col items-end gap-1.5 shrink-0">
+              {/* Right: Timer & Slots - Inline on mobile, column on lg+ */}
+              <div className="flex flex-wrap items-center gap-1.5 lg:flex-col lg:items-end">
                   {/* Timer */}
                   {isPendingGoLive ? (
                      <div
@@ -109,9 +109,9 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
           </div>
 
           {/* Bottom Section: Price & Actions */}
-          <div className="flex items-end justify-between mt-2 pt-1 border-t border-slate-100/50">
+          <div className="flex flex-wrap items-end justify-between gap-2 mt-2 pt-1 border-t border-slate-100/50">
                {/* Asking Price - Left Aligned */}
-               <div id={`listing-price-container-${item.id}`} className="flex flex-col items-start min-w-0">
+               <div id={`listing-price-container-${item.id}`} className="flex flex-col items-start min-w-0 shrink-0">
                   <span className="text-[0.65rem] font-bold uppercase tracking-wider mb-0.5 flex items-center gap-1 text-slate-400">
                     Asking
                   </span>
@@ -120,8 +120,8 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
                   </span>
               </div>
 
-              {/* Actions - Right Aligned */}
-              <div id={`listing-actions-${item.id}`} className="flex items-center gap-1.5 md:gap-2">
+              {/* Actions - Right Aligned, wraps on small screens */}
+              <div id={`listing-actions-${item.id}`} className="flex flex-wrap items-center gap-1.5 md:gap-2">
                     <Button 
                       id={`listing-view-btn-${item.id}`} 
                       variant="outline"  
