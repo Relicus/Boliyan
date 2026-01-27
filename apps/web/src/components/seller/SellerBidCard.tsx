@@ -54,8 +54,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
 
   const location = useMemo(() => getFuzzyLocationString(bidder.location.address), [bidder.location.address]);
 
-  // Calculate time remaining (24h from created_at + extensions?)
-  // Actually, we use expires_at if available, else created_at + 24h
+  // Calculate time remaining
   const expiresAt = useMemo(() => 
     bid.expiresAt ? new Date(bid.expiresAt) : new Date(new Date(bid.createdAt).getTime() + 24 * 60 * 60 * 1000)
   , [bid.expiresAt, bid.createdAt]);
@@ -74,7 +73,6 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   };
 
   const handleChat = () => {
-    // Find existing conversation for this bid
     const conv = conversations.find(c => 
       c.itemId === bid.itemId && 
       ((c.sellerId === user?.id && c.bidderId === bidder.id) || 
@@ -88,16 +86,14 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
     }
   };
 
-  // Don't render if bid is rejected (keep accepted to show Chat button)
   if (bid.status === 'rejected') {
     return null;
   }
 
   return (
     <div id={`bid-card-${bid.id}`} className="@container bg-slate-50 border border-slate-200 rounded-xl hover:shadow-md transition-all p-3">
-      {/* MOBILE Layout (md:hidden) */}
+      {/* MOBILE Layout */}
       <div id={`bid-card-mobile-${bid.id}`} className="flex flex-col gap-2 md:hidden">
-        {/* Top Row: User (65%) | Price (35%) */}
         <div id={`bid-card-mobile-top-row-${bid.id}`} className="flex items-start justify-between gap-3">
           <div id={`bid-card-mobile-user-info-${bid.id}`} className="flex items-center gap-2 min-w-0 flex-1">
             <Avatar className="h-9 w-9 border-2 border-slate-50 shrink-0">
@@ -127,20 +123,16 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
           <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right shrink-0 flex flex-col items-end">
             <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1">Bid Amount</span>
             <p id={`bid-amount-mobile-${bid.id}`} className="price-font font-black text-blue-600 leading-none truncate text-[clamp(1rem,5cqi,1.25rem)]">Rs. {formatPrice(bid.amount)}</p>
-            
-            {/* Expiration Timer (Mobile) */}
             {!isExpired && (bid.status === 'pending' || bid.status === 'shortlisted') && (
                  <div className="mt-1 flex justify-end">
                     <TimerBadge expiryAt={expiresAt.toISOString()} variant="solid" className="bg-transparent text-slate-400 p-0 shadow-none animate-none" />
                  </div>
             )}
-            
             {isExpired && bid.status !== 'accepted' && (
                 <div className="text-[9px] font-bold mt-1 text-right text-red-500 uppercase tracking-tighter">
                    Expired
                 </div>
             )}
-            
             {!isOutside && (
               <div id={`bid-distance-info-mobile-${bid.id}`} className="flex items-center justify-end gap-2 mt-1 text-[10px] text-muted-foreground font-medium whitespace-nowrap">
                 <DistanceBadge 
@@ -155,7 +147,6 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
           </div>
         </div>
 
-        {/* Bottom Row: Actions */}
         <div id={`bid-card-mobile-actions-${bid.id}`} className="grid grid-cols-2 gap-3 mt-1">
           {bid.status !== 'accepted' && (
             <Button id={`bid-reject-btn-mobile-${bid.id}`} onClick={handleReject} variant="outline" className="w-full h-10 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 font-semibold">
@@ -167,17 +158,17 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             <div className="col-span-2 flex gap-2">
               <Button 
                 id={`bid-whatsapp-btn-mobile-${bid.id}`} 
-                disabled={!bidder.phone}
+                disabled={!bidder.phone && !bidder.whatsapp}
                 className={cn(
                   "flex-1 h-10 font-bold transition-all",
-                  bidder.phone 
+                  (bidder.phone || bidder.whatsapp)
                     ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
                     : "bg-slate-100 text-slate-400 grayscale cursor-not-allowed border border-slate-200"
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (!bidder.phone) return;
-                  window.open(getWhatsAppUrl(bidder.phone, waMessage), '_blank');
+                  if (!bidder.phone && !bidder.whatsapp) return;
+                  window.open(getWhatsAppUrl(bidder.whatsapp || bidder.phone || "", waMessage), '_blank');
                 }} 
               >
                 <WhatsAppIcon className="h-4 w-4 mr-2" />
@@ -197,7 +188,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
         </div>
       </div>
 
-      {/* DESKTOP Layout (hidden md:flex) */}
+      {/* DESKTOP Layout */}
       <div id={`bid-card-desktop-${bid.id}`} className="hidden md:flex flex-row items-center justify-between gap-4">
           <div id={`bid-card-desktop-left-${bid.id}`} className="flex items-center gap-4">
             <Avatar className="h-12 w-12 border-2 border-slate-50">
@@ -212,68 +203,54 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                     <Star className="h-3 w-3 fill-amber-500" />
                     {bidder.rating}
                   </div>
-                  <span className="text-xs text-amber-600/70 font-semibold">(24)</span>
                 </div>
                 
                  <div id={`bidder-stats-desktop-${bid.id}`} className="flex items-center gap-3 text-[11px] text-muted-foreground">
                    <div className="flex items-center gap-1">
                     <MapPin className="h-3 w-3 text-red-400" />
-                    {location}
+                    <span className="truncate max-w-[150px]">{location}</span>
                   </div>
                   {!isOutside && (
-                    <div className="flex items-center gap-3">
-                      <DistanceBadge 
-                        distance={distance} 
-                        duration={duration} 
-                        variant="inline" 
-                        className="text-muted-foreground font-medium"
-                      />
-                    </div>
+                    <DistanceBadge distance={distance} duration={duration} variant="inline" className="bg-transparent p-0 text-muted-foreground" iconClassName="h-3 w-3" />
                   )}
                 </div>
-
             </div>
           </div>
 
-          <div id={`bid-card-desktop-right-${bid.id}`} className="flex flex-row items-center gap-6">
+          <div id={`bid-card-desktop-right-${bid.id}`} className="flex items-center gap-6">
               <div className="text-right">
-                <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 block mb-1">Bid Amount</span>
-                 <p id={`bid-amount-desktop-${bid.id}`} className="price-font text-[clamp(1.25rem,4cqi,1.75rem)] font-black text-blue-600 leading-none">Rs. {formatPrice(bid.amount)}</p>
-                
-                {/* Expiration Timer */}
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-0.5">Bid Amount</span>
+                <p id={`bid-amount-desktop-${bid.id}`} className="price-font font-black text-xl text-blue-600 leading-none">Rs. {formatPrice(bid.amount)}</p>
                 {!isExpired && (bid.status === 'pending' || bid.status === 'shortlisted') && (
-                     <div className="mt-1 flex justify-end">
-                        <TimerBadge expiryAt={expiresAt.toISOString()} variant="solid" className="bg-transparent text-slate-400 p-0 shadow-none animate-none" />
-                     </div>
+                  <div className="mt-1.5 flex justify-end">
+                    <TimerBadge expiryAt={expiresAt.toISOString()} variant="solid" className="bg-transparent text-slate-400 p-0 shadow-none animate-none" />
+                  </div>
                 )}
                 {isExpired && bid.status !== 'accepted' && (
-                    <span className="text-[10px] font-bold text-red-500 mt-1 block uppercase tracking-tighter">Expired</span>
+                  <div className="text-[10px] font-bold mt-1.5 text-right text-red-500 uppercase tracking-widest">
+                    Expired
+                  </div>
                 )}
               </div>
 
-              <div id={`bid-actions-desktop-${bid.id}`} className="flex gap-2">
-                {bid.status !== 'accepted' && (
-                  <Button id={`bid-reject-btn-desktop-${bid.id}`} onClick={handleReject} size="sm" variant="outline" className="h-9 px-4 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200">
-                    <X className="h-4 w-4 mr-1" />
-                    Reject
-                  </Button>
-                )}
+              <div id={`bid-card-desktop-actions-${bid.id}`} className="flex items-center gap-2 border-l border-slate-200 pl-6 py-1">
                 {bid.status === 'accepted' ? (
                   <>
                     <Button 
-                      id={`bid-whatsapp-btn-desktop-${bid.id}`} 
-                      disabled={!bidder.phone}
+                      id={`bid-whatsapp-btn-desktop-${bid.id}`}
+                      variant="outline" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!bidder.phone && !bidder.whatsapp) return;
+                        window.open(getWhatsAppUrl(bidder.whatsapp || bidder.phone || "", waMessage), '_blank');
+                      }}
+                      disabled={!bidder.phone && !bidder.whatsapp}
                       className={cn(
                         "h-9 px-4 font-bold transition-all",
-                        bidder.phone 
+                        (bidder.phone || bidder.whatsapp)
                           ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
                           : "bg-slate-100 text-slate-400 grayscale cursor-not-allowed border border-slate-200 shadow-none"
                       )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!bidder.phone) return;
-                        window.open(getWhatsAppUrl(bidder.phone, waMessage), '_blank');
-                      }} 
                       size="sm" 
                     >
                       <WhatsAppIcon className="h-4 w-4 mr-1" />
@@ -285,10 +262,15 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                     </Button>
                   </>
                 ) : (
-                  <Button id={`bid-unlock-btn-desktop-${bid.id}`} onClick={handleAccept} size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold">
-                    <Check className="h-4 w-4 mr-1" />
-                    Accept
-                  </Button>
+                  <>
+                    <Button id={`bid-reject-btn-desktop-${bid.id}`} onClick={handleReject} variant="ghost" size="sm" className="h-9 w-9 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg">
+                      <X className="h-5 w-5" />
+                    </Button>
+                    <Button id={`bid-accept-btn-desktop-${bid.id}`} onClick={handleAccept} size="sm" className="h-9 px-4 bg-blue-600 hover:bg-blue-700 font-bold text-white rounded-lg shadow-sm">
+                      <Check className="h-4 w-4 mr-1" />
+                      Accept
+                    </Button>
+                  </>
                 )}
               </div>
           </div>

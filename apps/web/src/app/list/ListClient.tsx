@@ -14,9 +14,11 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, Sparkles, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { CATEGORIES, LISTING_IMAGE_ACCEPT, LISTING_LIMITS, isAllowedListingImageInput } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +26,7 @@ import { uploadListingImage } from "@/lib/uploadImage";
 import { supabase } from "@/lib/supabase";
 import { generateSlug, formatPrice, formatCountdown } from "@/lib/utils";
 import { toast } from "sonner";
+import { sonic } from "@/lib/sonic";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { Item } from "@/types";
 import { roundToReasonablePrice } from "@/lib/bidding";
@@ -47,7 +50,7 @@ function ListForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("id");
-  const { items, user, openAuthModal, isLoading: isAuthLoading } = useApp();
+  const { items, user, myLocation, openAuthModal, isLoading: isAuthLoading } = useApp();
   const { now } = useTime();
   
   useEffect(() => {
@@ -118,6 +121,7 @@ function ListForm() {
   const [isWhatsappSameAsPhone, setIsWhatsappSameAsPhone] = useState(true);
   const [showPriceEstimator, setShowPriceEstimator] = useState(false);
   const [location, setLocation] = useState<{lat: number, lng: number, address: string, city?: string} | null>(null);
+  const [isMapGeocoding, setIsMapGeocoding] = useState(false);
   const [isDraftRestored, setIsDraftRestored] = useState(false);
 
   // Sync WhatsApp with Phone if enabled
@@ -159,6 +163,15 @@ function ListForm() {
       }
     }
   }, [editingItem, isAuthLoading, user]);
+  
+  // Default to global myLocation for new listings if no location is set (e.g. from draft)
+  useEffect(() => {
+    if (editingItem || isAuthLoading) return;
+    
+    if (myLocation && !location) {
+      setLocation(myLocation);
+    }
+  }, [editingItem, isAuthLoading, myLocation, location]);
 
   // Save Draft to LocalStorage
   useEffect(() => {
@@ -419,6 +432,7 @@ function ListForm() {
             asked_price: roundedPrice,
             description,
             contact_phone: contactPhone.trim(),
+            contact_whatsapp: contactWhatsapp.trim(),
             auction_mode: (isPublic ? 'visible' : 'hidden') as 'visible' | 'hidden',
             images: orderedUrls,
             condition: condition,
@@ -438,6 +452,7 @@ function ListForm() {
                 p_category: listingPayload.category,
                 p_asked_price: listingPayload.asked_price,
                 p_contact_phone: listingPayload.contact_phone,
+                p_contact_whatsapp: listingPayload.contact_whatsapp,
                 p_auction_mode: listingPayload.auction_mode,
                 p_images: listingPayload.images,
                 p_condition: listingPayload.condition,
@@ -459,7 +474,26 @@ function ListForm() {
           toast.success("Listing updated", {
             description: GO_LIVE_NOTE
           });
-          router.push("/");
+          
+          // Celebration
+          const btn = document.getElementById("post-listing-btn");
+          const rect = btn?.getBoundingClientRect();
+          const confettiX = rect ? (rect.left + rect.width / 2) / window.innerWidth : 0.5;
+          const confettiY = rect ? (rect.top + rect.height / 2) / window.innerHeight : 0.5;
+          
+          sonic.confetti();
+          confetti({
+            origin: { x: confettiX, y: confettiY },
+            particleCount: 100,
+            spread: 70,
+            gravity: 1.2,
+            scalar: 0.8,
+            zIndex: 9999,
+            colors: ['#fbbf24', '#f59e0b', '#d97706', '#ffffff'],
+          });
+
+          localStorage.removeItem(DRAFT_KEY);
+          setTimeout(() => router.push("/"), 800);
         } else {
           const { error } = await supabase.rpc('create_listing', {
             p_title: listingPayload.title,
@@ -467,6 +501,7 @@ function ListForm() {
             p_category: listingPayload.category,
             p_asked_price: listingPayload.asked_price,
             p_contact_phone: listingPayload.contact_phone,
+            p_contact_whatsapp: listingPayload.contact_whatsapp,
             p_auction_mode: listingPayload.auction_mode,
             p_images: listingPayload.images,
             p_condition: listingPayload.condition,
@@ -482,7 +517,26 @@ function ListForm() {
           toast.success("Listing created", {
             description: GO_LIVE_NOTE
           });
-          router.push("/");
+          
+          // Celebration
+          const btn = document.getElementById("post-listing-btn");
+          const rect = btn?.getBoundingClientRect();
+          const confettiX = rect ? (rect.left + rect.width / 2) / window.innerWidth : 0.5;
+          const confettiY = rect ? (rect.top + rect.height / 2) / window.innerHeight : 0.5;
+          
+          sonic.confetti();
+          confetti({
+            origin: { x: confettiX, y: confettiY },
+            particleCount: 100,
+            spread: 70,
+            gravity: 1.2,
+            scalar: 0.8,
+            zIndex: 9999,
+            colors: ['#fbbf24', '#f59e0b', '#d97706', '#ffffff'],
+          });
+
+          localStorage.removeItem(DRAFT_KEY);
+          setTimeout(() => router.push("/"), 800);
         }
 
     } catch (error) {
@@ -781,17 +835,20 @@ function ListForm() {
                             <Label className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
                               <Calendar className="w-3 h-3" /> Date
                             </Label>
-                            <div className="flex gap-2 w-full">
-                              <div className="flex-[2] min-w-[80px]">
+                             <div className="flex gap-2 w-full">
+                              <div className="flex-[2] min-w-[100px]">
                                 <Select value={purchaseMonth} onValueChange={setPurchaseMonth}>
-                                  <SelectTrigger id="purchase-month-select" className="h-9 text-xs bg-white border-slate-200 px-2 w-full min-w-[80px]">
-                                    <SelectValue placeholder="Mo" />
+                                  <SelectTrigger id="purchase-month-select" className="h-9 text-xs bg-white border-slate-200 px-2 w-full min-w-[100px]">
+                                    <SelectValue placeholder="Month" />
                                   </SelectTrigger>
-                                  <SelectContent id="purchase-month-select-content">
+
+
+                                   <SelectContent id="purchase-month-select-content">
                                     {getPurchaseMonthOptions().map(m => (
-                                      <SelectItem key={m.value} value={m.value.toString()} className="text-xs">{m.label.slice(0,3)}</SelectItem>
+                                      <SelectItem key={m.value} value={m.value.toString()} className="text-xs">{m.label}</SelectItem>
                                     ))}
-                                  </SelectContent>
+                                   </SelectContent>
+
                                 </Select>
                               </div>
                               <div className="flex-[3] min-w-[110px]">
@@ -988,37 +1045,68 @@ function ListForm() {
                 </AnimatePresence>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="listing-phone-input" className="flex items-center gap-1">
-                  <Phone className="h-3.5 w-3.5 text-slate-500" />
-                  Phone for this listing <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="listing-phone-input"
-                  type="tel"
-                  placeholder="Enter phone number"
-                  value={contactPhone}
-                  onChange={(e) => {
-                    setContactPhone(e.target.value);
-                    if (errors.contactPhone) setErrors(prev => ({ ...prev, contactPhone: false }));
-                  }}
-                  className={`transition-all ${errors.contactPhone ? "border-red-500 bg-red-50/50 ring-red-500/20" : "bg-slate-50 border-slate-100"}`}
-                />
-                {errors.contactPhone && (
-                  <p className="text-[10px] font-bold text-red-500">Please enter a valid phone number</p>
-                )}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="listing-phone-input" className="flex items-center gap-1">
+                    <Phone className="h-3.5 w-3.5 text-slate-500" />
+                    Phone <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="listing-phone-input"
+                    type="tel"
+                    placeholder="Enter phone number"
+                    value={contactPhone}
+                    onChange={(e) => {
+                      setContactPhone(e.target.value);
+                      if (errors.contactPhone) setErrors(prev => ({ ...prev, contactPhone: false }));
+                    }}
+                    className={`transition-all ${errors.contactPhone ? "border-red-500 bg-red-50/50 ring-red-500/20" : "bg-slate-50 border-slate-100"}`}
+                  />
+                  {errors.contactPhone && (
+                    <p className="text-[10px] font-bold text-red-500">Please enter a valid phone number</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="listing-whatsapp-input" className="flex items-center gap-1.5">
+                      <svg className="h-3.5 w-3.5 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.659 1.432 5.631 1.433h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                      </svg>
+                      WhatsApp
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Same as Phone</span>
+                      <Switch 
+                        id="whatsapp-same-toggle"
+                        checked={isWhatsappSameAsPhone}
+                        onCheckedChange={setIsWhatsappSameAsPhone}
+                      />
+                    </div>
+                  </div>
+                  <Input
+                    id="listing-whatsapp-input"
+                    type="tel"
+                    placeholder="Enter WhatsApp number"
+                    value={contactWhatsapp}
+                    disabled={isWhatsappSameAsPhone}
+                    onChange={(e) => setContactWhatsapp(e.target.value)}
+                    className="h-11 bg-slate-50 border-slate-100 disabled:opacity-50"
+                  />
+                </div>
               </div>
 
               {/* Location Map Section */}
               <div className="space-y-4">
                 <Label className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5 text-slate-500" />
-                  Item Location <span className="text-red-500">*</span>
+                  Location <span className="text-red-500">*</span>
                 </Label>
                 <div className={`h-[300px] rounded-xl overflow-hidden border ${errors.location ? 'border-red-500' : 'border-slate-200'} shadow-sm`}>
                   <MapPicker 
                     initialLocation={location}
                     onLocationSelect={setLocation}
+                    onGeocodingChange={setIsMapGeocoding}
                     required
                   />
                 </div>
@@ -1100,9 +1188,9 @@ function ListForm() {
               id="post-listing-btn"
               className="flex-[2] bg-blue-600 hover:bg-blue-700 h-14 text-lg font-bold"
               onClick={handleSubmit}
-              disabled={isUploading || isProcessingImages || isLoadingItem || isEditCooldown}
+              disabled={isUploading || isProcessingImages || isLoadingItem || isEditCooldown || isMapGeocoding}
             >
-              {(isUploading || isProcessingImages) ? (
+              {(isUploading || isProcessingImages || isMapGeocoding) ? (
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
               ) : editingItem ? (
                   <Save className="h-5 w-5 mr-2" />
@@ -1113,9 +1201,11 @@ function ListForm() {
                 ? "Uploading..."
                 : isProcessingImages
                   ? "Processing images..."
-                  : editingItem
-                    ? (isEditCooldown ? `Edit in ${editCooldownLabel || "1h"}` : "Save")
-                    : "Post Listing"}
+                  : isMapGeocoding
+                    ? "Locating..."
+                    : editingItem
+                      ? (isEditCooldown ? `Edit in ${editCooldownLabel || "1h"}` : "Save")
+                      : "Post Listing"}
             </Button>
           </div>
           <div id="go-live-note" className="flex justify-center">

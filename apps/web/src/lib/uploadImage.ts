@@ -14,7 +14,8 @@ export async function uploadListingImage(file: File): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to get upload URL");
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to get upload URL");
   }
 
   const payload = await response.json();

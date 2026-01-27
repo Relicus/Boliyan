@@ -46,8 +46,8 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   }, [conversations, item.id, user]);
   const isAccepted = userBid.status === 'accepted';
   const canChat = isAccepted && !!acceptedConversation;
-  const listingPhone = item.contactPhone || seller.phone;
-  const canCall = canChat && !!listingPhone;
+  const listingPhone = item.contactWhatsapp || seller.whatsapp || item.contactPhone || seller.phone;
+  const canCall = canChat && (!!item.contactPhone || !!seller.phone);
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
   const productSlug = item.slug || item.id;
   const shortCode = getListingShortCode(item.slug);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 import { Search, MapPin, Loader2, Navigation, Crosshair } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -29,7 +30,7 @@ interface LocationResult {
 }
 
 interface MapPickerProps {
-  initialLocation?: { lat: number; lng: number } | null;
+  initialLocation?: { lat: number; lng: number; address?: string; city?: string } | null;
   onLocationSelect: (location: LocationResult) => void;
   onGeocodingChange?: (isGeocoding: boolean) => void;
   className?: string;
@@ -81,6 +82,19 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
   useEffect(() => {
     onGeocodingChange?.(isGeocoding);
   }, [isGeocoding, onGeocodingChange]);
+
+  // Sync center and address with initialLocation if changed from outside
+  useEffect(() => {
+    if (initialLocation && (initialLocation.lat !== center[0] || initialLocation.lng !== center[1])) {
+       setCenter([initialLocation.lat, initialLocation.lng]);
+       if (initialLocation.address) {
+           setAddress(initialLocation.address);
+           // Prevent redundant geocode
+           skipGeocodeRef.current = true;
+           lastGeocodedCoords.current = [initialLocation.lat, initialLocation.lng];
+       }
+    }
+  }, [initialLocation]);
   
   // Ref to prevent geocoding loop when location is manually set
   const skipGeocodeRef = useRef(false);
@@ -120,12 +134,17 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
   // Reverse Geocode on pin move
   // STABILIZED: useCallback avoids unnecessary re-renders in LeafletMap
   const handleMapMove = useCallback((lat: number, lng: number) => {
-    // Only update center if significantly different to avoid loops?
-    // Actually, we must update center to keep pin in center of map view logic 
-    // (though pin is CSS absolute center, map center is what matters).
+    // Check if we actually moved significantly before triggering geocoding state
+    if (lastGeocodedCoords.current) {
+        const [lastLat, lastLng] = lastGeocodedCoords.current;
+        const latDiff = Math.abs(lastLat - lat);
+        const lngDiff = Math.abs(lastLng - lng);
+        if (latDiff < 0.0001 && lngDiff < 0.0001) return;
+    }
+
+    // IMMEDIATELY set geocoding to true when movement ends to disable buttons
+    setIsGeocoding(true);
     setCenter([lat, lng]);
-    
-    // We don't trigger geocode here directly, useEffect does it.
   }, []);
 
   // Ref to store the last geocoded coordinates to prevent loops
@@ -137,19 +156,8 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
     if (skipGeocodeRef.current) {
         skipGeocodeRef.current = false;
         lastGeocodedCoords.current = [...center];
+        setIsGeocoding(false);
         return;
-    }
-
-    // Check if we have moved significantly before triggering a new fetch
-    if (lastGeocodedCoords.current) {
-        const [lastLat, lastLng] = lastGeocodedCoords.current;
-        const latDiff = Math.abs(lastLat - center[0]);
-        const lngDiff = Math.abs(lastLng - center[1]);
-        
-        // Approx 10 meters threshold
-        if (latDiff < 0.0001 && lngDiff < 0.0001) {
-            return;
-        }
     }
 
     const timer = setTimeout(async () => {
@@ -185,7 +193,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
         } finally {
           setIsGeocoding(false);
         }
-    }, 1200); // Increased debounce to 1200ms to avoid flicker during fine map adjustments
+    }, 800); // Reduced debounce to 800ms for faster feedback while keeping it stable
 
     return () => clearTimeout(timer);
   }, [center, onLocationSelect]); // Re-run when center changes (drag ends)
@@ -243,11 +251,11 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
               (position) => {
                   const lat = position.coords.latitude;
                   const lng = position.coords.longitude;
-                  setCenter([lat, lng]);
-                  // Let the useEffect handle the reverse geocoding for this one
-                  // to get the accurate address
-                  setIsGeocoding(false);
+                   setCenter([lat, lng]);
+                  // Let the useEffect handle the reverse geocoding
+                  // We DON'T set isGeocoding(false) here, useEffect will do it after fetching address
               },
+
               (error) => {
                   console.error("Geolocation error:", error);
                   setIsGeocoding(false);
@@ -310,13 +318,20 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
             <Crosshair className="h-5 w-5 text-slate-700" />
         </Button>
 
-        {/* Fixed Center Pin Overlay */}
+         {/* Fixed Center Pin Overlay */}
         <div className="absolute inset-0 pointer-events-none z-[400] flex items-center justify-center pb-8">
-          <div className="relative">
-              <MapPin className="h-8 w-8 text-blue-600 fill-blue-600/20 drop-shadow-xl animate-bounce" style={{ animationDuration: '0.3s', animationIterationCount: 1 }} />
+          <motion.div 
+            key={`${center[0]}-${center[1]}`}
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            className="relative"
+          >
+              <MapPin className="h-8 w-8 text-blue-600 fill-blue-600/20 drop-shadow-xl" />
               <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-1 bg-black/20 rounded-full blur-[1px]" />
-          </div>
+          </motion.div>
         </div>
+
 
         {/* Address Badge Overlay */}
         <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-lg border border-slate-200/50 z-[400]">

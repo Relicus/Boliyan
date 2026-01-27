@@ -380,12 +380,15 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
 
             {/* Desktop Unified Actions + Price */}
             <div className="hidden md:flex items-center gap-4">
-               {/* Actions in line on desktop */}
-               {(() => {
-                  const listingPhone = !isSeller ? item?.contactPhone : undefined;
-                  const phone = listingPhone || otherUser?.phone;
-                   const waMessageText = waMessage;
-                  if (!phone && isSealed) return null;
+                {/* Actions in line on desktop */}
+                {(() => {
+                   const listingWhatsapp = !isSeller ? item?.contactWhatsapp : undefined;
+                   const profileWhatsapp = otherUser?.whatsapp;
+                   const listingPhone = !isSeller ? item?.contactPhone : undefined;
+                   const phone = listingWhatsapp || profileWhatsapp || listingPhone || otherUser?.phone;
+                    const waMessageText = waMessage;
+                   if (!phone && isSealed) return null;
+
 
                   return (
                     <div className="flex items-center gap-2">
@@ -479,8 +482,10 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
               
               <div className="flex items-center gap-1.5 ml-auto">
                 {(() => {
-                  const listingPhone = !isSeller ? item?.contactPhone : undefined;
-                  const phone = listingPhone || otherUser?.phone;
+                   const listingWhatsapp = !isSeller ? item?.contactWhatsapp : undefined;
+                   const profileWhatsapp = otherUser?.whatsapp;
+                   const listingPhone = !isSeller ? item?.contactPhone : undefined;
+                   const phone = listingWhatsapp || profileWhatsapp || listingPhone || otherUser?.phone;
 
                    const waMessageText = waMessage;
 

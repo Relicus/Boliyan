@@ -4,19 +4,33 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const r2Client = new S3Client({
-  region: "auto",
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
-  },
-});
-
 const sanitizeFilename = (value: string) => value.replace(/[^a-zA-Z0-9.-]/g, "_");
 
 export async function POST(request: Request) {
   try {
+    // Check Config
+    const {
+      R2_ACCOUNT_ID,
+      R2_ACCESS_KEY_ID,
+      R2_SECRET_ACCESS_KEY,
+      R2_BUCKET_NAME,
+      NEXT_PUBLIC_R2_DOMAIN
+    } = process.env;
+
+    if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME) {
+      console.error("Missing R2 configuration env vars");
+      return NextResponse.json({ error: "Storage configuration error" }, { status: 500 });
+    }
+
+    const r2Client = new S3Client({
+      region: "auto",
+      endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId: R2_ACCESS_KEY_ID,
+        secretAccessKey: R2_SECRET_ACCESS_KEY,
+      },
+    });
+
     const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -26,13 +40,22 @@ export async function POST(request: Request) {
           getAll() {
             return cookieStore.getAll();
           },
-          setAll() {},
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // Ignore if called from RSC
+            }
+          },
         },
       }
     );
 
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error("Presign upload auth error:", authError);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -58,6 +81,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Presign upload error:", error);
-    return NextResponse.json({ error: "Failed to create upload URL" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to create upload URL";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

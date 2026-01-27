@@ -227,7 +227,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                       mapUrl,
                       chatUrl: chatShortLink
                     });
-                   window.open(getWhatsAppUrl(bidder.phone!, waMessage), '_blank');
+                   window.open(getWhatsAppUrl(bidder.whatsapp || bidder.phone!, waMessage), '_blank');
                  }}
                  title="WhatsApp"
               >
