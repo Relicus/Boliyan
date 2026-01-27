@@ -4,10 +4,11 @@ import { memo, useMemo, useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Gavel, HatGlasses, Loader2, AlertCircle, Edit } from "lucide-react";
+import { Gavel, HatGlasses, AlertCircle, Edit } from "lucide-react";
 import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import RollingPrice from "./RollingPrice";
 import { BoliyanUrduMark } from "@/components/branding/BoliyanLogo";
+import { BoliyanLogomarkLoader } from "@/components/branding/BoliyanLogomarkLoader";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -303,7 +304,7 @@ export const BiddingControls = memo(({
     if (isSubmitting) {
       return {
         theme: 'active' as ButtonTheme, // Blue base
-        content: <Loader2 className="w-6 h-6 animate-spin" />
+        content: <BoliyanLogomarkLoader className="text-white" />
       };
     }
 

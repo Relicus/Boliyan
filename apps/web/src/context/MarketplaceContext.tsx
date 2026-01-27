@@ -508,12 +508,13 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     
     // Find item if available (may not be in current filtered view)
     const originalItem = itemsByIdRef.current[itemId];
-    const existingBid = bidsByIdRef.current[`${itemId}-${user.id}`] || Object.values(bidsByIdRef.current).find(b => b.itemId === itemId && b.bidderId === user.id);
+    const existingBid = Object.values(bidsByIdRef.current).find(b => b.itemId === itemId && b.bidderId === user.id);
     
     // --- OPTIMISTIC UPDATE START ---
     // 1. Create a temporary bid object
+    const optimisticBidId = existingBid ? existingBid.id : `temp-${Date.now()}`;
     const optimisticBid: Bid = {
-        id: existingBid ? existingBid.id : `temp-${Date.now()}`,
+        id: optimisticBidId,
         itemId: itemId,
         bidderId: user.id,
         amount: amount,
@@ -533,7 +534,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         const isNewHigh = amount > currentMax;
         const updatedItem = {
             ...originalItem,
-            bidCount: originalItem.bidCount + 1,
+            bidCount: existingBid ? originalItem.bidCount : originalItem.bidCount + 1,
             currentHighBid: isNewHigh ? amount : currentMax,
             currentHighBidderId: isNewHigh ? user.id : originalItem.currentHighBidderId
         };
@@ -597,6 +598,27 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         return false;
     }
     
+    const bidRow = data[0] as Database['public']['Tables']['bids']['Row'];
+    const resolvedBid: Bid = {
+        id: bidRow.id,
+        itemId: bidRow.listing_id || itemId,
+        bidderId: bidRow.bidder_id || user.id,
+        bidder: user,
+        amount: Number(bidRow.amount ?? amount),
+        status: (bidRow.status || 'pending') as Bid['status'],
+        type: type === 'private' ? 'private' : 'public',
+        createdAt: bidRow.created_at || new Date().toISOString(),
+        update_count: bidRow.update_count ?? optimisticBid.update_count
+    };
+
+    setBidsById(prev => {
+        const next = { ...prev };
+        if (optimisticBidId !== resolvedBid.id) {
+            delete next[optimisticBidId];
+        }
+        return upsertEntity(next, resolvedBid);
+    });
+
     // Add to involved and watchlist on success
     setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
     if (!watchedItemIdsRef.current.includes(itemId)) {

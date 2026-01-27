@@ -109,22 +109,6 @@ export const PriceDisplay = memo(({
   let displayText: string | null = null;
   let displayColor = darkMode ? "text-white" : "text-slate-800";
   
-  // Realtime targeting props
-  const highBidProps = itemId && !safeShowUserBid && config.variant === 'public' && config.showHighBid 
-    ? {
-        'data-rt-item-id': itemId,
-        'data-rt-high-bid': 'true',
-        'data-rt-high-bid-value': config.currentHighBid || 0
-      }
-    : {};
-    
-  const bidCountProps = itemId && !safeShowUserBid && (!config.showHighBid || config.variant !== 'public')
-    ? {
-        'data-rt-item-id': itemId,
-        'data-rt-bid-count': 'true'
-      }
-    : {};
-
   if (safeShowUserBid && userCurrentBid) {
       labelText = "Your Bid";
       LabelIcon = UserIcon;
@@ -159,6 +143,24 @@ export const PriceDisplay = memo(({
           displayColor = darkMode ? "text-amber-400" : "text-amber-600";
       }
   }
+
+  const isBidCountView = displayPrice === null;
+
+  // Realtime targeting props
+  const highBidProps = itemId && !safeShowUserBid && !isBidCountView && config.variant === 'public' && config.showHighBid 
+    ? {
+        'data-rt-item-id': itemId,
+        'data-rt-high-bid': 'true',
+        'data-rt-high-bid-value': config.currentHighBid || 0
+      }
+    : {};
+    
+  const bidCountProps = itemId && !safeShowUserBid && isBidCountView
+    ? {
+        'data-rt-item-id': itemId,
+        'data-rt-bid-count': 'true'
+      }
+    : {};
 
 
 
