@@ -11,7 +11,7 @@ test.describe('Create Listing Flow', () => {
   test('should display all create listing elements', async ({ page }) => {
     await expect(page.locator('#list-page-container')).toBeVisible();
     await expect(page.locator('#list-item-card')).toBeVisible();
-    await expect(page.locator('#list-item-title-heading')).toContainText('List an Item');
+    await expect(page.locator('#list-item-title-heading')).toContainText('Create New Listing');
     
     await expect(page.locator('#image-upload-input')).toBeAttached(); // Hidden input
     await expect(page.locator('#add-image-label')).toBeVisible();

@@ -202,6 +202,7 @@ export type Database = {
           location_lat: number | null
           location_lng: number | null
           location_address: string | null
+          listing_duration: number | null
         }
         Insert: {
           asked_price: number
@@ -225,6 +226,7 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           location_address?: string | null
+          listing_duration?: number | null
         }
         Update: {
           asked_price?: number
@@ -248,6 +250,7 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           location_address?: string | null
+          listing_duration?: number | null
         }
         Relationships: [
           {
@@ -605,6 +608,7 @@ export type Database = {
           p_images: string[]
           p_condition: string
           p_ends_at: string
+          p_listing_duration?: number
         }
         Returns: string
       }

@@ -93,10 +93,10 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
   // Calculate expiry
   const createdAt = listing.created_at ? new Date(listing.created_at).getTime() : Date.now();
   
-  // Use DB 'ends_at' if available (randomized timers), otherwise fallback to 72h
+  // Use DB 'ends_at' if available (randomized timers), otherwise fallback to 30 days (720h)
   const expiryAt = listing.ends_at 
     ? listing.ends_at 
-    : new Date(createdAt + 72 * 60 * 60 * 1000).toISOString();
+    : new Date(createdAt + 720 * 60 * 60 * 1000).toISOString();
 
   // Basic Auction Mode mapping
   const isPublicBid = listing.auction_mode === 'visible';
@@ -145,7 +145,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     
     createdAt: listing.created_at || new Date().toISOString(),
     expiryAt: expiryAt,
-    listingDuration: 72,
+    listingDuration: 720,
     status: isValidStatus(listing.status) ? listing.status : 'active',
     goLiveAt: listing.go_live_at || undefined,
     lastEditedAt: listing.last_edited_at || undefined,

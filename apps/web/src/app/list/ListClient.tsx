@@ -94,7 +94,7 @@ function ListForm() {
   const [askPrice, setAskPrice] = useState<string>("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(true);
-  const [duration, setDuration] = useState<"24" | "48" | "72">("24");
+  const [duration, setDuration] = useState<"24" | "168" | "720">("720");
   const [condition, setCondition] = useState<'new' | 'like_new' | 'used' | 'fair'>("used");
   const [purchasePrice, setPurchasePrice] = useState<string>("");
   const [purchaseYear, setPurchaseYear] = useState<string>("");
@@ -161,7 +161,7 @@ function ListForm() {
           isNew: false
         }))
       );
-      setDuration(editingItem.listingDuration.toString() as "24" | "48" | "72");
+      setDuration(editingItem.listingDuration.toString() as "24" | "168" | "720");
       setCondition(editingItem.condition || "used");
       setContactPhone(editingItem.contactPhone || user?.phone || "");
       return;
@@ -278,38 +278,40 @@ function ListForm() {
         );
 
         const orderedUrls = updatedEntries.map(entry => entry.url);
-        const finalDurationNum = parseInt(duration) as 24 | 48 | 72;
+        const finalDurationNum = parseInt(duration) as 24 | 168 | 720;
         const endsAt = new Date(Date.now() + finalDurationNum * 60 * 60 * 1000).toISOString();
 
-        const listingPayload = {
-          title,
-          category,
-          asked_price: roundedPrice,
-          description,
-          contact_phone: contactPhone.trim(),
-          auction_mode: (isPublic ? 'visible' : 'hidden') as 'visible' | 'hidden',
-          images: orderedUrls,
-          condition: condition,
-          ends_at: endsAt,
-          location_lat: location!.lat,
-          location_lng: location!.lng,
-          location_address: location!.address
-        };
+          const listingPayload = {
+            title,
+            category,
+            asked_price: roundedPrice,
+            description,
+            contact_phone: contactPhone.trim(),
+            auction_mode: (isPublic ? 'visible' : 'hidden') as 'visible' | 'hidden',
+            images: orderedUrls,
+            condition: condition,
+            ends_at: endsAt,
+            listing_duration: finalDurationNum,
+            location_lat: location!.lat,
+            location_lng: location!.lng,
+            location_address: location!.address
+          };
 
-        if (editingItem) {
-          const { error } = await supabase
-            .rpc('edit_listing_with_cooldown', {
-              p_listing_id: editingItem.id,
-              p_title: listingPayload.title,
-              p_description: listingPayload.description,
-              p_category: listingPayload.category,
-              p_asked_price: listingPayload.asked_price,
-              p_contact_phone: listingPayload.contact_phone,
-              p_auction_mode: listingPayload.auction_mode,
-              p_images: listingPayload.images,
-              p_condition: listingPayload.condition,
-              p_ends_at: listingPayload.ends_at
-            });
+          if (editingItem) {
+            const { error } = await supabase
+              .rpc('edit_listing_with_cooldown', {
+                p_listing_id: editingItem.id,
+                p_title: listingPayload.title,
+                p_description: listingPayload.description,
+                p_category: listingPayload.category,
+                p_asked_price: listingPayload.asked_price,
+                p_contact_phone: listingPayload.contact_phone,
+                p_auction_mode: listingPayload.auction_mode,
+                p_images: listingPayload.images,
+                p_condition: listingPayload.condition,
+                p_ends_at: listingPayload.ends_at,
+                p_listing_duration: listingPayload.listing_duration
+              });
             
           // NOTE: edit_listing_with_cooldown RPC might not accept location params yet.
           // We need to update location separately or update the RPC. 
@@ -344,10 +346,7 @@ function ListForm() {
             ...listingPayload,
             seller_id: user.id,
             status: 'active',
-            slug: generateSlug(title),
-            location_lat: location!.lat,
-            location_lng: location!.lng,
-            location_address: location!.address
+            slug: generateSlug(title)
           };
 
           const { error } = await supabase.from('listings').insert([insertPayload]);
@@ -388,10 +387,10 @@ function ListForm() {
       <Card id="list-item-card" className="border-none shadow-lg bg-white">
         <CardHeader id="list-item-header" className="space-y-1">
           <CardTitle id="list-item-title-heading" className="text-2xl font-bold text-slate-900">
-            {isLoadingItem ? "Loading..." : editingItem ? "Edit Listing" : "List an Item"}
+            {isLoadingItem ? "Loading..." : editingItem ? "Edit Listing" : "Create New Listing"}
           </CardTitle>
           <CardDescription id="list-item-description-text">
-            {isLoadingItem ? "Fetching item details..." : editingItem ? "Update your item details and bidding strategy." : "Minimalist listing. Set your price and choose your bidding style."}
+            {isLoadingItem ? "Fetching item details..." : editingItem ? "Update your item details and bidding strategy." : "Enter your item details and set a fair price to attract the best bids."}
           </CardDescription>
         </CardHeader>
         <CardContent id="list-item-form" className="space-y-6">
@@ -501,22 +500,6 @@ function ListForm() {
                     </label>
                   )}
                 </div>
-              </div>
-
-              {/* Location Map Section */}
-              <div className="space-y-4">
-                <Label className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-slate-500" />
-                  Item Location <span className="text-red-500">*</span>
-                </Label>
-                <div className={`h-[300px] rounded-xl overflow-hidden border ${errors.location ? 'border-red-500' : 'border-slate-200'} shadow-sm`}>
-                  <MapPicker 
-                    initialLocation={location}
-                    onLocationSelect={setLocation}
-                    required
-                  />
-                </div>
-                {errors.location && <p className="text-[10px] font-bold text-red-500">Location is required</p>}
               </div>
 
               <div className="space-y-2">
@@ -898,6 +881,22 @@ function ListForm() {
                 )}
               </div>
 
+              {/* Location Map Section */}
+              <div className="space-y-4">
+                <Label className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-slate-500" />
+                  Item Location <span className="text-red-500">*</span>
+                </Label>
+                <div className={`h-[300px] rounded-xl overflow-hidden border ${errors.location ? 'border-red-500' : 'border-slate-200'} shadow-sm`}>
+                  <MapPicker 
+                    initialLocation={location}
+                    onLocationSelect={setLocation}
+                    required
+                  />
+                </div>
+                {errors.location && <p className="text-[10px] font-bold text-red-500">Location is required</p>}
+              </div>
+
               <div className="space-y-4 pt-4">
                 <h3 id="bidding-style-heading" className="text-sm font-semibold text-slate-900">Bidding Style</h3>
                 
@@ -937,7 +936,7 @@ function ListForm() {
                     Listing Duration
                   </Label>
                   <div className="grid grid-cols-3 gap-3">
-                    {(['24', '48', '72'] as const).map((d) => (
+                    {(['24', '168', '720'] as const).map((d) => (
                       <button
                         key={d}
                         id={`duration-btn-${d}`}
@@ -948,7 +947,7 @@ function ListForm() {
                             : 'bg-white border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600'
                         }`}
                       >
-                        {d} Hours
+                        {d === '24' ? '24 Hours' : d === '168' ? '7 Days' : '30 Days'}
                       </button>
                     ))}
                   </div>

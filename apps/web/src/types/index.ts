@@ -52,7 +52,7 @@ export interface Item {
   bidCount: number;
   createdAt: string;
   expiryAt: string;
-  listingDuration: 24 | 48 | 72;
+  listingDuration: 24 | 168 | 720;
   status: 'active' | 'completed' | 'cancelled' | 'hidden';
   goLiveAt?: string;
   lastEditedAt?: string;

@@ -60,8 +60,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         isPublicBid: item.auction_mode === 'visible',
         createdAt: item.created_at || new Date().toISOString(),
         category: item.category || 'Other',
-        listingDuration: 24, // Default or fetch if available
-        expiryAt: new Date(Date.now() + 86400000).toISOString(), // Mock expiry
+        listingDuration: 720, // Default to 30 days
+        expiryAt: new Date(Date.now() + 2592000000).toISOString(), // 30 day mock expiry
         description: item.description || '', // Ensure string
         condition: isValidCondition(item.condition) ? item.condition : 'used',
         status: isValidStatus(item.status) ? item.status : 'active',

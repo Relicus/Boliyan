@@ -35,6 +35,7 @@ CREATE TABLE listings (
   last_edited_at TIMESTAMP WITH TIME ZONE,
   search_vector TSVECTOR,
   slug TEXT UNIQUE,
+  listing_duration INTEGER DEFAULT 720 CHECK (listing_duration IN (24, 168, 720)),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
