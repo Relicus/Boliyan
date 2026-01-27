@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function proxy(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
+  if (
+    pathname.startsWith('/data-deletion') ||
+    pathname.startsWith('/privacy-policy') ||
+    pathname.startsWith('/terms-of-service')
+  ) {
+    return NextResponse.next();
+  }
   // 1. Bypass for Localhost / Development
   // This ensures your local development flow is never interrupted
   const hostname = req.headers.get('host') || '';
