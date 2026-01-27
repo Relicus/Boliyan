@@ -20,7 +20,7 @@ interface AuthContextType {
   setMyLocation: (location: UserLocation) => void;
   isLoggedIn: boolean;
   isLoading: boolean;
-  login: () => Promise<void>;
+  login: (provider?: 'google' | 'facebook') => Promise<void>;
   logout: () => Promise<void>;
   getUser: (id: string) => User | undefined; // Keep for compat, though less useful with real auth
   updateProfile: (data: Partial<User>) => Promise<void>;
@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     type ProfileRow = Database['public']['Tables']['profiles']['Row'];
     type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
     type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
-    type ProfileExtras = { is_verified?: boolean; review_count?: number; phone?: string; name?: string };
+    type ProfileExtras = { is_verified?: boolean; review_count?: number; phone?: string; whatsapp?: string; name?: string };
 
     const fetchProfile = useCallback(async (supabaseUser: SupabaseUser) => {
         console.log("[AuthContext] Fetching profile for:", supabaseUser.id);
@@ -168,10 +168,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.warn("Profile not found, attempting to create or use fallback...");
           const metadata = (supabaseUser.user_metadata || {}) as Record<string, string | undefined>;
           
+          const fullName = metadata.full_name || 
+                           metadata.name || 
+                           (metadata.first_name ? `${metadata.first_name} ${metadata.last_name || ''}`.trim() : null) ||
+                           supabaseUser.email?.split('@')[0];
+
           const newProfile: ProfileInsert = {
               id: supabaseUser.id,
-              full_name: metadata.full_name || metadata.name || supabaseUser.email?.split('@')[0],
-              avatar_url: metadata.avatar_url,
+              full_name: fullName,
+              avatar_url: metadata.avatar_url || metadata.picture,
               location: metadata.city // Map city to location
           };
 
@@ -209,19 +214,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               isVerified: profile.is_verified || false,
               // Default/Fallback values for fields not yet in DB schema or optional
               phone: profile.phone || undefined,
+              whatsapp: profile.whatsapp || undefined,
               rating: profile.rating || 0,
               reviewCount: profile.review_count || profile.rating_count || 0,
               location: parsedLocation
                 ? (typeof parsedLocation === 'string'
-                    ? { lat: 0, lng: 0, address: parsedLocation }
+                    ? { lat: 0, lng: 0, address: parsedLocation, city: parsedLocation }
                     : parsedLocation)
-                : { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan" },
+                : { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan", city: "Karachi" },
               badges: [], // TODO: Fetch badges from a relation if needed
               stats: {
                   bidsAcceptedByMe: 0,
                   myBidsAccepted: 0
-              }
+              },
+              emailVerified: ['google', 'facebook'].includes(supabaseUser.app_metadata.provider || '') || !!supabaseUser.email_confirmed_at,
           };
+
+          // Determine profile completeness - strictly check DB fields
+          appUser.profileComplete = !!profile.full_name && !!profile.phone && !!profile.location;
+
           setUser(appUser);
         }
     } catch (err) {
@@ -267,15 +278,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
-  const login = async () => {
-    // Redirect to Google OAuth
+  const login = async (provider: 'google' | 'facebook' = 'google') => {
+    // Redirect to OAuth provider
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (error) console.error("Login failed:", error);
+    if (error) console.error(`${provider} login failed:`, error);
   };
 
   const logout = async () => {
@@ -296,6 +307,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const updates: ProfileUpdate = {};
     if (data.name) updates.full_name = data.name;
     if (data.avatar) updates.avatar_url = data.avatar;
+    if (data.phone) updates.phone = data.phone;
+    if (data.whatsapp !== undefined) updates.whatsapp = data.whatsapp;
+    if (data.location?.city) updates.location = data.location.city;
 
     const { error } = await supabase
       .from('profiles')

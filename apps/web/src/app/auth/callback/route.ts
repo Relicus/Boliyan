@@ -31,6 +31,23 @@ export async function GET(request: Request) {
       }
     );
     await supabase.auth.exchangeCodeForSession(code);
+
+    // After exchanging code, check if profile is complete
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, phone, location')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.full_name || !profile?.phone || !profile?.location) {
+        const redirect = requestUrl.searchParams.get('redirect');
+        const completeProfileUrl = new URL(`${requestUrl.origin}/complete-profile`);
+        if (redirect) completeProfileUrl.searchParams.set('redirect', redirect);
+        return NextResponse.redirect(completeProfileUrl.toString());
+      }
+    }
   }
 
   // URL to redirect to after sign in process completes

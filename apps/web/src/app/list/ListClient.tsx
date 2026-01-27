@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, Sparkles, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
-import { CATEGORIES, LISTING_IMAGE_ACCEPT, LISTING_LIMITS, isAllowedListingImage } from "@/lib/constants";
+import { CATEGORIES, LISTING_IMAGE_ACCEPT, LISTING_LIMITS, isAllowedListingImageInput } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useApp } from "@/lib/store";
@@ -28,6 +28,7 @@ import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { Item } from "@/types";
 import { roundToReasonablePrice } from "@/lib/bidding";
 import { calculateDepreciation, formatPriceEstimate, getPurchaseYearOptions, getPurchaseMonthOptions, DepreciationResult } from "@/lib/depreciation";
+import { processListingImage } from "@/lib/processListingImage";
 import { MapPicker } from "@/components/common/MapPicker";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useTime } from "@/context/TimeContext";
@@ -44,8 +45,19 @@ function ListForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("id");
-  const { items, user } = useApp();
+  const { items, user, openAuthModal, isLoading: isAuthLoading } = useApp();
   const { now } = useTime();
+  
+  useEffect(() => {
+    if (!isAuthLoading && !user) {
+      openAuthModal();
+      return;
+    }
+    
+    if (user && (!user.emailVerified || !user.profileComplete)) {
+      router.push(`/complete-profile?redirect=${encodeURIComponent(window.location.pathname)}`);
+    }
+  }, [user, isAuthLoading, openAuthModal, router]);
   
   const [fetchedItem, setFetchedItem] = useState<Item | null>(null);
   const [isLoadingItem, setIsLoadingItem] = useState(!!editId);
@@ -174,31 +186,55 @@ function ListForm() {
 
   const isValidPhone = (value: string) => value.replace(/\D/g, "").length >= 10;
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
       const newFiles = Array.from(files);
-      const allowedFiles = newFiles.filter(isAllowedListingImage);
+      const allowedFiles = newFiles.filter(isAllowedListingImageInput);
       const rejectedCount = newFiles.length - allowedFiles.length;
       if (rejectedCount > 0) {
         toast.error("Only JPG, PNG, or iPhone HEIC/HEIF images are allowed.");
       }
       if (allowedFiles.length === 0) return;
-      setImageEntries(prev => {
-        const remainingSlots = Math.max(0, 5 - prev.length);
-        if (remainingSlots === 0) return prev;
 
-        const stamp = Date.now();
-        const newEntries = allowedFiles.slice(0, remainingSlots).map((file, index) => ({
-          id: `new-${stamp}-${index}`,
-          url: URL.createObjectURL(file),
-          file,
-          isNew: true
-        }));
+      const remainingSlots = Math.max(0, 5 - imageEntries.length);
+      if (remainingSlots === 0) return;
 
-        return [...prev, ...newEntries];
-      });
+      const filesToProcess = allowedFiles.slice(0, remainingSlots);
+      const processedEntries: ImageEntry[] = [];
+      let rejectedOversize = 0;
+      let rejectedProcessing = 0;
+
+      for (const file of filesToProcess) {
+        try {
+          const processed = await processListingImage(file);
+          processedEntries.push({
+            id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            url: URL.createObjectURL(processed),
+            file: processed,
+            isNew: true
+          });
+        } catch (error) {
+          if (error instanceof Error && error.message.includes("exceeds 1MB")) {
+            rejectedOversize += 1;
+          } else {
+            rejectedProcessing += 1;
+          }
+        }
+      }
+
+      if (rejectedOversize > 0) {
+        toast.error("Some images exceed 1MB after compression.");
+      }
+      if (rejectedProcessing > 0) {
+        toast.error("Some images could not be processed.");
+      }
+
+      if (processedEntries.length > 0) {
+        setImageEntries(prev => [...prev, ...processedEntries]);
+      }
     }
+    e.target.value = "";
   };
 
   const removeImage = (index: number) => {

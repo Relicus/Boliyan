@@ -36,14 +36,14 @@ export const LISTING_LIMITS = {
   DESCRIPTION: { MIN: 20, MAX: 2000 }
 };
 
-export const LISTING_IMAGE_MIME_TYPES = [
+export const LISTING_IMAGE_INPUT_MIME_TYPES = [
   "image/jpeg",
   "image/png",
   "image/heic",
   "image/heif"
 ];
 
-export const LISTING_IMAGE_EXTENSIONS = [
+export const LISTING_IMAGE_INPUT_EXTENSIONS = [
   ".jpg",
   ".jpeg",
   ".png",
@@ -51,13 +51,31 @@ export const LISTING_IMAGE_EXTENSIONS = [
   ".heif"
 ];
 
-export const LISTING_IMAGE_ACCEPT = LISTING_IMAGE_MIME_TYPES.join(",");
+export const LISTING_IMAGE_OUTPUT_MIME = "image/webp";
+export const LISTING_IMAGE_UPLOAD_MIME_TYPES = [
+  ...LISTING_IMAGE_INPUT_MIME_TYPES,
+  LISTING_IMAGE_OUTPUT_MIME
+];
 
-export const isAllowedListingImage = (file: File) => {
+export const LISTING_IMAGE_ACCEPT = LISTING_IMAGE_INPUT_MIME_TYPES.join(",");
+
+export const LISTING_IMAGE_MAX_BYTES = 1_000_000;
+export const LISTING_IMAGE_MAX_DIMENSION = 1600;
+export const LISTING_IMAGE_WEBP_QUALITY = 0.82;
+export const LISTING_IMAGE_WEBP_MIN_QUALITY = 0.5;
+
+export const isAllowedListingImageInput = (file: File) => {
   const type = file.type.toLowerCase();
-  if (LISTING_IMAGE_MIME_TYPES.includes(type)) return true;
+  if (LISTING_IMAGE_INPUT_MIME_TYPES.includes(type)) return true;
   const name = file.name.toLowerCase();
-  return LISTING_IMAGE_EXTENSIONS.some((ext) => name.endsWith(ext));
+  return LISTING_IMAGE_INPUT_EXTENSIONS.some((ext) => name.endsWith(ext));
+};
+
+export const isAllowedListingImageUpload = (file: File) => {
+  const type = file.type.toLowerCase();
+  if (LISTING_IMAGE_UPLOAD_MIME_TYPES.includes(type)) return true;
+  const name = file.name.toLowerCase();
+  return LISTING_IMAGE_INPUT_EXTENSIONS.some((ext) => name.endsWith(ext));
 };
 
 

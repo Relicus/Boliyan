@@ -140,7 +140,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     isPublicBid: isPublicBid,
     
     // Server-side stats if available
-    currentHighBid: listing.high_bid !== undefined && listing.high_bid > 0 
+    currentHighBid: listing.high_bid && listing.high_bid > 0 
       ? Number(listing.high_bid) 
       : undefined,
     currentHighBidderId: listing.high_bidder_id || undefined,

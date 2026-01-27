@@ -19,6 +19,7 @@ export interface User {
   name: string;
   avatar: string;
   phone?: string;
+  whatsapp?: string;
   rating: number; // 0-5
   reviewCount: number;
   location: {
@@ -30,6 +31,8 @@ export interface User {
   badges: Badge[];
   stats: UserStats;
   isVerified?: boolean;
+  emailVerified?: boolean;
+  profileComplete?: boolean;
   sellerSuccessRate?: number;
   buyerSuccessRate?: number;
 }

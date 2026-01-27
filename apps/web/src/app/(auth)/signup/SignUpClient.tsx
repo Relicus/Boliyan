@@ -44,6 +44,7 @@ export default function SignUpClient() {
   }>({});
   const [isShaking, setIsShaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +89,10 @@ export default function SignUpClient() {
          console.error("Signup error:", error.message);
          // Ideally show error to user
          setIsShaking(true);
+      } else if (!data.session) {
+         // Success! But email verification is enabled
+         setNeedsVerification(true);
+         console.log("[SignUp] Success! Verification required.");
       } else {
          // Success!
          console.log("[SignUp] Success! Redirecting...");
@@ -123,6 +128,37 @@ export default function SignUpClient() {
     }
   };
 
+
+  if (needsVerification) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+      >
+        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm text-center p-8 space-y-6">
+          <div className="mx-auto h-20 w-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+            <Mail className="h-10 w-10" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-slate-900">Check your email</h2>
+            <p className="text-slate-600">
+              We've sent a verification link to <span className="font-bold text-slate-900">{email}</span>.
+            </p>
+          </div>
+          <div className="bg-blue-50/50 p-4 rounded-xl text-sm text-blue-800 font-medium">
+            Please click the link in the email to activate your account.
+          </div>
+          <Button 
+            variant="outline" 
+            className="w-full h-12"
+            onClick={() => setNeedsVerification(false)}
+          >
+            Back to Sign Up
+          </Button>
+        </Card>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

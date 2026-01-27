@@ -1,9 +1,9 @@
-import { LISTING_IMAGE_MIME_TYPES, isAllowedListingImage } from "@/lib/constants";
+import { LISTING_IMAGE_UPLOAD_MIME_TYPES, isAllowedListingImageUpload } from "@/lib/constants";
 import { supabase } from "@/lib/supabase";
 
 export async function uploadListingImage(file: File, userId: string): Promise<string> {
-  if (!isAllowedListingImage(file)) {
-    throw new Error(`Unsupported image type. Allowed: ${LISTING_IMAGE_MIME_TYPES.join(", ")}`);
+  if (!isAllowedListingImageUpload(file)) {
+    throw new Error(`Unsupported image type. Allowed: ${LISTING_IMAGE_UPLOAD_MIME_TYPES.join(", ")}`);
   }
   // Sanitize filename and prepend timestamp/userId for uniqueness/organization
   const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_'); 

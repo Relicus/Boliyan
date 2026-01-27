@@ -21,6 +21,7 @@ export default function SignInClient() {
   const [errors, setErrors] = useState<{ email?: boolean; password?: boolean }>({});
   const [isShaking, setIsShaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +42,7 @@ export default function SignInClient() {
     setIsLoading(true);
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({ 
+      const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       });
@@ -51,6 +52,9 @@ export default function SignInClient() {
          // Ideally show error to user but for now just stop loading
          // In a real app we'd set an error state here
          setIsShaking(true);
+      } else if (data.user && !data.user.email_confirmed_at) {
+          // User is signed in but email not confirmed
+          setUnverifiedEmail(email);
       } else {
          // Check for safe redirect path (should start with /)
          const target = redirect && redirect.startsWith('/') ? redirect : '/';
@@ -88,6 +92,54 @@ export default function SignInClient() {
       setIsLoading(false); 
     }
   };
+
+  const handleResendEmail = async () => {
+    if (!unverifiedEmail) return;
+    setIsLoading(true);
+    await supabase.auth.resend({
+      type: 'signup',
+      email: unverifiedEmail,
+    });
+    setIsLoading(false);
+    // Maybe show a success state or toast
+  };
+
+  if (unverifiedEmail) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+      >
+        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm text-center p-8 space-y-6">
+          <div className="mx-auto h-20 w-20 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center">
+            <Mail className="h-10 w-10" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-slate-900">Verify your email</h2>
+            <p className="text-slate-600">
+              Your account is almost ready. Please check <span className="font-bold text-slate-900">{unverifiedEmail}</span> for a verification link.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <Button 
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+              onClick={handleResendEmail}
+              disabled={isLoading}
+            >
+              {isLoading ? "Sending..." : "Resend Email"}
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full h-12"
+              onClick={() => setUnverifiedEmail(null)}
+            >
+              Back to Sign In
+            </Button>
+          </div>
+        </Card>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

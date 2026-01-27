@@ -363,6 +363,7 @@ export type Database = {
           rating: number | null
           rating_count: number | null
           seller_success_rate: number | null
+          whatsapp: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -380,6 +381,7 @@ export type Database = {
           rating?: number | null
           rating_count?: number | null
           seller_success_rate?: number | null
+          whatsapp?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -397,6 +399,7 @@ export type Database = {
           rating?: number | null
           rating_count?: number | null
           seller_success_rate?: number | null
+          whatsapp?: string | null
         }
         Relationships: []
       }

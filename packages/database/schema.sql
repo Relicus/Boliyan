@@ -8,6 +8,7 @@ CREATE TABLE profiles (
   location_lng DOUBLE PRECISION,
   email TEXT,
   phone TEXT,
+  whatsapp TEXT,
   is_verified BOOLEAN DEFAULT false,
   rating DECIMAL DEFAULT 0,
   rating_count INTEGER DEFAULT 0,

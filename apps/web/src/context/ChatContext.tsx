@@ -294,6 +294,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const sendMessage = useCallback(async (conversationId: string, content: string) => {
     if (!user) return; 
     
+    if (!user.emailVerified || !user.profileComplete) {
+      window.location.href = `/complete-profile?redirect=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+    
     // Optimistic Update
     const tempId = `temp-${Date.now()}`;
     const optimMsg: Message = {

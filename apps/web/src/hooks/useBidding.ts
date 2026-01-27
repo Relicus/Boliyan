@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import confetti from "canvas-confetti";
 import { useApp } from "@/lib/store";
 import { Item, User } from "@/types";
+import { useRouter } from "next/navigation";
 import { getSmartStep, getMinimumAllowedBid, getMaximumAllowedBid, MAX_BID_ATTEMPTS, roundToReasonablePrice } from "@/lib/bidding";
 import { formatPrice } from "@/lib/utils";
 import { sonic } from "@/lib/sonic";
@@ -13,6 +14,7 @@ const BID_COOLDOWN_MS = 3000;
 
 export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) {
   const { placeBid, user, bids, openAuthModal, lastBidTimestamp } = useApp();
+  const router = useRouter();
 
   // Get current user's active bid on this item
   const userBid = useMemo(() => {
@@ -321,6 +323,11 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
     if (!user) {
       openAuthModal();
       return;
+    }
+
+    if (!user.emailVerified || !user.profileComplete) {
+        router.push(`/complete-profile?redirect=${encodeURIComponent(window.location.pathname)}`);
+        return;
     }
 
     if (userBid && amount <= userBid.amount) {

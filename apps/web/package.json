@@ -12,6 +12,7 @@
     "checks": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
+    "@jsquash/webp": "^1.5.0",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -38,6 +39,7 @@
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.26.1",
+    "heic2any": "^0.0.4",
     "idb-keyval": "^6.2.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",

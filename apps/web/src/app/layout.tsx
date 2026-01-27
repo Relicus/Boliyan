@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
+import Footer from "@/components/layout/Footer";
 import ScrollToTop from "@/components/layout/ScrollToTop";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 import { AppProvider } from "@/lib/store";
@@ -107,6 +108,7 @@ export default function RootLayout({
                 <Sidebar />
                 <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100dvh-4rem)] pb-16 md:pb-0">
                   {children}
+                  <Footer />
                 </main>
               </div>
               <Suspense fallback={null}>
