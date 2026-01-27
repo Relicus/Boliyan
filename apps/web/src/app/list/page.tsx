@@ -1,10 +1,7 @@
-import { Suspense } from "react";
-import ListClient from "./ListClient";
+import ListPageClient from "./ListPageClient";
 
 export default function ListPage() {
   return (
-    <Suspense fallback={<div className="min-h-[420px]" />}>
-      <ListClient />
-    </Suspense>
+    <ListPageClient />
   );
 }

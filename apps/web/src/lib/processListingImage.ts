@@ -34,7 +34,7 @@ const loadImageFromFile = async (file: File): Promise<LoadedImage> => {
     ? await normalizeHeic(file)
     : file;
 
-  if ("createImageBitmap" in window) {
+  if (typeof window !== "undefined" && "createImageBitmap" in window) {
     const source = await createImageBitmap(normalizedFile);
     return { width: source.width, height: source.height, source };
   }
