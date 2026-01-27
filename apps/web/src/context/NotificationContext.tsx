@@ -17,6 +17,7 @@ interface NotificationContextType {
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+const NOTIFICATION_POOL_LIMIT = 15;
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -37,7 +38,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(50);
+      .limit(NOTIFICATION_POOL_LIMIT);
 
     if (!error && data) {
       setNotifications(data.map(transformNotification));
@@ -65,7 +66,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           const newNotification = transformNotification(payload.new as Record<string, unknown>);
-          setNotifications((prev) => [newNotification, ...prev]);
+          setNotifications((prev) => [newNotification, ...prev].slice(0, NOTIFICATION_POOL_LIMIT));
 
           const resolvedLink = resolveNotificationLink(newNotification);
           toast(newNotification.title, {

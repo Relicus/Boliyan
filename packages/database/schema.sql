@@ -147,3 +147,90 @@ CREATE TABLE reviews (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(reviewer_id, listing_id, role)
 );
+
+-- Notifications
+CREATE TABLE notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  type TEXT NOT NULL CHECK (type IN ('outbid', 'bid_accepted', 'new_message', 'bid_received')),
+  title TEXT NOT NULL,
+  body TEXT,
+  link TEXT,
+  is_read BOOLEAN DEFAULT false,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = false;
+
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own notifications"
+ON notifications FOR SELECT
+USING ((SELECT auth.uid()) = user_id);
+
+CREATE POLICY "Users can update own notifications"
+ON notifications FOR UPDATE
+USING ((SELECT auth.uid()) = user_id);
+
+CREATE POLICY "Service can insert notifications"
+ON notifications FOR INSERT
+WITH CHECK (true);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE notifications;
+
+-- Enforce notification pool per user (15 newest)
+CREATE OR REPLACE FUNCTION enforce_notification_pool() RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM notifications
+  WHERE id IN (
+    SELECT id
+    FROM notifications
+    WHERE user_id = NEW.user_id
+    ORDER BY created_at DESC, id DESC
+    OFFSET 15
+  );
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_notification_pool_enforce ON notifications;
+CREATE TRIGGER on_notification_pool_enforce
+  AFTER INSERT ON notifications
+  FOR EACH ROW
+  EXECUTE FUNCTION enforce_notification_pool();
+
+-- Purge listing-scoped notifications on listing end/remove
+CREATE OR REPLACE FUNCTION purge_listing_notifications() RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM notifications
+  WHERE metadata->>'itemId' = OLD.id::text;
+
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION purge_listing_notifications_on_status() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.status IN ('completed', 'cancelled') AND NEW.status IS DISTINCT FROM OLD.status THEN
+    DELETE FROM notifications
+    WHERE metadata->>'itemId' = NEW.id::text;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_listing_status_purge_notifications ON listings;
+CREATE TRIGGER on_listing_status_purge_notifications
+  AFTER UPDATE OF status ON listings
+  FOR EACH ROW
+  EXECUTE FUNCTION purge_listing_notifications_on_status();
+
+DROP TRIGGER IF EXISTS on_listing_delete_purge_notifications ON listings;
+CREATE TRIGGER on_listing_delete_purge_notifications
+  AFTER DELETE ON listings
+  FOR EACH ROW
+  EXECUTE FUNCTION purge_listing_notifications();

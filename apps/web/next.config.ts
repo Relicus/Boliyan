@@ -25,6 +25,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ...(config.watchOptions || {}),
+        aggregateTimeout: 2500,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
