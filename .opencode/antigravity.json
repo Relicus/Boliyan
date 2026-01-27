@@ -4,7 +4,8 @@
   "switch_on_first_rate_limit": true,
   "pid_offset_enabled": true,
   "web_search": {
-    "default_mode": "auto"
+    "default_mode": "auto",
+    "grounding_threshold": 0.1
   },
   "quiet_mode": true
 }
