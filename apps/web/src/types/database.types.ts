@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
@@ -70,7 +72,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "marketplace_listings"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       categories: {
@@ -105,7 +107,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       conversations: {
@@ -176,7 +178,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       listings: {
@@ -189,20 +191,19 @@ export type Database = {
           created_at: string | null
           description: string | null
           ends_at: string | null
-          go_live_at: string | null
-          last_edited_at: string | null
           final_buyer_id: string | null
+          go_live_at: string | null
           id: string
           images: string[] | null
+          last_edited_at: string | null
+          location_address: string | null
+          location_lat: number | null
+          location_lng: number | null
           search_vector: unknown
           seller_id: string | null
           slug: string | null
           status: string | null
           title: string
-          location_lat: number | null
-          location_lng: number | null
-          location_address: string | null
-          listing_duration: number | null
         }
         Insert: {
           asked_price: number
@@ -213,20 +214,19 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           ends_at?: string | null
-          go_live_at?: string | null
-          last_edited_at?: string | null
           final_buyer_id?: string | null
+          go_live_at?: string | null
           id?: string
           images?: string[] | null
+          last_edited_at?: string | null
+          location_address?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           search_vector?: unknown
           seller_id?: string | null
           slug?: string | null
           status?: string | null
           title: string
-          location_lat?: number | null
-          location_lng?: number | null
-          location_address?: string | null
-          listing_duration?: number | null
         }
         Update: {
           asked_price?: number
@@ -237,20 +237,19 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           ends_at?: string | null
-          go_live_at?: string | null
-          last_edited_at?: string | null
           final_buyer_id?: string | null
+          go_live_at?: string | null
           id?: string
           images?: string[] | null
+          last_edited_at?: string | null
+          location_address?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           search_vector?: unknown
           seller_id?: string | null
           slug?: string | null
           status?: string | null
           title?: string
-          location_lat?: number | null
-          location_lng?: number | null
-          location_address?: string | null
-          listing_duration?: number | null
         }
         Relationships: [
           {
@@ -266,7 +265,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       messages: {
@@ -308,7 +307,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       notifications: {
@@ -358,12 +357,12 @@ export type Database = {
           id: string
           is_verified: boolean | null
           location: string | null
+          location_lat: number | null
+          location_lng: number | null
           phone: string | null
           rating: number | null
           rating_count: number | null
           seller_success_rate: number | null
-          location_lat: number | null
-          location_lng: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -375,12 +374,12 @@ export type Database = {
           id: string
           is_verified?: boolean | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           phone?: string | null
           rating?: number | null
           rating_count?: number | null
           seller_success_rate?: number | null
-          location_lat?: number | null
-          location_lng?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -392,12 +391,12 @@ export type Database = {
           id?: string
           is_verified?: boolean | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           phone?: string | null
           rating?: number | null
           rating_count?: number | null
           seller_success_rate?: number | null
-          location_lat?: number | null
-          location_lng?: number | null
         }
         Relationships: []
       }
@@ -470,7 +469,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       search_history: {
@@ -524,7 +523,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "marketplace_listings"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
     }
@@ -532,6 +531,7 @@ export type Database = {
       listing_bid_stats: {
         Row: {
           bid_count: number | null
+          bid_attempts_count: number | null
           high_bid: number | null
           high_bidder_id: string | null
           listing_id: string | null
@@ -550,7 +550,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "marketplace_listings"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       marketplace_listings: {
@@ -558,6 +558,7 @@ export type Database = {
           asked_price: number | null
           auction_mode: string | null
           bid_count: number | null
+          bid_attempts_count: number | null
           category: string | null
           condition: string | null
           contact_phone: string | null
@@ -569,6 +570,9 @@ export type Database = {
           high_bidder_id: string | null
           id: string | null
           images: string[] | null
+          location_address: string | null
+          location_lat: number | null
+          location_lng: number | null
           search_vector: unknown
           seller_avatar: string | null
           seller_id: string | null
@@ -579,9 +583,6 @@ export type Database = {
           slug: string | null
           status: string | null
           title: string | null
-          location_lat: number | null
-          location_lng: number | null
-          location_address: string | null
         }
         Relationships: [
           {
@@ -590,12 +591,38 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
     }
     Functions: {
+      accept_bid: {
+        Args: { p_bid_id: string }
+        Returns: {
+          bid_id: string
+          conversation_id: string
+        }[]
+      }
       cleanup_expired_bids: { Args: never; Returns: undefined }
+      create_listing: {
+        Args: {
+          p_title: string
+          p_description: string
+          p_category: string
+          p_asked_price: number
+          p_contact_phone: string
+          p_auction_mode: string
+          p_images: string[]
+          p_condition: string
+          p_ends_at: string
+          p_listing_duration: number
+          p_location_lat: number
+          p_location_lng: number
+          p_location_address: string
+          p_slug: string
+        }
+        Returns: string
+      }
       edit_listing_with_cooldown: {
         Args: {
           p_listing_id: string
@@ -608,11 +635,62 @@ export type Database = {
           p_images: string[]
           p_condition: string
           p_ends_at: string
-          p_listing_duration?: number
+          p_listing_duration: number
+          p_location_lat: number
+          p_location_lng: number
+          p_location_address: string
         }
         Returns: string
       }
+      ensure_conversation: {
+        Args: { p_bidder_id: string; p_listing_id: string }
+        Returns: string
+      }
       expire_old_bids: { Args: never; Returns: undefined }
+      place_bid: {
+        Args: { p_amount: number; p_listing_id: string; p_message: string }
+        Returns: {
+          amount: number
+          bidder_id: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          listing_id: string | null
+          message: string | null
+          status: string | null
+          update_count: number | null
+          updated_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bids"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      reject_bid: { Args: { p_bid_id: string }; Returns: string }
+      send_message: {
+        Args: { p_content: string; p_conversation_id: string }
+        Returns: {
+          content: string
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          sender_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "messages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      update_listing_fields: {
+        Args: { p_listing_id: string; p_status: string | null; p_title: string | null }
+        Returns: string
+      }
+      delete_listing: { Args: { p_listing_id: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
@@ -636,7 +714,7 @@ export type Tables<
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never = never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -664,7 +742,7 @@ export type TablesInsert<
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never = never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -689,7 +767,7 @@ export type TablesUpdate<
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never = never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -714,7 +792,7 @@ export type Enums<
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never = never
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -731,7 +809,7 @@ export type CompositeTypes<
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never = never
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

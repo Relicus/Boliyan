@@ -40,7 +40,8 @@ SELECT
       ORDER BY b2.amount DESC, b2.created_at ASC
       LIMIT 1
     )
-  END as high_bidder_id
+  END as high_bidder_id,
+  SUM(CASE WHEN b.status != 'expired' THEN (COALESCE(b.update_count, 0) + 1) ELSE 0 END) as bid_attempts_count
 
 FROM bids b
 JOIN listings l ON b.listing_id = l.id

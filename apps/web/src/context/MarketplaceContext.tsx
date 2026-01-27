@@ -39,8 +39,8 @@ interface MarketplaceContextType {
   isLoadingMore: boolean;
   hasMore: boolean;
   loadMore: () => void;
-  addItem: (item: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => void;
-  updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => void;
+  addItem: (item: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => void;
+  updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>>) => void;
   deleteItem: (id: string) => void;
   placeBid: (itemId: string, amount: number, type: 'public' | 'private') => Promise<boolean>;
   toggleWatch: (itemId: string) => void;
@@ -59,9 +59,6 @@ interface MarketplaceContextType {
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
 
 type MarketplaceListingRow = Database['public']['Views']['marketplace_listings']['Row'];
-type BidInsert = Database['public']['Tables']['bids']['Insert'];
-type BidUpdate = Database['public']['Tables']['bids']['Update'];
-type ListingUpdate = Database['public']['Tables']['listings']['Update'];
 type WatchlistRow = Database['public']['Tables']['watchlist']['Row'];
 
 export function MarketplaceProvider({ children }: { children: React.ReactNode }) {
@@ -435,10 +432,12 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         const currentMax = item.currentHighBid || 0;
         const isNewHigh = newBid.amount > currentMax;
         const isSameHighBidder = item.currentHighBidderId === newBid.bidderId;
+        const nextAttempts = (item.bidAttemptsCount ?? item.bidCount) + 1;
 
         const updatedItem = {
            ...item,
            bidCount: isSameHighBidder ? item.bidCount : item.bidCount + 1,
+           bidAttemptsCount: nextAttempts,
            currentHighBid: (isNewHigh || isSameHighBidder) ? newBid.amount : currentMax,
            currentHighBidderId: (isNewHigh || isSameHighBidder) ? newBid.bidderId : item.currentHighBidderId
         };
@@ -457,19 +456,16 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       fetchItems(nextPage, false);
   }, [isLoading, isLoadingMore, hasMore, page, fetchItems]);
 
-  const addItem = useCallback((newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount'>) => {
+  const addItem = useCallback((newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => {
     console.log("addItem - logic pending refactor in selling phase", newItem);
   }, []);
 
-  const updateItem = useCallback(async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount'>>) => {
-     const dbUpdates: ListingUpdate = {};
-     if (updates.status) dbUpdates.status = updates.status;
-     if (updates.title) dbUpdates.title = updates.title;
-
-      const { error } = await supabase
-        .from('listings')
-        .update(dbUpdates)
-        .eq('id', id);
+  const updateItem = useCallback(async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>>) => {
+     const { error } = await supabase.rpc('update_listing_fields', {
+       p_listing_id: id,
+       p_status: updates.status ?? null,
+       p_title: updates.title ?? null
+     });
      
      if (error) {
          console.error("Failed to update item:", error);
@@ -482,10 +478,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const deleteItem = useCallback(async (id: string) => {
-    const { error } = await supabase
-      .from('listings')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.rpc('delete_listing', { p_listing_id: id });
 
     if (error) {
         console.error("Failed to delete item:", error);
@@ -532,9 +525,11 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     if (originalItem) {
         const currentMax = originalItem.currentHighBid || 0;
         const isNewHigh = amount > currentMax;
+        const nextAttempts = (originalItem.bidAttemptsCount ?? originalItem.bidCount) + 1;
         const updatedItem = {
             ...originalItem,
             bidCount: existingBid ? originalItem.bidCount : originalItem.bidCount + 1,
+            bidAttemptsCount: nextAttempts,
             currentHighBid: isNewHigh ? amount : currentMax,
             currentHighBidderId: isNewHigh ? user.id : originalItem.currentHighBidderId
         };
@@ -542,16 +537,6 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     }
     // --- OPTIMISTIC UPDATE END ---
 
-
-    // Use UPSERT to handle the unique constraint on (listing_id, bidder_id)
-    // This allows users to update their existing bid instead of creating duplicates
-    const bidPayload: BidInsert = {
-      listing_id: itemId,
-      bidder_id: user.id,
-      amount: amount,
-      message: type === 'private' ? 'Private Bid' : 'Public Bid',
-      status: 'pending'
-    };
 
     // Debug: Check auth state before making the call
     const { data: sessionData } = await supabase.auth.getSession();
@@ -562,20 +547,21 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       idsMatch: sessionData.session?.user?.id === user.id
     });
 
-    const { data, error } = await supabase
-      .from('bids')
-      .upsert(bidPayload, { onConflict: 'listing_id,bidder_id' })
-      .select();
+    const { data, error } = await supabase.rpc('place_bid', {
+      p_listing_id: itemId,
+      p_amount: amount,
+      p_message: type === 'private' ? 'Private Bid' : 'Public Bid'
+    });
     
-    console.log('[placeBid] Supabase response:', { dataLength: data?.length, error, data });
+    console.log('[placeBid] Supabase response:', { hasData: !!data, error });
 
     // Only trust the bid when Supabase confirms it.
-    if (error || !data || data.length === 0) {
+    if (error || !data) {
         console.error("Failed to place bid:", {
             message: error?.message || 'No data returned',
             details: error?.details,
             hint: error?.hint,
-            dataLength: data?.length
+            dataPresent: !!data
         });
         
         // Handle Server-Level Cooldown Error
@@ -598,7 +584,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
         return false;
     }
     
-    const bidRow = data[0] as Database['public']['Tables']['bids']['Row'];
+    const bidRow = data as Database['public']['Tables']['bids']['Row'];
     const resolvedBid: Bid = {
         id: bidRow.id,
         itemId: bidRow.listing_id || itemId,
@@ -782,11 +768,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const rejectBid = useCallback(async (bidId: string) => {
-      const bidUpdates: BidUpdate = { status: 'ignored' };
-      const { error } = await supabase
-        .from('bids')
-        .update(bidUpdates)
-        .eq('id', bidId);
+      const { error } = await supabase.rpc('reject_bid', { p_bid_id: bidId });
       if (error) console.error("Failed to reject bid", error);
       else setBidsById(prev => {
           if (!prev[bidId]) return prev;
@@ -795,17 +777,15 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const acceptBid = useCallback(async (bidId: string) => {
-      const bidUpdates: BidUpdate = { status: 'accepted' };
-      const { error } = await supabase
-        .from('bids')
-        .update(bidUpdates)
-        .eq('id', bidId);
-      if (error) return undefined;
+      const { data, error } = await supabase.rpc('accept_bid', { p_bid_id: bidId });
+      if (error || !data) return undefined;
+      const result = Array.isArray(data) ? data[0] : data;
+      if (!result?.conversation_id) return undefined;
       setBidsById(prev => {
           if (!prev[bidId]) return prev;
           return upsertEntity(prev, { ...prev[bidId], status: 'accepted' });
       });
-      return bidId;
+      return result.conversation_id as string;
   }, []);
 
 

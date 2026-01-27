@@ -81,6 +81,7 @@ export const BiddingDashboard = memo(function BiddingDashboard({
             config={finalConfig}
             askPrice={item.askPrice}
             bidCount={item.bidCount}
+            bidAttemptsCount={item.bidAttemptsCount}
             viewMode="modal"
             orientation="stacked"
             showTotalBids={true}

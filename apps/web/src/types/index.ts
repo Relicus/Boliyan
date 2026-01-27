@@ -50,10 +50,11 @@ export interface Item {
   currentHighBid?: number;
   currentHighBidderId?: string;
   bidCount: number;
+  bidAttemptsCount: number;
   createdAt: string;
   expiryAt: string;
   listingDuration: 24 | 168 | 720;
-  status: 'active' | 'completed' | 'cancelled' | 'hidden';
+  status: 'active' | 'completed' | 'cancelled' | 'hidden' | 'expired';
   goLiveAt?: string;
   lastEditedAt?: string;
   location?: {

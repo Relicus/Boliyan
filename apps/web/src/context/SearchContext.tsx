@@ -416,9 +416,11 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             const amount = Number(newBid.amount);
             const currentMax = item.currentHighBid || 0;
             const isNewHigh = amount > currentMax;
+            const nextAttempts = (item.bidAttemptsCount ?? item.bidCount) + 1;
             return {
                ...item,
                bidCount: item.bidCount + 1,
+               bidAttemptsCount: nextAttempts,
                currentHighBid: isNewHigh ? amount : currentMax,
                currentHighBidderId: isNewHigh ? newBid.bidderId : item.currentHighBidderId
             };

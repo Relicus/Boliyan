@@ -17,10 +17,7 @@ interface ChatStore {
 const StoreKeyPrefix = 'chat-store-';
 
 type ConversationRow = Database['public']['Tables']['conversations']['Row'];
-type ConversationInsert = Database['public']['Tables']['conversations']['Insert'];
-type ConversationUpdate = Database['public']['Tables']['conversations']['Update'];
 type MessageRow = Database['public']['Tables']['messages']['Row'];
-type MessageInsert = Database['public']['Tables']['messages']['Insert'];
 
 interface ChatContextType {
   conversations: Conversation[];
@@ -304,18 +301,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     };
     setMessages(prev => [...prev, optimMsg]);
 
-    // DB Insert (Messages)
-    const insertPayload: MessageInsert = {
-      conversation_id: conversationId,
-      sender_id: user.id,
-      content
-    };
-
-    const { data, error } = await supabase
-      .from('messages')
-      .insert(insertPayload)
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc('send_message', {
+      p_conversation_id: conversationId,
+      p_content: content
+    });
 
     if (error) {
         console.error("Failed to send message", error);
@@ -326,16 +315,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     if (data) {
         const realMsg = transformMessage(data);
         setMessages(prev => prev.map(m => m.id === tempId ? realMsg : m));
-        
-        // Explicit conversation update
-        const conversationUpdates: ConversationUpdate = {
-          last_message: content,
-          updated_at: new Date().toISOString()
-        };
-        await supabase
-          .from('conversations')
-          .update(conversationUpdates)
-          .eq('id', conversationId);
     }
   }, [user, transformMessage]);
 
@@ -362,46 +341,27 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  const startConversation = useCallback(async (bidId: string, itemId: string, bidderId: string, sellerId: string) => {
+  const startConversation = useCallback(async (_bidId: string, itemId: string, bidderId: string, _sellerId: string) => {
     // 1. Check local cache
     const existing = conversationsRef.current.find(c => c.itemId === itemId && c.bidderId === bidderId);
     if (existing) return existing.id;
 
-    // 2. Insert new conversation
-    const insertPayload: ConversationInsert = {
-      listing_id: itemId,
-      seller_id: sellerId,
-      bidder_id: bidderId,
-      last_message: "Chat started",
-      updated_at: new Date().toISOString()
-    };
-
-    const { data, error } = await supabase
-      .from('conversations')
-      .insert(insertPayload)
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc('ensure_conversation', {
+      p_listing_id: itemId,
+      p_bidder_id: bidderId
+    });
 
     if (data) {
-        const hydrated = await fetchHydratedConversation(data.id);
+        const conversationId = Array.isArray(data) ? data[0] : data;
+        const hydrated = await fetchHydratedConversation(conversationId as string);
         if (hydrated) {
           setConversations(prev => prev.some(c => c.id === hydrated.id) ? prev : [hydrated, ...prev]);
         }
-        return data.id;
-    } else if (error?.code === '23505') { // Unique constraint violation (race condition)
-        const { data: exist } = await supabase
-          .from('conversations')
-          .select('*')
-          .eq('listing_id', itemId)
-          .eq('bidder_id', bidderId)
-          .single();
-        if (exist) {
-          const hydrated = await fetchHydratedConversation(exist.id);
-          if (hydrated) {
-            setConversations(prev => prev.some(c => c.id === hydrated.id) ? prev : [hydrated, ...prev]);
-          }
-          return exist.id;
-        }
+        return conversationId as string;
+    }
+
+    if (error) {
+        console.error("Failed to start conversation", error);
     }
     return undefined;
   }, [fetchHydratedConversation]);

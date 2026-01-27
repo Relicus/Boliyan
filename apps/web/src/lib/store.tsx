@@ -63,47 +63,9 @@ export function useApp() {
   // We patch it here for backward compatibility.
   
   const acceptBidCompat = useCallback(async (bidId: string) => {
-    const updated = await marketplace.acceptBid(bidId);
-    if (!updated) return undefined;
-
-    const getBid = async () => {
-      const existing = marketplace.bids.find(b => b.id === bidId);
-      if (existing) return existing;
-
-      const { data } = await supabase
-        .from('bids')
-        .select('*, profiles(*)')
-        .eq('id', bidId)
-        .single();
-
-      if (!data) return undefined;
-      return transformBidToHydratedBid(data as unknown as BidWithProfile);
-    };
-
-    const getItem = async (itemId: string) => {
-      const existing = marketplace.items.find(i => i.id === itemId);
-      if (existing) return existing;
-
-      const { data } = await supabase
-        .from('marketplace_listings')
-        .select('*')
-        .eq('id', itemId)
-        .single();
-
-      if (!data) return undefined;
-      return transformListingToItem(data as unknown as ListingWithSeller);
-    };
-
-    const bid = await getBid();
-    if (!bid) return undefined;
-
-    const item = await getItem(bid.itemId);
-    if (!item) return undefined;
-
-    // Start conversation via ChatContext
-    const convId = await chat.startConversation(bidId, bid.itemId, bid.bidderId, item.sellerId);
-
-    return convId;
+    const conversationId = await marketplace.acceptBid(bidId);
+    if (!conversationId) return undefined;
+    return conversationId;
   }, [marketplace, chat]);
 
   type MarketplaceFilters = typeof marketplace.filters;

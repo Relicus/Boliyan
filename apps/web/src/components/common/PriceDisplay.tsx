@@ -16,6 +16,7 @@ interface PriceDisplayProps {
   config: BiddingConfig;
   askPrice: number;
   bidCount: number;
+  bidAttemptsCount?: number;
   viewMode?: BiddingViewMode;
   className?: string;
   remainingAttempts?: number;
@@ -52,6 +53,7 @@ export const PriceDisplay = memo(({
   config, 
   askPrice, 
   bidCount,
+  bidAttemptsCount,
   viewMode = 'compact',
   className = '',
   userCurrentBid,
@@ -64,6 +66,7 @@ export const PriceDisplay = memo(({
   const [showUserBid, setShowUserBid] = useState(false);
   const prevUserBid = useRef(userCurrentBid);
   const lastBidTimestamp = useRef(0);
+  const effectiveBidCount = bidAttemptsCount ?? bidCount;
 
   // Rotation Logic
   // Wait for rolling animation (500ms) + display time (2000ms) before switching
@@ -72,7 +75,6 @@ export const PriceDisplay = memo(({
   const TOTAL_ROTATION_INTERVAL = ROLLING_ANIMATION_DURATION + DISPLAY_HOLD_DURATION;
 
   // Force show "Your Bid" immediately when user places a new bid
-  // Using queueMicrotask to avoid synchronous setState in effect (lint error)
   useEffect(() => {
     if (userCurrentBid !== undefined && userCurrentBid !== null && userCurrentBid !== prevUserBid.current) {
       // New bid detected - force show "Your Bid" on next microtask
@@ -120,18 +122,17 @@ export const PriceDisplay = memo(({
       if (config.variant === 'public') {
           labelText = "Highest";
           LabelIcon = Trophy;
-          if (config.showHighBid && config.currentHighBid) {
-              displayPrice = config.currentHighBid;
+          if (config.showHighBid && effectiveBidCount > 0 && (config.currentHighBid || 0) > 0) {
+              displayPrice = config.currentHighBid || 0;
               if (config.isUserHighBidder) {
                 displayColor = darkMode ? "text-amber-400" : "text-amber-600";
               } else {
                 displayColor = darkMode ? "text-blue-400" : "text-blue-600";
               }
           } else {
-              // No bids or not showing high bid
-              // Explicitly ensure displayPrice is null here
+              // No valid bids in pool
               displayPrice = null;
-              displayText = bidCount === 0 ? 'Be first!' : `${bidCount} ${bidCount === 1 ? 'Bid' : 'Bids'}`;
+              displayText = 'Be first!';
               displayColor = darkMode ? "text-blue-400" : "text-blue-600";
           }
       } else {
@@ -139,7 +140,7 @@ export const PriceDisplay = memo(({
           labelText = "Hidden";
           LabelIcon = Lock;
           displayPrice = null;
-          displayText = bidCount === 0 ? 'Be first!' : `${bidCount} ${bidCount === 1 ? 'Bid' : 'Bids'}`;
+          displayText = effectiveBidCount === 0 ? 'Be first!' : `${effectiveBidCount} ${effectiveBidCount === 1 ? 'Bid' : 'Bids'}`;
           displayColor = darkMode ? "text-amber-400" : "text-amber-600";
       }
   }
@@ -162,9 +163,6 @@ export const PriceDisplay = memo(({
       }
     : {};
 
-
-
-  
   const renderValue = () => (
     <AnimatePresence mode="wait" initial={false}>
       <motion.span 
@@ -177,16 +175,24 @@ export const PriceDisplay = memo(({
           ease: [0.23, 1, 0.32, 1] // Apple-style ease-out
         }}
         className={cn(getPriceClass(viewMode), "flex items-center gap-1 transition-colors duration-300", displayColor)}
-        {...(displayPrice !== null ? highBidProps : bidCountProps)}
       >
-          {/* Show Total Bids Count only when there are bids */}
-          {(showTotalBids && config.variant === 'public' && bidCount > 0) ? (
-               <span className="text-[0.8em] font-bold text-slate-400">({bidCount})</span>
+          {/* Show Total Bids Count only when there are bids AND we are showing a price */}
+          {(showTotalBids && config.variant === 'public' && effectiveBidCount > 0 && displayPrice !== null) ? (
+               <span 
+                 {...(itemId && !safeShowUserBid ? { 'data-rt-item-id': itemId, 'data-rt-bid-count-small': 'true' } : {})}
+                 className="text-[0.8em] font-bold text-slate-400"
+               >
+                 ({effectiveBidCount})
+               </span>
           ) : null}
           {displayPrice !== null ? (
-              <RollingPrice price={displayPrice} />
+              <span {...highBidProps} className="flex items-center">
+                <RollingPrice price={displayPrice} />
+              </span>
           ) : (
-              displayText
+              <span {...bidCountProps} className="flex items-center">
+                {displayText}
+              </span>
           )}
       </motion.span>
     </AnimatePresence>
@@ -295,16 +301,24 @@ export const PriceDisplay = memo(({
           <span 
             id={itemId ? `price-dynamic-value-${itemId}` : undefined}
             className={cn(getPriceClass(viewMode), "flex items-baseline gap-1 transition-colors duration-300 leading-[0.9]", displayColor)}
-            {...(displayPrice !== null ? highBidProps : bidCountProps)}
           >
-              {/* Show Total Bids Count only when there are bids */}
-              {(showTotalBids && config.variant === 'public' && bidCount > 0) ? (
-                   <span className="text-[0.8em] font-bold text-slate-400">({bidCount})</span>
+              {/* Show Total Bids Count only when there are bids AND we are showing a price */}
+              {(showTotalBids && config.variant === 'public' && effectiveBidCount > 0 && displayPrice !== null) ? (
+                   <span 
+                     {...(itemId && !safeShowUserBid ? { 'data-rt-item-id': itemId, 'data-rt-bid-count-small': 'true' } : {})}
+                     className="text-[0.8em] font-bold text-slate-400"
+                   >
+                     ({effectiveBidCount})
+                   </span>
               ) : null}
               {displayPrice !== null ? (
-                  <RollingPrice key="stable-price-display" price={displayPrice} />
+                  <span {...highBidProps} className="flex items-baseline">
+                    <RollingPrice key="stable-price-display" price={displayPrice} />
+                  </span>
               ) : (
-                  displayText
+                  <span {...bidCountProps} className="flex items-baseline">
+                    {displayText}
+                  </span>
               )}
           </span>
       </div>

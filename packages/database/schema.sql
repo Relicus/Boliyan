@@ -42,6 +42,34 @@ CREATE TABLE listings (
 -- Indexes
 CREATE INDEX idx_listings_slug ON listings(slug);
 
+-- Listing Bid Stats View
+CREATE OR REPLACE VIEW listing_bid_stats AS
+SELECT 
+  b.listing_id,
+  COUNT(*) as bid_count,
+  CASE 
+    WHEN l.auction_mode IN ('hidden', 'sealed') THEN 0 
+    ELSE COALESCE(MAX(CASE WHEN b.expires_at > NOW() AND b.status != 'expired' THEN b.amount END), 0)
+  END as high_bid,
+  CASE 
+    WHEN l.auction_mode IN ('hidden', 'sealed') THEN NULL
+    ELSE (
+      SELECT b2.bidder_id 
+      FROM bids b2 
+      WHERE b2.listing_id = b.listing_id 
+        AND b2.status != 'rejected'
+        AND b2.status != 'expired'
+        AND b2.expires_at > NOW()
+      ORDER BY b2.amount DESC, b2.created_at ASC
+      LIMIT 1
+    )
+  END as high_bidder_id,
+  SUM(CASE WHEN b.status != 'expired' THEN (COALESCE(b.update_count, 0) + 1) ELSE 0 END) as bid_attempts_count
+FROM bids b
+JOIN listings l ON b.listing_id = l.id
+WHERE b.status != 'rejected'
+GROUP BY b.listing_id, l.auction_mode;
+
 -- Marketplace Listings View
 CREATE OR REPLACE VIEW marketplace_listings AS
 SELECT
@@ -66,6 +94,7 @@ SELECT
   l.location_lng,
   l.location_address,
   COALESCE(s.bid_count, 0::bigint) AS bid_count,
+  COALESCE(s.bid_attempts_count, 0::bigint) AS bid_attempts_count,
   COALESCE(s.high_bid, 0::numeric) AS high_bid,
   s.high_bidder_id,
   l.slug,

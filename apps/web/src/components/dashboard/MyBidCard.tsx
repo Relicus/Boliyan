@@ -131,9 +131,10 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                   {/* Bottom: Price Display (Pushed Right) */}
                   <PriceDisplay 
                       config={biddingConfig}
-                      askPrice={item.askPrice}
-                      bidCount={item.bidCount}
-                      viewMode="compact"
+                        askPrice={item.askPrice}
+                        bidCount={item.bidCount}
+                        bidAttemptsCount={item.bidAttemptsCount}
+                        viewMode="compact"
                       className="mt-2 pt-1"
                       userCurrentBid={userBid.amount}
                       itemId={item.id}

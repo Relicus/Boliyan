@@ -23,6 +23,7 @@ export type ListingWithSeller = ListingRow & {
   location_address?: string | null;
   
   bid_count?: number | null;
+  bid_attempts_count?: number | null;
   high_bid?: number | null;
   high_bidder_id?: string | null;
   
@@ -105,7 +106,7 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     value === 'new' || value === 'like_new' || value === 'used' || value === 'fair';
 
   const isValidStatus = (value: string | null | undefined): value is Item['status'] =>
-    value === 'active' || value === 'completed' || value === 'cancelled' || value === 'hidden';
+    value === 'active' || value === 'completed' || value === 'cancelled' || value === 'hidden' || value === 'expired';
 
   // Image URL Transformation
   // We assume images in DB are filenames/paths (e.g. "chair.jpg")
@@ -139,9 +140,14 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
     isPublicBid: isPublicBid,
     
     // Server-side stats if available
-    currentHighBid: listing.high_bid !== undefined ? Number(listing.high_bid) : undefined,
+    currentHighBid: listing.high_bid !== undefined && listing.high_bid > 0 
+      ? Number(listing.high_bid) 
+      : undefined,
     currentHighBidderId: listing.high_bidder_id || undefined,
     bidCount: listing.bid_count !== undefined ? Number(listing.bid_count) : 0,
+    bidAttemptsCount: listing.bid_attempts_count !== undefined
+      ? Number(listing.bid_attempts_count)
+      : (listing.bid_count !== undefined ? Number(listing.bid_count) : 0),
     
     createdAt: listing.created_at || new Date().toISOString(),
     expiryAt: expiryAt,

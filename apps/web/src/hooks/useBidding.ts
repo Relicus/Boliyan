@@ -75,18 +75,20 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
   }, [minBid, maxBid]);
 
   const initialBid = useMemo(() => {
+    // All programmatic anchors should be auto-rounded to nearest 10s
+    // This prevents validation errors on first load when askPrice isn't a multiple of 10
     if (userBid) {
         const nextStep = getSmartStep(userBid.amount);
         const aggressiveAnchor = userBid.amount + nextStep;
-        return Math.min(aggressiveAnchor, maxBid);
+        return roundToReasonablePrice(Math.min(aggressiveAnchor, maxBid));
     }
 
     if (item.isPublicBid) {
         const anchor = Math.max(item.askPrice, item.currentHighBid || 0);
-        return Math.min(anchor, maxBid);
+        return roundToReasonablePrice(Math.min(anchor, maxBid));
     }
 
-    return item.askPrice;
+    return roundToReasonablePrice(item.askPrice);
   }, [item.askPrice, item.isPublicBid, item.currentHighBid, userBid, maxBid]);
 
   const [bidAmount, setBidAmount] = useState<string>(initialBid.toLocaleString());

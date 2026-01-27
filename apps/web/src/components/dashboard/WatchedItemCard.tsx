@@ -132,9 +132,10 @@ export default function WatchedItemCard({ item, seller, userBid }: WatchedItemCa
             {/* Bottom: Price Display */}
             <PriceDisplay 
                 config={biddingConfig}
-                askPrice={item.askPrice}
-                bidCount={item.bidCount}
-                viewMode="compact"
+                  askPrice={item.askPrice}
+                  bidCount={item.bidCount}
+                  bidAttemptsCount={item.bidAttemptsCount}
+                  viewMode="compact"
                 remainingAttempts={remainingAttempts}
                 showAttempts={!!activeBid}
                 userCurrentBid={activeBid?.amount}

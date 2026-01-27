@@ -72,6 +72,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         images: item.images || [], // Ensure array
         seller: user, // user is seller
         bidCount: item.bids?.[0]?.count || 0,
+        bidAttemptsCount: item.bids?.[0]?.count || 0,
         views: item.view_count ?? Math.floor(Math.random() * 50) + 10, // Mock if missing
         unreadBids: 0, // TODO: Implement unread logic with notifications
         lastActivity: item.created_at || new Date().toISOString(), // separate activity field later?
@@ -81,7 +82,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       const activeListings = listings.filter(l => l.status === 'active');
       const soldListings = listings.filter(l => l.status === 'completed');
       
-      const totalBids = listings.reduce((acc, curr) => acc + (curr.bidCount || 0), 0);
+      const totalBids = listings.reduce((acc, curr) => acc + ((curr.bidAttemptsCount ?? curr.bidCount) || 0), 0);
       
       const successRate = user.sellerSuccessRate ?? 100;
 
@@ -115,10 +116,11 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
   const updateListingStatus = async (itemId: string, status: 'active' | 'completed' | 'cancelled') => {
     try {
-      const { error } = await supabase
-        .from('listings')
-        .update({ status })
-        .eq('id', itemId);
+      const { error } = await supabase.rpc('update_listing_fields', {
+        p_listing_id: itemId,
+        p_status: status,
+        p_title: null
+      });
 
       if (error) throw error;
       

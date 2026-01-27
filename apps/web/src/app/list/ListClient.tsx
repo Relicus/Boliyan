@@ -23,7 +23,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { uploadListingImage } from "@/lib/uploadImage";
 import { supabase } from "@/lib/supabase";
 import { generateSlug, formatPrice, formatCountdown } from "@/lib/utils";
-import { Database } from "@/types/database.types";
 import { toast } from "sonner";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { Item } from "@/types";
@@ -310,24 +309,11 @@ function ListForm() {
                 p_images: listingPayload.images,
                 p_condition: listingPayload.condition,
                 p_ends_at: listingPayload.ends_at,
-                p_listing_duration: listingPayload.listing_duration
+                p_listing_duration: listingPayload.listing_duration,
+                p_location_lat: location!.lat,
+                p_location_lng: location!.lng,
+                p_location_address: location!.address
               });
-            
-          // NOTE: edit_listing_with_cooldown RPC might not accept location params yet.
-          // We need to update location separately or update the RPC. 
-          // For now, let's update location via direct update if RPC succeeds or just ignore location update in edit mode for this specific RPC path if risk is high.
-          // Better approach: Direct update for non-critical fields if we want to support location edit.
-          // However, since we are doing a "reset bids" edit, we might as well update everything.
-          // But RPC signature is fixed. I should update the RPC signature or do a separate update call.
-          // Let's do a separate update call for location immediately after RPC if successful.
-          
-          if (!error) {
-             await supabase.from('listings').update({
-               location_lat: location!.lat,
-               location_lng: location!.lng,
-               location_address: location!.address
-             }).eq('id', editingItem.id);
-          }
 
           if (error) {
             if (error.message?.includes('COOLDOWN_ACTIVE')) {
@@ -342,14 +328,22 @@ function ListForm() {
           });
           router.push("/");
         } else {
-          const insertPayload: Database['public']['Tables']['listings']['Insert'] = {
-            ...listingPayload,
-            seller_id: user.id,
-            status: 'active',
-            slug: generateSlug(title)
-          };
-
-          const { error } = await supabase.from('listings').insert([insertPayload]);
+          const { error } = await supabase.rpc('create_listing', {
+            p_title: listingPayload.title,
+            p_description: listingPayload.description,
+            p_category: listingPayload.category,
+            p_asked_price: listingPayload.asked_price,
+            p_contact_phone: listingPayload.contact_phone,
+            p_auction_mode: listingPayload.auction_mode,
+            p_images: listingPayload.images,
+            p_condition: listingPayload.condition,
+            p_ends_at: listingPayload.ends_at,
+            p_listing_duration: listingPayload.listing_duration,
+            p_location_lat: location!.lat,
+            p_location_lng: location!.lng,
+            p_location_address: location!.address,
+            p_slug: generateSlug(title)
+          });
 
           if (error) throw error;
           toast.success("Listing created", {

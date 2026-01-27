@@ -18,6 +18,7 @@ SELECT
   p.rating_count AS seller_rating_count,
   p.location AS seller_location,
   COALESCE(s.bid_count, 0::bigint) AS bid_count,
+  COALESCE(s.bid_attempts_count, 0::bigint) AS bid_attempts_count,
   COALESCE(s.high_bid, 0::numeric) AS high_bid,
   s.high_bidder_id,
   l.slug,

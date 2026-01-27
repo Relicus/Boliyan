@@ -36,6 +36,7 @@ export interface BidUpdatePayload {
 
 const SELECTORS = {
   bidCount: (itemId: string) => `[data-rt-item-id="${itemId}"][data-rt-bid-count]`,
+  bidCountSmall: (itemId: string) => `[data-rt-item-id="${itemId}"][data-rt-bid-count-small]`,
   highBid: (itemId: string) => `[data-rt-item-id="${itemId}"][data-rt-high-bid]`,
   itemCard: (itemId: string) => `#item-card-${itemId}`,
 } as const;
@@ -113,6 +114,23 @@ export function updateBidCount(itemId: string, newCount: number): boolean {
 }
 
 /**
+ * Update the small (x) bid count display directly in DOM.
+ */
+export function updateBidCountSmall(itemId: string, newCount: number): boolean {
+  const element = document.querySelector<HTMLElement>(SELECTORS.bidCountSmall(itemId));
+  
+  if (!element) {
+    return false;
+  }
+  
+  element.textContent = `(${newCount})`;
+  element.classList.remove('hidden');
+  pulseElement(element);
+  
+  return true;
+}
+
+/**
  * Update high bid price display with animation.
  */
 export function updateHighBid(
@@ -184,13 +202,23 @@ export function handleRealtimeBidDOM(
   const { itemId, newAmount, bidderId, isNewHighBid } = payload;
   
   // 1. Always try to update bid count (increment by 1 from current display)
-  const bidCountEl = document.querySelector<HTMLElement>(SELECTORS.bidCount(itemId));
   let bidCountUpdated = false;
   
+  // Try main bid count first
+  const bidCountEl = document.querySelector<HTMLElement>(SELECTORS.bidCount(itemId));
   if (bidCountEl) {
     const currentText = bidCountEl.textContent || '0';
     const currentCount = parseInt(currentText.match(/\d+/)?.[0] || '0', 10);
     bidCountUpdated = updateBidCount(itemId, currentCount + 1);
+  }
+  
+  // Also try small bid count (x)
+  const bidCountSmallEl = document.querySelector<HTMLElement>(SELECTORS.bidCountSmall(itemId));
+  if (bidCountSmallEl) {
+    const currentText = bidCountSmallEl.textContent || '0';
+    const currentCount = parseInt(currentText.match(/\d+/)?.[0] || '0', 10);
+    const smallUpdated = updateBidCountSmall(itemId, currentCount + 1);
+    bidCountUpdated = bidCountUpdated || smallUpdated;
   }
   
   // 2. Update high bid if this is a new high

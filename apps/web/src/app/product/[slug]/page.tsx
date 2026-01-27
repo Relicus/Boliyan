@@ -268,6 +268,7 @@ function ProductContent({ item, seller }: { item: Item; seller: User }) {
                     config={biddingConfig}
                     askPrice={item.askPrice}
                     bidCount={item.bidCount}
+                    bidAttemptsCount={item.bidAttemptsCount}
                     viewMode="spacious"
                     orientation="stacked"
                     showTotalBids={true}

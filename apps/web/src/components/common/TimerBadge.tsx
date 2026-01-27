@@ -11,33 +11,38 @@ interface TimerBadgeProps {
   variant?: "glass" | "glass-light" | "outline" | "solid";
   className?: string;
   onUrgentChange?: (isUrgent: boolean) => void;
+  onExpire?: () => void;
 }
 
 export const TimerBadge = memo(({ 
   expiryAt, 
   variant = "outline", 
   className = "",
-  onUrgentChange
+  onUrgentChange,
+  onExpire
 }: TimerBadgeProps) => {
   // Use global time heartbeat instead of local interval
   const { now } = useTime();
 
-  const { text, isUrgent } = useMemo(() => {
+  const { text, isUrgent, isExpired } = useMemo(() => {
     const diff = new Date(expiryAt).getTime() - now;
+    const expired = diff <= 0;
     const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
     const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
     const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
 
-    const urgent = hoursLeft < 2;
+    const urgent = hoursLeft < 2 && !expired;
     
     let timeString = "";
-    if (hoursLeft >= 24) {
+    if (expired) {
+      timeString = "EXPIRED";
+    } else if (hoursLeft >= 24) {
       timeString = `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`;
     } else {
       timeString = `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
     }
 
-    return { text: timeString, isUrgent: urgent };
+    return { text: timeString, isUrgent: urgent, isExpired: expired };
   }, [expiryAt, now]);
 
   // Handle urgency callback
@@ -45,19 +50,33 @@ export const TimerBadge = memo(({
     onUrgentChange?.(isUrgent);
   }, [isUrgent, onUrgentChange]);
 
-  const variants = {
-    glass: isUrgent 
-      ? "bg-red-500/95 text-white border-white/20 shadow-sm ring-1 ring-inset ring-white/10" 
-      : "bg-black/80 text-white border-white/10 shadow-sm ring-1 ring-inset ring-white/5",
-    "glass-light": isUrgent
-      ? "bg-red-100/90 text-red-700 border-red-200/50 shadow-sm ring-1 ring-inset ring-red-200/20"
-      : "bg-white/90 text-slate-800 border-slate-200/50 shadow-sm ring-1 ring-inset ring-white/50",
-    outline: isUrgent
-      ? "bg-red-50 text-red-600 border-red-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5)]"
-      : "bg-white text-slate-700 border-slate-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]",
-    solid: isUrgent
-      ? "bg-red-600 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
-      : "bg-slate-900 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.1)]"
+  // Handle expiration callback
+  useEffect(() => {
+    if (isExpired) {
+      onExpire?.();
+    }
+  }, [isExpired, onExpire]);
+
+  // Expired takes priority, then urgent, then default
+  const getVariantClass = () => {
+    if (isExpired) {
+      return "bg-slate-200 text-slate-500 border-slate-300 opacity-60";
+    }
+    const variantStyles = {
+      glass: isUrgent 
+        ? "bg-red-500/95 text-white border-white/20 shadow-sm ring-1 ring-inset ring-white/10" 
+        : "bg-black/80 text-white border-white/10 shadow-sm ring-1 ring-inset ring-white/5",
+      "glass-light": isUrgent
+        ? "bg-red-100/90 text-red-700 border-red-200/50 shadow-sm ring-1 ring-inset ring-red-200/20"
+        : "bg-white/90 text-slate-800 border-slate-200/50 shadow-sm ring-1 ring-inset ring-white/50",
+      outline: isUrgent
+        ? "bg-red-50 text-red-600 border-red-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5)]"
+        : "bg-white text-slate-700 border-slate-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]",
+      solid: isUrgent
+        ? "bg-red-600 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
+        : "bg-slate-900 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.1)]"
+    };
+    return variantStyles[variant];
   };
 
   return (
@@ -74,7 +93,7 @@ export const TimerBadge = memo(({
       } : { scale: 1 }}
       className={cn(
         "inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all font-black font-outfit tabular-nums",
-        variants[variant],
+        getVariantClass(),
         className
       )}
     >

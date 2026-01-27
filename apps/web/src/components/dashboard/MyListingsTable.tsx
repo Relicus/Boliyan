@@ -72,7 +72,7 @@ export function MyListingsTable() {
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-center">
-                  {item.bidCount}
+                  {item.bidAttemptsCount ?? item.bidCount}
                 </td>
                 <td className="px-4 py-3 text-center text-muted-foreground">
                   {item.views}

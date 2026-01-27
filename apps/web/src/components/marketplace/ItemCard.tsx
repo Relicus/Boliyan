@@ -48,9 +48,19 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const mainImage = item.images[0];
   const thumbnailImages = item.images.slice(1, 4);
 
+  // Handle expiration - first disable, then fade out
+  const handleExpire = () => {
+    if (!isExpired) {
+      setIsExpired(true);
+      // After a brief moment showing disabled state, start fade out
+      setTimeout(() => setIsFadingOut(true), 1500);
+    }
+  };
 
   // Hook for encapsulated bidding logic
   const {
@@ -151,16 +161,19 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
         initial={false}
             animate={{
-              scale: isSuccess ? 1.05 : 1,
+              scale: isFadingOut ? 0.95 : (isSuccess ? 1.05 : 1),
+              opacity: isFadingOut ? 0 : 1,
               x: (isOutbidTrigger && item.isPublicBid) || isSuccess ? [0, -4, 4, -4, 4, 0] : 0,
             }}
             transition={{
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
+              opacity: { duration: 0.8, ease: "easeOut" },
             }}
             className={cn(
-              "@container group relative border-none rounded-xl flex flex-col will-change-transform transition-[box-shadow,ring,padding] duration-500 bg-slate-50 shadow-sm",
-              isOutbidTrigger && item.isPublicBid && "ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+              "@container group relative border-none rounded-xl flex flex-col will-change-transform transition-[box-shadow,ring,padding,filter] duration-500 bg-slate-50 shadow-sm",
+              isOutbidTrigger && item.isPublicBid && "ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]",
+              isExpired && "pointer-events-none grayscale"
             )}
             style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
           >
@@ -207,6 +220,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   expiryAt={item.expiryAt} 
                   variant="glass-light" 
                   className="bg-red-600 text-white border-transparent"
+                  onExpire={handleExpire}
                 />
                 
                 {/* 2. Condition State */}
@@ -414,6 +428,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 config={biddingConfig}
                 askPrice={item.askPrice}
                 bidCount={item.bidCount}
+                bidAttemptsCount={item.bidAttemptsCount}
                 viewMode={viewMode}
                 className="min-h-[2.25rem]"
                 remainingAttempts={remainingAttempts}
