@@ -9,36 +9,26 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { User, MapPin, Phone, CheckCircle2 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-
-const CITIES = [
-  "Karachi",
-  "Lahore",
-  "Islamabad",
-  "Rawalpindi",
-  "Faisalabad",
-  "Multan",
-  "Peshawar",
-  "Quetta"
-];
+import { User, MapPin, Phone, CheckCircle2, Navigation } from "lucide-react";
+import { useApp } from "@/lib/store";
+import { cn } from "@/lib/utils";
+import { LocationSelector } from "@/components/marketplace/LocationSelector";
 
 export default function CompleteProfileClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect');
-  const { user, updateProfile, isLoading: isAuthLoading } = useAuth();
+  const { user, updateProfile, isLoading: isAuthLoading, myLocation } = useApp();
   
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [city, setCity] = useState("");
   const [isSameAsPhone, setIsSameAsPhone] = useState(true);
   
   const [errors, setErrors] = useState<{
     name?: boolean;
     phone?: boolean;
-    city?: boolean;
+    location?: boolean;
   }>({});
   const [isShaking, setIsShaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +39,6 @@ export default function CompleteProfileClient() {
       setName(user.name || "");
       setPhone(user.phone || "");
       setWhatsapp(user.whatsapp || "");
-      setCity(user.location?.city || "");
       
       if (user.whatsapp && user.whatsapp === user.phone) {
         setIsSameAsPhone(true);
@@ -72,7 +61,7 @@ export default function CompleteProfileClient() {
     const newErrors = {
       name: !name.trim() || name.length < 2,
       phone: !phone.trim() || phone.length < 10,
-      city: !city
+      location: !myLocation
     };
     
     setErrors(newErrors);
@@ -91,10 +80,10 @@ export default function CompleteProfileClient() {
         phone,
         whatsapp: isSameAsPhone ? phone : whatsapp,
         location: {
-          lat: user?.location?.lat || 24.8607,
-          lng: user?.location?.lng || 67.0011,
-          address: city,
-          city: city
+          lat: myLocation!.lat,
+          lng: myLocation!.lng,
+          address: myLocation!.address,
+          city: myLocation!.city || myLocation!.address.split(',')[0]
         }
       });
 
@@ -238,43 +227,45 @@ export default function CompleteProfileClient() {
               </p>
             </div>
 
-            {/* City */}
+            {/* Location (City Selection) */}
             <div className="space-y-2">
               <Label className="flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 text-slate-500" />
-                City
+                Your City / Location
               </Label>
-              <Select
-                value={city}
-                onValueChange={(val) => {
-                  setCity(val);
-                  if (errors.city) setErrors(prev => ({ ...prev, city: false }));
-                }}
-              >
-                <SelectTrigger
-                  id="city-select"
-                  className={`h-11 transition-all ${errors.city ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-200"}`}
-                >
-                  <SelectValue placeholder="Select your city" />
-                </SelectTrigger>
-                <SelectContent id="city-select-content">
-                  {CITIES.map(c => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              
+              <LocationSelector 
+                mode="user" 
+                variant="sidebar-compact" 
+                className={cn(
+                    "w-full h-11",
+                    errors.location && "border-red-500 ring-1 ring-red-500/20"
+                )}
+                triggerClassName={cn(
+                    "h-11 bg-slate-50 border-slate-200 hover:bg-slate-100",
+                    errors.location && "border-red-500"
+                )}
+              />
+              
               <AnimatePresence>
-                {errors.city && (
+                {errors.location && (
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     className="text-[10px] font-bold text-red-500"
                   >
-                    Please select a city
+                    Please select your location
                   </motion.p>
                 )}
               </AnimatePresence>
+              
+              {!errors.location && myLocation && (
+                  <p className="text-[10px] text-blue-600 font-medium flex items-center gap-1">
+                      <Navigation className="h-2.5 w-2.5 fill-current" />
+                      {myLocation.address}
+                  </p>
+              )}
             </div>
 
             <Button

@@ -60,7 +60,7 @@ export default function ProfileCompleteness({ user, className }: ProfileComplete
       </div>
 
       <Button asChild variant="outline" size="sm" className="w-full text-xs h-8">
-        <Link href="/settings/profile">Complete Profile</Link>
+        <Link href={`/complete-profile?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/profile')}`}>Complete Profile</Link>
       </Button>
     </div>
   );

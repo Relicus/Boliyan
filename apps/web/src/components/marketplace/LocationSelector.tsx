@@ -33,7 +33,7 @@ export function LocationSelector({ className, triggerClassName, align = "end", v
       <div id="location-selector-sidebar-compact" className={cn("w-full", className)}>
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <LocationSelectorTrigger mode={mode} variant={variant} isOpen={isOpen} />
+            <LocationSelectorTrigger mode={mode} variant={variant} isOpen={isOpen} className={triggerClassName} />
           </PopoverTrigger>
           <PopoverContent className="w-[320px] p-0 shadow-lg border-slate-200 rounded-xl overflow-hidden" align="start" sideOffset={8}>
             <LocationSelectorContent mode={mode} onSelect={() => setIsOpen(false)} />
