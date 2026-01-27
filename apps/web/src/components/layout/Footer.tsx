@@ -24,6 +24,9 @@ export default function Footer({ className }: FooterProps) {
           <Link id="footer-privacy-link-01" href="/privacy-policy" className="hover:text-slate-700">
             Privacy Policy
           </Link>
+          <Link id="footer-deletion-link-01" href="/data-deletion" className="hover:text-slate-700">
+            Data Deletion
+          </Link>
         </div>
       </div>
     </footer>
