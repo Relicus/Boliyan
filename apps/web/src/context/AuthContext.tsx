@@ -322,7 +322,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Update local state
-    setUser(prev => (prev ? { ...prev, ...data } : null));
+    setUser(prev => {
+      if (!prev) return null;
+      const updated = { ...prev, ...data };
+      // Recalculate completeness
+      updated.profileComplete = !!updated.name && !!updated.phone && !!updated.location;
+      return updated;
+    });
   };
 
   const openAuthModal = () => setIsAuthModalOpen(true);

@@ -40,6 +40,8 @@ const EDIT_WARNING_CONFIRM = "Save & Reset Bids";
 const EDIT_WARNING_CANCEL = "Keep Editing";
 const GO_LIVE_NOTE = "Goes live in 1 hour after saving.";
 const EDIT_COOLDOWN_TOAST = "You can edit this listing again in";
+const MAX_IMAGES = 5;
+const DRAFT_KEY = "boliyan_listing_draft";
 
 function ListForm() {
   const router = useRouter();
@@ -112,8 +114,71 @@ function ListForm() {
   const [purchaseMonth, setPurchaseMonth] = useState<string>("");
   const [currentNewPrice, setCurrentNewPrice] = useState<string>("");
   const [contactPhone, setContactPhone] = useState("");
+  const [contactWhatsapp, setContactWhatsapp] = useState("");
+  const [isWhatsappSameAsPhone, setIsWhatsappSameAsPhone] = useState(true);
   const [showPriceEstimator, setShowPriceEstimator] = useState(false);
   const [location, setLocation] = useState<{lat: number, lng: number, address: string, city?: string} | null>(null);
+  const [isDraftRestored, setIsDraftRestored] = useState(false);
+
+  // Sync WhatsApp with Phone if enabled
+  useEffect(() => {
+    if (isWhatsappSameAsPhone) {
+      setContactWhatsapp(contactPhone);
+    }
+  }, [contactPhone, isWhatsappSameAsPhone]);
+
+  // Restore Draft from LocalStorage
+  useEffect(() => {
+    if (editingItem || isAuthLoading || !user) return;
+
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft);
+        if (draft.title) setTitle(draft.title);
+        if (draft.category) setCategory(draft.category);
+        if (draft.askPrice) setAskPrice(draft.askPrice);
+        if (draft.description) setDescription(draft.description);
+        if (draft.contactPhone) setContactPhone(draft.contactPhone);
+        if (draft.contactWhatsapp) {
+            setContactWhatsapp(draft.contactWhatsapp);
+            setIsWhatsappSameAsPhone(draft.contactWhatsapp === draft.contactPhone);
+        }
+        if (draft.location) setLocation(draft.location);
+        if (draft.condition) setCondition(draft.condition);
+        if (draft.isPublic !== undefined) setIsPublic(draft.isPublic);
+        if (draft.duration) setDuration(draft.duration);
+        
+        setIsDraftRestored(true);
+        // Toast once
+        toast.success("Draft restored", {
+          description: "All text fields recovered. Please re-upload images."
+        });
+      } catch (err) {
+        console.error("Failed to restore draft", err);
+      }
+    }
+  }, [editingItem, isAuthLoading, user]);
+
+  // Save Draft to LocalStorage
+  useEffect(() => {
+    if (editingItem || !user) return;
+
+    const draft = {
+      title,
+      category,
+      askPrice,
+      description,
+      contactPhone,
+      contactWhatsapp,
+      location,
+      condition,
+      isPublic,
+      duration
+    };
+    
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  }, [title, category, askPrice, description, contactPhone, contactWhatsapp, location, condition, isPublic, duration, editingItem, user]);
   
   // Computed price estimate
   const priceEstimate: DepreciationResult | null = React.useMemo(() => {
@@ -141,6 +206,7 @@ function ListForm() {
 
   const [imageEntries, setImageEntries] = useState<ImageEntry[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isProcessingImages, setIsProcessingImages] = useState(false);
   const [showEditWarning, setShowEditWarning] = useState(false);
 
   const [errors, setErrors] = useState<{
@@ -175,20 +241,31 @@ function ListForm() {
       setDuration(editingItem.listingDuration.toString() as "24" | "168" | "720");
       setCondition(editingItem.condition || "used");
       setContactPhone(editingItem.contactPhone || user?.phone || "");
+      setContactWhatsapp(editingItem.contactWhatsapp || user?.whatsapp || editingItem.contactPhone || user?.phone || "");
+      setIsWhatsappSameAsPhone(editingItem.contactWhatsapp === editingItem.contactPhone);
       return;
     }
 
-    setImageEntries([]);
-    if (user?.phone && !contactPhone) {
-      setContactPhone(user.phone);
+    // New Listing defaults
+    if (user) {
+        if (user.phone && !contactPhone && !isDraftRestored) setContactPhone(user.phone);
+        if (user.whatsapp && !contactWhatsapp && !isDraftRestored) {
+            setContactWhatsapp(user.whatsapp);
+            setIsWhatsappSameAsPhone(user.whatsapp === user.phone);
+        }
     }
-  }, [editingItem, user, contactPhone]);
+  }, [editingItem, user, contactPhone, isDraftRestored]);
 
   const isValidPhone = (value: string) => value.replace(/\D/g, "").length >= 10;
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
+      if (isProcessingImages) {
+        toast.info("Please wait for image processing to finish.");
+        e.target.value = "";
+        return;
+      }
       const newFiles = Array.from(files);
       const allowedFiles = newFiles.filter(isAllowedListingImageInput);
       const rejectedCount = newFiles.length - allowedFiles.length;
@@ -197,30 +274,42 @@ function ListForm() {
       }
       if (allowedFiles.length === 0) return;
 
-      const remainingSlots = Math.max(0, 5 - imageEntries.length);
-      if (remainingSlots === 0) return;
+      const remainingSlots = Math.max(0, MAX_IMAGES - imageEntries.length);
+      if (remainingSlots === 0) {
+        toast.error(`Image limit reached (max ${MAX_IMAGES}).`);
+        return;
+      }
+
+      if (allowedFiles.length > remainingSlots) {
+        toast.info(`Only ${remainingSlots} more image${remainingSlots === 1 ? "" : "s"} allowed.`);
+      }
 
       const filesToProcess = allowedFiles.slice(0, remainingSlots);
       const processedEntries: ImageEntry[] = [];
       let rejectedOversize = 0;
       let rejectedProcessing = 0;
 
-      for (const file of filesToProcess) {
-        try {
-          const processed = await processListingImage(file);
-          processedEntries.push({
-            id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            url: URL.createObjectURL(processed),
-            file: processed,
-            isNew: true
-          });
-        } catch (error) {
-          if (error instanceof Error && error.message.includes("exceeds 1MB")) {
-            rejectedOversize += 1;
-          } else {
-            rejectedProcessing += 1;
+      setIsProcessingImages(true);
+      try {
+        for (const file of filesToProcess) {
+          try {
+            const processed = await processListingImage(file);
+            processedEntries.push({
+              id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              url: URL.createObjectURL(processed),
+              file: processed,
+              isNew: true
+            });
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("exceeds 1MB")) {
+              rejectedOversize += 1;
+            } else {
+              rejectedProcessing += 1;
+            }
           }
         }
+      } finally {
+        setIsProcessingImages(false);
       }
 
       if (rejectedOversize > 0) {
@@ -232,6 +321,8 @@ function ListForm() {
 
       if (processedEntries.length > 0) {
         setImageEntries(prev => [...prev, ...processedEntries]);
+      } else {
+        toast.error("No images were added.");
       }
     }
     e.target.value = "";
@@ -268,6 +359,11 @@ function ListForm() {
         return;
     }
 
+    if (isProcessingImages) {
+      toast.info("Please wait for images to finish processing.");
+      return;
+    }
+
     const priceNum = parseFloat(askPrice);
     const roundedPrice = roundToReasonablePrice(priceNum);
     
@@ -279,8 +375,8 @@ function ListForm() {
       contactPhone: !isValidPhone(contactPhone),
       images: imageEntries.length < 1,
       location: !location,
-      purchasePrice: !purchasePrice || isNaN(parseFloat(purchasePrice)) || parseFloat(purchasePrice) <= 0,
-      purchaseYear: !purchaseYear
+      purchasePrice: false,
+      purchaseYear: false
     };
 
     setErrors(newErrors);
@@ -288,6 +384,7 @@ function ListForm() {
     if (Object.values(newErrors).some(Boolean)) {
       if (newErrors.images) toast.error("At least one image is required");
       if (newErrors.location) toast.error("Location is required");
+      toast.error("Please fix the highlighted fields.");
       return;
     }
 
@@ -302,7 +399,7 @@ function ListForm() {
         const updatedEntries = await Promise.all(
           imageEntries.map(async (entry) => {
             if (!entry.file) return entry;
-            const uploadedUrl = await uploadListingImage(entry.file, user.id);
+            const uploadedUrl = await uploadListingImage(entry.file);
             return {
               ...entry,
               url: uploadedUrl,
@@ -390,8 +487,9 @@ function ListForm() {
 
     } catch (error) {
         console.error("Error creating listing:", error);
+        const message = error instanceof Error ? error.message : "Please try again in a moment.";
         toast.error("Listing not saved", {
-          description: "Please try again in a moment."
+          description: message
         });
     } finally {
         setIsUploading(false);
@@ -470,7 +568,7 @@ function ListForm() {
               <div className="space-y-4">
                 <Label id="images-label" className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
                   <Camera className="h-3.5 w-3.5 text-slate-500" />
-                  Product Images (Max 5)
+                  Product Images (Max {MAX_IMAGES})
                 </Label>
                 <div id="images-preview-container" className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                   {imageEntries.map((entry, index) => (
@@ -513,13 +611,13 @@ function ListForm() {
                       <button 
                         id={`remove-image-btn-${index}`}
                         onClick={() => removeImage(index)}
-                        className="absolute top-1.5 right-1.5 p-1.5 bg-white/90 rounded-full hover:bg-red-50 hover:text-red-500 shadow-sm transition-all opacity-0 group-hover:opacity-100"
+                        className="absolute top-1.5 right-1.5 p-1.5 bg-white/90 rounded-full hover:bg-red-50 hover:text-red-500 shadow-sm transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   ))}
-                  {imageEntries.length < 5 && (
+                  {imageEntries.length < MAX_IMAGES && (
                     <label 
                       id="add-image-label"
                       className="h-28 w-28 shrink-0 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all group"
@@ -634,7 +732,7 @@ function ListForm() {
                 </div>
               </div>
 
-              {/* Price Estimator Toggle - Optional Helper */}
+              {/* Price Estimator Toggle */}
               <div className="space-y-3">
                 <button
                   type="button"
@@ -659,16 +757,16 @@ function ListForm() {
                     >
                       <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
                         
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
                           {/* Paid Price */}
                           <div className="space-y-1">
                             <Label htmlFor="purchase-price-input" className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
-                              <CreditCard className="w-3 h-3" /> Paid (Rs.)
+                              <CreditCard className="w-3 h-3" /> Purchase Price (Rs.)
                             </Label>
                             <Input 
                               id="purchase-price-input" 
                               type="number" 
-                              placeholder="Original Price" 
+                              placeholder="Purchase Price" 
                               value={purchasePrice}
                               onChange={(e) => {
                                 setPurchasePrice(e.target.value);
@@ -684,9 +782,9 @@ function ListForm() {
                               <Calendar className="w-3 h-3" /> Date
                             </Label>
                             <div className="flex gap-2 w-full">
-                              <div className="flex-[2] min-w-0">
+                              <div className="flex-[2] min-w-[80px]">
                                 <Select value={purchaseMonth} onValueChange={setPurchaseMonth}>
-                                  <SelectTrigger id="purchase-month-select" className="h-9 text-xs bg-white border-slate-200 px-2 w-full">
+                                  <SelectTrigger id="purchase-month-select" className="h-9 text-xs bg-white border-slate-200 px-2 w-full min-w-[80px]">
                                     <SelectValue placeholder="Mo" />
                                   </SelectTrigger>
                                   <SelectContent id="purchase-month-select-content">
@@ -696,7 +794,7 @@ function ListForm() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="flex-[3] min-w-0">
+                              <div className="flex-[3] min-w-[110px]">
                                 <Select 
                                   value={purchaseYear} 
                                   onValueChange={(val) => {
@@ -706,7 +804,7 @@ function ListForm() {
                                 >
                                   <SelectTrigger 
                                     id="purchase-year-select" 
-                                    className={`h-9 text-xs bg-white px-2 w-full ${errors.purchaseYear ? "border-red-500" : "border-slate-200"}`}
+                                    className={`h-9 text-xs bg-white px-2 w-full min-w-[110px] ${errors.purchaseYear ? "border-red-500" : "border-slate-200"}`}
                                   >
                                     <SelectValue placeholder="Year" />
                                   </SelectTrigger>
@@ -729,7 +827,7 @@ function ListForm() {
                           <Input 
                             id="current-new-price-input" 
                             type="number" 
-                            placeholder="Current New Price (Optional)" 
+                            placeholder="Latest Price" 
                             value={currentNewPrice}
                             onChange={(e) => setCurrentNewPrice(e.target.value)}
                             className="h-8 text-xs bg-white border-slate-200 pl-7 placeholder:text-slate-400"
@@ -1002,16 +1100,22 @@ function ListForm() {
               id="post-listing-btn"
               className="flex-[2] bg-blue-600 hover:bg-blue-700 h-14 text-lg font-bold"
               onClick={handleSubmit}
-              disabled={isUploading || isLoadingItem || isEditCooldown}
+              disabled={isUploading || isProcessingImages || isLoadingItem || isEditCooldown}
             >
-              {isUploading ? (
+              {(isUploading || isProcessingImages) ? (
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
               ) : editingItem ? (
                   <Save className="h-5 w-5 mr-2" />
               ) : (
                   <Check className="h-5 w-5 mr-2" />
               )}
-              {isUploading ? "Uploading..." : editingItem ? (isEditCooldown ? `Edit in ${editCooldownLabel || "1h"}` : "Save") : "Post Listing"}
+              {isUploading
+                ? "Uploading..."
+                : isProcessingImages
+                  ? "Processing images..."
+                  : editingItem
+                    ? (isEditCooldown ? `Edit in ${editCooldownLabel || "1h"}` : "Save")
+                    : "Post Listing"}
             </Button>
           </div>
           <div id="go-live-note" className="flex justify-center">

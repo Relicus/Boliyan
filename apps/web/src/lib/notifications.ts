@@ -26,7 +26,12 @@ export function resolveNotificationLink(
     case 'bid_accepted':
     case 'new_message':
       if (metadata.conversationId) {
-        return `/inbox?id=${metadata.conversationId}`;
+        // Try to find if we have a shortCode in context
+        if (context?.conversations) {
+          const conv = context.conversations.find(c => c.id === metadata.conversationId);
+          if (conv?.shortCode) return `/i/${conv.shortCode}`;
+        }
+        return `/i/${metadata.conversationId}`;
       }
       // Fallback: try to find conversation in context if we have itemId and userId
       if (context?.conversations && metadata.itemId && context.userId) {
@@ -34,7 +39,7 @@ export function resolveNotificationLink(
           c.itemId === metadata.itemId && 
           (c.sellerId === context.userId || c.bidderId === context.userId)
         );
-        if (conv) return `/inbox?id=${conv.id}`;
+        if (conv) return `/i/${conv.shortCode || conv.id}`;
       }
       return '/inbox';
 

@@ -1,25 +1,42 @@
 import { LISTING_IMAGE_UPLOAD_MIME_TYPES, isAllowedListingImageUpload } from "@/lib/constants";
-import { supabase } from "@/lib/supabase";
 
-export async function uploadListingImage(file: File, userId: string): Promise<string> {
+export async function uploadListingImage(file: File): Promise<string> {
   if (!isAllowedListingImageUpload(file)) {
     throw new Error(`Unsupported image type. Allowed: ${LISTING_IMAGE_UPLOAD_MIME_TYPES.join(", ")}`);
   }
-  // Sanitize filename and prepend timestamp/userId for uniqueness/organization
-  const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_'); 
-  const fileName = `${userId}/${Date.now()}_${cleanName}`;
-  
-  const { error } = await supabase.storage
-    .from('listings')
-    .upload(fileName, file, { 
-        cacheControl: '3600', 
-        upsert: false 
-    });
-  
-  if (error) {
-    throw error;
+  const response = await fetch("/api/upload-url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fileName: file.name,
+      contentType: file.type,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to get upload URL");
   }
-  
-  const { data } = supabase.storage.from('listings').getPublicUrl(fileName);
-  return data.publicUrl;
+
+  const payload = await response.json();
+  const uploadUrl = payload?.uploadUrl as string | undefined;
+  const publicUrl = payload?.publicUrl as string | undefined;
+  const objectKey = payload?.objectKey as string | undefined;
+
+  if (!uploadUrl || !objectKey) {
+    throw new Error("Upload URL response invalid");
+  }
+
+  const uploadResponse = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type,
+    },
+    body: file,
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error("Upload failed");
+  }
+
+  return objectKey;
 }

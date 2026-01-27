@@ -12,6 +12,8 @@
     "checks": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.975.0",
+    "@aws-sdk/s3-request-presigner": "^3.975.0",
     "@jsquash/webp": "^1.5.0",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",

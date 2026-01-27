@@ -386,17 +386,39 @@ export default function ProductPageClient({ params }: { params: { id?: string; s
             query = query.eq('slug', slugOrId);
         }
 
-        query = query.lte('go_live_at', new Date().toISOString());
+        const { data, error } = await query.maybeSingle();
 
-        const { data, error } = await query.single();
-
-        if (error || !data) {
+        if (error) {
           console.error("Error fetching item:", error);
-          setFetchError(true);
-        } else {
-          const newItem = transformListingToItem(data as unknown as ListingWithSeller);
-          setFetchedItem(newItem);
         }
+
+        if (!data) {
+          let fallbackQuery = supabase.from('listings').select('*, profiles(*)');
+          if (isUUID) {
+            fallbackQuery = fallbackQuery.eq('id', slugOrId);
+          } else {
+            fallbackQuery = fallbackQuery.eq('slug', slugOrId);
+          }
+          const { data: fallbackData, error: fallbackError } = await fallbackQuery.maybeSingle();
+
+          if (fallbackError) {
+            console.error("Error fetching fallback item:", fallbackError);
+            setFetchError(true);
+            return;
+          }
+
+          if (!fallbackData) {
+            setFetchError(true);
+            return;
+          }
+
+          const newItem = transformListingToItem(fallbackData as unknown as ListingWithSeller);
+          setFetchedItem(newItem);
+          return;
+        }
+
+        const newItem = transformListingToItem(data as unknown as ListingWithSeller);
+        setFetchedItem(newItem);
       } catch (err) {
         console.error("Exception fetching item:", err);
         setFetchError(true);

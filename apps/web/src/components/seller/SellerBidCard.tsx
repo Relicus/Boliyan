@@ -5,7 +5,7 @@ import { Bid, User } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { MapPin, MessageSquare, Star, Check, X } from "lucide-react";
-import { buildWhatsAppMessage, calculatePrivacySafeDistance, getFuzzyLocationString, formatPrice, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessage, calculatePrivacySafeDistance, getFuzzyLocationString, formatPrice, getListingShortCode, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
 import { useRouter } from "next/navigation";
@@ -26,11 +26,17 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const item = itemsById[bid.itemId];
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
   const productSlug = item?.slug || item?.id || bid.itemId;
-  const productUrl = productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl;
+  const shortCode = getListingShortCode(item?.slug);
+  const productUrl = shortCode ? `${siteUrl}/p/${shortCode}` : (productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl);
   const rawCity = item?.location?.city || (item?.location?.address ? getFuzzyLocationString(item.location.address) : '');
   const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
   const mapUrl = getMapUrl(item?.location);
-  const inAppUrl = 'https://boliyan.pk/dashboard?tab=offers';
+  const conversation = conversations.find(c => 
+    c.itemId === bid.itemId && 
+    ((c.sellerId === user?.id && c.bidderId === bidder.id) || 
+     (c.bidderId === user?.id && c.sellerId === bidder.id))
+  );
+  const chatShortLink = conversation?.shortCode ? `${siteUrl}/i/${conversation.shortCode}` : (conversation?.id ? `${siteUrl}/i/${conversation.id}` : undefined);
   const waMessage = buildWhatsAppMessage({
     role: 'seller',
     productName: item?.title,
@@ -39,7 +45,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
     city,
     productUrl,
     mapUrl,
-    inAppUrl
+    chatUrl: chatShortLink
   });
   // Stable derived values based on bidder profile
   const { distance, duration, isOutside } = useMemo(() => {

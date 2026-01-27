@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
-import { buildWhatsAppMessage, cn, formatPrice, getFuzzyLocationString, getMapUrl, getWhatsAppUrl } from '@/lib/utils';
+import { buildWhatsAppMessage, cn, formatPrice, getFuzzyLocationString, getListingShortCode, getMapUrl, getWhatsAppUrl } from '@/lib/utils';
 import { Conversation } from '@/types';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { WhatsAppIcon } from '@/components/common/WhatsAppIcon';
@@ -110,12 +110,13 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const offerPrice = offerBid?.amount ?? item?.currentHighBid;
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
   const productSlug = item?.slug || item?.id;
-  const productUrl = productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl;
+  const shortCode = getListingShortCode(item?.slug);
+  const productUrl = shortCode ? `${siteUrl}/p/${shortCode}` : (productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl);
   const locationAddress = item?.location?.address;
   const rawCity = item?.location?.city || (locationAddress ? getFuzzyLocationString(locationAddress) : '');
   const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
   const mapUrl = getMapUrl(item?.location);
-  const inAppUrl = isSeller ? 'https://boliyan.pk/dashboard?tab=offers' : 'https://boliyan.pk/inbox';
+  const chatShortLink = conversation?.shortCode ? `${siteUrl}/i/${conversation.shortCode}` : (conversation?.id ? `${siteUrl}/i/${conversation.id}` : undefined);
   const waMessage = buildWhatsAppMessage({
     role: isSeller ? 'seller' : 'buyer',
     productName: item?.title,
@@ -124,7 +125,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     city,
     productUrl,
     mapUrl,
-    inAppUrl
+    chatUrl: chatShortLink
   });
   const priceBlock = item ? (
     <div className="flex flex-col items-end shrink-0">

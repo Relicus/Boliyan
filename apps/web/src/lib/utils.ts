@@ -221,7 +221,7 @@ interface WhatsAppMessageOptions {
   city?: string;
   productUrl?: string;
   mapUrl?: string;
-  inAppUrl: string;
+  chatUrl?: string;
 }
 
 export function buildWhatsAppMessage({
@@ -232,7 +232,7 @@ export function buildWhatsAppMessage({
   city,
   productUrl,
   mapUrl,
-  inAppUrl
+  chatUrl
 }: WhatsAppMessageOptions): string {
   const safeName = productName?.trim() || 'Item';
   const safeAsk = typeof askPrice === 'number' ? formatPrice(askPrice) : 'N/A';
@@ -240,6 +240,7 @@ export function buildWhatsAppMessage({
   const safeCity = city?.trim();
   const safeProductUrl = productUrl?.trim() || 'https://boliyan.pk';
   const safeMapUrl = mapUrl?.trim();
+  const safeChatUrl = chatUrl?.trim();
 
   const title = role === 'seller' ? 'Deal Follow-Up' : 'Item Inquiry';
   const bidLabel = role === 'seller' ? 'Your Bid' : 'My Bid';
@@ -260,9 +261,10 @@ export function buildWhatsAppMessage({
     safeMapUrl ? '' : null,
     safeMapUrl ? 'Location:' : null,
     safeMapUrl ? safeMapUrl : null,
-    '',
-    role === 'seller' ? 'Offers:' : 'Inbox:',
-    inAppUrl
+    safeChatUrl ? '' : null,
+    safeChatUrl ? 'Chat:' : null,
+    safeChatUrl ? safeChatUrl : null,
+    ''
   ];
 
   return lines.filter((line) => line !== undefined && line !== null).join('\n');
@@ -282,6 +284,15 @@ export function getMapUrl(location?: {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
   }
   return undefined;
+}
+
+export function getListingShortCode(slug?: string): string | undefined {
+  if (!slug) return undefined;
+  const trimmed = slug.trim();
+  if (!trimmed) return undefined;
+  const lastDash = trimmed.lastIndexOf('-');
+  if (lastDash === -1 || lastDash === trimmed.length - 1) return undefined;
+  return trimmed.slice(lastDash + 1);
 }
 
 /**

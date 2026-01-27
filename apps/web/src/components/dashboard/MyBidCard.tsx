@@ -16,7 +16,7 @@ import { createBiddingConfig } from "@/types/bidding";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 import { useApp } from "@/lib/store";
-import { buildWhatsAppMessage, getFuzzyLocationString, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessage, getFuzzyLocationString, getListingShortCode, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
 
 interface MyBidCardProps {
   item: Item;
@@ -50,11 +50,12 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   const canCall = canChat && !!listingPhone;
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
   const productSlug = item.slug || item.id;
-  const productUrl = productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl;
+  const shortCode = getListingShortCode(item.slug);
+  const productUrl = shortCode ? `${siteUrl}/p/${shortCode}` : (productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl);
   const rawCity = item.location?.city || (item.location?.address ? getFuzzyLocationString(item.location.address) : '');
   const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
   const mapUrl = getMapUrl(item.location);
-  const inAppUrl = 'https://boliyan.pk/inbox';
+  const chatShortLink = acceptedConversation?.shortCode ? `${siteUrl}/i/${acceptedConversation.shortCode}` : (acceptedConversation?.id ? `${siteUrl}/i/${acceptedConversation.id}` : undefined);
   const waMessage = buildWhatsAppMessage({
     role: 'buyer',
     productName: item.title,
@@ -63,7 +64,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
     city,
     productUrl,
     mapUrl,
-    inAppUrl
+    chatUrl: chatShortLink
   });
 
   const handleChat = (event: React.MouseEvent) => {

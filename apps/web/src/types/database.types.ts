@@ -122,6 +122,7 @@ export type Database = {
           listing_id: string | null
           seller_confirmed_at: string | null
           seller_id: string | null
+          short_code: string | null
           updated_at: string | null
         }
         Insert: {
@@ -135,6 +136,7 @@ export type Database = {
           listing_id?: string | null
           seller_confirmed_at?: string | null
           seller_id?: string | null
+          short_code?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -148,6 +150,7 @@ export type Database = {
           listing_id?: string | null
           seller_confirmed_at?: string | null
           seller_id?: string | null
+          short_code?: string | null
           updated_at?: string | null
         }
         Relationships: [

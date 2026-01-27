@@ -92,6 +92,13 @@ function InboxContent() {
   const displayedAllConversations = isSearching ? filteredAllConversations : conversations;
   const displayedOfferConversations = isSearching ? filteredAllConversations : offerConversations;
   const displayedBidConversations = isSearching ? filteredAllConversations : bidConversations;
+  useEffect(() => {
+    if (!selectedIdParam) return;
+    if (resolvedSelectedId === selectedIdParam) return;
+    if (conversations.some(c => c.id === selectedIdParam)) {
+      setSelectedId(selectedIdParam);
+    }
+  }, [conversations, resolvedSelectedId, selectedIdParam]);
   const handleTabChange = (value: string) => {
     if (value === 'all' || value === 'offers' || value === 'bids') {
       setActiveTab(value);

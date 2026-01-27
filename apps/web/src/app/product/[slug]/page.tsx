@@ -34,16 +34,30 @@ const fetchListingMeta = async (slugOrId: string) => {
     query = query.eq("slug", slugOrId);
   }
 
-  const { data } = await query.single();
-  return data || null;
+  const { data } = await query.maybeSingle();
+  if (data) return data;
+
+  let fallbackQuery = supabaseServer
+    .from("listings")
+    .select("id, slug, title, description, images");
+
+  if (isUuid(slugOrId)) {
+    fallbackQuery = fallbackQuery.eq("id", slugOrId);
+  } else {
+    fallbackQuery = fallbackQuery.eq("slug", slugOrId);
+  }
+
+  const { data: fallbackData } = await fallbackQuery.maybeSingle();
+  return fallbackData || null;
 };
 
 export async function generateMetadata({
   params
 }: {
-  params: { id?: string; slug?: string };
+  params: Promise<{ id?: string; slug?: string }>;
 }): Promise<Metadata> {
-  const slugOrId = params.slug || params.id || "";
+  const { id, slug } = await params;
+  const slugOrId = slug || id || "";
   if (!slugOrId) {
     return {
       title: "Product | Boliyan",
@@ -76,6 +90,7 @@ export async function generateMetadata({
   };
 }
 
-export default function ProductPage({ params }: { params: { id?: string; slug?: string } }) {
-  return <ProductPageClient params={params} />;
+export default async function ProductPage({ params }: { params: Promise<{ id?: string; slug?: string }> }) {
+  const resolvedParams = await params;
+  return <ProductPageClient params={resolvedParams} />;
 }

@@ -46,6 +46,7 @@ export interface Item {
   sellerId: string;
   seller?: User; // Embedded seller profile for UI & Logic
   contactPhone?: string;
+  contactWhatsapp?: string;
   askPrice: number;
   category: string;
   condition: 'new' | 'like_new' | 'used' | 'fair';
@@ -99,7 +100,8 @@ export interface Conversation {
   expiresAt?: string;
   sellerConfirmedAt?: string;
   buyerConfirmedAt?: string;
-  isSealed: boolean;
+  isSealed?: boolean;
+  shortCode?: string;
 }
 
 export interface Message {
