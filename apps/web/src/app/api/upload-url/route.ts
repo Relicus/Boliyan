@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     });
 
     const uploadUrl = await getSignedUrl(r2Client, command, { expiresIn: 600 });
-    const publicBase = process.env.NEXT_PUBLIC_R2_DOMAIN || "";
+    const publicBase = NEXT_PUBLIC_R2_DOMAIN || "";
 
     return NextResponse.json({
       uploadUrl,

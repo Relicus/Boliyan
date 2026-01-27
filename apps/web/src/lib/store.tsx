@@ -8,8 +8,6 @@ import { TimeProvider, useTime } from '@/context/TimeContext';
 import { useSearch, SearchProvider } from '@/context/SearchContext';
 import { useReviews, ReviewProvider } from '@/context/ReviewContext';
 import { ViewportProvider } from '@/context/ViewportContext';
-import { supabase } from '@/lib/supabase';
-import { transformBidToHydratedBid, transformListingToItem, type BidWithProfile, type ListingWithSeller } from '@/lib/transform';
 
 /* 
   LEGACY COMPATIBILITY LAYER
@@ -66,7 +64,7 @@ export function useApp() {
     const conversationId = await marketplace.acceptBid(bidId);
     if (!conversationId) return undefined;
     return conversationId;
-  }, [marketplace, chat]);
+  }, [marketplace]);
 
   type MarketplaceFilters = typeof marketplace.filters;
   type MarketplaceFilterKey = keyof MarketplaceFilters;

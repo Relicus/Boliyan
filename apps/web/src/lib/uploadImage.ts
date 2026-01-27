@@ -20,7 +20,6 @@ export async function uploadListingImage(file: File): Promise<string> {
 
   const payload = await response.json();
   const uploadUrl = payload?.uploadUrl as string | undefined;
-  const publicUrl = payload?.publicUrl as string | undefined;
   const objectKey = payload?.objectKey as string | undefined;
 
   if (!uploadUrl || !objectKey) {

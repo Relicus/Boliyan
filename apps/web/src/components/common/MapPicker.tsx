@@ -94,7 +94,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
            lastGeocodedCoords.current = [initialLocation.lat, initialLocation.lng];
        }
     }
-  }, [initialLocation]);
+  }, [initialLocation, center]);
   
   // Ref to prevent geocoding loop when location is manually set
   const skipGeocodeRef = useRef(false);

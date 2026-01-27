@@ -96,7 +96,8 @@ function InboxContent() {
     if (!selectedIdParam) return;
     if (resolvedSelectedId === selectedIdParam) return;
     if (conversations.some(c => c.id === selectedIdParam)) {
-      setSelectedId(selectedIdParam);
+      const timer = setTimeout(() => setSelectedId(selectedIdParam), 0);
+      return () => clearTimeout(timer);
     }
   }, [conversations, resolvedSelectedId, selectedIdParam]);
   const handleTabChange = (value: string) => {

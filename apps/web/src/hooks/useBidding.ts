@@ -354,7 +354,7 @@ export function useBidding(item: Item, seller: User, onBidSuccess?: () => void) 
       setPendingConfirmation(null);
     }, 3000);
 
-  }, [bidAmount, clampBid, formatBoundMessage, maxBid, minBid, user, userBid, executeBid, pendingConfirmation, isSubmitting, cooldownRemaining, setTemporaryError, openAuthModal]);
+  }, [bidAmount, clampBid, formatBoundMessage, maxBid, minBid, user, userBid, executeBid, pendingConfirmation, isSubmitting, cooldownRemaining, setTemporaryError, openAuthModal, router]);
 
   const clearPendingConfirmation = useCallback(() => {
     if (confirmationTimeoutRef.current) {

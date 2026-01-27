@@ -267,7 +267,7 @@ function ListForm() {
             setIsWhatsappSameAsPhone(user.whatsapp === user.phone);
         }
     }
-  }, [editingItem, user, contactPhone, isDraftRestored]);
+  }, [editingItem, user, contactPhone, contactWhatsapp, isDraftRestored]);
 
   const isValidPhone = (value: string) => value.replace(/\D/g, "").length >= 10;
 

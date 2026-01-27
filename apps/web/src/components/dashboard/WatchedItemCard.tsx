@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { MapPin, Bookmark, Trash2, MessageSquare } from "lucide-react";
+import { Bookmark, Trash2, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Item, User, Bid } from "@/types";
 import ProductDetailsModal from "@/components/marketplace/ProductDetailsModal";
