@@ -141,6 +141,8 @@ CREATE TABLE messages (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+CREATE INDEX idx_messages_conversation_created_at ON messages(conversation_id, created_at);
+
 -- Auto-update conversation preview on new messages
 CREATE OR REPLACE FUNCTION handle_conversation_last_message()
 RETURNS TRIGGER AS $$
@@ -208,7 +210,7 @@ CREATE POLICY "Service can insert notifications"
 ON notifications FOR INSERT
 WITH CHECK (true);
 
-ALTER PUBLICATION supabase_realtime ADD TABLE notifications;
+ALTER PUBLICATION supabase_realtime ADD TABLE notifications, messages, conversations;
 
 -- Enforce notification pool per user (15 newest)
 CREATE OR REPLACE FUNCTION enforce_notification_pool() RETURNS TRIGGER AS $$
