@@ -16,7 +16,7 @@ import { createBiddingConfig } from "@/types/bidding";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 import { useApp } from "@/lib/store";
-import { getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessage, getFuzzyLocationString, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
 
 interface MyBidCardProps {
   item: Item;
@@ -48,6 +48,23 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
   const canChat = isAccepted && !!acceptedConversation;
   const listingPhone = item.contactPhone || seller.phone;
   const canCall = canChat && !!listingPhone;
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
+  const productSlug = item.slug || item.id;
+  const productUrl = productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl;
+  const rawCity = item.location?.city || (item.location?.address ? getFuzzyLocationString(item.location.address) : '');
+  const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
+  const mapUrl = getMapUrl(item.location);
+  const inAppUrl = 'https://boliyan.pk/inbox';
+  const waMessage = buildWhatsAppMessage({
+    role: 'buyer',
+    productName: item.title,
+    askPrice: item.askPrice,
+    bidPrice: userBid.amount,
+    city,
+    productUrl,
+    mapUrl,
+    inAppUrl
+  });
 
   const handleChat = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -167,8 +184,7 @@ export default function MyBidCard({ item, userBid, seller }: MyBidCardProps) {
                             onClick={(e) => {
                               e.stopPropagation();
                               if (!listingPhone) return;
-                              const msg = `Hi ${seller.name.split(' ')[0]}, you accepted my bid for "${item.title}" on Boliyan. Let's coordinate the pickup! ${window.location.origin}/product/${item.slug || item.id}`;
-                              window.open(getWhatsAppUrl(listingPhone, msg), '_blank');
+                              window.open(getWhatsAppUrl(listingPhone, waMessage), '_blank');
                             }}
                           >
                               <WhatsAppIcon className="w-3 h-3 mr-1" />

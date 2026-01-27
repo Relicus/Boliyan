@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { CardShell } from "@/components/common/CardShell";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
-import { calculatePrivacySafeDistance, formatCountdown, formatPrice, getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessage, calculatePrivacySafeDistance, formatCountdown, formatPrice, getFuzzyLocationString, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { TimerBadge } from "@/components/common/TimerBadge";
 import { DistanceBadge } from "@/components/common/DistanceBadge";
@@ -31,6 +31,13 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   const goLiveAt = item.goLiveAt ? new Date(item.goLiveAt).getTime() : null;
   const isPendingGoLive = goLiveAt !== null && now < goLiveAt;
   const goLiveCountdown = isPendingGoLive && goLiveAt ? formatCountdown(goLiveAt, now) : null;
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
+  const productSlug = item.slug || item.id;
+  const productUrl = productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl;
+  const rawCity = item.location?.city || (item.location?.address ? getFuzzyLocationString(item.location.address) : '');
+  const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
+  const mapUrl = getMapUrl(item.location);
+  const inAppUrl = 'https://boliyan.pk/dashboard?tab=offers';
 
   // Sort offers: highest amount first, then by closest distance
   const sortedOffers = useMemo(() => {
@@ -208,8 +215,17 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 )}
                  onClick={() => {
                    if (!bidder.phone) return;
-                   const msg = `Hi ${bidder.name.split(' ')[0]}, I've accepted your bid for "${item.title}" on Boliyan. When can we meet? ${window.location.origin}/product/${item.slug || item.id}`;
-                   window.open(getWhatsAppUrl(bidder.phone!, msg), '_blank');
+                   const waMessage = buildWhatsAppMessage({
+                     role: 'seller',
+                     productName: item.title,
+                     askPrice: item.askPrice,
+                     bidPrice: bid.amount,
+                     city,
+                     productUrl,
+                     mapUrl,
+                     inAppUrl
+                   });
+                   window.open(getWhatsAppUrl(bidder.phone!, waMessage), '_blank');
                  }}
                  title="WhatsApp"
               >

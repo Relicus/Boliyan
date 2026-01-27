@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn, formatPrice, getWhatsAppUrl } from '@/lib/utils';
+import { buildWhatsAppMessage, cn, formatPrice, getFuzzyLocationString, getMapUrl, getWhatsAppUrl } from '@/lib/utils';
 import { Conversation } from '@/types';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { WhatsAppIcon } from '@/components/common/WhatsAppIcon';
@@ -108,6 +108,24 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     ? bids.find(b => b.itemId === conversation.itemId && b.bidderId === conversation.bidderId)
     : undefined;
   const offerPrice = offerBid?.amount ?? item?.currentHighBid;
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
+  const productSlug = item?.slug || item?.id;
+  const productUrl = productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl;
+  const locationAddress = item?.location?.address;
+  const rawCity = item?.location?.city || (locationAddress ? getFuzzyLocationString(locationAddress) : '');
+  const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
+  const mapUrl = getMapUrl(item?.location);
+  const inAppUrl = isSeller ? 'https://boliyan.pk/dashboard?tab=offers' : 'https://boliyan.pk/inbox';
+  const waMessage = buildWhatsAppMessage({
+    role: isSeller ? 'seller' : 'buyer',
+    productName: item?.title,
+    askPrice: item?.askPrice,
+    bidPrice: typeof offerPrice === 'number' ? offerPrice : null,
+    city,
+    productUrl,
+    mapUrl,
+    inAppUrl
+  });
   const priceBlock = item ? (
     <div className="flex flex-col items-end shrink-0">
       <span className="price-font text-[clamp(0.55rem,1.8vw,0.7rem)] font-black text-slate-400 tracking-[0.2em] uppercase leading-none mb-1">
@@ -365,7 +383,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                {(() => {
                   const listingPhone = !isSeller ? item?.contactPhone : undefined;
                   const phone = listingPhone || otherUser?.phone;
-                  const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
+                   const waMessageText = waMessage;
                   if (!phone && isSealed) return null;
 
                   return (
@@ -382,7 +400,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                             : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
                         )}
                         onClick={() => {
-                          if (phone) window.open(getWhatsAppUrl(phone, waMessage), '_blank');
+                           if (phone) window.open(getWhatsAppUrl(phone, waMessageText), '_blank');
                         }}
                       >
                         <WhatsAppIcon className="h-4 w-4 mr-1.5" />
@@ -463,7 +481,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                   const listingPhone = !isSeller ? item?.contactPhone : undefined;
                   const phone = listingPhone || otherUser?.phone;
 
-                  const waMessage = `Hi ${otherUser?.name?.split(' ')[0] || ''}, I'm interested in "${item?.title || 'this item'}" on Boliyan. Let's coordinate! ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
+                   const waMessageText = waMessage;
 
                   return (
                     <>
@@ -479,7 +497,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                             : "opacity-30 grayscale cursor-not-allowed bg-slate-50/50"
                         )}
                         onClick={() => {
-                          if (phone) window.open(getWhatsAppUrl(phone, waMessage), '_blank');
+                           if (phone) window.open(getWhatsAppUrl(phone, waMessageText), '_blank');
                         }}
                       >
                         <WhatsAppIcon className="h-3.5 w-3.5 mr-1" />

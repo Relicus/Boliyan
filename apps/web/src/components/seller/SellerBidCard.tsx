@@ -5,7 +5,7 @@ import { Bid, User } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { MapPin, MessageSquare, Star, Check, X } from "lucide-react";
-import { calculatePrivacySafeDistance, getFuzzyLocationString, formatPrice, getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessage, calculatePrivacySafeDistance, getFuzzyLocationString, formatPrice, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,23 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const router = useRouter();
   
   const item = itemsById[bid.itemId];
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
+  const productSlug = item?.slug || item?.id || bid.itemId;
+  const productUrl = productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl;
+  const rawCity = item?.location?.city || (item?.location?.address ? getFuzzyLocationString(item.location.address) : '');
+  const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
+  const mapUrl = getMapUrl(item?.location);
+  const inAppUrl = 'https://boliyan.pk/dashboard?tab=offers';
+  const waMessage = buildWhatsAppMessage({
+    role: 'seller',
+    productName: item?.title,
+    askPrice: item?.askPrice,
+    bidPrice: bid.amount,
+    city,
+    productUrl,
+    mapUrl,
+    inAppUrl
+  });
   // Stable derived values based on bidder profile
   const { distance, duration, isOutside } = useMemo(() => {
     return calculatePrivacySafeDistance(user?.location, bidder.location);
@@ -154,8 +171,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                 onClick={(e) => {
                   e.stopPropagation();
                   if (!bidder.phone) return;
-                  const msg = `Hi ${bidder.name.split(' ')[0]}, I've accepted your bid for "${item?.title || 'item'}" on Boliyan. When can we meet? ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
-                  window.open(getWhatsAppUrl(bidder.phone, msg), '_blank');
+                  window.open(getWhatsAppUrl(bidder.phone, waMessage), '_blank');
                 }} 
               >
                 <WhatsAppIcon className="h-4 w-4 mr-2" />
@@ -250,8 +266,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!bidder.phone) return;
-                        const msg = `Hi ${bidder.name.split(' ')[0]}, I've accepted your bid for "${item?.title || 'item'}" on Boliyan. When can we meet? ${window.location.origin}/product/${item?.slug || item?.id || ''}`;
-                        window.open(getWhatsAppUrl(bidder.phone, msg), '_blank');
+                        window.open(getWhatsAppUrl(bidder.phone, waMessage), '_blank');
                       }} 
                       size="sm" 
                     >

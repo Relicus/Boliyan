@@ -203,8 +203,85 @@ export function getWhatsAppUrl(phone: string, text: string): string {
   if (finalPhone.startsWith("03") && finalPhone.length === 11) {
     finalPhone = "92" + finalPhone.substring(1);
   }
-  
-  return `https://wa.me/${finalPhone}?text=${encodeURIComponent(text)}`;
+
+  const lines = text.split(/\r?\n/);
+  const encodedText = lines.map(encodeURIComponent).join('%0a');
+  const isDesktop = typeof navigator !== 'undefined' && !/Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+  const baseUrl = isDesktop ? 'https://web.whatsapp.com/send' : 'whatsapp://send';
+  return `${baseUrl}?phone=${finalPhone}&text=${encodedText}`;
+}
+
+type WhatsAppMessageRole = 'buyer' | 'seller';
+
+interface WhatsAppMessageOptions {
+  role: WhatsAppMessageRole;
+  productName?: string;
+  askPrice?: number | null;
+  bidPrice?: number | null;
+  city?: string;
+  productUrl?: string;
+  mapUrl?: string;
+  inAppUrl: string;
+}
+
+export function buildWhatsAppMessage({
+  role,
+  productName,
+  askPrice,
+  bidPrice,
+  city,
+  productUrl,
+  mapUrl,
+  inAppUrl
+}: WhatsAppMessageOptions): string {
+  const safeName = productName?.trim() || 'Item';
+  const safeAsk = typeof askPrice === 'number' ? formatPrice(askPrice) : 'N/A';
+  const safeBid = typeof bidPrice === 'number' ? formatPrice(bidPrice) : 'N/A';
+  const safeCity = city?.trim();
+  const safeProductUrl = productUrl?.trim() || 'https://boliyan.pk';
+  const safeMapUrl = mapUrl?.trim();
+
+  const title = role === 'seller' ? 'Deal Follow-Up' : 'Item Inquiry';
+  const bidLabel = role === 'seller' ? 'Your Bid' : 'My Bid';
+  const closeLine = role === 'seller' ? 'Ready to proceed?' : "Let's finalize details.";
+
+  const lines = [
+    `*Boliyan • ${title}*`,
+    '',
+    `*Item:* ${safeName}`,
+    `*Ask:* ${safeAsk}`,
+    `*${bidLabel}:* ${safeBid}`,
+    safeCity ? `*City:* ${safeCity}` : null,
+    '',
+    `_${closeLine}_`,
+    '',
+    'Product:',
+    safeProductUrl,
+    safeMapUrl ? '' : null,
+    safeMapUrl ? 'Location:' : null,
+    safeMapUrl ? safeMapUrl : null,
+    '',
+    role === 'seller' ? 'Offers:' : 'Inbox:',
+    inAppUrl
+  ];
+
+  return lines.filter((line) => line !== undefined && line !== null).join('\n');
+}
+
+export function getMapUrl(location?: {
+  lat?: number;
+  lng?: number;
+  address?: string;
+}): string | undefined {
+  if (!location) return undefined;
+  const { lat, lng, address } = location;
+  if (typeof lat === 'number' && typeof lng === 'number') {
+    return `https://www.google.com/maps?q=${lat},${lng}`;
+  }
+  if (address?.trim()) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  }
+  return undefined;
 }
 
 /**
