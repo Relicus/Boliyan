@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "pub-dffb7782d4344c16b7dbd3e485e5f3a2.r2.dev",
       },
+      {
+        protocol: "https",
+        hostname: "boliyan-listings.8e7ce4e70585cc080469d856ec2b1c5e.r2.cloudflarestorage.com",
+      },
     ],
   },
   webpack: (config, { dev }) => {
