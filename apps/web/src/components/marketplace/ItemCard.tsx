@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import React, { useState, useMemo, useEffect, memo } from "react";
+import { motion, animate } from "framer-motion";
+import React, { useState, useMemo, useEffect, memo, useCallback } from "react";
 import { Item, User } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Lock, Bookmark } from "lucide-react";
@@ -50,6 +50,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const cardRef = React.useRef<HTMLDivElement | null>(null);
   const mainImage = item.images[0];
   const thumbnailImages = item.images.slice(1, 4);
 
@@ -86,6 +87,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   // Watch for outbid events (only if user has an existing bid)
   // Logic: Only trigger if the high bid CHANGED to something higher than before
   const prevHighBid = React.useRef(item.currentHighBid);
+  const prevNudgeBid = React.useRef(item.currentHighBid);
+
+  const setCardRef = useCallback((node: HTMLDivElement | null) => {
+    visibilityRef.current = node;
+    cardRef.current = node;
+  }, [visibilityRef]);
 
   useEffect(() => {
     if (!user || !item.isPublicBid) return;
@@ -112,6 +119,25 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     // Always keep ref in sync with latest value to detect future changes
     prevHighBid.current = item.currentHighBid;
   }, [item, user, bids]);
+
+  useEffect(() => {
+    if (prevNudgeBid.current === item.currentHighBid) return;
+    if (item.currentHighBid === null || item.currentHighBid === undefined) {
+      prevNudgeBid.current = item.currentHighBid;
+      return;
+    }
+
+    const node = cardRef.current;
+    if (node) {
+      animate(
+        node,
+        { filter: ["brightness(1)", "brightness(1.04)", "brightness(1)"] },
+        { duration: 0.42, ease: "easeOut" }
+      );
+    }
+
+    prevNudgeBid.current = item.currentHighBid;
+  }, [item.currentHighBid]);
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, isOutside } = useMemo(() => {
@@ -156,7 +182,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   return (
     <>
       <motion.div
-        ref={visibilityRef}
+        ref={setCardRef}
         id={`item-card-${item.id}`}
 
         initial={false}

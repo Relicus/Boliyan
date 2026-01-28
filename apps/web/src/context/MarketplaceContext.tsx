@@ -115,6 +115,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const [lastBidTimestamp, setLastBidTimestamp] = useState<number | null>(null);
   const loadingLockRef = React.useRef(false);
   const ITEMS_PER_PAGE = 8;
+  const NEWEST_CACHE_TTL_MS = 90_000;
 
   const [filters, setFilters] = useState<MarketplaceFilters>({
     category: null,
@@ -196,7 +197,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
       // --- 1. CHECK CACHE (L1/L2) ---
       if (reset) {
-          const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey);
+          const cacheOptions = filters.sortBy === 'newest' ? { ttl: NEWEST_CACHE_TTL_MS } : undefined;
+          const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey, cacheOptions);
           
           if (cachedItems) {
               setItemsById(prev => upsertEntities(prev, cachedItems));
