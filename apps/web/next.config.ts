@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  /* Fix monorepo build tracing - must match turbopack.root */
+  outputFileTracingRoot: path.join(__dirname, "../../"),
   /* Fix monorepo module resolution for Turbopack */
   turbopack: {
-    root: __dirname,
+    root: path.join(__dirname, "../../"),
   },
   /* Allow cross-origin requests from local network devices */
   allowedDevOrigins: [
