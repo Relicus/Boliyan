@@ -33,9 +33,9 @@ export default function BottomNav() {
       href: "/",
     },
     {
-      label: "Dash",
-      icon: LayoutDashboard,
-      href: "/dashboard?tab=offers",
+      label: "Analytics",
+      icon: BarChart3,
+      href: "/dashboard/seller",
     },
     {
       label: "Sell",
@@ -48,9 +48,9 @@ export default function BottomNav() {
       href: "/inbox",
     },
     {
-      label: "Analytics",
-      icon: BarChart3,
-      href: "/dashboard/seller",
+      label: "Dash",
+      icon: LayoutDashboard,
+      href: "/dashboard?tab=offers",
     },
   ];
 

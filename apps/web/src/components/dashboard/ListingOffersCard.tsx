@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { CardShell } from "@/components/common/CardShell";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
-import { buildWhatsAppMessage, calculatePrivacySafeDistance, formatCountdown, formatPrice, getFuzzyLocationString, getListingShortCode, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessageForDeal, calculatePrivacySafeDistance, formatCountdown, formatPrice, getFuzzyLocationString, getWhatsAppUrl, cn } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { TimerBadge } from "@/components/common/TimerBadge";
 import { DistanceBadge } from "@/components/common/DistanceBadge";
@@ -31,13 +31,6 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   const goLiveAt = item.goLiveAt ? new Date(item.goLiveAt).getTime() : null;
   const isPendingGoLive = goLiveAt !== null && now < goLiveAt;
   const goLiveCountdown = isPendingGoLive && goLiveAt ? formatCountdown(goLiveAt, now) : null;
-  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
-  const productSlug = item.slug || item.id;
-  const shortCode = getListingShortCode(item.slug);
-  const productUrl = shortCode ? `${siteUrl}/p/${shortCode}` : (productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl);
-  const rawCity = item.location?.city || (item.location?.address ? getFuzzyLocationString(item.location.address) : '');
-  const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
-  const mapUrl = getMapUrl(item.location);
 
   // Sort offers: highest amount first, then by closest distance
   const sortedOffers = useMemo(() => {
@@ -215,17 +208,12 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 )}
                  onClick={() => {
                    if (!bidder.phone) return;
-                    const conversation = conversations.find(c => c.itemId === item.id && c.bidderId === bidder.id);
-                    const chatShortLink = conversation?.shortCode ? `${siteUrl}/i/${conversation.shortCode}` : (conversation?.id ? `${siteUrl}/i/${conversation.id}` : undefined);
-                    const waMessage = buildWhatsAppMessage({
-                      role: 'seller',
-                      productName: item.title,
-                      askPrice: item.askPrice,
-                      bidPrice: bid.amount,
-                      city,
-                      productUrl,
-                      mapUrl,
-                      chatUrl: chatShortLink
+                    const waMessage = buildWhatsAppMessageForDeal({
+                      item,
+                      bidAmount: bid.amount,
+                      myRole: 'seller',
+                      myLocation: myLocation || undefined,
+                      otherUserLocation: bidder.location
                     });
                    window.open(getWhatsAppUrl(bidder.whatsapp || bidder.phone!, waMessage), '_blank');
                  }}

@@ -91,7 +91,9 @@ function DashboardContent() {
 
 
 
-  const myBids = bids.filter(b => b.bidderId === user?.id);
+  const myBids = bids
+    .filter(b => b.bidderId === user?.id)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   
   // Offers received on MY listings (I'm the seller) - grouped by listing
   const listingsWithOffers = myItems

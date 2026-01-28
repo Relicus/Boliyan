@@ -5,7 +5,7 @@ import { Bid, User } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { MapPin, MessageSquare, Star, Check, X } from "lucide-react";
-import { buildWhatsAppMessage, calculatePrivacySafeDistance, getFuzzyLocationString, formatPrice, getListingShortCode, getMapUrl, getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessageForDeal, calculatePrivacySafeDistance, getFuzzyLocationString, formatPrice, getWhatsAppUrl, cn } from "@/lib/utils";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
 import { useRouter } from "next/navigation";
@@ -24,35 +24,26 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const router = useRouter();
   
   const item = itemsById[bid.itemId];
-  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
-  const productSlug = item?.slug || item?.id || bid.itemId;
-  const shortCode = getListingShortCode(item?.slug);
-  const productUrl = shortCode ? `${siteUrl}/p/${shortCode}` : (productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl);
-  const rawCity = item?.location?.city || (item?.location?.address ? getFuzzyLocationString(item.location.address) : '');
-  const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
-  const mapUrl = getMapUrl(item?.location);
   const conversation = conversations.find(c => 
     c.itemId === bid.itemId && 
     ((c.sellerId === user?.id && c.bidderId === bidder.id) || 
      (c.bidderId === user?.id && c.sellerId === bidder.id))
   );
-  const chatShortLink = conversation?.shortCode ? `${siteUrl}/i/${conversation.shortCode}` : (conversation?.id ? `${siteUrl}/i/${conversation.id}` : undefined);
-  const waMessage = buildWhatsAppMessage({
-    role: 'seller',
-    productName: item?.title,
-    askPrice: item?.askPrice,
-    bidPrice: bid.amount,
-    city,
-    productUrl,
-    mapUrl,
-    chatUrl: chatShortLink
-  });
+  
   // Stable derived values based on bidder profile
   const { distance, duration, isOutside } = useMemo(() => {
     return calculatePrivacySafeDistance(user?.location, bidder.location);
   }, [user?.location, bidder.location]);
 
   const location = useMemo(() => getFuzzyLocationString(bidder.location.address), [bidder.location.address]);
+
+  const waMessage = buildWhatsAppMessageForDeal({
+    item,
+    bidAmount: bid.amount,
+    myRole: 'seller',
+    myLocation: user?.location,
+    otherUserLocation: bidder.location
+  });
 
   // Calculate time remaining
   const expiresAt = useMemo(() => 

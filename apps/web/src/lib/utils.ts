@@ -220,27 +220,30 @@ interface WhatsAppMessageOptions {
   bidPrice?: number | null;
   city?: string;
   productUrl?: string;
-  mapUrl?: string;
-  chatUrl?: string;
+  distance?: number | null;
+  duration?: number | null;
 }
 
-export function buildWhatsAppMessage({
+function buildWhatsAppMessage({
   role,
   productName,
   askPrice,
   bidPrice,
   city,
   productUrl,
-  mapUrl,
-  chatUrl
+  distance,
+  duration
 }: WhatsAppMessageOptions): string {
   const safeName = productName?.trim() || 'Item';
   const safeAsk = typeof askPrice === 'number' ? formatPrice(askPrice) : 'N/A';
   const safeBid = typeof bidPrice === 'number' ? formatPrice(bidPrice) : 'N/A';
   const safeCity = city?.trim();
   const safeProductUrl = productUrl?.trim() || 'https://boliyan.pk';
-  const safeMapUrl = mapUrl?.trim();
-  const safeChatUrl = chatUrl?.trim();
+  
+  // Only show location if we have valid distance data and it's not "far" (>100km)
+  const isFar = typeof distance === 'number' && distance > 100;
+  const hasLocation = typeof distance === 'number' && distance > 0 && typeof duration === 'number' && !isFar;
+  const locationText = hasLocation ? `~${distance}km • ${duration}min` : null;
 
   const title = role === 'seller' ? 'Deal Follow-Up' : 'Item Inquiry';
   const bidLabel = role === 'seller' ? 'Your Bid' : 'My Bid';
@@ -253,21 +256,73 @@ export function buildWhatsAppMessage({
     `*Ask:* ${safeAsk}`,
     `*${bidLabel}:* ${safeBid}`,
     safeCity ? `*City:* ${safeCity}` : null,
+    locationText,
     '',
     `_${closeLine}_`,
     '',
     'Product:',
     safeProductUrl,
-    safeMapUrl ? '' : null,
-    safeMapUrl ? 'Location:' : null,
-    safeMapUrl ? safeMapUrl : null,
-    safeChatUrl ? '' : null,
-    safeChatUrl ? 'Chat:' : null,
-    safeChatUrl ? safeChatUrl : null,
     ''
   ];
 
   return lines.filter((line) => line !== undefined && line !== null).join('\n');
+}
+
+/**
+ * Centralized WhatsApp message builder for deals.
+ * Takes core entities and handles all data extraction internally.
+ */
+interface WhatsAppDealOptions {
+  item?: {
+    id?: string;
+    slug?: string;
+    title?: string;
+    askPrice?: number;
+    location?: {
+      city?: string;
+      address?: string;
+      lat?: number;
+      lng?: number;
+    };
+  };
+  bidAmount?: number | null;
+  myRole: 'buyer' | 'seller';
+  myLocation?: { lat: number; lng: number; address?: string };
+  otherUserLocation?: { lat: number; lng: number; address?: string };
+}
+
+export function buildWhatsAppMessageForDeal({
+  item,
+  bidAmount,
+  myRole,
+  myLocation,
+  otherUserLocation
+}: WhatsAppDealOptions): string {
+  // Build product URL
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://boliyan.pk';
+  const shortCode = getListingShortCode(item?.slug);
+  const productSlug = item?.slug || item?.id;
+  const productUrl = shortCode 
+    ? `${siteUrl}/p/${shortCode}` 
+    : (productSlug ? `${siteUrl}/product/${productSlug}` : siteUrl);
+
+  // Extract city
+  const rawCity = item?.location?.city || (item?.location?.address ? getFuzzyLocationString(item.location.address) : '');
+  const city = rawCity && rawCity !== 'Unknown Location' ? rawCity : undefined;
+
+  // Calculate distance between parties
+  const { distance, duration, isOutside } = calculatePrivacySafeDistance(myLocation, otherUserLocation);
+
+  return buildWhatsAppMessage({
+    role: myRole,
+    productName: item?.title,
+    askPrice: item?.askPrice,
+    bidPrice: bidAmount,
+    city,
+    productUrl,
+    distance: isOutside ? null : distance,
+    duration: isOutside ? null : duration
+  });
 }
 
 export function getMapUrl(location?: {

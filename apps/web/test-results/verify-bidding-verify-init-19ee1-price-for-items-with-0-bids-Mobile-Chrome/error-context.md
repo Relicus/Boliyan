@@ -16,883 +16,178 @@
       - generic [ref=e21]:
         - button "Notifications" [ref=e23]:
           - img
-          - generic [ref=e27]: Notifications
-        - img [ref=e29] [cursor=pointer]
-  - main [ref=e31]:
-    - generic [ref=e34]:
-      - generic [ref=e38]:
-        - generic [ref=e39]:
-          - combobox [ref=e40]:
+          - generic [ref=e24]: Notifications
+        - img [ref=e26] [cursor=pointer]
+  - main [ref=e28]:
+    - generic [ref=e31]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - combobox [ref=e37]:
             - img
-            - generic [ref=e41]: Trending
-          - combobox [ref=e42]:
+            - generic [ref=e38]: Trending
+          - combobox [ref=e39]:
             - img
-            - generic [ref=e43]: Categories
-          - combobox [ref=e44]:
+            - generic [ref=e40]: Categories
+          - combobox [ref=e41]:
             - img
-            - generic [ref=e45]: Type
-          - button "View" [ref=e46]:
+            - generic [ref=e42]: Type
+          - button "View" [ref=e43]:
             - img
-            - generic [ref=e47]: View
-        - generic [ref=e48]:
-          - button "Islamabad" [ref=e51]:
-            - generic [ref=e52]:
+            - generic [ref=e44]: View
+        - generic [ref=e45]:
+          - button "Islamabad" [ref=e48]:
+            - generic [ref=e49]:
               - img
-            - generic [ref=e53]: Islamabad
-          - button "Price" [ref=e55]:
-            - generic [ref=e56]:
+            - generic [ref=e50]: Islamabad
+          - button "Price" [ref=e52]:
+            - generic [ref=e53]:
               - img
-            - generic [ref=e57]: Price
-      - generic [ref=e58]:
-        - generic [ref=e62]:
-          - generic [ref=e63] [cursor=pointer]:
-            - img "Richard RM 123456 main image" [ref=e65]
-            - generic [ref=e66]:
-              - generic [ref=e67]:
-                - img [ref=e68]
-                - generic [ref=e71]: Unknown
-              - button "Fashion" [ref=e72]:
-                - img [ref=e73]
-                - generic [ref=e75]: Fashion
-            - generic [ref=e76]:
-              - generic [ref=e77]:
-                - img [ref=e78]
-                - generic [ref=e81]: 29d 13h
-              - generic [ref=e83]: 🔨 Fair
-            - button [ref=e85]:
-              - img [ref=e86]
-          - generic [ref=e88]:
-            - heading "Richard RM 123456" [level=3] [ref=e90] [cursor=pointer]
-            - generic [ref=e91]:
-              - generic [ref=e92]:
-                - generic [ref=e94]:
-                  - img [ref=e95]
+            - generic [ref=e54]: Price
+      - generic [ref=e55]:
+        - generic [ref=e59]:
+          - generic [ref=e60] [cursor=pointer]:
+            - img "Test Item Camera main image" [ref=e62]
+            - generic [ref=e63]:
+              - generic [ref=e64]:
+                - img [ref=e65]
+                - generic [ref=e68]: Karachi
+              - button "Cameras" [ref=e69]:
+                - img [ref=e70]
+                - generic [ref=e73]: Cameras
+            - generic [ref=e74]:
+              - generic [ref=e75]:
+                - img [ref=e76]
+                - generic [ref=e79]: 29d 23h
+              - generic [ref=e81]: 👌 Used
+            - generic [ref=e83]:
+              - img [ref=e84]
+              - generic [ref=e87]: Far
+            - button [ref=e89]:
+              - img [ref=e90]
+          - generic [ref=e92]:
+            - heading "Test Item Camera" [level=3] [ref=e94] [cursor=pointer]
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - generic [ref=e98]:
+                  - img [ref=e99]
                   - text: Asking
-                - generic [ref=e99]: 4,998
-              - generic [ref=e100]:
-                - generic [ref=e102]:
-                  - img [ref=e103]
+                - generic [ref=e103]: 13,100
+              - generic [ref=e104]:
+                - generic [ref=e106]:
+                  - img [ref=e107]
                   - text: Highest
-                - generic [ref=e109]:
-                  - generic [ref=e110]: (6)
-                  - generic [ref=e112]: 6,260
-            - generic [ref=e114]:
-              - generic [ref=e115]:
-                - generic:
-                  - button [disabled]:
-                    - img
+                - generic [ref=e113]:
+                  - generic [ref=e114]: (5)
+                  - generic [ref=e116]: 12,000
+            - generic [ref=e118]:
+              - generic [ref=e120]:
+                - button [ref=e121]:
+                  - img [ref=e122]
+                - generic [ref=e123]:
+                  - textbox [ref=e124]: 13,100
                   - generic:
-                    - textbox [disabled]: 6,360
-                    - generic:
-                      - generic: 6,360
-                  - button [disabled]:
-                    - img
-              - button "Out of Bids" [disabled] [ref=e116]:
-                - generic [ref=e118]:
-                  - img [ref=e119]
-                  - text: Out of Bids
-        - generic [ref=e124]:
-          - generic [ref=e125] [cursor=pointer]:
-            - img "Camping Tent (4 Person) main image" [ref=e127]
-            - generic [ref=e128]:
-              - generic [ref=e129]:
-                - img [ref=e130]
-                - generic [ref=e133]: Karachi
-              - button "Sports" [ref=e134]:
-                - img [ref=e135]
-                - generic [ref=e141]: Sports
-            - generic [ref=e142]:
-              - generic [ref=e143]:
-                - img [ref=e144]
-                - generic [ref=e147]: 29d 13h
-              - generic [ref=e149]: 👌 Used
-            - generic [ref=e151]:
-              - img [ref=e152]
-              - generic [ref=e155]: Far
-            - generic [ref=e156]:
-              - button [ref=e157]:
-                - img [ref=e158]
-              - img [ref=e161]
-          - generic [ref=e164]:
-            - heading "Camping Tent (4 Person)" [level=3] [ref=e166] [cursor=pointer]
-            - generic [ref=e167]:
-              - generic [ref=e168]:
-                - generic [ref=e170]:
-                  - img [ref=e171]
-                  - text: Asking
-                - generic [ref=e175]: 9,000
-              - generic [ref=e176]:
-                - generic [ref=e178]:
-                  - img [ref=e179]
-                  - text: Hidden
-                - generic [ref=e184]: 9,000
+                    - generic: 13,100
+                - button [ref=e125]:
+                  - img [ref=e126]
+              - button "Place Bid" [ref=e128]:
+                - generic [ref=e130]:
+                  - img [ref=e131]
+                  - text: Place Bid
+        - generic [ref=e148]:
+          - generic [ref=e149] [cursor=pointer]:
+            - img "Persian Rug main image" [ref=e151]
+            - generic [ref=e152]:
+              - generic [ref=e153]:
+                - img [ref=e154]
+                - generic [ref=e157]: Lahore
+              - button "Home" [ref=e158]:
+                - img [ref=e159]
+                - generic [ref=e164]: Home
+            - generic [ref=e165]:
+              - generic [ref=e166]:
+                - img [ref=e167]
+                - generic [ref=e170]: 29d 23h
+              - generic [ref=e172]: 👌 Used
+            - generic [ref=e174]:
+              - img [ref=e175]
+              - generic [ref=e178]: Far
+            - button [ref=e180]:
+              - img [ref=e181]
+          - generic [ref=e183]:
+            - heading "Persian Rug" [level=3] [ref=e185] [cursor=pointer]
             - generic [ref=e186]:
-              - generic [ref=e188]:
-                - button [ref=e189]:
+              - generic [ref=e187]:
+                - generic [ref=e189]:
                   - img [ref=e190]
-                - generic [ref=e191]:
-                  - textbox [ref=e192]: 9,100
-                  - generic:
-                    - generic: 9,100
-                - button [ref=e193]:
-                  - img [ref=e194]
-              - button "Update Bid" [ref=e196]:
-                - generic [ref=e198]:
-                  - img [ref=e199]
-                  - text: Update Bid
-        - generic [ref=e215]:
-          - generic [ref=e216] [cursor=pointer]:
-            - img "My Cloud main image" [ref=e218]
-            - generic [ref=e219]:
-              - generic [ref=e220]:
-                - img [ref=e221]
-                - generic [ref=e224]: Islamabad
-              - button "Appliances" [ref=e225]:
-                - img [ref=e226]
-                - generic [ref=e229]: Appliances
-            - generic [ref=e230]:
-              - generic [ref=e231]:
-                - img [ref=e232]
-                - generic [ref=e235]: 29d 13h
-              - generic [ref=e237]: 👌 Used
-            - generic [ref=e239]:
-              - img [ref=e240]
-              - generic [ref=e243]: 6.6km • 17min
-            - button [ref=e245]:
-              - img [ref=e246]
-          - generic [ref=e248]:
-            - heading "My Cloud" [level=3] [ref=e250] [cursor=pointer]
-            - generic [ref=e251]:
-              - generic [ref=e252]:
-                - generic [ref=e254]:
-                  - img [ref=e255]
                   - text: Asking
-                - generic [ref=e259]: 50,000
-              - generic [ref=e260]:
-                - generic [ref=e262]:
-                  - img [ref=e263]
+                - generic [ref=e194]: 25,000
+              - generic [ref=e195]:
+                - generic [ref=e197]:
+                  - img [ref=e198]
                   - text: Highest
-                - generic [ref=e269]:
-                  - generic [ref=e270]: (1)
-                  - generic [ref=e272]: 55,000
-            - generic [ref=e274]:
-              - generic [ref=e275]:
-                - generic:
-                  - button:
-                    - img
+                - generic [ref=e205]: Be first!
+            - generic [ref=e207]:
+              - generic [ref=e209]:
+                - button [ref=e210]:
+                  - img [ref=e211]
+                - generic [ref=e212]:
+                  - textbox [ref=e213]: 25,000
                   - generic:
-                    - textbox: 55,000
-                    - generic:
-                      - generic: 55,000
-                  - button:
-                    - img
-              - button "Edit Listing" [ref=e276]:
-                - generic [ref=e278]:
-                  - img [ref=e279]
-                  - text: Edit Listing
-        - generic [ref=e285]:
-          - generic [ref=e286] [cursor=pointer]:
-            - img "Acoustic Guitar - Yamaha F310 main image" [ref=e288]
-            - generic [ref=e289]:
-              - generic [ref=e290]:
-                - img [ref=e291]
-                - generic [ref=e294]: Karachi
-              - button "Hobbies" [ref=e295]:
-                - img [ref=e296]
-                - generic [ref=e298]: Hobbies
-            - generic [ref=e299]:
-              - generic [ref=e300]:
-                - img [ref=e301]
-                - generic [ref=e304]: 29d 13h
-              - generic [ref=e306]: 👌 Used
-            - generic [ref=e308]:
-              - img [ref=e309]
-              - generic [ref=e312]: Far
-            - button [ref=e314]:
-              - img [ref=e315]
-          - generic [ref=e317]:
-            - heading "Acoustic Guitar - Yamaha F310" [level=3] [ref=e319] [cursor=pointer]
-            - generic [ref=e320]:
-              - generic [ref=e321]:
-                - generic [ref=e323]:
-                  - img [ref=e324]
-                  - text: Asking
-                - generic [ref=e328]: 22,000
-              - generic [ref=e329]:
-                - generic [ref=e331]:
-                  - img [ref=e332]
-                  - text: Highest
-                - generic [ref=e338]:
-                  - generic [ref=e339]: (1)
-                  - generic [ref=e341]: 23,500
-            - generic [ref=e343]:
-              - generic [ref=e345]:
-                - button [ref=e346]:
-                  - img [ref=e347]
-                - generic [ref=e348]:
-                  - textbox [ref=e349]: 23,500
-                  - generic:
-                    - generic: 23,500
-                - button [ref=e350]:
-                  - img [ref=e351]
-              - button "Place Bid" [ref=e353]:
-                - generic [ref=e355]:
-                  - img [ref=e356]
+                    - generic: 25,000
+                - button [ref=e214]:
+                  - img [ref=e215]
+              - button "Place Bid" [ref=e217]:
+                - generic [ref=e219]:
+                  - img [ref=e220]
                   - text: Place Bid
-        - generic [ref=e373]:
-          - generic [ref=e374] [cursor=pointer]:
-            - img "Apple Watch Series 8 45mm main image" [ref=e376]
-            - generic [ref=e377]:
-              - generic [ref=e378]:
-                - img [ref=e379]
-                - generic [ref=e382]: Karachi
-              - button "Electronics" [ref=e383]:
-                - img [ref=e384]
-                - generic [ref=e386]: Electronics
-            - generic [ref=e387]:
-              - generic [ref=e388]:
-                - img [ref=e389]
-                - generic [ref=e392]: 29d 13h
-              - generic [ref=e394]: 👌 Used
-            - generic [ref=e396]:
-              - img [ref=e397]
-              - generic [ref=e400]: Far
-            - button [ref=e402]:
-              - img [ref=e403]
-          - generic [ref=e405]:
-            - heading "Apple Watch Series 8 45mm" [level=3] [ref=e407] [cursor=pointer]
-            - generic [ref=e408]:
-              - generic [ref=e409]:
-                - generic [ref=e411]:
-                  - img [ref=e412]
-                  - text: Asking
-                - generic [ref=e416]: 95,000
-              - generic [ref=e417]:
-                - generic [ref=e419]:
-                  - img [ref=e420]
-                  - text: Highest
-                - generic [ref=e426]:
-                  - generic [ref=e427]: (1)
-                  - generic [ref=e429]: 98,500
-            - generic [ref=e431]:
-              - generic [ref=e433]:
-                - button [ref=e434]:
-                  - img [ref=e435]
-                - generic [ref=e436]:
-                  - textbox [ref=e437]: 98,500
-                  - generic:
-                    - generic: 98,500
-                - button [ref=e438]:
-                  - img [ref=e439]
-              - button "Place Bid" [ref=e441]:
-                - generic [ref=e443]:
-                  - img [ref=e444]
-                  - text: Place Bid
-        - generic [ref=e458]:
-          - generic [ref=e461]:
-            - generic [ref=e462] [cursor=pointer]:
-              - img "KitchenAid Stand Mixer main image" [ref=e464]
-              - generic [ref=e465]:
-                - generic [ref=e466]:
-                  - img [ref=e467]
-                  - generic [ref=e470]: Karachi
-                - button "Appliances" [ref=e471]:
-                  - img [ref=e472]
-                  - generic [ref=e475]: Appliances
-              - generic [ref=e476]:
-                - generic [ref=e477]:
-                  - img [ref=e478]
-                  - generic [ref=e481]: 29d 13h
-                - generic [ref=e483]: 👌 Used
-              - generic [ref=e485]:
-                - img [ref=e486]
-                - generic [ref=e489]: Far
-              - button [ref=e491]:
-                - img [ref=e492]
-            - generic [ref=e494]:
-              - heading "KitchenAid Stand Mixer" [level=3] [ref=e496] [cursor=pointer]
-              - generic [ref=e497]:
-                - generic [ref=e498]:
-                  - generic [ref=e500]:
-                    - img [ref=e501]
-                    - text: Asking
-                  - generic [ref=e505]: 65,000
-                - generic [ref=e506]:
-                  - generic [ref=e508]:
-                    - img [ref=e509]
-                    - text: Highest
-                  - generic [ref=e515]:
-                    - generic [ref=e516]: (3)
-                    - generic [ref=e518]: 66,000
-              - generic [ref=e520]:
-                - generic [ref=e522]:
-                  - button [ref=e523]:
-                    - img [ref=e524]
-                  - generic [ref=e525]:
-                    - textbox [ref=e526]: 66,500
-                    - generic:
-                      - generic: 66,500
-                  - button [ref=e527]:
-                    - img [ref=e528]
-                - button "Update Bid" [ref=e530]:
-                  - generic [ref=e532]:
-                    - img [ref=e533]
-                    - text: Update Bid
-          - generic [ref=e548]:
-            - generic [ref=e549]:
-              - img "Ad Content" [ref=e550]
-              - generic [ref=e552]: Sponsored
-            - generic [ref=e553]:
-              - heading "Unlimited Entertainment" [level=3] [ref=e555]
-              - generic [ref=e556]:
-                - generic [ref=e557]:
-                  - generic [ref=e558]: Starting
-                  - generic [ref=e559]: Free Trial
-                - generic [ref=e560]:
-                  - generic [ref=e561]: Then
-                  - generic [ref=e562]: $9.99/mo
-              - generic [ref=e563]:
-                - generic [ref=e566]: Watch anytime, anywhere
-                - link "Learn More" [ref=e567] [cursor=pointer]:
-                  - /url: "#"
-                  - text: Learn More
-                  - img [ref=e568]
-        - generic [ref=e575]:
-          - generic [ref=e576] [cursor=pointer]:
-            - img "Test Condition Item 1769554437182 main image" [ref=e578]
-            - generic [ref=e579]:
-              - generic [ref=e580]:
-                - img [ref=e581]
-                - generic [ref=e584]: Islamabad
-              - button "Electronics" [ref=e585]:
-                - img [ref=e586]
-                - generic [ref=e588]: Electronics
-            - generic [ref=e589]:
-              - generic [ref=e590]:
-                - img [ref=e591]
-                - generic [ref=e594]: 29d 22h
-              - generic [ref=e596]: 🌟 New
-            - generic [ref=e598]:
-              - img [ref=e599]
-              - generic [ref=e602]: 0.2km • 1min
-            - button [ref=e604]:
-              - img [ref=e605]
-          - generic [ref=e607]:
-            - heading "Test Condition Item 1769554437182" [level=3] [ref=e609] [cursor=pointer]
-            - generic [ref=e610]:
-              - generic [ref=e611]:
-                - generic [ref=e613]:
-                  - img [ref=e614]
-                  - text: Asking
-                - generic [ref=e618]: 1,000
-              - generic [ref=e619]:
-                - generic [ref=e621]:
-                  - img [ref=e622]
-                  - text: Highest
-                - generic [ref=e629]: Be first!
-            - generic [ref=e631]:
-              - generic [ref=e632]:
-                - generic:
-                  - button:
-                    - img
-                  - generic:
-                    - textbox: 1,000
-                    - generic:
-                      - generic: 1,000
-                  - button:
-                    - img
-              - button "Edit Listing" [ref=e633]:
-                - generic [ref=e635]:
-                  - img [ref=e636]
-                  - text: Edit Listing
-        - generic [ref=e642]:
-          - generic [ref=e643] [cursor=pointer]:
-            - img "Eye Relaxer main image" [ref=e645]
-            - generic [ref=e646]:
-              - generic [ref=e647]:
-                - img [ref=e648]
-                - generic [ref=e651]: Islamabad
-              - button "Electronics" [ref=e652]:
-                - img [ref=e653]
-                - generic [ref=e655]: Electronics
-            - generic [ref=e656]:
-              - generic [ref=e657]:
-                - img [ref=e658]
-                - generic [ref=e661]: 29d 21h
-              - generic [ref=e663]: 👌 Used
-            - generic [ref=e665]:
-              - img [ref=e666]
-              - generic [ref=e669]: 23.4km • 59min
-            - button [ref=e671]:
-              - img [ref=e672]
-          - generic [ref=e674]:
-            - heading "Eye Relaxer" [level=3] [ref=e676] [cursor=pointer]
-            - generic [ref=e677]:
-              - generic [ref=e678]:
-                - generic [ref=e680]:
-                  - img [ref=e681]
-                  - text: Asking
-                - generic [ref=e685]: 7,900
-              - generic [ref=e686]:
-                - generic [ref=e688]:
-                  - img [ref=e689]
-                  - text: Highest
-                - generic [ref=e696]: Be first!
-            - generic [ref=e698]:
-              - generic [ref=e699]:
-                - generic:
-                  - button:
-                    - img
-                  - generic:
-                    - textbox: 7,900
-                    - generic:
-                      - generic: 7,900
-                  - button:
-                    - img
-              - button "Edit Listing" [ref=e700]:
-                - generic [ref=e702]:
-                  - img [ref=e703]
-                  - text: Edit Listing
-        - generic [ref=e709]:
-          - generic [ref=e710] [cursor=pointer]:
-            - img "Precast Concrete Barrier main image" [ref=e712]
-            - generic [ref=e713]:
-              - generic [ref=e714]:
-                - img [ref=e715]
-                - generic [ref=e718]: Islamabad
-              - button "Community" [ref=e719]:
-                - img [ref=e720]
-                - generic [ref=e725]: Community
-            - generic [ref=e726]:
-              - generic [ref=e727]:
-                - img [ref=e728]
-                - generic [ref=e731]: 29d 21h
-              - generic [ref=e733]: 👌 Used
-            - generic [ref=e735]:
-              - img [ref=e736]
-              - generic [ref=e739]: Far
-            - button [ref=e741]:
-              - img [ref=e742]
-          - generic [ref=e744]:
-            - heading "Precast Concrete Barrier" [level=3] [ref=e746] [cursor=pointer]
-            - generic [ref=e747]:
-              - generic [ref=e748]:
-                - generic [ref=e750]:
-                  - img [ref=e751]
-                  - text: Asking
-                - generic [ref=e755]: 20,000
-              - generic [ref=e756]:
-                - generic [ref=e758]:
-                  - img [ref=e759]
-                  - text: Highest
-                - generic [ref=e766]: Be first!
-            - generic [ref=e768]:
-              - generic [ref=e769]:
-                - generic:
-                  - button:
-                    - img
-                  - generic:
-                    - textbox: 20,000
-                    - generic:
-                      - generic: 20,000
-                  - button:
-                    - img
-              - button "Edit Listing" [ref=e770]:
-                - generic [ref=e772]:
-                  - img [ref=e773]
-                  - text: Edit Listing
-        - generic [ref=e779]:
-          - generic [ref=e780] [cursor=pointer]:
-            - img "Keychron K2 Mechanical Keyboard main image" [ref=e782]
-            - generic [ref=e783]:
-              - generic [ref=e784]:
-                - img [ref=e785]
-                - generic [ref=e788]: Karachi
-              - button "Electronics" [ref=e789]:
-                - img [ref=e790]
-                - generic [ref=e792]: Electronics
-            - generic [ref=e793]:
-              - generic [ref=e794]:
-                - img [ref=e795]
-                - generic [ref=e798]: 29d 13h
-              - generic [ref=e800]: 👌 Used
-            - generic [ref=e802]:
-              - img [ref=e803]
-              - generic [ref=e806]: Far
-            - generic [ref=e807]:
-              - button [ref=e808]:
-                - img [ref=e809]
-              - img [ref=e812]
-          - generic [ref=e815]:
-            - heading "Keychron K2 Mechanical Keyboard" [level=3] [ref=e817] [cursor=pointer]
-            - generic [ref=e818]:
-              - generic [ref=e819]:
-                - generic [ref=e821]:
-                  - img [ref=e822]
-                  - text: Asking
-                - generic [ref=e826]: 18,000
-              - generic [ref=e827]:
-                - generic [ref=e829]:
-                  - img [ref=e830]
-                  - text: Hidden
-                - generic [ref=e834]: Be first!
-            - generic [ref=e836]:
-              - generic [ref=e838]:
-                - button [ref=e839]:
-                  - img [ref=e840]
-                - generic [ref=e841]:
-                  - textbox [ref=e842]: 18,000
-                  - generic:
-                    - generic: 18,000
-                - button [ref=e843]:
-                  - img [ref=e844]
-              - button "Place Bid" [ref=e846]:
-                - generic [ref=e848]:
-                  - img [ref=e849]
-                  - text: Place Bid
-        - generic [ref=e865]:
-          - generic [ref=e866] [cursor=pointer]:
-            - img "Sony WH-1000XM4 main image" [ref=e868]
-            - generic [ref=e869]:
-              - generic [ref=e870]:
-                - img [ref=e871]
-                - generic [ref=e874]: Karachi
-              - button "Audio" [ref=e875]:
-                - img [ref=e876]
-                - generic [ref=e880]: Audio
-            - generic [ref=e881]:
-              - generic [ref=e882]:
-                - img [ref=e883]
-                - generic [ref=e886]: 29d 13h
-              - generic [ref=e888]: 👌 Used
-            - generic [ref=e890]:
-              - img [ref=e891]
-              - generic [ref=e894]: Far
-            - generic [ref=e895]:
-              - button [ref=e896]:
-                - img [ref=e897]
-              - img [ref=e900]
-          - generic [ref=e903]:
-            - heading "Sony WH-1000XM4" [level=3] [ref=e905] [cursor=pointer]
-            - generic [ref=e906]:
-              - generic [ref=e907]:
-                - generic [ref=e909]:
-                  - img [ref=e910]
-                  - text: Asking
-                - generic [ref=e914]: 55,000
-              - generic [ref=e915]:
-                - generic [ref=e917]:
-                  - img [ref=e918]
-                  - text: Hidden
-                - generic [ref=e922]: Be first!
-            - generic [ref=e924]:
-              - generic [ref=e926]:
-                - button [ref=e927]:
-                  - img [ref=e928]
-                - generic [ref=e929]:
-                  - textbox [ref=e930]: 55,000
-                  - generic:
-                    - generic: 55,000
-                - button [ref=e931]:
-                  - img [ref=e932]
-              - button "Place Bid" [ref=e934]:
-                - generic [ref=e936]:
-                  - img [ref=e937]
-                  - text: Place Bid
-        - generic [ref=e950]:
-          - generic [ref=e953]:
-            - generic [ref=e954] [cursor=pointer]:
-              - img "Herman Miller Aeron Office Chair main image" [ref=e956]
-              - generic [ref=e957]:
-                - generic [ref=e958]:
-                  - img [ref=e959]
-                  - generic [ref=e962]: Karachi
-                - button "Furniture" [ref=e963]:
-                  - img [ref=e964]
-                  - generic [ref=e967]: Furniture
-              - generic [ref=e968]:
-                - generic [ref=e969]:
-                  - img [ref=e970]
-                  - generic [ref=e973]: 29d 13h
-                - generic [ref=e975]: 👌 Used
-              - generic [ref=e977]:
-                - img [ref=e978]
-                - generic [ref=e981]: Far
-              - button [ref=e983]:
-                - img [ref=e984]
-            - generic [ref=e986]:
-              - heading "Herman Miller Aeron Office Chair" [level=3] [ref=e988] [cursor=pointer]
-              - generic [ref=e989]:
-                - generic [ref=e990]:
-                  - generic [ref=e992]:
-                    - img [ref=e993]
-                    - text: Asking
-                  - generic [ref=e997]: 180,000
-                - generic [ref=e998]:
-                  - generic [ref=e1000]:
-                    - img [ref=e1001]
-                    - text: Highest
-                  - generic [ref=e1008]: Be first!
-              - generic [ref=e1010]:
-                - generic [ref=e1012]:
-                  - button [ref=e1013]:
-                    - img [ref=e1014]
-                  - generic [ref=e1015]:
-                    - textbox [ref=e1016]: 180,000
-                    - generic:
-                      - generic: 180,000
-                  - button [ref=e1017]:
-                    - img [ref=e1018]
-                - button "Place Bid" [ref=e1020]:
-                  - generic [ref=e1022]:
-                    - img [ref=e1023]
-                    - text: Place Bid
-          - generic [ref=e1038]:
-            - generic [ref=e1039]:
-              - img "Ad Content" [ref=e1040]
-              - generic [ref=e1042]: Sponsored
-            - generic [ref=e1043]:
-              - heading "Unlimited Entertainment" [level=3] [ref=e1045]
-              - generic [ref=e1046]:
-                - generic [ref=e1047]:
-                  - generic [ref=e1048]: Starting
-                  - generic [ref=e1049]: Free Trial
-                - generic [ref=e1050]:
-                  - generic [ref=e1051]: Then
-                  - generic [ref=e1052]: $9.99/mo
-              - generic [ref=e1053]:
-                - generic [ref=e1056]: Watch anytime, anywhere
-                - link "Learn More" [ref=e1057] [cursor=pointer]:
-                  - /url: "#"
-                  - text: Learn More
-                  - img [ref=e1058]
-        - generic [ref=e1065]:
-          - generic [ref=e1066] [cursor=pointer]:
-            - img "PlayStation 5 Disc Edition main image" [ref=e1068]
-            - generic [ref=e1069]:
-              - generic [ref=e1070]:
-                - img [ref=e1071]
-                - generic [ref=e1074]: Karachi
-              - button "Gaming" [ref=e1075]:
-                - img [ref=e1076]
-                - generic [ref=e1078]: Gaming
-            - generic [ref=e1079]:
-              - generic [ref=e1080]:
-                - img [ref=e1081]
-                - generic [ref=e1084]: 29d 13h
-              - generic [ref=e1086]: 👌 Used
-            - generic [ref=e1088]:
-              - img [ref=e1089]
-              - generic [ref=e1092]: Far
-            - button [ref=e1094]:
-              - img [ref=e1095]
-          - generic [ref=e1097]:
-            - heading "PlayStation 5 Disc Edition" [level=3] [ref=e1099] [cursor=pointer]
-            - generic [ref=e1100]:
-              - generic [ref=e1101]:
-                - generic [ref=e1103]:
-                  - img [ref=e1104]
-                  - text: Asking
-                - generic [ref=e1108]: 140,000
-              - generic [ref=e1109]:
-                - generic [ref=e1111]:
-                  - img [ref=e1112]
-                  - text: Highest
-                - generic [ref=e1119]: Be first!
-            - generic [ref=e1121]:
-              - generic [ref=e1123]:
-                - button [ref=e1124]:
-                  - img [ref=e1125]
-                - generic [ref=e1126]:
-                  - textbox [ref=e1127]: 140,000
-                  - generic:
-                    - generic: 140,000
-                - button [ref=e1128]:
-                  - img [ref=e1129]
-              - button "Place Bid" [ref=e1131]:
-                - generic [ref=e1133]:
-                  - img [ref=e1134]
-                  - text: Place Bid
-        - generic [ref=e1151]:
-          - generic [ref=e1152] [cursor=pointer]:
-            - img "Nespresso Vertuo Next Coffee Machine main image" [ref=e1154]
-            - generic [ref=e1155]:
-              - generic [ref=e1156]:
-                - img [ref=e1157]
-                - generic [ref=e1160]: Karachi
-              - button "Appliances" [ref=e1161]:
-                - img [ref=e1162]
-                - generic [ref=e1165]: Appliances
-            - generic [ref=e1166]:
-              - generic [ref=e1167]:
-                - img [ref=e1168]
-                - generic [ref=e1171]: 29d 13h
-              - generic [ref=e1173]: 👌 Used
-            - generic [ref=e1175]:
-              - img [ref=e1176]
-              - generic [ref=e1179]: Far
-            - generic [ref=e1180]:
-              - button [ref=e1181]:
-                - img [ref=e1182]
-              - img [ref=e1185]
-          - generic [ref=e1188]:
-            - heading "Nespresso Vertuo Next Coffee Machine" [level=3] [ref=e1190] [cursor=pointer]
-            - generic [ref=e1191]:
-              - generic [ref=e1192]:
-                - generic [ref=e1194]:
-                  - img [ref=e1195]
-                  - text: Asking
-                - generic [ref=e1199]: 35,000
-              - generic [ref=e1200]:
-                - generic [ref=e1202]:
-                  - img [ref=e1203]
-                  - text: Hidden
-                - generic [ref=e1207]: Be first!
-            - generic [ref=e1209]:
-              - generic [ref=e1211]:
-                - button [ref=e1212]:
-                  - img [ref=e1213]
-                - generic [ref=e1214]:
-                  - textbox [ref=e1215]: 35,000
-                  - generic:
-                    - generic: 35,000
-                - button [ref=e1216]:
-                  - img [ref=e1217]
-              - button "Place Bid" [ref=e1219]:
-                - generic [ref=e1221]:
-                  - img [ref=e1222]
-                  - text: Place Bid
-        - generic [ref=e1238]:
-          - generic [ref=e1239] [cursor=pointer]:
-            - img "Gym Dumbbell Set (Pair of 10kg) main image" [ref=e1241]
-            - generic [ref=e1242]:
-              - generic [ref=e1243]:
-                - img [ref=e1244]
-                - generic [ref=e1247]: Karachi
-              - button "Sports" [ref=e1248]:
-                - img [ref=e1249]
-                - generic [ref=e1255]: Sports
-            - generic [ref=e1256]:
-              - generic [ref=e1257]:
-                - img [ref=e1258]
-                - generic [ref=e1261]: 29d 13h
-              - generic [ref=e1263]: 👌 Used
-            - generic [ref=e1265]:
-              - img [ref=e1266]
-              - generic [ref=e1269]: Far
-            - button [ref=e1271]:
-              - img [ref=e1272]
-          - generic [ref=e1274]:
-            - heading "Gym Dumbbell Set (Pair of 10kg)" [level=3] [ref=e1276] [cursor=pointer]
-            - generic [ref=e1277]:
-              - generic [ref=e1278]:
-                - generic [ref=e1280]:
-                  - img [ref=e1281]
-                  - text: Asking
-                - generic [ref=e1285]: 8,000
-              - generic [ref=e1286]:
-                - generic [ref=e1288]:
-                  - img [ref=e1289]
-                  - text: Highest
-                - generic [ref=e1296]: Be first!
-            - generic [ref=e1298]:
-              - generic [ref=e1300]:
-                - button [ref=e1301]:
-                  - img [ref=e1302]
-                - generic [ref=e1303]:
-                  - textbox [ref=e1304]: 8,000
-                  - generic:
-                    - generic: 8,000
-                - button [ref=e1305]:
-                  - img [ref=e1306]
-              - button "Place Bid" [ref=e1308]:
-                - generic [ref=e1310]:
-                  - img [ref=e1311]
-                  - text: Place Bid
-        - generic [ref=e1328]:
-          - generic [ref=e1329] [cursor=pointer]:
-            - img "Canon EOS R5 Body Only main image" [ref=e1331]
-            - generic [ref=e1332]:
-              - generic [ref=e1333]:
-                - img [ref=e1334]
-                - generic [ref=e1337]: Karachi
-              - button "Cameras" [ref=e1338]:
-                - img [ref=e1339]
-                - generic [ref=e1342]: Cameras
-            - generic [ref=e1343]:
-              - generic [ref=e1344]:
-                - img [ref=e1345]
-                - generic [ref=e1348]: 29d 13h
-              - generic [ref=e1350]: 👌 Used
-            - generic [ref=e1352]:
-              - img [ref=e1353]
-              - generic [ref=e1356]: Far
-            - button [ref=e1358]:
-              - img [ref=e1359]
-          - generic [ref=e1361]:
-            - heading "Canon EOS R5 Body Only" [level=3] [ref=e1363] [cursor=pointer]
-            - generic [ref=e1364]:
-              - generic [ref=e1365]:
-                - generic [ref=e1367]:
-                  - img [ref=e1368]
-                  - text: Asking
-                - generic [ref=e1372]: 750,000
-              - generic [ref=e1373]:
-                - generic [ref=e1375]:
-                  - img [ref=e1376]
-                  - text: Highest
-                - generic [ref=e1383]: Be first!
-            - generic [ref=e1385]:
-              - generic [ref=e1387]:
-                - button [ref=e1388]:
-                  - img [ref=e1389]
-                - generic [ref=e1390]:
-                  - textbox [ref=e1391]: 750,000
-                  - generic:
-                    - generic: 750,000
-                - button [ref=e1392]:
-                  - img [ref=e1393]
-              - button "Place Bid" [ref=e1395]:
-                - generic [ref=e1397]:
-                  - img [ref=e1398]
-                  - text: Place Bid
-    - generic [ref=e1413]:
-      - generic [ref=e1414]: Copyright © 2026 Boliyan
-      - generic [ref=e1415]:
-        - link "Terms of Service" [ref=e1416] [cursor=pointer]:
+    - generic [ref=e235]:
+      - generic [ref=e236]: Copyright © 2026 Boliyan
+      - generic [ref=e237]:
+        - link "Terms of Service" [ref=e238] [cursor=pointer]:
           - /url: /terms-of-service
-        - link "Privacy Policy" [ref=e1417] [cursor=pointer]:
+        - link "Privacy Policy" [ref=e239] [cursor=pointer]:
           - /url: /privacy-policy
-        - link "Data Deletion" [ref=e1418] [cursor=pointer]:
+        - link "Data Deletion" [ref=e240] [cursor=pointer]:
           - /url: /data-deletion
-  - generic [ref=e1421]:
-    - link "Market" [ref=e1422] [cursor=pointer]:
+  - generic [ref=e243]:
+    - link "Market" [ref=e244] [cursor=pointer]:
       - /url: /
-      - generic [ref=e1424]:
-        - img [ref=e1426]
-        - generic [ref=e1430]: Market
-    - link "Dash" [ref=e1431] [cursor=pointer]:
-      - /url: /dashboard?tab=offers
-      - generic [ref=e1433]:
-        - img [ref=e1435]
-        - generic [ref=e1440]: Dash
-    - link "Sell" [ref=e1441] [cursor=pointer]:
-      - /url: /list
-      - generic [ref=e1443]:
-        - img [ref=e1445]
-        - generic [ref=e1447]: Sell
-    - link "Inbox" [ref=e1448] [cursor=pointer]:
-      - /url: /inbox
-      - generic [ref=e1450]:
-        - img [ref=e1452]
-        - generic [ref=e1454]: Inbox
-    - link "Analytics" [ref=e1455] [cursor=pointer]:
+      - generic [ref=e246]:
+        - img [ref=e248]
+        - generic [ref=e252]: Market
+    - link "Analytics" [ref=e253] [cursor=pointer]:
       - /url: /dashboard/seller
-      - generic [ref=e1457]:
-        - img [ref=e1459]
-        - generic [ref=e1461]: Analytics
+      - generic [ref=e255]:
+        - img [ref=e257]
+        - generic [ref=e259]: Analytics
+    - link "Sell" [ref=e260] [cursor=pointer]:
+      - /url: /list
+      - generic [ref=e262]:
+        - img [ref=e264]
+        - generic [ref=e266]: Sell
+    - link "Inbox" [ref=e267] [cursor=pointer]:
+      - /url: /inbox
+      - generic [ref=e269]:
+        - img [ref=e271]
+        - generic [ref=e273]: Inbox
+    - link "Dash" [ref=e274] [cursor=pointer]:
+      - /url: /dashboard?tab=offers
+      - generic [ref=e276]:
+        - img [ref=e278]
+        - generic [ref=e283]: Dash
   - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e1467] [cursor=pointer]:
-    - img [ref=e1468]
-  - alert [ref=e1471]
+  - generic [ref=e288] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e289]:
+      - img [ref=e290]
+    - generic [ref=e293]:
+      - button "Open issues overlay" [ref=e294]:
+        - generic [ref=e295]:
+          - generic [ref=e296]: "1"
+          - generic [ref=e297]: "2"
+        - generic [ref=e298]:
+          - text: Issue
+          - generic [ref=e299]: s
+      - button "Collapse issues badge" [ref=e300]:
+        - img [ref=e301]
+  - alert [ref=e303]
 ```

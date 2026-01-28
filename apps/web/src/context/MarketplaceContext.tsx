@@ -38,6 +38,7 @@ interface MarketplaceContextType {
   involvedIds: string[];
   isLoading: boolean;
   isLoadingMore: boolean;
+  isRevalidating: boolean; // Background refresh of stale cache
   hasMore: boolean;
   loadMore: () => void;
   addItem: (item: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => void;
@@ -110,6 +111,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isRevalidating, setIsRevalidating] = useState(false); // Background refresh of stale cache
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [lastBidTimestamp, setLastBidTimestamp] = useState<number | null>(null);
@@ -211,6 +213,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                   loadingLockRef.current = false;
                   return;
               }
+              // Stale cache - show revalidating indicator while fetching fresh data
+              setIsRevalidating(true);
           }
       }
 
@@ -401,6 +405,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
        } finally {
           setIsLoading(false);
           setIsLoadingMore(false);
+          setIsRevalidating(false);
           loadingLockRef.current = false;
       }
   }, [filters, ITEMS_PER_PAGE]);
@@ -899,14 +904,14 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
   const contextValue = useMemo<MarketplaceContextType>(() => ({
     items, bids, itemsById, bidsById, feedIds, involvedIds,
-    isLoading, isLoadingMore, hasMore, loadMore, addItem,
+    isLoading, isLoadingMore, isRevalidating, hasMore, loadMore, addItem,
     updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds,
     rejectBid, acceptBid, confirmExchange, filters, setFilter,
     updateFilters, lastBidTimestamp, setLastBidTimestamp, refreshInvolvedItems,
     liveFeed
   }), [
     items, bids, itemsById, bidsById, feedIds, involvedIds,
-    isLoading, isLoadingMore, hasMore, watchedItemIds, filters, lastBidTimestamp,
+    isLoading, isLoadingMore, isRevalidating, hasMore, watchedItemIds, filters, lastBidTimestamp,
     // All functions now stable via useCallback
     loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch,
     rejectBid, acceptBid, confirmExchange, setFilter, updateFilters,
