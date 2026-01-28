@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mayaar Laptop Logo - All Variations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-noto-urdu: 'Noto Sans Arabic', sans-serif;
+      --font-outfit: 'Outfit', system-ui, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f1f5f9;
+      font-family: var(--font-outfit);
+      padding: 48px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: #1e293b;
+      margin-bottom: 48px;
+    }
+
+    .logo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .variation-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .variation-label {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .variation-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: -8px;
+    }
+
+    /* ==========================================
+       LOGO CONTAINER BASE
+       ========================================== */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 28px 40px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      width: max-content;
+    }
+
+    .logo-container:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    /* ICON */
+    .logo-icon {
+      width: 72px;
+      height: 54px;
+      flex-shrink: 0;
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transform: scaleX(-1);
+    }
+
+    /* TEXT BLOCK */
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      width: max-content;
+    }
+
+    .urdu-text {
+      font-family: var(--font-noto-urdu);
+      font-size: 2.25rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: -4px;
+      text-align: center;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .english-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 2px;
+      margin-top: 8px;
+    }
+
+    .english-char {
+      font-family: var(--font-outfit);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ==========================================
+       GRADIENT VARIATIONS
+       ========================================== */
+    
+    /* EMERALD */
+    .emerald .urdu-text {
+      background: linear-gradient(to bottom right, #059669, #10b981, #047857);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .emerald .english-char {
+      background: linear-gradient(to bottom right, #34d399, #a7f3d0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* BLUE (Boliyan Style) */
+    .blue .urdu-text {
+      background: linear-gradient(to bottom right, #2563eb, #3b82f6, #1d4ed8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .blue .english-char {
+      background: linear-gradient(to bottom right, #60a5fa, #bfdbfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* GOLD / AMBER (Premium) */
+    .gold .urdu-text {
+      background: linear-gradient(to bottom right, #d97706, #f59e0b, #b45309);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gold .english-char {
+      background: linear-gradient(to bottom right, #fbbf24, #fde68a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* PURPLE / VIOLET */
+    .purple .urdu-text {
+      background: linear-gradient(to bottom right, #7c3aed, #8b5cf6, #6d28d9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .purple .english-char {
+      background: linear-gradient(to bottom right, #a78bfa, #ddd6fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ROSE / PINK */
+    .rose .urdu-text {
+      background: linear-gradient(to bottom right, #e11d48, #f43f5e, #be123c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .rose .english-char {
+      background: linear-gradient(to bottom right, #fb7185, #fecdd3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* SLATE / GRAYSCALE (Print) */
+    .slate .urdu-text {
+      background: linear-gradient(to bottom right, #334155, #475569, #1e293b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .slate .english-char {
+      background: linear-gradient(to bottom right, #64748b, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* DARK MODE - White on Dark */
+    .dark-mode {
+      background: #0f172a;
+    }
+    .dark-mode .urdu-text {
+      background: linear-gradient(to bottom right, #f8fafc, #e2e8f0, #f1f5f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .dark-mode .english-char {
+      background: linear-gradient(to bottom right, #94a3b8, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* BILLBOARD - High Contrast Emerald on Dark */
+    .billboard {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 40px 56px;
+    }
+    .billboard .urdu-text {
+      font-size: 2.5rem;
+      background: linear-gradient(to bottom right, #34d399, #10b981, #6ee7b7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .billboard .english-char {
+      font-size: 13px;
+      background: linear-gradient(to bottom right, #a7f3d0, #d1fae5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .billboard .logo-icon {
+      width: 88px;
+      height: 66px;
+    }
+
+    /* BILLBOARD GOLD */
+    .billboard-gold {
+      background: linear-gradient(135deg, #1c1917 0%, #292524 100%);
+      padding: 40px 56px;
+    }
+    .billboard-gold .urdu-text {
+      font-size: 2.5rem;
+      background: linear-gradient(to bottom right, #fbbf24, #f59e0b, #fde68a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .billboard-gold .english-char {
+      font-size: 13px;
+      background: linear-gradient(to bottom right, #fde68a, #fef3c7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .billboard-gold .logo-icon {
+      width: 88px;
+      height: 66px;
+    }
+
+    /* Section divider */
+    .section-title {
+      grid-column: 1 / -1;
+      font-size: 14px;
+      color: #475569;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 32px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>معیار LAPTOP — Logo Variations</h1>
+  
+  <div class="logo-grid">
+    
+    <div class="section-title">🎨 Color Variations</div>
+
+    <!-- EMERALD -->
+    <div class="variation-card">
+      <div class="variation-label">Emerald Green</div>
+      <div class="variation-subtitle">Primary Brand Color</div>
+      <div class="logo-container emerald">
+        <div class="logo-icon"><img src="mayaar-icon-new.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLUE -->
+    <div class="variation-card">
+      <div class="variation-label">Boliyan Blue</div>
+      <div class="variation-subtitle">Matches Boliyan Branding</div>
+      <div class="logo-container blue">
+        <div class="logo-icon"><img src="mayaar-icon-blue.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GOLD -->
+    <div class="variation-card">
+      <div class="variation-label">Premium Gold</div>
+      <div class="variation-subtitle">Luxury / Premium Feel</div>
+      <div class="logo-container gold">
+        <div class="logo-icon"><img src="mayaar-icon-gold.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PURPLE -->
+    <div class="variation-card">
+      <div class="variation-label">Royal Purple</div>
+      <div class="variation-subtitle">Tech / Gaming Vibe</div>
+      <div class="logo-container purple">
+        <div class="logo-icon"><img src="mayaar-icon-purple.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROSE -->
+    <div class="variation-card">
+      <div class="variation-label">Rose Pink</div>
+      <div class="variation-subtitle">Bold / Modern</div>
+      <div class="logo-container rose">
+        <div class="logo-icon"><img src="mayaar-icon-rose.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLATE -->
+    <div class="variation-card">
+      <div class="variation-label">Slate Gray</div>
+      <div class="variation-subtitle">Print / Monochrome</div>
+      <div class="logo-container slate">
+        <div class="logo-icon"><img src="mayaar-icon-slate.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">🌙 Dark Mode & Billboard</div>
+
+    <!-- DARK MODE -->
+    <div class="variation-card">
+      <div class="variation-label">Dark Mode (White)</div>
+      <div class="variation-subtitle">For Dark Backgrounds</div>
+      <div class="logo-container dark-mode">
+        <div class="logo-icon"><img src="mayaar-icon-white.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILLBOARD EMERALD -->
+    <div class="variation-card">
+      <div class="variation-label">Billboard - Emerald</div>
+      <div class="variation-subtitle">High Contrast for Signage</div>
+      <div class="logo-container billboard">
+        <div class="logo-icon"><img src="mayaar-icon-new.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILLBOARD GOLD -->
+    <div class="variation-card">
+      <div class="variation-label">Billboard - Gold</div>
+      <div class="variation-subtitle">Premium Signage</div>
+      <div class="logo-container billboard-gold">
+        <div class="logo-icon"><img src="mayaar-icon-gold.svg" alt="Icon" /></div>
+        <div class="logo-text">
+          <span class="urdu-text">معیار</span>
+          <div class="english-container">
+            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIGHTBOX MODAL -->
+  <div id="lightbox" class="lightbox">
+    <div class="lightbox-content" id="lightbox-content"></div>
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  </div>
+
+  <style>
+    /* Lightbox styles */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      cursor: zoom-out;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      transform: scale(4);
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+
+    .lightbox-content .logo-container {
+      transform: scale(1);
+      cursor: default;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    .lightbox-content .logo-container:hover {
+      transform: scale(1);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 48px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .lightbox-close:hover {
+      opacity: 1;
+    }
+
+    /* Hint text */
+    .logo-container::after {
+      content: 'Click to zoom';
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #94a3b8;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .variation-card {
+      position: relative;
+    }
+
+    .logo-container:hover::after {
+      opacity: 1;
+    }
+  </style>
+
+  <script>
+    // Lightbox functionality
+    const lightbox = document.getElementById('lightbox');
+    const lightboxContent = document.getElementById('lightbox-content');
+
+    document.querySelectorAll('.logo-container').forEach(container => {
+      container.addEventListener('click', function() {
+        const clone = this.cloneNode(true);
+        lightboxContent.innerHTML = '';
+        lightboxContent.appendChild(clone);
+        lightbox.classList.add('active');
+      });
+    });
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+    }
+
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+  </script>
+</body>
+</html>
