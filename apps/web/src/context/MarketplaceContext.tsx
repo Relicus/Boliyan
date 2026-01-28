@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { transformListingToItem, transformBidToHydratedBid, ListingWithSeller, BidWithProfile } from "@/lib/transform";
 import { generateCacheKey, getFromCache, setCache } from "@/lib/cache";
 import { useBidRealtime } from "@/hooks/useBidRealtime";
+import { useListingsPolling } from "@/hooks/useListingsPolling";
 import { sonic } from "@/lib/sonic";
 import type { Database } from "@/types/database.types";
 import { normalize, upsertEntities, upsertEntity, removeEntity } from "@/lib/store-helpers";
@@ -54,6 +55,15 @@ interface MarketplaceContextType {
   lastBidTimestamp: number | null;
   setLastBidTimestamp: (ts: number | null) => void;
   refreshInvolvedItems: () => Promise<void>;
+  // Live polling for new listings (only when sortBy: 'newest')
+  liveFeed: {
+    pendingCount: number;
+    loadPending: () => void;
+    isPollingActive: boolean;
+    showContinuePrompt: boolean;
+    continueWatching: () => void;
+    pauseUpdates: () => void;
+  };
 }
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
@@ -447,6 +457,30 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   }, [user]);
 
   useBidRealtime(handleRealtimeBid, activeIds, user?.id);
+
+  // --- LIVE FEED POLLING (New Listings) ---
+  // Only active when sortBy: 'newest' and tab is visible
+  const handleNewListings = useCallback((newItems: Item[]) => {
+    // Prepend new items to the feed
+    setItemsById(prev => upsertEntities(prev, newItems));
+    setFeedIds(prev => {
+      const existingIds = new Set(prev);
+      const newIds = newItems.map(i => i.id).filter(id => !existingIds.has(id));
+      return [...newIds, ...prev]; // Prepend
+    });
+  }, []);
+
+  const {
+    pendingCount,
+    loadPending,
+    isPollingActive,
+    showContinuePrompt,
+    continueWatching,
+    pauseUpdates,
+  } = useListingsPolling({
+    enabled: filters.sortBy === 'newest',
+    onNewListings: handleNewListings,
+  });
 
   const loadMore = useCallback(() => {
       // Prevent loading more if initial load is processing (isLoading)
@@ -852,19 +886,29 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     refreshInvolvedItems();
   }, [refreshInvolvedItems]);
 
+  const liveFeed = useMemo(() => ({
+    pendingCount,
+    loadPending,
+    isPollingActive,
+    showContinuePrompt,
+    continueWatching,
+    pauseUpdates,
+  }), [pendingCount, loadPending, isPollingActive, showContinuePrompt, continueWatching, pauseUpdates]);
+
   const contextValue = useMemo<MarketplaceContextType>(() => ({
     items, bids, itemsById, bidsById, feedIds, involvedIds,
     isLoading, isLoadingMore, hasMore, loadMore, addItem,
     updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds,
     rejectBid, acceptBid, confirmExchange, filters, setFilter,
-    updateFilters, lastBidTimestamp, setLastBidTimestamp, refreshInvolvedItems
+    updateFilters, lastBidTimestamp, setLastBidTimestamp, refreshInvolvedItems,
+    liveFeed
   }), [
     items, bids, itemsById, bidsById, feedIds, involvedIds,
     isLoading, isLoadingMore, hasMore, watchedItemIds, filters, lastBidTimestamp,
     // All functions now stable via useCallback
     loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch,
     rejectBid, acceptBid, confirmExchange, setFilter, updateFilters,
-    setLastBidTimestamp, refreshInvolvedItems
+    setLastBidTimestamp, refreshInvolvedItems, liveFeed
   ]);
 
   return (

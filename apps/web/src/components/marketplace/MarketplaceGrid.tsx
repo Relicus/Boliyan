@@ -26,6 +26,8 @@ import PriceSelector from "./PriceSelector";
 import { Badge } from "@/components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CATEGORIES } from "@/lib/constants";
+import { NewListingsToast } from "@/components/ui/NewListingsToast";
+import { ContinueBrowsingModal } from "@/components/ui/ContinueBrowsingModal";
 
 // Listing type options for dropdown
 const LISTING_TYPES = [
@@ -36,6 +38,7 @@ const LISTING_TYPES = [
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 type FilterId = typeof FILTERS[number]['id'];
+
 
 const subscribeToViewport = (callback: () => void) => {
   if (typeof window === "undefined") return () => {};
@@ -62,8 +65,11 @@ const getViewportSnapshot = () => (typeof window !== "undefined" ? window.innerW
 const getServerSnapshot = () => false;
 
 export default function MarketplaceGrid() {
-  const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, hasMore, loadMore } = useMarketplace();
+  const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, hasMore, loadMore, liveFeed } = useMarketplace();
   const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters } = useSearch();
+  
+  // Live feed toast dismiss state
+  const [toastDismissed, setToastDismissed] = useState(false);
 
   const isDesktop = useSyncExternalStore(subscribeToViewport, getViewportSnapshot, getServerSnapshot);
   const [manualViewMode, setManualViewMode] = useState<ViewMode | null>(null);
@@ -78,6 +84,8 @@ export default function MarketplaceGrid() {
   const displayItems = isSearchActive ? searchResults : marketplaceItems;
   const currentSortId = isSearchActive ? getSearchSortFilterId(searchFilters.sortBy) : mpFilters.sortBy;
   
+  // Toast shows when: pending items exist AND user hasn't dismissed
+  // After loading pending items, pendingCount goes to 0 which hides toast
   // Effective loading state: 
   // We want to show skeletons if we're REALLY loading or if we're briefly transitioning viewMode
   const isLoading = (isSearchActive ? isSearching : mpLoading) || isChangingView;
@@ -153,6 +161,22 @@ export default function MarketplaceGrid() {
 
   return (
     <div id="marketplace-grid-root" className="px-4 pb-4 pt-2 md:px-4 md:pb-4 md:pt-2">
+      {/* Live Feed UI Components */}
+      {!toastDismissed && liveFeed.pendingCount > 0 && mpFilters.sortBy === 'newest' && (
+        <NewListingsToast
+          count={liveFeed.pendingCount}
+          onLoad={() => {
+            liveFeed.loadPending();
+            setToastDismissed(true);
+          }}
+          onDismiss={() => setToastDismissed(true)}
+        />
+      )}
+      <ContinueBrowsingModal
+        open={liveFeed.showContinuePrompt}
+        onContinue={liveFeed.continueWatching}
+        onPause={liveFeed.pauseUpdates}
+      />
       <div className="mb-4 md:mb-0 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-0 md:bg-transparent md:border-0 md:shadow-none">
         <div className="flex flex-col gap-2 pt-2 pb-2 md:py-0">
           {/* MOBILE: New Enhanced "Search & Filter" Mobile Header */}
