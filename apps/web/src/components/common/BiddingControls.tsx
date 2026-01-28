@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo, useState, useRef, useEffect } from "react";
+import { memo, useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -218,7 +218,7 @@ export const BiddingControls = memo(({
   const router = useRouter();
   const [isFocused, setIsFocused] = useState(false);
   const numericBid = parseFloat(bidAmount.replace(/[^0-9.-]+/g, '')) || 0;
-  const buildId = (suffix: string) => `${idPrefix}-${suffix}`;
+  const buildId = useCallback((suffix: string) => `${idPrefix}-${suffix}`, [idPrefix]);
   const isQuotaReached = remainingAttempts === 0;
   
   // Disabled state logic
@@ -365,7 +365,7 @@ export const BiddingControls = memo(({
       theme: 'active' as ButtonTheme,
       content: <BiddingButtonContent icon={actionIcon} text="Place Bid" />
     };
-  }, [isSuccess, isSubmitting, errorMessage, isQuotaReached, derivedStatus, pendingConfirmation, isOwner, hasPriorBid, isSecretBid]);
+  }, [isSuccess, isSubmitting, errorMessage, isQuotaReached, derivedStatus, pendingConfirmation, isOwner, hasPriorBid, isSecretBid, buildId]);
 
   // Derived styles from centralized config
   const activeTheme = BUTTON_THEMES[theme];

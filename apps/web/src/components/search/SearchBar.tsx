@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearch } from '@/context/SearchContext';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Search, X, Clock, Tag, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
