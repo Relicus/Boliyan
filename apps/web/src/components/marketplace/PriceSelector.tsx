@@ -69,17 +69,18 @@ export default function PriceSelector() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
              <h4 className="text-sm font-black uppercase tracking-wider text-slate-800">Price Range</h4>
-             {hasActivePriceFilter && (
-               <button onClick={handleClear} className="text-[10px] font-bold text-red-500 hover:text-red-700 uppercase tracking-wide">
-                 Reset
-               </button>
-             )}
+              {hasActivePriceFilter && (
+                <button id="price-reset-btn" onClick={handleClear} className="text-[10px] font-bold text-red-500 hover:text-red-700 uppercase tracking-wide">
+                  Reset
+                </button>
+              )}
           </div>
           
           <div className="flex items-center gap-2">
             <div className="space-y-1 flex-1">
               <Label className="text-[10px] font-bold text-slate-400 uppercase">Min</Label>
               <Input 
+                id="price-min-input"
                 type="number" 
                 placeholder="0" 
                 value={localMin}
@@ -91,6 +92,7 @@ export default function PriceSelector() {
             <div className="space-y-1 flex-1">
               <Label className="text-[10px] font-bold text-slate-400 uppercase">Max</Label>
               <Input 
+                id="price-max-input"
                 type="number" 
                 placeholder="Any" 
                 value={localMax}
@@ -100,7 +102,7 @@ export default function PriceSelector() {
             </div>
           </div>
 
-          <Button onClick={handleApply} className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold h-10 rounded-lg">
+          <Button id="price-apply-btn" onClick={handleApply} className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold h-10 rounded-lg">
             Apply Filter
           </Button>
         </div>

@@ -1,42 +1,52 @@
 
 import { test, expect } from '@playwright/test';
+import { loginUser } from './helpers/auth';
+import { mockSupabaseNetwork } from './helpers/mock-network';
 
 test.describe('Search & Discovery', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockSupabaseNetwork(page);
+  });
 
   test('Search Bar visibility and input', async ({ page }) => {
-    await page.goto('http://192.168.18.125:3000/');
+    await loginUser(page);
+    await page.goto('/');
     
     // Check if search bar exists (desktop)
-    const searchInput = page.getByPlaceholder('Search items, categories...');
+    const searchInput = page.locator('#navbar-search-input');
     await expect(searchInput).toBeVisible();
     
     // Type query
-    await searchInput.fill('iphone');
-    await expect(searchInput).toHaveValue('iphone');
-    
-    // Check suggestions appear (mocked data usually, or real if seeded)
-    // We assume there might be suggestions or "No suggestions found" if empty
-    // await expect(page.locator('text=No suggestions found').or(page.locator('text=iphone'))).toBeVisible(); 
+    await searchInput.click();
+    await searchInput.fill('Camera');
+    // Allow state to settle
+    await page.waitForTimeout(1000);
+    await expect(searchInput).toHaveValue('Camera');
   });
 
   test('Execute Search and Filter Results', async ({ page }) => {
-    await page.goto('http://192.168.18.125:3000/');
+    await loginUser(page);
+    await page.goto('/');
     
     // Type and Enter
-    const searchInput = page.getByPlaceholder('Search items, categories...');
-    await searchInput.fill('test item');
+    const searchInput = page.locator('#navbar-search-input');
+    await searchInput.click();
+    await searchInput.fill('Camera');
+    await page.waitForTimeout(500);
     await searchInput.press('Enter');
     
     // URL should not necessarily change if context-based, but filter badge should appear
-    // Check for "test item" badge in desktop filter row or mobile
-    // Note: Depends on screen size. Default playwright is desktop-ish usually (1280x720)
+    // Check for "Camera" badge in desktop filter row or mobile
     
     // Wait for badge to appear
-    await expect(page.getByText('"test item"')).toBeVisible();
+    const badge = page.locator('#active-filter-badge, [id^="active-filter-chip-"]').first();
+    await expect(badge).toBeVisible({ timeout: 10000 });
+    await expect(badge).toContainText('Camera');
   });
 
   test('Category Navigation', async ({ page }) => {
-    await page.goto('http://192.168.18.125:3000/');
+    await loginUser(page);
+    await page.goto('/');
     
     // Click a category in CategoryNav
     // Assuming "Vehicles" or similar exists from constants
@@ -49,7 +59,8 @@ test.describe('Search & Discovery', () => {
   test('Mobile Filter View', async ({ page }) => {
     // Set viewport to mobile
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('http://192.168.18.125:3000/');
+    await loginUser(page);
+    await page.goto('/');
     
     // Check for mobile filter dropdowns
     await expect(page.locator('#mobile-search-filter-container')).toBeVisible();

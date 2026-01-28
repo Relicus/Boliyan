@@ -82,6 +82,7 @@ export default function CategoryBar() {
       {/* Navigation Button - Left */}
       {showLeftArrow && (
         <button
+          id="category-scroll-left-btn"
           onClick={() => scroll("left")}
           className="absolute left-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-md text-slate-600 hover:text-slate-900 transition-all active:scale-y-95 active:bg-slate-100"
           aria-label="Scroll left"
@@ -135,6 +136,7 @@ export default function CategoryBar() {
       {/* Navigation Button - Right */}
       {showRightArrow && (
         <button
+          id="category-scroll-right-btn"
           onClick={() => scroll("right")}
           className="absolute right-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white md:bg-slate-50 border border-slate-200 shadow-md text-slate-600 hover:text-slate-900 transition-all active:scale-y-95 active:bg-slate-100"
           aria-label="Scroll right"

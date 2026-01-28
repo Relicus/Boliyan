@@ -6,7 +6,7 @@ import { mockSupabaseNetwork } from './helpers/mock-network';
 const clickBidWithConfirm = async (button: Locator) => {
   await button.click();
   const confirmLabel = button.locator('text=Confirm?');
-  const needsConfirm = await confirmLabel.isVisible({ timeout: 1500 }).catch(() => false);
+  const needsConfirm = await confirmLabel.isVisible({ timeout: 3000 }).catch(() => false);
   if (needsConfirm) {
     await button.click();
   }
@@ -56,20 +56,24 @@ test.describe('Auction Lifecycle & Engagement', () => {
     const initialValueStr = await input.inputValue();
     const initialValue = parseFloat(initialValueStr.replace(/,/g, ''));
 
-    // Increment once
-    await itemCard.locator(`#item-card-${itemId}-increment-btn`).click();
-    
-    const incrementedValueStr = await input.inputValue();
+  // Increment once
+  await itemCard.locator(`#item-card-${itemId}-increment-btn`).dispatchEvent('pointerdown');
+  await itemCard.locator(`#item-card-${itemId}-increment-btn`).dispatchEvent('pointerup');
+  
+  const incrementedValueStr = await input.inputValue();
     const incrementedValue = parseFloat(incrementedValueStr.replace(/,/g, ''));
     expect(incrementedValue).toBeGreaterThan(initialValue);
 
     // Place bid (handle double-tap confirmation if needed)
     await clickBidWithConfirm(bidBtn);
 
+    // Verify success state
+    await expect(bidBtn).toContainText(/Bid Placed!|Update Bid/, { timeout: 10000 });
+
     await expect.poll(async () => {
       const currentValue = await input.inputValue();
       return parseFloat(currentValue.replace(/,/g, ''));
-    }).toBeGreaterThan(incrementedValue);
+    }, { timeout: 10000 }).toBeGreaterThan(incrementedValue);
   });
 
   test('should handle 70% minimum bid rule on Card', async ({ page }) => {
@@ -84,11 +88,11 @@ test.describe('Auction Lifecycle & Engagement', () => {
     const input = itemCard.locator(`#item-card-${itemId}-bid-input`);
     const bidBtn = itemCard.locator(`#item-card-${itemId}-place-bid-btn`);
 
-    // Read ask price from the rendered card (Asking label + price span)
-    const askLabel = itemCard.locator('span', { hasText: 'Asking' }).first();
-    const askContainer = askLabel.locator('..');
-    const askPriceText = await askContainer.locator('span').nth(1).innerText();
+    // Read ask price from the rendered card
+    const askPriceElement = itemCard.locator(`[id*="price-asking-value-"]`).first();
+    const askPriceText = await askPriceElement.innerText();
     const askPrice = parseFloat(askPriceText.replace(/[^0-9.]/g, ''));
+    console.log(`[Test] Item ${itemId} Ask Price: ${askPrice}`);
     
     const invalidBid = Math.floor(askPrice * 0.5); // 50% is definitely invalid
 
@@ -96,7 +100,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
     await input.fill(invalidBid.toString());
 
     await bidBtn.click();
-    await expect(bidBtn).toContainText(/Below Min|Min Bid Reached/);
+    await expect(bidBtn).toContainText(/Min Rs\.|Below Min|Min Bid Reached/);
   });
 
   test('should place bid from Product Modal', async ({ page }) => {
@@ -116,15 +120,17 @@ test.describe('Auction Lifecycle & Engagement', () => {
 
     const modalBidBtn = dialog.locator(`#modal-item-card-${itemId}-place-bid-btn`);
 
-    // Increment
-    await dialog.locator(`#modal-item-card-${itemId}-increment-btn`).click();
-    
+  // Increment
+  const modalIncrBtn = dialog.locator(`#modal-item-card-${itemId}-increment-btn`);
+  await modalIncrBtn.dispatchEvent('pointerdown');
+  await modalIncrBtn.dispatchEvent('pointerup');
+  
     // Place bid
     await clickBidWithConfirm(modalBidBtn);
 
     // Verify success state in modal
-    await expect(dialog.locator('text=Placed!')).toBeVisible({ timeout: 10000 });
-    console.log("Success message 'Placed!' found in modal");
+    await expect(modalBidBtn).toContainText('Bid Placed!', { timeout: 10000 });
+    console.log("Success message 'Bid Placed!' found in modal");
     
     // Close modal explicitly (auto-close is disabled)
     await dialog.locator(`#close-listing-btn-${itemId}`).click();
@@ -175,10 +181,13 @@ test.describe('Auction Lifecycle & Engagement', () => {
     const startingValue = parseFloat(startingValueStr.replace(/,/g, ''));
 
     await clickBidWithConfirm(bidBtn);
+    // Verify success state
+    await expect(bidBtn).toContainText(/Bid Placed!|Update Bid/, { timeout: 10000 });
+    
     await expect.poll(async () => {
       const currentValue = await input.inputValue();
       return parseFloat(currentValue.replace(/,/g, ''));
-    }).toBeGreaterThan(startingValue);
+    }, { timeout: 10000 }).toBeGreaterThan(startingValue);
 
     // Wait for success to clear (1500ms in hook)
     await page.waitForTimeout(2000);

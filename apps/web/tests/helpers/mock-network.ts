@@ -12,16 +12,20 @@ export async function mockSupabaseNetwork(page: Page) {
 
   // 1. Mock Auth Token/Login/Signup
   await page.route('**/auth/v1/token?*', async route => {
+    const body = route.request().postDataJSON() || {};
+    const email = body.email || MOCK_EMAIL;
+    const userId = email.includes('test-') ? `user-${email.split('@')[0]}` : MOCK_USER_ID;
+
     const json = {
       access_token: "mock-access-token",
       token_type: "bearer",
       expires_in: 3600,
       refresh_token: "mock-refresh-token",
       user: {
-        id: MOCK_USER_ID,
+        id: userId,
         aud: "authenticated",
         role: "authenticated",
-        email: MOCK_EMAIL,
+        email: email,
         email_confirmed_at: new Date().toISOString(),
         phone: "",
         app_metadata: { provider: "email", providers: ["email"] },
@@ -34,12 +38,16 @@ export async function mockSupabaseNetwork(page: Page) {
   });
 
   await page.route('**/auth/v1/signup', async route => {
+     const body = route.request().postDataJSON() || {};
+     const email = body.email || MOCK_EMAIL;
+     const userId = email.includes('test-') ? `user-${email.split('@')[0]}` : MOCK_USER_ID;
+
      // Return a valid session structure to trick the client
      const json = {
-      id: MOCK_USER_ID,
+      id: userId,
       aud: "authenticated",
       role: "authenticated",
-      email: MOCK_EMAIL,
+      email: email,
       email_confirmed_at: new Date().toISOString(),
       phone: "",
       app_metadata: { provider: "email", providers: ["email"] },
@@ -52,7 +60,7 @@ export async function mockSupabaseNetwork(page: Page) {
           token_type: "bearer",
           expires_in: 3600,
           refresh_token: "mock-refresh-token",
-          user: { id: MOCK_USER_ID, email: MOCK_EMAIL }
+          user: { id: userId, email: email }
       }
     };
     await route.fulfill({ json });
@@ -60,6 +68,8 @@ export async function mockSupabaseNetwork(page: Page) {
 
   // 2. Mock 'getUser'
   await page.route('**/auth/v1/user', async route => {
+      // For getUser, we don't easily know which user is being asked for without session
+      // But we can return MOCK_USER_ID as fallback
       const json = {
         id: MOCK_USER_ID,
         aud: "authenticated",
@@ -74,22 +84,23 @@ export async function mockSupabaseNetwork(page: Page) {
 
   // 3. Mock Profile Fetch (GET /rest/v1/profiles?...)
   await page.route(/\/rest\/v1\/profiles.*/, async route => {
-    // If querying for the specific mock user
-    if (route.request().url().includes(`id=eq.${MOCK_USER_ID}`)) {
-        await route.fulfill({ 
-            json: {
-                id: MOCK_USER_ID,
-                full_name: "Mock User",
-                avatar_url: "https://github.com/shadcn.png",
-                city: "Karachi",
-                rating: 5.0,
-                review_count: 10,
-                is_verified: true
-            }
-        });
-    } else {
-        await route.continue();
-    }
+    const url = route.request().url();
+    const idMatch = url.match(/id=eq\.(.+?)(&|$)/);
+    const userId = idMatch ? idMatch[1] : MOCK_USER_ID;
+
+    await route.fulfill({ 
+        json: {
+            id: userId,
+            full_name: userId.startsWith('user-') ? `Test User ${userId.split('-')[1]}` : "Mock User",
+            avatar_url: "https://github.com/shadcn.png",
+            city: "Karachi",
+            phone: "03001234567",
+            location: { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan", city: "Karachi" },
+            rating: 5.0,
+            review_count: 10,
+            is_verified: true
+        }
+    });
   });
 
   // 4. Mock Bids (GET/POST/PATCH) - Consolidated
@@ -218,6 +229,25 @@ export async function mockSupabaseNetwork(page: Page) {
 
   // Catch-all moved to top
 
+
+  // 11. Mock RPC calls
+  await page.route(/\/rest\/v1\/rpc\/place_bid.*/, async route => {
+      const postData = route.request().postDataJSON();
+      const response = {
+          id: `bid-${Date.now()}`,
+          listing_id: postData.p_listing_id,
+          bidder_id: MOCK_USER_ID,
+          amount: postData.p_amount,
+          status: 'pending',
+          created_at: new Date().toISOString()
+      };
+      console.log(`[MockNetwork] RPC place_bid success. Amount: ${postData.p_amount}`);
+      await route.fulfill({ json: response });
+  });
+
+  await page.route(/\/rest\/v1\/rpc\/.*/, async route => {
+      await route.fulfill({ json: { success: true } });
+  });
 
   // 8. Realtime Mock
   await page.route('**/realtime/v1/*', async route => {

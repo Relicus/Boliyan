@@ -1,8 +1,11 @@
 {
-  "timestamp": "2026-01-26T16:16:55.978Z",
+  "timestamp": "2026-01-28T00:20:22.383Z",
   "routes": [
     "/",
     "/signin?redirect=%2Flist",
+    "/terms-of-service",
+    "/privacy-policy",
+    "/data-deletion",
     "/dashboard?tab=offers",
     "/list",
     "/inbox",
@@ -11,7 +14,7 @@
   "elements": [
     {
       "route": "/",
-      "title": "Boliyan - Speak Your Price",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
       "interactiveElements": [
         {
           "id": "root-body-01",
@@ -104,12 +107,27 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Trending\nCategories\nType\nView\nLocating...\nPrice"
+          "text": "Trending\nCategories\nType\nView\nLocating...\nPrice\nCo"
         },
         {
           "id": "sidebar-01",
           "tagName": "ASIDE",
           "text": "AllPublicHidden[data-radix-scroll-area-viewport]{s"
+        },
+        {
+          "id": "sidebar-toggle-all",
+          "tagName": "BUTTON",
+          "text": "All"
+        },
+        {
+          "id": "sidebar-toggle-public",
+          "tagName": "BUTTON",
+          "text": "Public"
+        },
+        {
+          "id": "sidebar-toggle-hidden",
+          "tagName": "BUTTON",
+          "text": "Hidden"
         },
         {
           "id": "sidebar-scroll-area-02",
@@ -160,7 +178,7 @@
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Trending\nCategories\nType\nView\nLocating...\nPrice"
+          "text": "Trending\nCategories\nType\nView\nLocating...\nPrice\nCo"
         },
         {
           "id": "marketplace-grid-root",
@@ -392,6 +410,41 @@
           "text": ""
         },
         {
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
+          "tagName": "DIV",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-copy-01",
+          "tagName": "SPAN",
+          "text": "Copyright © 2026 Boliyan"
+        },
+        {
+          "id": "footer-links-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
+        },
+        {
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
+        },
+        {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
           "text": "Market\nDash\nSell\nInbox\nAnalytics"
@@ -499,7 +552,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"4NoLsDxQmZ9mDnbdizll4\""
+          "text": "self.__next_r=\"GC_fjTt81CRLL7rpWtyvp\""
         },
         {
           "id": "devtools-indicator",
@@ -527,7 +580,7 @@
     },
     {
       "route": "/signin?redirect=%2Flist",
-      "title": "Boliyan - Speak Your Price",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
       "interactiveElements": [
         {
           "id": "root-body-01",
@@ -655,7 +708,7 @@
         {
           "id": "signin-form-container",
           "tagName": "DIV",
-          "text": "Email\nPassword\nSign In\nOR CONTINUE WITH\nGoogle\nFac"
+          "text": "Email\nPassword\nSign In\nOR CONTINUE WITH\nGoogle\nDon"
         },
         {
           "id": "signin-form",
@@ -689,15 +742,44 @@
           "type": "button"
         },
         {
-          "id": "facebook-signin-btn",
-          "tagName": "BUTTON",
-          "text": "Facebook",
-          "type": "button"
-        },
-        {
           "id": "signup-link",
           "tagName": "A",
           "text": "Sign Up"
+        },
+        {
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
+          "tagName": "DIV",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-copy-01",
+          "tagName": "SPAN",
+          "text": "Copyright © 2026 Boliyan"
+        },
+        {
+          "id": "footer-links-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
+        },
+        {
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
         },
         {
           "id": "bottom-nav-container-01",
@@ -807,7 +889,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"NT8tF-QC8tdJjAMdC_ECn\""
+          "text": "self.__next_r=\"ivynVLU_AUyQLKBnTHFYL\""
         },
         {
           "id": "devtools-indicator",
@@ -839,13 +921,13 @@
       ]
     },
     {
-      "route": "/dashboard?tab=offers",
-      "title": "Boliyan - Speak Your Price",
+      "route": "/terms-of-service",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
       "interactiveElements": [
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nDashboard\nSelling\nBuying\nWatchlist\n"
+          "text": "بولیاں\nBOLIYAN\nMarketplace Ruleset\nTerms of Servic"
         },
         {
           "id": "navbar-01",
@@ -933,36 +1015,117 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "Dashboard\nSelling\nBuying\nWatchlist\nListings\nNo off"
+          "text": "Marketplace Ruleset\nTerms of Service\n\nSimple, fair"
         },
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "Dashboard\nSelling\nBuying\nWatchlist\nListings\nNo off"
+          "text": "Marketplace Ruleset\nTerms of Service\n\nSimple, fair"
         },
         {
-          "id": "dashboard-offers-tab",
-          "tagName": "BUTTON",
-          "text": "Selling",
-          "type": "button"
+          "id": "terms-page-01",
+          "tagName": "DIV",
+          "text": "Marketplace Ruleset\nTerms of Service\n\nSimple, fair"
         },
         {
-          "id": "dashboard-bids-tab",
-          "tagName": "BUTTON",
-          "text": "Buying",
-          "type": "button"
+          "id": "terms-wrap-01",
+          "tagName": "DIV",
+          "text": "Marketplace Ruleset\nTerms of Service\n\nSimple, fair"
         },
         {
-          "id": "dashboard-watchlist-tab",
-          "tagName": "BUTTON",
-          "text": "Watchlist",
-          "type": "button"
+          "id": "terms-hero-01",
+          "tagName": "DIV",
+          "text": "Marketplace Ruleset\nTerms of Service\n\nSimple, fair"
         },
         {
-          "id": "dashboard-listings-tab",
-          "tagName": "BUTTON",
-          "text": "Listings",
-          "type": "button"
+          "id": "terms-badge-01",
+          "tagName": "DIV",
+          "text": "Marketplace Ruleset"
+        },
+        {
+          "id": "terms-title-block-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\n\nSimple, fair rules that keep bid"
+        },
+        {
+          "id": "terms-title-01",
+          "tagName": "H1",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "terms-scoreboard-01",
+          "tagName": "DIV",
+          "text": "STATUS\nActive Ruleset\nNo chat before deal\nVerified"
+        },
+        {
+          "id": "terms-grid-01",
+          "tagName": "DIV",
+          "text": "RULE 01\nRequired\nAccount Integrity\n\nKeep your prof"
+        },
+        {
+          "id": "terms-card-accounts",
+          "tagName": "DIV",
+          "text": "RULE 01\nRequired\nAccount Integrity\n\nKeep your prof"
+        },
+        {
+          "id": "terms-card-bidding",
+          "tagName": "DIV",
+          "text": "RULE 02\nRequired\nBids Are Commitments\n\nPlace only "
+        },
+        {
+          "id": "terms-card-sellers",
+          "tagName": "DIV",
+          "text": "RULE 03\nRequired\nSeller Clarity\n\nList items honest"
+        },
+        {
+          "id": "terms-card-prohibited",
+          "tagName": "DIV",
+          "text": "RULE 04\nRequired\nProhibited Items\n\nIllegal, unsafe"
+        },
+        {
+          "id": "terms-card-termination",
+          "tagName": "DIV",
+          "text": "RULE 05\nRequired\nFair Play\n\nWe may suspend account"
+        },
+        {
+          "id": "terms-footer-01",
+          "tagName": "DIV",
+          "text": "Keep your activity aligned with these rules to pro"
+        },
+        {
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
+          "tagName": "DIV",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-copy-01",
+          "tagName": "SPAN",
+          "text": "Copyright © 2026 Boliyan"
+        },
+        {
+          "id": "footer-links-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
+        },
+        {
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
         },
         {
           "id": "bottom-nav-container-01",
@@ -1072,7 +1235,1004 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"2AyYWL9QzCRMHV3wM8uKq\""
+          "text": "self.__next_r=\"iCNfLtVBFfMRywRjuQx3J\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": ""
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "route": "/privacy-policy",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nData Playbook\nPrivacy Policy\n\nClear"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
+          "text": "",
+          "placeholder": "Search items, categories..."
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Locating..."
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Locating...",
+          "type": "button"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "Data Playbook\nPrivacy Policy\n\nClear choices on wha"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "Data Playbook\nPrivacy Policy\n\nClear choices on wha"
+        },
+        {
+          "id": "privacy-page-01",
+          "tagName": "DIV",
+          "text": "Data Playbook\nPrivacy Policy\n\nClear choices on wha"
+        },
+        {
+          "id": "privacy-wrap-01",
+          "tagName": "DIV",
+          "text": "Data Playbook\nPrivacy Policy\n\nClear choices on wha"
+        },
+        {
+          "id": "privacy-hero-01",
+          "tagName": "DIV",
+          "text": "Data Playbook\nPrivacy Policy\n\nClear choices on wha"
+        },
+        {
+          "id": "privacy-badge-01",
+          "tagName": "DIV",
+          "text": "Data Playbook"
+        },
+        {
+          "id": "privacy-title-block-01",
+          "tagName": "DIV",
+          "text": "Privacy Policy\n\nClear choices on what data we coll"
+        },
+        {
+          "id": "privacy-title-01",
+          "tagName": "H1",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "privacy-scoreboard-01",
+          "tagName": "DIV",
+          "text": "CONTROL CENTER\nYou Own Your Data\nNo data sales\nCoo"
+        },
+        {
+          "id": "privacy-grid-01",
+          "tagName": "DIV",
+          "text": "PILLAR 01\nCore\nWhat We Collect\n\nAccount details, l"
+        },
+        {
+          "id": "privacy-card-collection",
+          "tagName": "DIV",
+          "text": "PILLAR 01\nCore\nWhat We Collect\n\nAccount details, l"
+        },
+        {
+          "id": "privacy-card-usage",
+          "tagName": "DIV",
+          "text": "PILLAR 02\nCore\nHow We Use It\n\nOperate the platform"
+        },
+        {
+          "id": "privacy-card-cookies",
+          "tagName": "DIV",
+          "text": "PILLAR 03\nCore\nCookies\n\nRemember preferences, keep"
+        },
+        {
+          "id": "privacy-card-rights",
+          "tagName": "DIV",
+          "text": "PILLAR 04\nCore\nYour Rights\n\nRequest access, correc"
+        },
+        {
+          "id": "privacy-footer-01",
+          "tagName": "DIV",
+          "text": "For data requests or privacy questions, contact su"
+        },
+        {
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
+          "tagName": "DIV",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-copy-01",
+          "tagName": "SPAN",
+          "text": "Copyright © 2026 Boliyan"
+        },
+        {
+          "id": "footer-links-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
+        },
+        {
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-dash",
+          "tagName": "A",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-item-dash",
+          "tagName": "DIV",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-icon-dash",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dash",
+          "tagName": "SPAN",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-link-sell",
+          "tagName": "A",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-item-sell",
+          "tagName": "DIV",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-icon-sell",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-sell",
+          "tagName": "SPAN",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-analytics",
+          "tagName": "A",
+          "text": "Analytics"
+        },
+        {
+          "id": "bottom-nav-item-analytics",
+          "tagName": "DIV",
+          "text": "Analytics"
+        },
+        {
+          "id": "bottom-nav-icon-analytics",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-analytics",
+          "tagName": "SPAN",
+          "text": "Analytics"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"_UH9wN-1xFBpGMeOMtOQT\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": ""
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "route": "/data-deletion",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nData Deletion\nDelete Your Data\n\nA c"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
+          "text": "",
+          "placeholder": "Search items, categories..."
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Locating..."
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Locating...",
+          "type": "button"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "Data Deletion\nDelete Your Data\n\nA clear path to re"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "Data Deletion\nDelete Your Data\n\nA clear path to re"
+        },
+        {
+          "id": "deletion-page-01",
+          "tagName": "DIV",
+          "text": "Data Deletion\nDelete Your Data\n\nA clear path to re"
+        },
+        {
+          "id": "deletion-wrap-01",
+          "tagName": "DIV",
+          "text": "Data Deletion\nDelete Your Data\n\nA clear path to re"
+        },
+        {
+          "id": "deletion-hero-01",
+          "tagName": "DIV",
+          "text": "Data Deletion\nDelete Your Data\n\nA clear path to re"
+        },
+        {
+          "id": "deletion-badge-01",
+          "tagName": "DIV",
+          "text": "Data Deletion"
+        },
+        {
+          "id": "deletion-title-block-01",
+          "tagName": "DIV",
+          "text": "Delete Your Data\n\nA clear path to remove your pers"
+        },
+        {
+          "id": "deletion-title-01",
+          "tagName": "H1",
+          "text": "Delete Your Data"
+        },
+        {
+          "id": "deletion-scoreboard-01",
+          "tagName": "DIV",
+          "text": "REQUEST FLOW\n4-Step Process\nAccount settings\nVerif"
+        },
+        {
+          "id": "deletion-grid-01",
+          "tagName": "DIV",
+          "text": "STEP 01\nRequired\nSubmit a Request\n\nUse your accoun"
+        },
+        {
+          "id": "deletion-card-request",
+          "tagName": "DIV",
+          "text": "STEP 01\nRequired\nSubmit a Request\n\nUse your accoun"
+        },
+        {
+          "id": "deletion-card-verify",
+          "tagName": "DIV",
+          "text": "STEP 02\nRequired\nVerify Ownership\n\nWe confirm the "
+        },
+        {
+          "id": "deletion-card-process",
+          "tagName": "DIV",
+          "text": "STEP 03\nRequired\nDeletion Process\n\nWe remove perso"
+        },
+        {
+          "id": "deletion-card-retain",
+          "tagName": "DIV",
+          "text": "STEP 04\nRequired\nLegal Retention\n\nSome records may"
+        },
+        {
+          "id": "deletion-footer-01",
+          "tagName": "DIV",
+          "text": "To start, open your account settings and submit a "
+        },
+        {
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
+          "tagName": "DIV",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-copy-01",
+          "tagName": "SPAN",
+          "text": "Copyright © 2026 Boliyan"
+        },
+        {
+          "id": "footer-links-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
+        },
+        {
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-dash",
+          "tagName": "A",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-item-dash",
+          "tagName": "DIV",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-icon-dash",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dash",
+          "tagName": "SPAN",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-link-sell",
+          "tagName": "A",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-item-sell",
+          "tagName": "DIV",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-icon-sell",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-sell",
+          "tagName": "SPAN",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-analytics",
+          "tagName": "A",
+          "text": "Analytics"
+        },
+        {
+          "id": "bottom-nav-item-analytics",
+          "tagName": "DIV",
+          "text": "Analytics"
+        },
+        {
+          "id": "bottom-nav-icon-analytics",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-analytics",
+          "tagName": "SPAN",
+          "text": "Analytics"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"mGcK7NkCRirJepjrNOsy4\""
+        },
+        {
+          "id": "devtools-indicator",
+          "tagName": "DIV",
+          "text": "0\n1\nIssue"
+        },
+        {
+          "id": "next-logo",
+          "tagName": "BUTTON",
+          "text": ""
+        },
+        {
+          "id": "next_logo_paint0_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_paint1_linear_1357_10853",
+          "tagName": "linearGradient"
+        },
+        {
+          "id": "next_logo_mask0",
+          "tagName": "mask"
+        },
+        {
+          "id": "__next-route-announcer__",
+          "tagName": "DIV",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "route": "/dashboard?tab=offers",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
+      "interactiveElements": [
+        {
+          "id": "root-body-01",
+          "tagName": "BODY",
+          "text": "بولیاں\nBOLIYAN\nDashboard\nMessages\nNew Listing\nSell"
+        },
+        {
+          "id": "navbar-01",
+          "tagName": "NAV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-container-02",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-left-section-03",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-link-04",
+          "tagName": "A",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-logo-svg-05",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-logo-path-06",
+          "tagName": "path"
+        },
+        {
+          "id": "navbar-logo-dot-07",
+          "tagName": "circle"
+        },
+        {
+          "id": "navbar-brand-name-08",
+          "tagName": "DIV",
+          "text": "بولیاں\nBOLIYAN"
+        },
+        {
+          "id": "navbar-brand-urdu-09",
+          "tagName": "SPAN",
+          "text": "بولیاں"
+        },
+        {
+          "id": "navbar-brand-english-10",
+          "tagName": "SPAN",
+          "text": "BOLIYAN"
+        },
+        {
+          "id": "navbar-search-input",
+          "tagName": "INPUT",
+          "text": "",
+          "placeholder": "Search items, categories..."
+        },
+        {
+          "id": "navbar-right-section-11",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "location-selector-root",
+          "tagName": "DIV",
+          "text": "Locating..."
+        },
+        {
+          "id": "location-popover-trigger",
+          "tagName": "BUTTON",
+          "text": "Locating...",
+          "type": "button"
+        },
+        {
+          "id": "navbar-sell-btn-12",
+          "tagName": "A",
+          "text": "Sell Item"
+        },
+        {
+          "id": "navbar-sell-plus-icon-13",
+          "tagName": "svg"
+        },
+        {
+          "id": "navbar-loading-avatar",
+          "tagName": "DIV",
+          "text": ""
+        },
+        {
+          "id": "layout-wrapper-02",
+          "tagName": "DIV",
+          "text": "Dashboard\nMessages\nNew Listing\nSelling\nBuying\nWatc"
+        },
+        {
+          "id": "main-content-03",
+          "tagName": "MAIN",
+          "text": "Dashboard\nMessages\nNew Listing\nSelling\nBuying\nWatc"
+        },
+        {
+          "id": "dashboard-actions",
+          "tagName": "DIV",
+          "text": "Messages\nNew Listing"
+        },
+        {
+          "id": "dashboard-messages-btn",
+          "tagName": "A",
+          "text": "Messages"
+        },
+        {
+          "id": "dashboard-new-listing-btn",
+          "tagName": "A",
+          "text": "New Listing"
+        },
+        {
+          "id": "dashboard-offers-tab",
+          "tagName": "BUTTON",
+          "text": "Selling",
+          "type": "button"
+        },
+        {
+          "id": "dashboard-bids-tab",
+          "tagName": "BUTTON",
+          "text": "Buying",
+          "type": "button"
+        },
+        {
+          "id": "dashboard-watchlist-tab",
+          "tagName": "BUTTON",
+          "text": "Watchlist",
+          "type": "button"
+        },
+        {
+          "id": "dashboard-listings-tab",
+          "tagName": "BUTTON",
+          "text": "Listings",
+          "type": "button"
+        },
+        {
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
+          "tagName": "DIV",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-copy-01",
+          "tagName": "SPAN",
+          "text": "Copyright © 2026 Boliyan"
+        },
+        {
+          "id": "footer-links-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
+        },
+        {
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
+        },
+        {
+          "id": "bottom-nav-container-01",
+          "tagName": "DIV",
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
+        },
+        {
+          "id": "bottom-nav-wrapper-02",
+          "tagName": "DIV",
+          "text": "Market\nDash\nSell\nInbox\nAnalytics"
+        },
+        {
+          "id": "bottom-nav-link-market",
+          "tagName": "A",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-item-market",
+          "tagName": "DIV",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-icon-market",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-market",
+          "tagName": "SPAN",
+          "text": "Market"
+        },
+        {
+          "id": "bottom-nav-link-dash",
+          "tagName": "A",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-item-dash",
+          "tagName": "DIV",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-icon-dash",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-dash",
+          "tagName": "SPAN",
+          "text": "Dash"
+        },
+        {
+          "id": "bottom-nav-link-sell",
+          "tagName": "A",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-item-sell",
+          "tagName": "DIV",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-icon-sell",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-sell",
+          "tagName": "SPAN",
+          "text": "Sell"
+        },
+        {
+          "id": "bottom-nav-link-inbox",
+          "tagName": "A",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-item-inbox",
+          "tagName": "DIV",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-icon-inbox",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-inbox",
+          "tagName": "SPAN",
+          "text": "Inbox"
+        },
+        {
+          "id": "bottom-nav-link-analytics",
+          "tagName": "A",
+          "text": "Analytics"
+        },
+        {
+          "id": "bottom-nav-item-analytics",
+          "tagName": "DIV",
+          "text": "Analytics"
+        },
+        {
+          "id": "bottom-nav-icon-analytics",
+          "tagName": "svg"
+        },
+        {
+          "id": "bottom-nav-text-analytics",
+          "tagName": "SPAN",
+          "text": "Analytics"
+        },
+        {
+          "id": "_R_",
+          "tagName": "SCRIPT",
+          "text": "self.__next_r=\"4tnwHRf2E3EFI6-7C-ona\""
         },
         {
           "id": "devtools-indicator",
@@ -1105,22 +2265,22 @@
     },
     {
       "route": "/list",
-      "title": "Boliyan - Speak Your Price",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
       "interactiveElements": [
         {
           "id": "root-body-01",
           "tagName": "BODY",
-          "text": "بولیاں\nBOLIYAN\nList an Item\nMinimalist listing. Se"
+          "text": "بولیاں\nBOLIYAN\nSign In\nCopyright © 2026 Boliyan\nTe"
         },
         {
           "id": "navbar-01",
           "tagName": "NAV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nSign In"
         },
         {
           "id": "navbar-container-02",
           "tagName": "DIV",
-          "text": "بولیاں\nBOLIYAN"
+          "text": "بولیاں\nBOLIYAN\nSign In"
         },
         {
           "id": "navbar-left-section-03",
@@ -1168,7 +2328,7 @@
         {
           "id": "navbar-right-section-11",
           "tagName": "DIV",
-          "text": ""
+          "text": "Sign In"
         },
         {
           "id": "location-selector-root",
@@ -1198,156 +2358,57 @@
         {
           "id": "layout-wrapper-02",
           "tagName": "DIV",
-          "text": "List an Item\nMinimalist listing. Set your price an"
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
         },
         {
           "id": "main-content-03",
           "tagName": "MAIN",
-          "text": "List an Item\nMinimalist listing. Set your price an"
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
         },
         {
-          "id": "list-page-container",
+          "id": "list-page-01",
           "tagName": "DIV",
-          "text": "List an Item\nMinimalist listing. Set your price an"
+          "text": ""
         },
         {
-          "id": "list-item-card",
+          "id": "list-loading-01",
           "tagName": "DIV",
-          "text": "List an Item\nMinimalist listing. Set your price an"
+          "text": ""
         },
         {
-          "id": "list-item-header",
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
           "tagName": "DIV",
-          "text": "List an Item\nMinimalist listing. Set your price an"
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
         },
         {
-          "id": "list-item-title-heading",
-          "tagName": "DIV",
-          "text": "List an Item"
-        },
-        {
-          "id": "list-item-description-text",
-          "tagName": "DIV",
-          "text": "Minimalist listing. Set your price and choose your"
-        },
-        {
-          "id": "list-item-form",
-          "tagName": "DIV",
-          "text": "Product Images (Max 5)\nAdd Photo\nItem Location\n*\n+"
-        },
-        {
-          "id": "images-label",
-          "tagName": "LABEL",
-          "text": "Product Images (Max 5)"
-        },
-        {
-          "id": "images-preview-container",
-          "tagName": "DIV",
-          "text": "Add Photo"
-        },
-        {
-          "id": "add-image-label",
-          "tagName": "LABEL",
-          "text": "Add Photo"
-        },
-        {
-          "id": "camera-icon",
-          "tagName": "svg"
-        },
-        {
-          "id": "add-photo-text",
+          "id": "footer-copy-01",
           "tagName": "SPAN",
-          "text": "Add Photo"
+          "text": "Copyright © 2026 Boliyan"
         },
         {
-          "id": "image-upload-input",
-          "tagName": "INPUT",
-          "text": "",
-          "type": "file"
-        },
-        {
-          "id": "title-input",
-          "tagName": "INPUT",
-          "text": "",
-          "placeholder": "e.g. Sony Headphones, Wood Table..."
-        },
-        {
-          "id": "category-select",
-          "tagName": "BUTTON",
-          "text": "Select Category",
-          "type": "button"
-        },
-        {
-          "id": "condition-select",
-          "tagName": "BUTTON",
-          "text": "👌 Used",
-          "type": "button"
-        },
-        {
-          "id": "price-input",
-          "tagName": "INPUT",
-          "text": "",
-          "type": "number",
-          "placeholder": "0"
-        },
-        {
-          "id": "description-textarea",
-          "tagName": "TEXTAREA",
-          "text": "",
-          "placeholder": "Tell buyers about condition, usage, and any defects..."
-        },
-        {
-          "id": "listing-phone-input",
-          "tagName": "INPUT",
-          "text": "",
-          "type": "tel",
-          "placeholder": "Enter phone number"
-        },
-        {
-          "id": "bidding-style-heading",
-          "tagName": "H3",
-          "text": "Bidding Style"
-        },
-        {
-          "id": "public-auction-option",
+          "id": "footer-links-01",
           "tagName": "DIV",
-          "text": "Public Auction\n\nEveryone can see the highest bid"
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
         },
         {
-          "id": "hidden-bids-option",
-          "tagName": "DIV",
-          "text": "Hidden Bids Only\n\nOnly you see the bid amounts"
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
         },
         {
-          "id": "duration-btn-24",
-          "tagName": "BUTTON",
-          "text": "24 Hours"
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
         },
         {
-          "id": "duration-btn-48",
-          "tagName": "BUTTON",
-          "text": "48 Hours"
-        },
-        {
-          "id": "duration-btn-72",
-          "tagName": "BUTTON",
-          "text": "72 Hours"
-        },
-        {
-          "id": "cancel-listing-btn",
-          "tagName": "BUTTON",
-          "text": "Cancel",
-          "type": "button"
-        },
-        {
-          "id": "post-listing-btn",
-          "tagName": "BUTTON",
-          "text": "Post Listing"
-        },
-        {
-          "id": "go-live-note",
-          "tagName": "DIV",
-          "text": "Goes live in 1 hour after saving."
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
         },
         {
           "id": "bottom-nav-container-01",
@@ -1457,12 +2518,12 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"wZiF-2CkIrKkQbobXuxFe\""
+          "text": "self.__next_r=\"4LYkecLVpfvO6KqnOKZyi\""
         },
         {
           "id": "devtools-indicator",
           "tagName": "DIV",
-          "text": ""
+          "text": "0\n1\nIssue"
         },
         {
           "id": "next-logo",
@@ -1490,7 +2551,7 @@
     },
     {
       "route": "/inbox",
-      "title": "Boliyan - Speak Your Price",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
       "interactiveElements": [
         {
           "id": "root-body-01",
@@ -1635,24 +2696,59 @@
           "type": "button"
         },
         {
-          "id": "radix-_R_16atpddp9lb_-content-all",
+          "id": "radix-_R_4pbn5lmp9lb_-content-all",
           "tagName": "DIV",
           "text": "No active conversations\n\nChats appear here once a "
         },
         {
-          "id": "radix-_R_16atpddp9lb_-content-offers",
+          "id": "radix-_R_4pbn5lmp9lb_-content-offers",
           "tagName": "DIV",
           "text": ""
         },
         {
-          "id": "radix-_R_16atpddp9lb_-content-bids",
+          "id": "radix-_R_4pbn5lmp9lb_-content-bids",
           "tagName": "DIV",
           "text": ""
         },
         {
           "id": "chat-window-container",
           "tagName": "DIV",
-          "text": "Speak Your PriceChoose a chat from the left to arr"
+          "text": "Sell Fast. Buy Fair.Choose a chat from the left to"
+        },
+        {
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
+          "tagName": "DIV",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-copy-01",
+          "tagName": "SPAN",
+          "text": "Copyright © 2026 Boliyan"
+        },
+        {
+          "id": "footer-links-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
+        },
+        {
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
         },
         {
           "id": "bottom-nav-container-01",
@@ -1762,7 +2858,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"rrA2FoftBH-dbtrUUTyuJ\""
+          "text": "self.__next_r=\"k63qBB5BpHfg-ckXnS2iP\""
         },
         {
           "id": "devtools-indicator",
@@ -1795,7 +2891,7 @@
     },
     {
       "route": "/dashboard/seller",
-      "title": "Boliyan - Speak Your Price",
+      "title": "Boliyan - Sell Fast. Buy Fair.",
       "interactiveElements": [
         {
           "id": "root-body-01",
@@ -1933,6 +3029,41 @@
           "text": "Listing Performance\nLoading listings..."
         },
         {
+          "id": "footer-01",
+          "tagName": "FOOTER",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-inner-01",
+          "tagName": "DIV",
+          "text": "Copyright © 2026 Boliyan\nTerms of Service\nPrivacy "
+        },
+        {
+          "id": "footer-copy-01",
+          "tagName": "SPAN",
+          "text": "Copyright © 2026 Boliyan"
+        },
+        {
+          "id": "footer-links-01",
+          "tagName": "DIV",
+          "text": "Terms of Service\nPrivacy Policy\nData Deletion"
+        },
+        {
+          "id": "footer-terms-link-01",
+          "tagName": "A",
+          "text": "Terms of Service"
+        },
+        {
+          "id": "footer-privacy-link-01",
+          "tagName": "A",
+          "text": "Privacy Policy"
+        },
+        {
+          "id": "footer-deletion-link-01",
+          "tagName": "A",
+          "text": "Data Deletion"
+        },
+        {
           "id": "bottom-nav-container-01",
           "tagName": "DIV",
           "text": "Market\nDash\nSell\nInbox\nAnalytics"
@@ -2040,7 +3171,7 @@
         {
           "id": "_R_",
           "tagName": "SCRIPT",
-          "text": "self.__next_r=\"55pCZ-JkAzQUFGVYeD2Ij\""
+          "text": "self.__next_r=\"Y08Qvepm4OhNsxZscJq6X\""
         },
         {
           "id": "devtools-indicator",

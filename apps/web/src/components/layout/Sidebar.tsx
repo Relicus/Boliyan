@@ -78,6 +78,7 @@ export default function Sidebar() {
         <div className="flex bg-slate-100/80 p-1.5 rounded-2xl isolate">
           {/* All Toggle */}
           <button
+            id="sidebar-toggle-all"
             onClick={() => setFilter('listingType', 'all')}
             className={cn(
               "flex-1 relative flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-colors duration-200 z-10",
@@ -99,6 +100,7 @@ export default function Sidebar() {
 
           {/* Public Toggle */}
           <button
+            id="sidebar-toggle-public"
             onClick={() => setFilter('listingType', 'public')}
             className={cn(
               "flex-1 relative flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-colors duration-200 z-10",
@@ -120,6 +122,7 @@ export default function Sidebar() {
 
           {/* Hidden Toggle */}
           <button
+            id="sidebar-toggle-hidden"
             onClick={() => setFilter('listingType', 'hidden')}
             className={cn(
               "flex-1 relative flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-colors duration-200 z-10",

@@ -259,13 +259,14 @@ export default function Navbar() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-slate-100" />
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
-                    <Link href="/profile" className="flex items-center w-full">
+                    <Link id="navbar-profile-link" href="/profile" className="flex items-center w-full">
                       <UserCircle className="mr-2.5 h-4 w-4 opacity-70" />
                       Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-slate-100" />
                   <DropdownMenuItem 
+                    id="navbar-logout-btn"
                     onClick={() => {
                       logout();
                     }}

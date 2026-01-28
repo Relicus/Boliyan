@@ -39,8 +39,9 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   // Find the stepper row container (parent of input)
   // Test Card Stepper (+)
   const plusBtn = firstCard.locator('button[id*="increment-btn"]');
-  // Use force: true to avoid overlay issues
-  await plusBtn.click({ force: true });
+  // Use dispatchEvent to trigger pointer events used for long-press logic
+  await plusBtn.dispatchEvent('pointerdown');
+  await plusBtn.dispatchEvent('pointerup');
   
   const incrementedValueStr = await input.inputValue();
   const incrementedValue = parseFloat(incrementedValueStr.replace(/,/g, ''));
@@ -48,7 +49,8 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
 
   // 3. Test Card Stepper (-)
   const minusBtn = firstCard.locator('button[id*="decrement-btn"]');
-  await minusBtn.click({ force: true });
+  await minusBtn.dispatchEvent('pointerdown');
+  await minusBtn.dispatchEvent('pointerup');
   const decrementedValueStr = await input.inputValue();
   const decrementedValue = parseFloat(decrementedValueStr.replace(/,/g, ''));
   expect(decrementedValue).toBe(initialValue);
@@ -68,17 +70,22 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   const modalInitialValueStr = await modalInput.inputValue();
   const modalInitialValue = parseFloat(modalInitialValueStr.replace(/,/g, ''));
   
-  const modalPlusBtn = dialog.locator('button[id*="modal-increment-btn"]');
+  const modalPlusBtn = dialog.locator('button[id^="modal-item-card-"][id$="-increment-btn"]');
 
-  await modalPlusBtn.click();
+  await modalPlusBtn.dispatchEvent('pointerdown');
+  await modalPlusBtn.dispatchEvent('pointerup');
   const modalIncrementedStr = await modalInput.inputValue();
   expect(parseFloat(modalIncrementedStr.replace(/,/g, ''))).toBe(modalInitialValue + step);
 
   // 7. Test Bid Submission
   // Button text is now "Bid" or "Place Bid" depending on context. 
   // In modal it is just "Bid".
-  const bidBtn = dialog.locator('button', { hasText: 'Bid' }).last(); // Ensure we get the button
+  const bidBtn = dialog.locator('button[id^="modal-item-card-"][id$="-place-bid-btn"]');
+  await bidBtn.click();
+  // Dual-tap confirmation
+  await expect(bidBtn).toContainText('Confirm?', { timeout: 3000 });
   await bidBtn.click();
   
-  await expect(dialog).not.toBeVisible();
+  // Verify success state (it says "Bid Placed!" in the button now, or has a success-msg child)
+  await expect(bidBtn).toContainText('Bid Placed!', { timeout: 10000 });
 });

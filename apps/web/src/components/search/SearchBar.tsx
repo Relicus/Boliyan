@@ -69,14 +69,13 @@ export default function SearchBar() {
           className="pl-9 pr-9 h-10 w-full bg-slate-50 border-slate-200 focus:bg-white transition-colors rounded-xl"
         />
         {inputValue && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-slate-400 hover:text-slate-600 rounded-full"
+          <button
+            id="search-clear-btn"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
             onClick={clearSearch}
           >
             <X className="h-3 w-3" />
-          </Button>
+          </button>
         )}
       </div>
 
@@ -94,12 +93,13 @@ export default function SearchBar() {
                 </div>
             ) : (
                 <div className="flex flex-col gap-1">
-                {suggestions.map((item, index) => (
-                    <button
-                        key={`${item.type}-${item.text}-${index}`}
-                        onClick={() => handleSearch(item.category || item.text)}
-                        className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg flex items-center gap-3 transition-colors group"
-                    >
+                 {suggestions.map((item, index) => (
+                     <button
+                         key={`${item.type}-${item.text}-${index}`}
+                         id={"search-suggestion-" + index}
+                         onClick={() => handleSearch(item.category || item.text)}
+                         className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg flex items-center gap-3 transition-colors group"
+                     >
                     <div className="h-8 w-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 group-hover:bg-white group-hover:border-blue-100 transition-colors">
                         {item.type === 'recent' && <Clock className="h-3.5 w-3.5 text-slate-400" />}
                         {item.type === 'category' && <Tag className="h-3.5 w-3.5 text-blue-400" />}
@@ -119,13 +119,14 @@ export default function SearchBar() {
             {inputValue.length === 0 && (
                 <div className="mt-2 mb-2 px-2">
                     <h4 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Saved Searches</h4>
-                    <div className="flex flex-wrap gap-2">
-                        {['iPhone 15 Pro', 'Gaming Laptop', 'Vintage Watch', 'Sony WH-1000XM5', 'MacBook Air M2'].map((search) => (
-                            <button
-                                key={search}
-                                onClick={() => handleSearch(search)}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-slate-50 text-slate-600 rounded-md border border-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100 transition-colors"
-                            >
+                     <div className="flex flex-wrap gap-2">
+                         {['iPhone 15 Pro', 'Gaming Laptop', 'Vintage Watch', 'Sony WH-1000XM5', 'MacBook Air M2'].map((search, index) => (
+                             <button
+                                 key={search}
+                                 id={"saved-search-" + index}
+                                 onClick={() => handleSearch(search)}
+                                 className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-slate-50 text-slate-600 rounded-md border border-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-100 transition-colors"
+                             >
                                 <span className="truncate max-w-[120px]">{search}</span>
                                 <div className="h-1 w-1 rounded-full bg-slate-300" />
                             </button>

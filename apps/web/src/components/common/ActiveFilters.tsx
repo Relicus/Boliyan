@@ -130,6 +130,7 @@ export const ActiveFilters = memo(({ className, variant = "sidebar" }: ActiveFil
                 <span className="whitespace-nowrap">{filter.label}</span>
               </div>
               <button
+                id={"remove-filter-" + filter.id}
                 type="button"
                 onClick={filter.onRemove}
                 className="p-0.5 rounded hover:bg-black/10 transition-colors"

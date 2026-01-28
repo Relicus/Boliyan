@@ -4,12 +4,14 @@ import { memo } from "react";
 import { getConditionLabel, cn } from "@/lib/utils";
 
 interface ConditionBadgeProps {
+  id?: string;
   condition: string;
   variant?: "glass" | "glass-light" | "outline" | "solid";
   className?: string;
 }
 
 export const ConditionBadge = memo(({ 
+  id,
   condition, 
   variant = "outline", 
   className = "" 
@@ -24,7 +26,7 @@ export const ConditionBadge = memo(({
   };
 
   return (
-    <div className={cn(
+    <div id={id} className={cn(
       "inline-flex items-center px-2 py-1 rounded-md transition-all",
       variants[variant],
       className

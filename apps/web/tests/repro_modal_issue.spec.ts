@@ -22,9 +22,9 @@ test('reproduce product modal not opening', async ({ page }) => {
   console.log(`Found card with ID: ${cardId}`);
   expect(cardId).not.toBeNull();
 
-  // Click the card
-  console.log(`Clicking card ${cardId}...`);
-  await page.click(`#${cardId}`);
+  // Click the card title to open modal
+  console.log(`Clicking card title for ${cardId}...`);
+  await page.click(`#${cardId}-title`);
   
   // Check if dialog is visible
   console.log('Checking for dialog...');

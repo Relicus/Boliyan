@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginUser } from './helpers/auth';
 
 test.describe('Authentication Flows', () => {
   test.beforeEach(async ({ page }) => {
@@ -38,6 +39,7 @@ test.describe('Authentication Flows', () => {
 
     test('should display all sign-up elements', async ({ page }) => {
       await expect(page.locator('#signup-card')).toBeVisible();
+      await page.locator('#email-signup-btn').click();
       await expect(page.locator('#name-input')).toBeVisible();
       await expect(page.locator('#email-input')).toBeVisible();
       await expect(page.locator('#phone-input')).toBeVisible();
@@ -48,6 +50,7 @@ test.describe('Authentication Flows', () => {
     });
 
     test('should validate password mismatch', async ({ page }) => {
+      await page.locator('#email-signup-btn').click();
       await page.locator('#name-input').fill('Test User');
       await page.locator('#email-input').fill('test@example.com');
       await page.locator('#phone-input').fill('03001234567');
@@ -61,6 +64,22 @@ test.describe('Authentication Flows', () => {
     test('should navigate back to sign-in page', async ({ page }) => {
       await page.locator('#signin-link').click();
       await expect(page).toHaveURL('/signin');
+    });
+  });
+
+  test.describe('Sign Out', () => {
+    test('should log out successfully', async ({ page }) => {
+      await loginUser(page);
+      
+      // Click avatar to open dropdown
+      await page.locator('#navbar-avatar-18').click();
+      
+      // Click logout
+      await page.locator('#navbar-logout-btn').click();
+      
+      // Verify redirect to home
+      await expect(page).toHaveURL(/.*localhost:3000\/?/);
+      await expect(page.locator('#navbar-signin-btn')).toBeVisible();
     });
   });
 });

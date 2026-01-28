@@ -314,7 +314,7 @@ export default function MarketplaceGrid() {
                     className="flex items-center gap-2 pr-4 shrink-0"
                   >
                     <div className="h-6 w-px bg-slate-200 mx-2" />
-                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 font-bold py-1 px-3 flex items-center gap-2 rounded-full whitespace-nowrap">
+                    <Badge id="active-filter-badge" variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 font-bold py-1 px-3 flex items-center gap-2 rounded-full whitespace-nowrap">
                       {searchFilters.query ? `"${searchFilters.query}"` : mpFilters.category}
                       <button 
                         onClick={() => {

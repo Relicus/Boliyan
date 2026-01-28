@@ -6,6 +6,7 @@ import { LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CategoryBadgeProps {
+  id?: string;
   category: string;
   variant?: "glass" | "glass-light" | "outline" | "solid";
   className?: string;
@@ -14,6 +15,7 @@ interface CategoryBadgeProps {
 }
 
 export const CategoryBadge = memo(({ 
+  id,
   category, 
   variant = "outline", 
   className = "",
@@ -56,6 +58,7 @@ export const CategoryBadge = memo(({
   if (isClickable) {
     return (
       <button
+        id={id || ("category-badge-" + category.toLowerCase())}
         type="button"
         onClick={(e) => {
           e.stopPropagation();

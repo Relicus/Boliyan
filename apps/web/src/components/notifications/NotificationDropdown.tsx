@@ -64,6 +64,7 @@ export function NotificationDropdown() {
           </div>
           {unreadCount > 0 && (
             <Button 
+              id="notifications-mark-all-read-btn"
               variant="ghost" 
               size="sm" 
               onClick={() => markAllAsRead()}

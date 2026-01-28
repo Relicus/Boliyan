@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useTime } from "@/context/TimeContext";
 
 interface TimerBadgeProps {
+  id?: string;
   expiryAt: string;
   variant?: "glass" | "glass-light" | "outline" | "solid";
   className?: string;
@@ -15,6 +16,7 @@ interface TimerBadgeProps {
 }
 
 export const TimerBadge = memo(({ 
+  id,
   expiryAt, 
   variant = "outline", 
   className = "",
@@ -81,6 +83,7 @@ export const TimerBadge = memo(({
 
   return (
     <motion.div 
+      id={id}
       initial={false}
       animate={isUrgent ? {
         scale: [1, 1.06, 1, 1.06, 1],

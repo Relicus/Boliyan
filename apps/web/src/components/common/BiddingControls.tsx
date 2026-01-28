@@ -283,7 +283,7 @@ export const BiddingControls = memo(({
       return { 
         theme: 'success' as ButtonTheme,
         content: (
-          <span className="flex items-center gap-2">
+          <span id={buildId('success-msg')} className="flex items-center gap-2">
              <motion.svg 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}

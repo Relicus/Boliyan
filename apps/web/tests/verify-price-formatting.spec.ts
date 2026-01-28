@@ -18,7 +18,7 @@ test('Verify Price Formatting Rules', async ({ page }) => {
     await page.waitForTimeout(1000); // Wait for Framer Motion transitions
 
     // Locate first item card price - looking for the text content
-    const askPrice = page.locator('div[id^="item-card-"] h3 + div div, [id$="-ask-price"]').first();
+    const askPrice = page.locator('div[id^="item-card-"] [id^="price-asking-value-"]').first();
     const priceText = await askPrice.innerText();
 
     console.log(`Mode: ${id}, Price: ${priceText}`);
@@ -46,7 +46,7 @@ test('Verify Price Formatting Rules', async ({ page }) => {
   await page.locator('img[alt]').first().click();
   
   // Modal price should be full numeric
-  const modalPrice = page.locator('div[role="dialog"] .text-xl.font-black').first();
+  const modalPrice = page.locator('div[role="dialog"] [id^="price-asking-value"]').first();
   await expect(modalPrice).toBeVisible();
   const modalText = await modalPrice.innerText();
   console.log(`Modal Price: ${modalText}`);

@@ -51,7 +51,7 @@ test.describe('Profile Management & Reviews', () => {
                      content: "Great buyer!",
                      role: 'seller', // The reviewer was a seller
                      created_at: new Date().toISOString(),
-                     reviewer: { name: 'Seller One', avatar_url: '' },
+                     reviewer: { full_name: 'Seller One', avatar_url: '' },
                      listing: { title: 'Camera' }
                  }
              ]});

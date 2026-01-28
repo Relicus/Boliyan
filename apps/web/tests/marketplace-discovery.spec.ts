@@ -11,13 +11,16 @@ test.describe('Marketplace Discovery & Navigation', () => {
     await expect(searchInput).toBeVisible();
     
     // Type search query
-    await searchInput.fill('laptop');
+    await searchInput.click();
+    await searchInput.fill('Camera');
+    await page.waitForTimeout(300);
     await searchInput.press('Enter');
     
     // Verify search badge appears in the grid header
-    // Use .first() and wait for it to be visible (handles hydration/loading)
-    const searchBadge = page.locator('#marketplace-grid-root').getByText(/laptop/i).first();
+    // Look for the badge or chip
+    const searchBadge = page.locator('#active-filter-badge, [id^="active-filter-chip-"]').first();
     await expect(searchBadge).toBeVisible({ timeout: 15000 });
+    await expect(searchBadge).toContainText('Camera');
   });
 
   test('should navigate through categories', async ({ page }) => {
@@ -32,15 +35,17 @@ test.describe('Marketplace Discovery & Navigation', () => {
     await page.locator('#category-btn-all').click();
     
     // Try a common category (ID should be category-btn-{kebab-case-label})
-    // Let's try 'Electronics' if it exist, or just 'Vehicles'
-    const catBtn = page.locator('[id^="category-btn-"]').nth(1); // Second button after 'All'
+    // Use the desktop CategoryNav buttons specifically
+    const catBtn = page.locator('#category-bar-root [id^="category-btn-"]').nth(1); 
     await expect(catBtn).toBeVisible();
-    const catLabel = await catBtn.innerText();
+    const catLabel = (await catBtn.innerText()).trim();
     await catBtn.click();
     
     // Verify results reflect the category
-    const categoryBadge = page.locator('#marketplace-grid-root').getByText(catLabel, { exact: true }).first();
-    await expect(categoryBadge).toBeVisible();
+    // Look for the badge or chip
+    const categoryBadge = page.locator('#active-filter-badge, [id^="active-filter-chip-"]').first();
+    await expect(categoryBadge).toBeVisible({ timeout: 10000 });
+    await expect(categoryBadge).toContainText(catLabel);
   });
 
   test('should handle location changes', async ({ page, isMobile }) => {
@@ -55,14 +60,17 @@ test.describe('Marketplace Discovery & Navigation', () => {
     await locationBtn.click();
     
     // Search for another city in the command input
-    const cityInput = page.locator('input[placeholder="Search city..."]');
+    const cityInput = page.locator('#map-search-input');
     await expect(cityInput).toBeVisible();
     await cityInput.fill('Lahore');
     
     // Select Lahore from the command results
-    const lahoreOption = page.locator('[role="option"]').getByText('Lahore', { exact: true }).first();
-    await expect(lahoreOption).toBeVisible();
+    const lahoreOption = page.locator('button[id^="map-search-result-"]').getByText('Lahore', { exact: false }).first();
+    await expect(lahoreOption).toBeVisible({ timeout: 10000 });
     await lahoreOption.click();
+    
+    // Click confirm button in the popover
+    await page.locator('#location-confirm-btn').click();
     
     // Verify button label updated (check text or first word)
     await expect(locationBtn).toContainText(/Lahore|Near/); // "Near Me" if selected, but here we picked Lahore
@@ -98,7 +106,7 @@ test.describe('Marketplace Discovery & Navigation', () => {
     await expect(filterSheet).toBeVisible();
     
     // Set a price range
-    const minInput = filterSheet.locator('input[placeholder="Min"]');
+    const minInput = filterSheet.locator('#price-min-input');
     await minInput.fill('5000');
     
     // Apply

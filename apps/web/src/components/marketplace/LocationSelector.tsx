@@ -240,6 +240,7 @@ function LocationSelectorContent({ onSelect, mode }: { onSelect: () => void, mod
       {/* Footer / Confirm */}
       <div className="p-2 border-t bg-slate-50 flex justify-end">
         <Button 
+          id="location-confirm-btn"
           size="sm" 
           disabled={isMapLoading}
           className="h-8 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 disabled:opacity-70 disabled:bg-slate-400"

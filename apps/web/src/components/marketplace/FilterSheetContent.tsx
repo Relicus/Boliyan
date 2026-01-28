@@ -131,6 +131,7 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
                    <span className="text-slate-400 text-[10px] font-bold">₨</span>
                 </div>
                 <Input
+                  id="price-min-input"
                   type="number"
                   placeholder="Min"
                   value={filters.minPrice || ''}
@@ -145,6 +146,7 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
                    <span className="text-slate-400 text-[10px] font-bold">₨</span>
                 </div>
                 <Input
+                  id="price-max-input"
                   type="number"
                   placeholder="Max"
                   value={filters.maxPrice || ''}

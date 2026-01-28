@@ -272,6 +272,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input 
+            id="map-search-input"
             placeholder="Search city, area, or place..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -288,6 +289,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
             {searchResults.map((result) => (
               <button
                 key={result.place_id}
+                id={"map-search-result-" + result.place_id}
                 className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 border-b border-slate-50 last:border-0 truncate"
                 onClick={() => handleSearchResultClick(result)}
               >
@@ -308,6 +310,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
         
         {/* GPS Button */}
         <Button
+            id="map-locate-me-btn"
             type="button"
             variant="secondary"
             size="icon"
@@ -358,6 +361,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
         {PAKISTAN_CITIES.slice(0, 8).map((city) => (
            <button
              key={city}
+             id={"map-city-chip-" + city.toLowerCase()}
              onClick={() => handleQuickCityClick(city)}
              className="px-3 py-1.5 bg-slate-50 hover:bg-white border border-slate-200 hover:border-blue-200 rounded-full text-xs font-medium text-slate-600 hover:text-blue-600 whitespace-nowrap transition-colors"
            >

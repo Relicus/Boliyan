@@ -116,6 +116,14 @@ function DashboardContent() {
       
       {/* Header with Add Button */}
       <h1 className="sr-only">Dashboard</h1>
+      <div id="dashboard-actions" className="flex items-center justify-end gap-2">
+        <Button asChild variant="outline" size="sm" id="dashboard-messages-btn">
+          <Link href="/inbox">Messages</Link>
+        </Button>
+        <Button asChild size="sm" id="dashboard-new-listing-btn">
+          <Link href="/list">New Listing</Link>
+        </Button>
+      </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl h-auto">

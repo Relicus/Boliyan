@@ -14,18 +14,26 @@ interface ListingBadgesProps {
 
 export function ListingBadges({ item, seller, showTimer = true, className }: ListingBadgesProps) {
   const badgeStyle = "px-3 py-1.5";
+  const itemId = item.id;
   
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
+    <div id={`listing-badges-${itemId}`} className={`flex flex-wrap gap-2 ${className}`}>
       {/* Primary Status Row */}
-      <ConditionBadge condition={item.condition} variant="outline" className={badgeStyle} />
-      <CategoryBadge category={item.category} variant="outline" className={badgeStyle} />
-      {showTimer && <TimerBadge expiryAt={item.expiryAt} variant="outline" className={`${badgeStyle} bg-red-600 text-white border-transparent hover:bg-red-700`} />}
+      <ConditionBadge id={`condition-badge-${itemId}`} condition={item.condition} variant="outline" className={badgeStyle} />
+      <CategoryBadge id={`category-badge-${itemId}`} category={item.category} variant="outline" className={badgeStyle} />
+      {showTimer && (
+        <TimerBadge
+          id={`timer-badge-${itemId}`}
+          expiryAt={item.expiryAt}
+          variant="outline"
+          className={`${badgeStyle} bg-red-600 text-white border-transparent hover:bg-red-700`}
+        />
+      )}
 
       {/* Verified Badge */}
 
       {seller.isVerified && (
-        <Badge variant="outline" className={`font-bold bg-blue-50 text-blue-700 border-blue-100 flex items-center gap-1.5 ${badgeStyle}`}>
+        <Badge id={`verified-badge-${itemId}`} variant="outline" className={`font-bold bg-blue-50 text-blue-700 border-blue-100 flex items-center gap-1.5 ${badgeStyle}`}>
           <BadgeCheck className="h-3.5 w-3.5 fill-current text-blue-700 stroke-white" />
           Verified Listing
         </Badge>
@@ -33,7 +41,7 @@ export function ListingBadges({ item, seller, showTimer = true, className }: Lis
 
       {/* Hidden Bidding Badge */}
       {!item.isPublicBid && (
-        <Badge variant="secondary" className={`font-bold bg-amber-500 text-white border-none shadow-sm flex items-center gap-1.5 ${badgeStyle}`}>
+        <Badge id={`hidden-bidding-badge-${itemId}`} variant="secondary" className={`font-bold bg-amber-500 text-white border-none shadow-sm flex items-center gap-1.5 ${badgeStyle}`}>
           <Lock className="h-3.5 w-3.5" />
           Hidden Bidding
         </Badge>

@@ -22,8 +22,8 @@ test.describe('Messaging & Engagement', () => {
 
   test('should prevent messaging before deal acceptance', async ({ page }) => {
     // 1. Pick an item
-    const rootCards = page.locator('#marketplace-grid-container > div > [id^="item-card-"]');
-    const itemCard = rootCards.first();
+    await page.waitForSelector('[id^="item-card-"]', { state: 'visible', timeout: 15000 });
+    const itemCard = page.locator('#marketplace-grid-container [id^="item-card-"]').first();
     const itemId = (await itemCard.getAttribute('id'))?.replace('item-card-', '');
     if (!itemId) throw new Error("Could not find item ID");
 

@@ -313,10 +313,10 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
             <div className="text-[10px] text-slate-400 bg-slate-50 p-2 rounded border border-slate-100 font-mono mt-2">
                 User: {user.id.slice(0, 8)}...
             </div>
-            <Button onClick={handleRetryFetch} variant="outline" className="mt-4">
+            <Button id="chat-retry-btn" onClick={handleRetryFetch} variant="outline" className="mt-4">
                 Retry Connection
             </Button>
-            <Button onClick={onBack || (() => window.history.back())} variant="ghost" className="text-slate-400">
+            <Button id="chat-back-btn" onClick={onBack || (() => window.history.back())} variant="ghost" className="text-slate-400">
                 Go Back
             </Button>
         </div>
@@ -678,15 +678,16 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
                         size={28} 
                      />
                  </div>
-                 {vouchRating > 0 && (
-                     <Button 
-                        size="sm" 
-                        onClick={handleQuickVouch}
-                        className="w-full bg-slate-900 text-white rounded-xl shadow-lg animate-in zoom-in duration-200"
-                     >
-                         Confirm Vouch
-                     </Button>
-                 )}
+                  {vouchRating > 0 && (
+                      <Button 
+                         id="chat-vouch-confirm-btn"
+                         size="sm" 
+                         onClick={handleQuickVouch}
+                         className="w-full bg-slate-900 text-white rounded-xl shadow-lg animate-in zoom-in duration-200"
+                      >
+                          Confirm Vouch
+                      </Button>
+                  )}
              </motion.div>
         ) : isSealed && vouchSubmitted ? (
              /* --- VOUCH COMPLETE --- */
@@ -782,6 +783,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
           </div>
           <DialogFooter className="sm:justify-center gap-3">
             <Button
+              id="chat-seal-cancel-btn"
               variant="outline"
               onClick={() => setIsSealDialogOpen(false)}
               className="flex-1 rounded-xl"
@@ -789,6 +791,7 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
               Wait, not yet
             </Button>
             <Button
+              id="chat-seal-confirm-btn"
               onClick={handleConfirmExchange}
               className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-200"
             >
