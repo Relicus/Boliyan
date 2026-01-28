@@ -99,12 +99,20 @@ function DashboardContent() {
   const listingsWithOffers = myItems
     .map(item => ({
       item,
-      offers: bids.filter(b => 
-        b.itemId === item.id && 
-        (b.status === 'pending' || b.status === 'accepted')
-      )
+      offers: bids
+        .filter(b => 
+          b.itemId === item.id && 
+          (b.status === 'pending' || b.status === 'accepted')
+        )
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Latest offers first within each listing
     }))
-    .filter(group => group.offers.length > 0);
+    .filter(group => group.offers.length > 0)
+    .sort((a, b) => {
+      // Sort listings by most recent offer activity
+      const latestA = Math.max(...a.offers.map(o => new Date(o.createdAt).getTime()));
+      const latestB = Math.max(...b.offers.map(o => new Date(o.createdAt).getTime()));
+      return latestB - latestA;
+    });
   
   // Total offer count for badge
   const totalOfferCount = listingsWithOffers.reduce((sum, g) => sum + g.offers.length, 0);

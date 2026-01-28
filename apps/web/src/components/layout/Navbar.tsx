@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, LogOut, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3, MapPin } from "lucide-react";
+import { Plus, LogOut, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3, MapPin, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,7 @@ import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 // import { SearchDropdown } from "./SearchDropdown";
 import SearchBar from "@/components/search/SearchBar";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { useNotifications } from "@/context/NotificationContext";
 import Skeleton from "@/components/ui/Skeleton";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
@@ -27,6 +28,7 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
 export default function Navbar() {
   const { user, isLoggedIn, logout, items, bids, messages, isLoading, resetFilters } = useApp();
+  const { unreadCount: notificationUnreadCount } = useNotifications();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab');
@@ -235,17 +237,26 @@ export default function Navbar() {
 
               </div>
 
-              {/* New Notification Dropdown */}
-              <div className="ml-1 mr-3">
+              {/* New Notification Dropdown - Hidden below lg (1024px) */}
+              <div className="hidden lg:block ml-1 mr-3">
                  <NotificationDropdown />
               </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar id="navbar-avatar-18" className="h-12 w-12 cursor-pointer ring-2 ring-transparent hover:ring-blue-100 transition-all border shadow-sm">
-                    <AvatarImage id="navbar-avatar-image-19" src={user.avatar} />
-                    <AvatarFallback id="navbar-avatar-fallback-20">{user.name[0]}</AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar id="navbar-avatar-18" className="h-12 w-12 cursor-pointer ring-2 ring-transparent hover:ring-blue-100 transition-all border shadow-sm">
+                      <AvatarImage id="navbar-avatar-image-19" src={user.avatar} />
+                      <AvatarFallback id="navbar-avatar-fallback-20">{user.name[0]}</AvatarFallback>
+                    </Avatar>
+                    {/* Notification dot on avatar - shown below lg (1024px) when there are unread notifications */}
+                    {notificationUnreadCount > 0 && (
+                      <span className="lg:hidden absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-600 ring-2 ring-white"></span>
+                      </span>
+                    )}
+                  </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 mt-1 p-2 rounded-2xl shadow-xl border-slate-100">
                   <DropdownMenuLabel className="font-outfit pb-3">
@@ -258,6 +269,18 @@ export default function Navbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-slate-100" />
+                  {/* Notifications menu item - shown below lg (1024px) */}
+                  <DropdownMenuItem asChild className="lg:hidden rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
+                    <Link id="navbar-notifications-link" href="/notifications" className="flex items-center w-full">
+                      <Bell className="mr-2.5 h-4 w-4 opacity-70" />
+                      Notifications
+                      {notificationUnreadCount > 0 && (
+                        <span className="ml-auto flex h-5 min-w-[1.25rem] px-1.5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-bold text-blue-700">
+                          {notificationUnreadCount}
+                        </span>
+                      )}
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
                     <Link id="navbar-profile-link" href="/profile" className="flex items-center w-full">
                       <UserCircle className="mr-2.5 h-4 w-4 opacity-70" />
