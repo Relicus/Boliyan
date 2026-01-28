@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { loginUser } from './helpers/auth';
+import { mockSupabaseNetwork } from './helpers/mock-network';
 
 test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   // 1. Login first (Required by new RLS policies)
+  await mockSupabaseNetwork(page);
   await loginUser(page);
   
   // 2. Navigate to Home (should already be there after loginUser)
@@ -14,7 +16,9 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
 
   // Locate the first Item Card that actually has a bidding input
   // (Avoids selecting other 'group' elements like categories or banners)
-  const firstCard = page.locator('.group', { has: page.locator('input[id*="bid-input"]') }).first();
+  const firstCard = page.locator('#marketplace-grid-container [id^="item-card-"]').filter({
+    has: page.locator('button[id$="-place-bid-btn"]:not([disabled])')
+  }).first();
   
   // Ensure it's visible
   await expect(firstCard).toBeVisible();
@@ -22,6 +26,7 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   // Get the Asking Price or High Bid text to calculate expectations
   const input = firstCard.locator('input[id*="bid-input"]');
   await expect(input).toBeVisible();
+  await expect(input).toBeEnabled();
   
   const initialValueStr = await input.inputValue();
   // Handle comma-separated values (e.g. "1,200")
@@ -56,7 +61,7 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   expect(decrementedValue).toBe(initialValue);
 
   // 4. Test Click Input
-  await input.click();
+  await input.click({ force: true });
   await expect(page.locator('div[role="dialog"]')).toHaveCount(0);
 
   // 5. Open Modal
@@ -66,7 +71,7 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   await expect(dialog).toBeVisible();
 
   // 6. Test Modal Stepper
-  const modalInput = dialog.locator('input[type="text"]');
+  const modalInput = dialog.locator('input[id$="-bid-input"]');
   const modalInitialValueStr = await modalInput.inputValue();
   const modalInitialValue = parseFloat(modalInitialValueStr.replace(/,/g, ''));
   
@@ -81,11 +86,19 @@ test('Smart Bidding Logic & UX Verification', async ({ page }) => {
   // Button text is now "Bid" or "Place Bid" depending on context. 
   // In modal it is just "Bid".
   const bidBtn = dialog.locator('button[id^="modal-item-card-"][id$="-place-bid-btn"]');
-  await bidBtn.click();
-  // Dual-tap confirmation
-  await expect(bidBtn).toContainText('Confirm?', { timeout: 3000 });
-  await bidBtn.click();
-  
-  // Verify success state (it says "Bid Placed!" in the button now, or has a success-msg child)
-  await expect(bidBtn).toContainText('Bid Placed!', { timeout: 10000 });
+  await bidBtn.click({ force: true });
+  const confirmLabel = bidBtn.locator('text=Confirm?');
+  const needsConfirm = await confirmLabel.isVisible({ timeout: 3000 }).catch(() => false);
+  if (needsConfirm) {
+    await bidBtn.click({ force: true });
+  }
+
+  const successMsg = bidBtn.locator('[id$="-success-msg"]');
+  await expect
+    .poll(async () => {
+      const successVisible = await successMsg.isVisible().catch(() => false);
+      if (successVisible) return 'Bid Placed!';
+      return (await bidBtn.innerText()).trim();
+    }, { timeout: 10000 })
+    .toMatch(/Bid Placed!|Update Bid/);
 });

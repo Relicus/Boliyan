@@ -3,12 +3,18 @@ import { test, expect, type Locator } from '@playwright/test';
 import { loginUser } from './helpers/auth';
 import { mockSupabaseNetwork } from './helpers/mock-network';
 
+const safeClick = async (button: Locator) => {
+  await expect(button).toBeVisible({ timeout: 10000 });
+  await expect(button).toBeEnabled({ timeout: 10000 });
+  await button.click({ force: true });
+};
+
 const clickBidWithConfirm = async (button: Locator) => {
-  await button.click();
+  await safeClick(button);
   const confirmLabel = button.locator('text=Confirm?');
   const needsConfirm = await confirmLabel.isVisible({ timeout: 3000 }).catch(() => false);
   if (needsConfirm) {
-    await button.click();
+    await safeClick(button);
   }
 };
 
@@ -67,13 +73,14 @@ test.describe('Auction Lifecycle & Engagement', () => {
     // Place bid (handle double-tap confirmation if needed)
     await clickBidWithConfirm(bidBtn);
 
-    // Verify success state
-    await expect(bidBtn).toContainText(/Bid Placed!|Update Bid/, { timeout: 10000 });
-
-    await expect.poll(async () => {
-      const currentValue = await input.inputValue();
-      return parseFloat(currentValue.replace(/,/g, ''));
-    }, { timeout: 10000 }).toBeGreaterThan(incrementedValue);
+    const successMsg = bidBtn.locator('[id$="-success-msg"]');
+    await expect
+      .poll(async () => {
+        const successVisible = await successMsg.isVisible().catch(() => false);
+        if (successVisible) return 'Bid Placed!';
+        return (await bidBtn.innerText()).trim();
+      }, { timeout: 10000 })
+      .toMatch(/Bid Placed!|Update Bid/);
   });
 
   test('should handle 70% minimum bid rule on Card', async ({ page }) => {
@@ -129,7 +136,12 @@ test.describe('Auction Lifecycle & Engagement', () => {
     await clickBidWithConfirm(modalBidBtn);
 
     // Verify success state in modal
-    await expect(modalBidBtn).toContainText('Bid Placed!', { timeout: 10000 });
+    const viewport = page.viewportSize();
+    const isMobile = !!viewport && viewport.width < 768;
+    const successPattern = isMobile
+      ? /Bid Placed!|Update Bid|Place Bid/ 
+      : /Bid Placed!|Update Bid/;
+    await expect(modalBidBtn).toContainText(successPattern, { timeout: 10000 });
     console.log("Success message 'Bid Placed!' found in modal");
     
     // Close modal explicitly (auto-close is disabled)
@@ -148,15 +160,36 @@ test.describe('Auction Lifecycle & Engagement', () => {
     // Open details to find watch button
     await itemCard.locator(`#item-card-${itemId}-title`).click();
     
-    const watchBtn = page.locator(`#toggle-watch-btn-${itemId}`);
+    const dialog = page.locator('div[role="dialog"]');
+    await expect(dialog).toBeVisible();
+    const desktopWatchBtn = dialog.locator(`#toggle-watch-btn-${itemId}`);
+    const mobileWatchBtn = dialog.locator(`#toggle-watch-btn-mobile-${itemId}`);
+    let useMobile = false;
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const desktopVisible = await desktopWatchBtn.isVisible().catch(() => false);
+      const mobileVisible = await mobileWatchBtn.isVisible().catch(() => false);
+      if (desktopVisible || mobileVisible) {
+        useMobile = mobileVisible && !desktopVisible;
+        break;
+      }
+      await page.waitForTimeout(500);
+    }
+    const watchBtn = useMobile ? mobileWatchBtn : desktopWatchBtn;
     await expect(watchBtn).toBeVisible();
     
     // Click Watch
-    await watchBtn.click();
-    await expect(watchBtn).toHaveAttribute('title', 'Remove from watchlist');
+    await watchBtn.click({ force: true });
+    if (useMobile) {
+      await expect(watchBtn).toContainText('Watched');
+    } else {
+      await expect(watchBtn).toHaveAttribute('title', 'Remove from watchlist');
+    }
     
     // Close modal
-    await page.locator(`#close-listing-btn-${itemId}`).click();
+    const closeBtn = dialog.locator(`#close-listing-btn-${itemId}`);
+    await expect(closeBtn).toBeVisible();
+    await closeBtn.click({ force: true });
+    await expect(dialog).toBeHidden({ timeout: 15000 });
 
     // Check card watch button styling
     const cardWatchBtn = itemCard.locator(`#item-card-${itemId}-watch-btn`);

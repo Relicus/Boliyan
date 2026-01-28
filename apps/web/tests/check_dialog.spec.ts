@@ -12,11 +12,13 @@ test('check dialog close button', async ({ page }) => {
   await page.waitForSelector('[id^="item-card-"]');
   
   // Click first card
-  const cards = await page.$$('[id^="item-card-"]');
-  await cards[0].click();
+  const firstCard = page.locator('[id^="item-card-"]').first();
+  const itemId = (await firstCard.getAttribute('id'))?.replace('item-card-', '');
+  if (!itemId) throw new Error('Missing item id');
+  await firstCard.locator(`#item-card-${itemId}-title`).click();
   
   // Wait for dialog
-  await page.waitForSelector('[role="dialog"]');
+  await page.waitForSelector('[role="dialog"]', { state: 'visible' });
   
   // Take a screenshot
   await page.screenshot({ path: 'dialog_check.png' });

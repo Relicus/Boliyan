@@ -187,23 +187,20 @@ export async function mockSupabaseNetwork(page: Page) {
 
   // 10. Mock Marketplace Listings (GET)
   await page.route(/\/rest\/v1\/marketplace_listings.*/, async route => {
-      // Return a set of mock items containing the IDs expected by tests
-      // ID '...23' is commonly used by ItemCard test? 
-      // Actually the test uses whatever is on the page.
-      // But if we return Mocks, the page will Render Mocks.
-      // Wait: If we mock this, the 'real' items on localhost:3000 won't load.
-      // But we need them to inspect the 'Halo'.
-      // Strategy: Return a static list that MATCHES the test expectations.
-      // Or... can we fetch them from localhost? No, complex.
-      // Better: Return a robust mock list.
+      const requestUrl = new URL(route.request().url());
+      const acceptHeader = route.request().headers()['accept'] || '';
+      const idFilter = requestUrl.searchParams.get('id');
+      const slugFilter = requestUrl.searchParams.get('slug');
+
       const mockItems = [
           {
               id: '00000000-0000-0000-0000-000000000023',
+              slug: 'test-item-camera',
               title: "Test Item Camera",
               description: "A great camera",
               images: ["https://placehold.co/400"],
               seller_id: "seller-123",
-              asked_price: 13100, // Valid price for logic
+              asked_price: 13100,
               category: "Cameras",
               auction_mode: "visible",
               created_at: new Date().toISOString(),
@@ -218,8 +215,52 @@ export async function mockSupabaseNetwork(page: Page) {
               high_bidder_id: "other-bidder",
               condition: "used"
           },
-          // Add more if needed
+          {
+              id: '00000000-0000-0000-0000-000000000015',
+              slug: 'persian-rug',
+              title: "Persian Rug",
+              description: "Handwoven wool rug",
+              images: ["https://placehold.co/400"],
+              seller_id: "seller-456",
+              asked_price: 25000,
+              category: "Home",
+              auction_mode: "visible",
+              created_at: new Date().toISOString(),
+              status: "active",
+              seller_name: "Rug Dealer",
+              seller_avatar: "https://github.com/shadcn.png",
+              seller_rating: 4.6,
+              seller_rating_count: 8,
+              seller_location: "Lahore",
+              bid_count: 0,
+              high_bid: null,
+              high_bidder_id: null,
+              condition: "used"
+          }
       ];
+
+      const matchFilterValue = (filterValue: string | null) => {
+          if (!filterValue) return null;
+          const match = filterValue.match(/^eq\.(.+)$/);
+          return match ? match[1] : null;
+      };
+
+      const filterId = matchFilterValue(idFilter);
+      const filterSlug = matchFilterValue(slugFilter);
+      const matchedItem = mockItems.find(item =>
+        (filterId && item.id === filterId) || (filterSlug && item.slug === filterSlug)
+      );
+
+      if (matchedItem && acceptHeader.includes('application/vnd.pgrst.object+json')) {
+          await route.fulfill({ json: matchedItem });
+          return;
+      }
+
+      if (matchedItem) {
+          await route.fulfill({ json: [matchedItem] });
+          return;
+      }
+
       await route.fulfill({ json: mockItems }); 
   });
 

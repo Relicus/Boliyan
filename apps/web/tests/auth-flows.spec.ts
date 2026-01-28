@@ -28,7 +28,7 @@ test.describe('Authentication Flows', () => {
     test('should navigate to sign-up page', async ({ page }) => {
       await page.locator('#signup-link').click();
       await expect(page).toHaveURL('/signup');
-      await expect(page.locator('#signup-card')).toBeVisible();
+      await expect(page.locator('#signup-card').first()).toBeVisible();
     });
   });
 
@@ -38,7 +38,7 @@ test.describe('Authentication Flows', () => {
     });
 
     test('should display all sign-up elements', async ({ page }) => {
-      await expect(page.locator('#signup-card')).toBeVisible();
+      await expect(page.locator('#signup-card').first()).toBeVisible();
       await page.locator('#email-signup-btn').click();
       await expect(page.locator('#name-input')).toBeVisible();
       await expect(page.locator('#email-input')).toBeVisible();

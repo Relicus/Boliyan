@@ -32,7 +32,8 @@ test.describe('Visual Stability & Layout', () => {
     await page.waitForTimeout(500);
     const box2 = await items.first().boundingBox();
     
-    expect(box1?.y).toBe(box2?.y); // Should not jump vertically
+    const yDelta = Math.abs((box1?.y || 0) - (box2?.y || 0));
+    expect(yDelta).toBeLessThan(1); // Allow sub-pixel shifts
     expect(box1?.height).toBeCloseTo(box2?.height || 0, 1); // Height should be stable
   });
 
@@ -59,7 +60,7 @@ test.describe('Visual Stability & Layout', () => {
   
   test('should display Navbar elements strictly', async ({ page }) => {
       // Verify Logo
-      await expect(page.locator('text=Boliyan')).toBeVisible();
+      await expect(page.locator('#navbar-01').getByText('Boliyan').first()).toBeVisible();
       
       // Verify Search Bar
       await expect(page.locator('input[placeholder*="Search"]')).toBeVisible();

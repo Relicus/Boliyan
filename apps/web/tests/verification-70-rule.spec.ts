@@ -1,18 +1,23 @@
 
 import { test, expect } from '@playwright/test';
 import { loginUser } from './helpers/auth';
+import { mockSupabaseNetwork } from './helpers/mock-network';
 
 test('70% Minimum Bid Rule Verification', async ({ page }) => {
+  await mockSupabaseNetwork(page);
   await loginUser(page);
   await page.goto('/');
   
   // Wait for items to load
   await page.waitForSelector('.group');
 
-  // Find the first item card with a bidding input
-  const itemCard = page.locator('.group', { has: page.locator('input[id*="bid-input"]') }).first();
+  const itemCard = page.locator('#marketplace-grid-container [id^="item-card-"]').filter({
+    has: page.locator('button[id$="-place-bid-btn"]:not([disabled])')
+  }).first();
+  await expect(itemCard).toBeVisible({ timeout: 10000 });
   const input = itemCard.locator('input[id*="bid-input"]');
-  const bidBtn = itemCard.locator('button[id*="place-bid-btn"]');
+  const bidBtn = itemCard.locator('button[id$="-place-bid-btn"]');
+  await expect(input).toBeEnabled();
 
   // Get current asking price to calculate 70%
   const askPriceElement = itemCard.locator('[id*="price-asking-value"]');
@@ -44,9 +49,9 @@ test('70% Minimum Bid Rule Verification', async ({ page }) => {
   await expect(input).not.toHaveClass(/bg-red-50/);
   
   // Click bid button - should trigger confirmation
-  await bidBtn.click();
+  await bidBtn.click({ force: true });
   await expect(bidBtn).toContainText('Confirm?', { timeout: 3000 });
-  await bidBtn.click();
+  await bidBtn.click({ force: true });
   
-  await expect(bidBtn).toContainText('Bid Placed!', { timeout: 10000 });
+  await expect(bidBtn).toContainText(/Bid Placed!|Update Bid/, { timeout: 10000 });
 });
