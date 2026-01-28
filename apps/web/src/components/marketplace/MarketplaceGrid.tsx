@@ -10,6 +10,7 @@ import AdCard from "@/components/ads/AdCard";
 import ItemCardSkeleton from "./ItemCardSkeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import SmartFilterBar, { FILTERS } from "./SmartFilterBar";
+import ClearFiltersButton from "./ClearFiltersButton";
 import CategoryNav from "@/components/search/CategoryNav";
 import { LocationSelector } from "./LocationSelector";
 import { Button } from "@/components/ui/button";
@@ -189,6 +190,9 @@ export default function MarketplaceGrid() {
             {/* Filter Grid Container */}
             <div className="flex flex-col gap-2">
               
+              {/* Clear Filters Row (shown when filters active) */}
+              <ClearFiltersButton variant="mobile" className="w-full" />
+              
               {/* Row 1: Sort, Category, Type, View */}
               <div className="grid grid-cols-4 gap-2">
                 {/* 1. Sort Tab */}
@@ -331,6 +335,7 @@ export default function MarketplaceGrid() {
           {/* DESKTOP: Full Filter Buttons Row */}
           <div id="smart-filters-row" className="hidden md:flex items-center gap-4 md:px-0">
             <div className="flex-1 overflow-x-auto scrollbar-hide flex items-center gap-4">
+              <ClearFiltersButton variant="inline" />
               <SmartFilterBar />
               
               <AnimatePresence>

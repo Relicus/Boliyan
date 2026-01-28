@@ -47,7 +47,7 @@ function SmartFilterBar() {
   const currentSort = isSearchMode ? searchFilters.sortBy : mpFilters.sortBy;
 
   return (
-    <div id="smart-filter-bar-root" className="w-full flex items-center justify-between md:justify-start gap-4 overflow-x-auto scrollbar-hide px-4 py-1">
+    <div id="smart-filter-bar-root" className="w-full flex items-center justify-between md:justify-start gap-2 md:gap-4 overflow-x-auto scrollbar-hide px-4 py-1 min-w-0">
       {FILTERS.map((f) => {
         const Icon = f.icon;
         
@@ -62,8 +62,8 @@ function SmartFilterBar() {
             id={`smart-filter-btn-${f.id}`}
             onClick={() => handleFilterClick(f.id)}
             className={cn(
-              // Base / Mobile Styles (Vertical, Borderless)
-              "flex flex-col md:flex-row items-center justify-center md:gap-1.5 min-w-[60px] md:min-w-0 px-2 py-1 md:py-1.5 md:px-3 rounded-md md:rounded-full transition-all duration-200 md:border",
+              // Base / Mobile Styles (Vertical, Borderless) - min-w-0 allows shrinking
+              "flex flex-col md:flex-row items-center justify-center md:gap-1.5 min-w-[60px] md:min-w-0 px-2 py-1 md:py-1.5 md:px-3 rounded-md md:rounded-full transition-all duration-200 md:border flex-shrink",
               
               // Conditional Active States
               isActive 
@@ -74,7 +74,7 @@ function SmartFilterBar() {
             <Icon 
               id={`smart-filter-icon-${f.id}`}
               className={cn(
-                "h-6 w-6 mb-0.5 md:mb-0 md:h-4 md:w-4 transition-all duration-200",
+                "h-6 w-6 mb-0.5 md:mb-0 md:h-4 md:w-4 transition-all duration-200 flex-shrink-0",
                 isActive 
                   ? "stroke-[2.5px] md:stroke-2 text-blue-600 fill-blue-600/20 md:text-white md:fill-white/20" 
                   : cn(f.color, f.fill)
@@ -84,7 +84,7 @@ function SmartFilterBar() {
             <span 
               id={`smart-filter-label-${f.id}`}
               className={cn(
-              "text-[10px] md:text-sm md:font-bold hidden md:block",
+              "text-[10px] md:text-sm md:font-bold hidden md:block truncate min-w-0",
               isActive ? "font-bold" : "font-semibold"
             )}>
               {f.label}
