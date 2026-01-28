@@ -1,12 +1,12 @@
+import path from "node:path";
 import type { NextConfig } from "next";
-import path from "path";
+
+const repoRoot = path.resolve(__dirname, "../..");
 
 const nextConfig: NextConfig = {
-  /* Fix monorepo build tracing - must match turbopack.root */
-  outputFileTracingRoot: path.join(__dirname, "../../"),
-  /* Fix monorepo module resolution for Turbopack */
+  outputFileTracingRoot: repoRoot,
   turbopack: {
-    root: path.join(__dirname, "../../"),
+    root: repoRoot,
   },
   /* Allow cross-origin requests from local network devices */
   allowedDevOrigins: [
