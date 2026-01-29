@@ -204,10 +204,13 @@ export const PriceDisplay = memo(({
         >
              {/* Ask Price Block */}
              <div className="flex flex-col items-center justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20 min-w-0">
-                <span className={cn(getLabelClass(), "flex items-center gap-1.5 justify-center mb-0.5")}>
-                    <Tag className="w-3 h-3 text-slate-400" />
-                    Asking
-                </span>
+                {/* Label Container - Fixed Height for consistency */}
+                <div className="h-4 w-full relative flex justify-center mb-0.5">
+                    <span className={cn(getLabelClass(), "flex items-center gap-1.5 justify-center absolute inset-x-0")}>
+                        <Tag className="w-3 h-3 text-slate-400" />
+                        Asking
+                    </span>
+                </div>
                 <span 
                   id={itemId ? `price-asking-value-stacked-${itemId}` : undefined}
                   className={cn(getPriceClass(viewMode), "text-slate-800")}
@@ -219,7 +222,7 @@ export const PriceDisplay = memo(({
              {/* Highest/User Bid Block */}
              <div className="flex flex-col items-center justify-center p-3 pl-5 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm h-20 min-w-0 relative overflow-hidden">
                  {/* Label Container - Fixed Height */}
-                 <div className="h-4 w-full relative flex justify-center mb-1">
+                 <div className="h-4 w-full relative flex justify-center mb-0.5">
                      <AnimatePresence mode="wait">
                         <motion.span 
                             key={labelText}

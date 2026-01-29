@@ -122,7 +122,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
       <div 
         key={bid.id} 
         id={`offer-row-${bid.id}`}
-        className="bg-slate-50 rounded-lg p-3 mb-3 flex flex-col md:flex-row md:items-center gap-3"
+        className="@container bg-slate-50 rounded-lg p-3 mb-3 flex flex-col md:flex-row md:items-center gap-3"
       >
         {/* Top Section: Avatar + Info */}
         <div className="flex items-center gap-3 w-full md:w-auto md:flex-1 min-w-0">
@@ -157,8 +157,8 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
                 </div>
               </div>
             <span 
-              className={`font-black shrink-0 ${bid.amount >= item.askPrice ? 'text-green-600' : 'text-slate-900'}`}
-              style={{ fontSize: 'clamp(1.125rem, 4vw, 1.5rem)' }}
+              className={`font-black price-font leading-none ${bid.amount >= item.askPrice ? 'text-green-600' : 'text-slate-900'}`}
+              style={{ fontSize: 'clamp(1.25rem, 7cqi, 2rem)' }}
             >
               Rs. {formatPrice(bid.amount)}
             </span>
@@ -242,7 +242,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
               <Button 
                 id={`chat-btn-${bid.id}`}
                 size="sm"
-                className="h-9 w-full md:w-auto px-3 text-xs font-bold bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm"
+                className="h-9 w-full md:w-auto px-3 text-xs font-bold bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm col-span-2 md:col-span-1"
                  onClick={() => handleChat(bid.bidderId)}
                  disabled={actionsDisabled}
               >

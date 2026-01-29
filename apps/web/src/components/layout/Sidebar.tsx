@@ -21,7 +21,7 @@ import { useApp } from "@/lib/store";
 import { motion } from "framer-motion";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import BannerAd from "@/components/ads/BannerAd";
-import { ActiveFilters } from "@/components/common/ActiveFilters";
+
 import { cn } from "@/lib/utils";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { useState, useRef, useEffect } from "react";
@@ -144,8 +144,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Active Filters Section */}
-      <ActiveFilters variant="sidebar" className="border-b border-slate-100" />
 
       <ScrollArea id="sidebar-scroll-area-02" className="flex-1 px-4 min-h-0">
         <div className="space-y-6 py-4 pb-8">
