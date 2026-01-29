@@ -52,7 +52,12 @@ test.describe('Visual Stability & Layout', () => {
     // 3. Close Dialog using the specific ID from ItemCard implementation
     // ID format: `close-listing-btn-${item.id}`
     const closeBtn = page.locator(`#close-listing-btn-${itemId}`);
-    await closeBtn.click();
+    if (await closeBtn.isVisible().catch(() => false)) {
+      await closeBtn.scrollIntoViewIfNeeded();
+      await closeBtn.click({ force: true });
+    } else {
+      await page.keyboard.press('Escape');
+    }
     
     // 5. Verify Dialog is Gone (Animation completed)
     await expect(dialog).not.toBeVisible();

@@ -1,9 +1,36 @@
 import { test, expect, Page } from '@playwright/test';
 
+import { gotoWithRetry } from './helpers/goto';
+
 const getLocationTrigger = async (page: Page) => {
   const desktopTrigger = page.locator('#location-popover-trigger');
   if (await desktopTrigger.isVisible()) return desktopTrigger;
   return page.locator('#location-popover-trigger-mobile');
+};
+
+const openLocationPopover = async (page: Page) => {
+  const locationTrigger = await getLocationTrigger(page);
+  await locationTrigger.click();
+  const popover = page.locator('[role="dialog"]').first();
+  await expect(popover).toBeVisible();
+  return popover;
+};
+
+const selectCityFromMap = async (popover: ReturnType<Page['locator']>, city: string) => {
+  const cityId = `#map-city-chip-${city.toLowerCase()}`;
+  const chip = popover.locator(cityId).first();
+
+  if (await chip.isVisible().catch(() => false)) {
+    await chip.scrollIntoViewIfNeeded();
+    await chip.click();
+    return;
+  }
+
+  const searchInput = popover.locator('#map-search-input');
+  await searchInput.fill(city);
+  const firstResult = popover.locator('[id^="map-search-result-"]').first();
+  await expect(firstResult).toBeVisible({ timeout: 10000 });
+  await firstResult.click();
 };
 
 test.describe('Location Filtering', () => {
@@ -22,7 +49,7 @@ test.describe('Location Filtering', () => {
         currentCoords: { lat: 24.8607, lng: 67.0011 }
       }));
     });
-    await page.goto('/');
+    await gotoWithRetry(page, '/');
   });
 
   test('should show Pakistan by default', async ({ page }) => {
@@ -31,19 +58,15 @@ test.describe('Location Filtering', () => {
   });
 
   test('should open popover and show map picker', async ({ page }) => {
-    const locationTrigger = await getLocationTrigger(page);
-    await locationTrigger.click();
-    const popover = page.locator('[role="dialog"]');
-    await expect(popover).toBeVisible();
+    const popover = await openLocationPopover(page);
     await expect(popover.locator('#map-search-input')).toBeVisible();
     await expect(popover.locator('#location-confirm-btn')).toBeVisible();
   });
 
   test('should select a city and update trigger label', async ({ page }) => {
-    const locationTrigger = await getLocationTrigger(page);
-    await locationTrigger.click();
-    await page.click('#map-city-chip-lahore');
-    await page.click('#location-confirm-btn');
+    const popover = await openLocationPopover(page);
+    await selectCityFromMap(popover, 'Lahore');
+    await popover.locator('#location-confirm-btn').click();
     
     const updatedTrigger = await getLocationTrigger(page);
     await expect(updatedTrigger).toContainText('Lahore');
@@ -51,15 +74,16 @@ test.describe('Location Filtering', () => {
   });
 
   test('should allow switching cities from map chips', async ({ page }) => {
-    const locationTrigger = await getLocationTrigger(page);
-    await locationTrigger.click();
-    await page.click('#map-city-chip-lahore');
-    await page.click('#location-confirm-btn');
+    const popover = await openLocationPopover(page);
+    await selectCityFromMap(popover, 'Lahore');
+    await popover.locator('#location-confirm-btn').click();
     
     const updatedTrigger = await getLocationTrigger(page);
     await updatedTrigger.click();
-    await page.click('#map-city-chip-karachi');
-    await page.click('#location-confirm-btn');
+    const nextPopover = page.locator('[role="dialog"]').first();
+    await expect(nextPopover).toBeVisible();
+    await selectCityFromMap(nextPopover, 'Karachi');
+    await nextPopover.locator('#location-confirm-btn').click();
     
     const finalTrigger = await getLocationTrigger(page);
     await expect(finalTrigger).toContainText('Karachi');

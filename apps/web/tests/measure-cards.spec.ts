@@ -1,14 +1,16 @@
 import { test } from '@playwright/test';
 
+import { gotoWithRetry } from './helpers/goto';
+
 test('measure card heights', async ({ page }) => {
   page.on('console', msg => {
     if (msg.type() === 'log') console.log(`BROWSER: ${msg.text()}`);
   });
 
-  await page.goto('http://localhost:3000');
+  await gotoWithRetry(page, '/');
   
   // Wait for items to load
-  await page.waitForSelector('[id^="item-card-"]');
+  await page.waitForSelector('[id^="item-card-"]', { timeout: 15000 });
   
   await page.evaluate(() => {
     const results: Array<{ id: string; type: string; height: number; width: number }> = [];

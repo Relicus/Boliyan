@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { loginUser } from './helpers/auth';
+import { gotoWithRetry } from './helpers/goto';
 
 test.describe('Create Listing Flow', () => {
   test.beforeEach(async ({ page }) => {
     // Log in first to access the listing form and avoid redirects
     await loginUser(page);
-    await page.goto('/list');
+    await gotoWithRetry(page, '/list');
   });
 
   test('should display all create listing elements', async ({ page }) => {

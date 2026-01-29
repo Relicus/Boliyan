@@ -1,6 +1,7 @@
 
 import { test, expect } from '@playwright/test';
 import { loginUser } from './helpers/auth';
+import { gotoWithRetry } from './helpers/goto';
 import { mockSupabaseNetwork } from './helpers/mock-network';
 
 test.describe('Condition Variable Verification', () => {
@@ -8,7 +9,7 @@ test.describe('Condition Variable Verification', () => {
   test('Create listing with condition and verify display', async ({ page }) => {
     await mockSupabaseNetwork(page);
     await loginUser(page);
-    await page.goto('http://localhost:3000/list');
+    await gotoWithRetry(page, '/list');
 
     const title = `Test Condition Item ${Date.now()}`;
     await page.fill('#title-input', title);
@@ -28,7 +29,7 @@ test.describe('Condition Variable Verification', () => {
   });
 
   test('Filter by condition', async ({ page }) => {
-    await page.goto('http://localhost:3000/');
+    await gotoWithRetry(page, '/');
   });
 
 });

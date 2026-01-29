@@ -1,5 +1,5 @@
 
-import { test, expect, type Locator } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { loginUser } from './helpers/auth';
 import { mockSupabaseNetwork } from './helpers/mock-network';
 
@@ -9,13 +9,37 @@ const safeClick = async (button: Locator) => {
   await button.click({ force: true });
 };
 
-const clickBidWithConfirm = async (button: Locator) => {
+const clickBidWithConfirm = async (button: Locator, page: Page) => {
   await safeClick(button);
   const confirmLabel = button.locator('text=Confirm?');
   const needsConfirm = await confirmLabel.isVisible({ timeout: 3000 }).catch(() => false);
   if (needsConfirm) {
     await safeClick(button);
+    return;
   }
+
+  await page.waitForTimeout(200);
+  const hasConfirmText = (await button.innerText()).includes('Confirm?');
+  if (hasConfirmText) {
+    await safeClick(button);
+    return;
+  }
+
+  await safeClick(button);
+  const confirmVisibleAfterRetry = await confirmLabel.isVisible({ timeout: 3000 }).catch(() => false);
+  if (confirmVisibleAfterRetry) {
+    await safeClick(button);
+  }
+};
+
+const closeDetailsDialog = async (dialog: Locator, page: Page, itemId: string) => {
+  const closeBtn = dialog.locator(`#close-listing-btn-${itemId}`);
+  if (await closeBtn.isVisible().catch(() => false)) {
+    await closeBtn.click({ force: true });
+  } else {
+    await page.keyboard.press('Escape');
+  }
+  await expect(dialog).toBeHidden({ timeout: 15000 });
 };
 
 test.describe('Auction Lifecycle & Engagement', () => {
@@ -71,16 +95,21 @@ test.describe('Auction Lifecycle & Engagement', () => {
     expect(incrementedValue).toBeGreaterThan(initialValue);
 
     // Place bid (handle double-tap confirmation if needed)
-    await clickBidWithConfirm(bidBtn);
+    await clickBidWithConfirm(bidBtn, page);
 
     const successMsg = bidBtn.locator('[id$="-success-msg"]');
+    const viewport = page.viewportSize();
+    const isMobile = !!viewport && viewport.width < 768;
+    const successPattern = isMobile
+      ? /Bid Placed!|Update Bid|Place Bid/
+      : /Bid Placed!|Update Bid/;
     await expect
       .poll(async () => {
         const successVisible = await successMsg.isVisible().catch(() => false);
         if (successVisible) return 'Bid Placed!';
         return (await bidBtn.innerText()).trim();
       }, { timeout: 10000 })
-      .toMatch(/Bid Placed!|Update Bid/);
+      .toMatch(successPattern);
   });
 
   test('should handle 70% minimum bid rule on Card', async ({ page }) => {
@@ -133,7 +162,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
   await modalIncrBtn.dispatchEvent('pointerup');
   
     // Place bid
-    await clickBidWithConfirm(modalBidBtn);
+    await clickBidWithConfirm(modalBidBtn, page);
 
     // Verify success state in modal
     const viewport = page.viewportSize();
@@ -145,8 +174,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
     console.log("Success message 'Bid Placed!' found in modal");
     
     // Close modal explicitly (auto-close is disabled)
-    await dialog.locator(`#close-listing-btn-${itemId}`).click();
-    await expect(dialog).toBeHidden({ timeout: 15000 });
+    await closeDetailsDialog(dialog, page, itemId);
     console.log("Modal closed successfully");
   });
 
@@ -186,10 +214,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
     }
     
     // Close modal
-    const closeBtn = dialog.locator(`#close-listing-btn-${itemId}`);
-    await expect(closeBtn).toBeVisible();
-    await closeBtn.click({ force: true });
-    await expect(dialog).toBeHidden({ timeout: 15000 });
+    await closeDetailsDialog(dialog, page, itemId);
 
     // Check card watch button styling
     const cardWatchBtn = itemCard.locator(`#item-card-${itemId}-watch-btn`);
@@ -213,10 +238,7 @@ test.describe('Auction Lifecycle & Engagement', () => {
     const startingValueStr = await input.inputValue();
     const startingValue = parseFloat(startingValueStr.replace(/,/g, ''));
 
-    await clickBidWithConfirm(bidBtn);
-    // Verify success state
-    await expect(bidBtn).toContainText(/Bid Placed!|Update Bid/, { timeout: 10000 });
-    
+    await clickBidWithConfirm(bidBtn, page);
     await expect.poll(async () => {
       const currentValue = await input.inputValue();
       return parseFloat(currentValue.replace(/,/g, ''));

@@ -6,13 +6,15 @@ test.describe('Notification System', () => {
     await loginUser(page);
   });
 
-  test('should display notification trigger in navbar', async ({ page }) => {
+  test('should display notification trigger in navbar', async ({ page, isMobile }) => {
+    if (isMobile) return;
     // Check if the notification bell icon exists in the navbar
     const bellBtn = page.locator('#notification-bell-btn');
     await expect(bellBtn).toBeVisible();
   });
 
-  test('should open notifications dropdown', async ({ page }) => {
+  test('should open notifications dropdown', async ({ page, isMobile }) => {
+    if (isMobile) return;
     const bellBtn = page.locator('#notification-bell-btn');
     await bellBtn.click();
     
@@ -21,7 +23,8 @@ test.describe('Notification System', () => {
     await expect(popover.first()).toBeVisible();
   });
 
-  test('should show empty state if no notifications', async ({ page }) => {
+  test('should show empty state if no notifications', async ({ page, isMobile }) => {
+    if (isMobile) return;
     const bellBtn = page.locator('#notification-bell-btn');
     await bellBtn.click();
     

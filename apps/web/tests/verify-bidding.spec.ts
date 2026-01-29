@@ -28,8 +28,10 @@ test('verify initial bid is 70% of ask price for items with 0 bids', async ({ pa
   expect(bidValue).toBe(Math.ceil(askPrice / 10) * 10);
   
   const minBid = Math.ceil((askPrice * 0.7) / 10) * 10;
+  await bidInput.click({ force: true });
   await bidInput.fill((minBid - 100).toString());
-  await expect(bidInput).toHaveClass(/bg-red-50/);
+  const inputContainer = bidInput.locator('..').locator('..');
+  await expect(inputContainer).toHaveClass(/bg-red-50/);
   
   // Try to place bid
   const placeBidBtn = page.locator(`#item-card-${itemId}-place-bid-btn`);

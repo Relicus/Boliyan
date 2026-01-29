@@ -1,6 +1,7 @@
 import { test, type Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { gotoWithRetry } from './helpers/goto';
 
 /**
  * Boliyan Feature Discovery Script
@@ -32,7 +33,7 @@ const discoveredFeatures = {
 
 test('Programmatic Feature Discovery', async ({ page, baseURL }) => {
   const targetUrl = baseURL || 'http://localhost:3000';
-  await page.goto(targetUrl);
+  await gotoWithRetry(page, targetUrl);
   discoveredFeatures.routes.add('/');
   
   await scrapePage(page, '/');
@@ -48,7 +49,7 @@ test('Programmatic Feature Discovery', async ({ page, baseURL }) => {
   for (const route of Array.from(discoveredFeatures.routes)) {
     if (route === '/') continue;
     try {
-      await page.goto(`${targetUrl}${route}`);
+      await gotoWithRetry(page, `${targetUrl}${route}`);
       await scrapePage(page, route);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Unknown error';

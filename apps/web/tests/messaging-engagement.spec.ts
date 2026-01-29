@@ -2,6 +2,7 @@
 import { test, expect } from '@playwright/test';
 import { loginUser } from './helpers/auth';
 import { mockSupabaseNetwork, MOCK_USER_ID } from './helpers/mock-network';
+import { gotoWithRetry } from './helpers/goto';
 
 test.describe('Messaging & Engagement', () => {
   test.beforeEach(async ({ page }) => {
@@ -16,7 +17,7 @@ test.describe('Messaging & Engagement', () => {
     // Login
     await loginUser(page);
     
-    await page.goto('/');
+    await gotoWithRetry(page, '/');
     await page.waitForSelector('[id^="item-card-"]', { state: 'visible', timeout: 15000 });
   });
 

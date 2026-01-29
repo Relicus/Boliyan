@@ -22,6 +22,7 @@ export default function SignInClient() {
   const [isShaking, setIsShaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,6 +180,7 @@ export default function SignInClient() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
+                onFocus={() => setShowPassword(true)}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   if (errors.email) setErrors(prev => ({ ...prev, email: false }));
@@ -199,35 +201,45 @@ export default function SignInClient() {
               </AnimatePresence>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password-input" className="flex items-center gap-1.5">
-                <Lock className="h-3.5 w-3.5 text-slate-500" />
-                Password
-              </Label>
-              <Input
-                id="password-input"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  if (errors.password) setErrors(prev => ({ ...prev, password: false }));
-                }}
-                className={`h-11 transition-all ${errors.password ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-200"}`}
-              />
-              <AnimatePresence>
-                {errors.password && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="text-[10px] font-bold text-red-500"
-                  >
-                    Password must be at least 6 characters
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </div>
+            <AnimatePresence>
+              {showPassword && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="space-y-2 overflow-hidden"
+                >
+                  <Label htmlFor="password-input" className="flex items-center gap-1.5">
+                    <Lock className="h-3.5 w-3.5 text-slate-500" />
+                    Password
+                  </Label>
+                  <Input
+                    id="password-input"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errors.password) setErrors(prev => ({ ...prev, password: false }));
+                    }}
+                    className={`h-11 transition-all ${errors.password ? "border-red-500 bg-red-50/50" : "bg-slate-50 border-slate-200"}`}
+                  />
+                  <AnimatePresence>
+                    {errors.password && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="text-[10px] font-bold text-red-500"
+                      >
+                        Password must be at least 6 characters
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <Button
               id="signin-submit-btn"

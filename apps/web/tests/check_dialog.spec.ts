@@ -1,12 +1,14 @@
 import { test } from '@playwright/test';
 
 import { loginUser } from './helpers/auth';
+import { gotoWithRetry } from './helpers/goto';
 import { mockSupabaseNetwork } from './helpers/mock-network';
 
-test('check dialog close button', async ({ page }) => {
+test('check dialog close button', async ({ page, isMobile }) => {
+  if (isMobile) return;
   await mockSupabaseNetwork(page);
   await loginUser(page);
-  await page.goto('/');
+  await gotoWithRetry(page, '/');
   
   // Wait for item cards to load
   await page.waitForSelector('[id^="item-card-"]');

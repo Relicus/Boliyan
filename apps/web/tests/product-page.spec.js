@@ -17,6 +17,8 @@ test('verify navigation to product page and bidding', async ({ page }) => {
   await itemCard.locator(`#item-card-${itemId}-title`).click();
   
   // Wait for modal to open
+  const dialog = page.locator('div[role="dialog"]');
+  await expect(dialog).toBeVisible({ timeout: 10000 });
   const desktopDetailsBtn = page.locator(`#view-details-btn-${itemId}`);
   const mobileDetailsBtn = page.locator(`#view-details-btn-mobile-${itemId}`);
   const useMobile = await desktopDetailsBtn.isVisible().catch(() => false) === false;
@@ -24,7 +26,8 @@ test('verify navigation to product page and bidding', async ({ page }) => {
   await expect(viewDetailsBtn).toBeVisible();
   
   // Click View Full Details
-  await viewDetailsBtn.click();
+  await viewDetailsBtn.scrollIntoViewIfNeeded();
+  await viewDetailsBtn.click({ force: true });
   
   // Verify URL
   await expect(page).toHaveURL(new RegExp(`/product/${itemSlug}`));

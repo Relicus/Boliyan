@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 
+import { gotoWithRetry } from './helpers/goto';
+
 test('should have a favicon in the head', async ({ page }) => {
-  await page.goto('/');
+  await gotoWithRetry(page, '/');
 
   // Verify head contains the icon link
   const iconLinks = page.locator('link[rel="icon"]');
@@ -14,7 +16,7 @@ test('should have a favicon in the head', async ({ page }) => {
 });
 
 test('should have an apple-touch-icon in the head', async ({ page }) => {
-  await page.goto('/');
+  await gotoWithRetry(page, '/');
 
   const appleLink = page.locator('link[rel="apple-touch-icon"]');
   await expect(appleLink).toBeAttached();

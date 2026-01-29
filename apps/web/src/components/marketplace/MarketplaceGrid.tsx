@@ -15,16 +15,16 @@ import CategoryNav from "@/components/search/CategoryNav";
 import { LocationSelector } from "./LocationSelector";
 import { Button } from "@/components/ui/button";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { ActiveFilters } from "@/components/common/ActiveFilters";
+
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
-import { LayoutGrid, Grid3x3, Grid2x2, X, Gavel } from "lucide-react";
+import { LayoutGrid, Grid3x3, Grid2x2, Gavel } from "lucide-react";
 import PriceSelector from "./PriceSelector";
-import { Badge } from "@/components/ui/badge";
+
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CATEGORIES } from "@/lib/constants";
 import { NewListingsToast } from "@/components/ui/NewListingsToast";
@@ -326,9 +326,6 @@ export default function MarketplaceGrid() {
                   <PriceSelector />
                 </div>
               </div>
-
-              {/* Mobile Active Filters Row */}
-              <ActiveFilters variant="mobile" className="-mx-4" />
             </div>
           </div>
 
@@ -337,31 +334,6 @@ export default function MarketplaceGrid() {
             <div className="flex-1 overflow-x-auto scrollbar-hide flex items-center gap-4">
               <ClearFiltersButton variant="inline" />
               <SmartFilterBar />
-              
-              <AnimatePresence>
-                {(searchFilters.query || mpFilters.category) && (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="flex items-center gap-2 pr-4 shrink-0"
-                  >
-                    <div className="h-6 w-px bg-slate-200 mx-2" />
-                    <Badge id="active-filter-badge" variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 font-bold py-1 px-3 flex items-center gap-2 rounded-full whitespace-nowrap">
-                      {searchFilters.query ? `"${searchFilters.query}"` : mpFilters.category}
-                      <button 
-                        onClick={() => {
-                          if (searchFilters.query) setSearchFilters({...searchFilters, query: ''});
-                          if (mpFilters.category) setMpFilter('category', null);
-                        }}
-                        className="hover:bg-blue-100 p-0.5 rounded-full transition-colors"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
 
             {/* View Toggle Controls (Desktop) */}
@@ -397,27 +369,7 @@ export default function MarketplaceGrid() {
             </ToggleGroup>
           </div>
           
-          {/* Mobile Active Search Filter Badge (shown below dropdowns when searching) */}
-          <AnimatePresence>
-            {searchFilters.query && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="md:hidden flex items-center px-4"
-              >
-                <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 font-bold py-1.5 px-4 flex items-center gap-2 rounded-full whitespace-nowrap shadow-sm">
-                  Search: {searchFilters.query}
-                  <button 
-                    onClick={() => setSearchFilters({...searchFilters, query: ''})}
-                    className="bg-white/20 hover:bg-white/30 p-0.5 rounded-full transition-colors"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
         </div>
       </div>
 
