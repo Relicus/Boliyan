@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useRef, useState, useEffect, useSyncExternalStore } from "react";
 import type { SearchFilters } from "@/types";
 import { useMarketplace } from "@/context/MarketplaceContext";
@@ -331,10 +331,14 @@ export default function MarketplaceGrid() {
 
           {/* DESKTOP: Full Filter Buttons Row */}
           <div id="smart-filters-row" className="hidden md:flex items-center gap-4 md:px-0">
-            <div className="flex-1 overflow-x-auto scrollbar-hide flex items-center gap-4">
-              <ClearFiltersButton variant="inline" />
-              <SmartFilterBar />
-            </div>
+            <LayoutGroup>
+              <motion.div layout className="flex-1 overflow-x-auto scrollbar-hide flex items-center gap-4">
+                <ClearFiltersButton variant="inline" />
+                <motion.div layout>
+                  <SmartFilterBar />
+                </motion.div>
+              </motion.div>
+            </LayoutGroup>
 
             {/* View Toggle Controls (Desktop) */}
             {/* View Toggle Controls (Desktop) */}
