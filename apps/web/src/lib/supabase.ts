@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr';
+import { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database.types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -17,7 +18,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Missing Supabase URL or Anon Key. Check .env.local');
 }
 
-export const supabase = createBrowserClient<Database>(
+export const supabase: SupabaseClient<Database> = createBrowserClient<Database>(
   supabaseUrl,
   supabaseAnonKey,
   {

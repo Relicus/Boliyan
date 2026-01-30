@@ -35,6 +35,7 @@ export interface User {
   profileComplete?: boolean;
   sellerSuccessRate?: number;
   buyerSuccessRate?: number;
+  role?: 'user' | 'admin';
 }
 
 export interface Item {
@@ -67,6 +68,8 @@ export interface Item {
     address: string;
     city?: string;
   };
+  moderationStatus?: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string;
 }
 
 export interface Bid {

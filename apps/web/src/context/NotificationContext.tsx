@@ -6,6 +6,7 @@ import type { Notification } from '@/types/notification';
 import { useAuth } from '@/context/AuthContext';
 import { resolveNotificationLink } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase';
+import type { Database } from '@/types/database.types';
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -123,7 +124,9 @@ export function useNotifications() {
 }
 
 // Transform DB snake_case to camelCase
-function transformNotification(row: Record<string, unknown>): Notification {
+type NotificationRow = Database['public']['Tables']['notifications']['Row'];
+
+function transformNotification(row: any): Notification {
   return {
     id: row.id as string,
     userId: row.user_id as string,
@@ -131,7 +134,7 @@ function transformNotification(row: Record<string, unknown>): Notification {
     title: row.title as string,
     body: row.body as string | undefined,
     link: row.link as string | undefined,
-    isRead: row.is_read as boolean,
+    isRead: !!row.is_read,
     metadata: (row.metadata as Notification['metadata']) || {},
     createdAt: row.created_at as string,
   };

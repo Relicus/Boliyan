@@ -52,7 +52,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       const isValidStatus = (value: string | null | undefined): value is ManagedListing['status'] =>
         value === 'active' || value === 'completed' || value === 'cancelled' || value === 'hidden';
 
-      const listings: ManagedListing[] = (listingsData as ListingWithBidCount[] || []).map((item) => ({
+      const listings: ManagedListing[] = (listingsData as any[] || []).map((item) => ({
         ...item,
         // Manual mapping from Snake Case (DB) to Camel Case (App)
         sellerId: item.seller_id || '',
@@ -76,6 +76,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         views: item.view_count ?? Math.floor(Math.random() * 50) + 10, // Mock if missing
         unreadBids: 0, // TODO: Implement unread logic with notifications
         lastActivity: item.created_at || new Date().toISOString(), // separate activity field later?
+        
+        // Moderation fields for rejection badge
+        moderationStatus: (item as { moderation_status?: string }).moderation_status as ManagedListing['moderationStatus'],
+        rejectionReason: (item as { rejection_reason?: string }).rejection_reason || undefined,
       }));
 
       // 2. Calculate Metrics

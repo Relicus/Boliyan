@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, LogOut, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3, MapPin, Bell } from "lucide-react";
+import { Plus, LogOut, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3, MapPin, Bell, Shield, Users, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useApp } from "@/lib/store";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 // import { SearchDropdown } from "./SearchDropdown";
@@ -27,10 +27,11 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
 
 export default function Navbar() {
-  const { user, isLoggedIn, logout, items, bids, messages, isLoading, resetFilters } = useApp();
+  const { user, isLoggedIn, logout, items, bids, messages, isLoading, resetFilters, isAdminMode, toggleAdminMode } = useApp();
   const { unreadCount: notificationUnreadCount } = useNotifications();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentTab = searchParams.get('tab');
   const dashboardTab = currentTab || 'offers';
   const [isVisible, setIsVisible] = useState(true);
@@ -82,9 +83,11 @@ export default function Navbar() {
     <nav 
       id="navbar-01" 
       suppressHydrationWarning={true}
-      className={`fixed top-0 left-0 right-0 z-50 w-full border-b bg-white transition-transform duration-300 ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
-      }`}
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 w-full border-b bg-white transition-all duration-300",
+        isVisible ? "translate-y-0" : "-translate-y-full",
+        isAdminMode && "border-b-2 border-amber-400 bg-amber-50/30"
+      )}
     >
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-0">
         <LayoutGroup>
@@ -183,7 +186,8 @@ export default function Navbar() {
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 className="flex items-center"
               >
-              {/* Desktop Actions */}
+              {/* Desktop Actions - Hidden in Admin Mode */}
+              {!isAdminMode && (
               <div className="hidden md:flex items-center gap-1 mr-2">
                 <Button id="navbar-market-btn" asChild variant="ghost" className={cn(
                   "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
@@ -236,6 +240,32 @@ export default function Navbar() {
                 </Button>
 
               </div>
+              )}
+
+              {/* Admin Navigation (shown when in admin mode) */}
+              {isAdminMode && (
+                <div className="hidden md:flex items-center gap-1 mr-2">
+                  <Button id="navbar-admin-reports-btn" asChild variant="ghost" className={cn(
+                    "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-amber-50",
+                    pathname === '/admin/reports' ? "text-amber-600 font-bold bg-amber-50" : "text-slate-600 font-medium"
+                  )}>
+                    <Link href="/admin/reports">
+                      <Flag id="navbar-admin-reports-icon" className={cn("h-5 w-5", pathname === '/admin/reports' && "stroke-[2.5]")} strokeWidth={pathname === '/admin/reports' ? 2.5 : 1.5} />
+                      <span>Reports</span>
+                    </Link>
+                  </Button>
+
+                  <Button id="navbar-admin-users-btn" asChild variant="ghost" className={cn(
+                    "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-amber-50",
+                    pathname === '/admin/users' ? "text-amber-600 font-bold bg-amber-50" : "text-slate-600 font-medium"
+                  )}>
+                    <Link href="/admin/users">
+                      <Users id="navbar-admin-users-icon" className={cn("h-5 w-5", pathname === '/admin/users' && "stroke-[2.5]")} strokeWidth={pathname === '/admin/users' ? 2.5 : 1.5} />
+                      <span>Users</span>
+                    </Link>
+                  </Button>
+                </div>
+              )}
 
               {/* New Notification Dropdown - Hidden below lg (1024px) */}
               <div className="hidden lg:block ml-1 mr-3">
@@ -287,6 +317,30 @@ export default function Navbar() {
                       Profile
                     </Link>
                   </DropdownMenuItem>
+                  {/* Admin Mode Toggle - only visible to admin users */}
+                  {user.role === 'admin' && (
+                    <>
+                      <DropdownMenuSeparator className="bg-slate-100" />
+                      <DropdownMenuItem 
+                        id="navbar-admin-toggle"
+                        onClick={toggleAdminMode}
+                        className={cn(
+                          "rounded-xl py-2.5 cursor-pointer",
+                          isAdminMode 
+                            ? "bg-amber-50 text-amber-700 focus:bg-amber-100" 
+                            : "focus:bg-amber-50 focus:text-amber-700"
+                        )}
+                      >
+                        <Shield className="mr-2.5 h-4 w-4 opacity-70" />
+                        {isAdminMode ? "Exit Admin Mode" : "Admin Mode"}
+                        {isAdminMode && (
+                          <span className="ml-auto text-[9px] font-bold bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">
+                            ON
+                          </span>
+                        )}
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator className="bg-slate-100" />
                   <DropdownMenuItem 
                     id="navbar-logout-btn"

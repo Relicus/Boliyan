@@ -84,7 +84,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     id: row.id,
     conversationId: row.conversation_id || "",
     senderId: row.sender_id || "",
-    content: row.content,
+    content: row.content || "",
     isRead: row.is_read ?? false,
     createdAt: row.created_at || new Date().toISOString(),
   }), []);
@@ -241,8 +241,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
            // Update Conversation Last Message (Global List)
             setConversations(prev => prev.map(c => 
-              c.id === (newMsg.conversation_id || "")
-                ? { ...c, lastMessage: newMsg.content, updatedAt: newMsg.created_at || c.updatedAt }
+              c.id === (newMsg.conversation_id as string || "")
+                ? { ...c, lastMessage: (newMsg.content as string) || "", updatedAt: (newMsg.created_at as string) || c.updatedAt }
                 : c
             ));
         }
@@ -339,7 +339,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       .update({ is_read: true })
       .eq('conversation_id', conversationId)
       .neq('sender_id', user.id)
-      .is('is_read', false); 
+      .eq('is_read', false); 
 
     if (error) {
       console.error("Failed to mark messages as read", error);

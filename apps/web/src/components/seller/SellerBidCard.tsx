@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { TimerBadge } from "@/components/common/TimerBadge";
 import { DistanceBadge } from "@/components/common/DistanceBadge";
+import Link from "next/link";
 
 interface SellerBidCardProps {
   bid: Bid;
@@ -94,7 +95,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h4 id={`bidder-name-mobile-${bid.id}`} className="font-semibold text-sm text-slate-700 truncate max-w-[120px]">{bidder.name}</h4>
+                <Link href={`/user/${bidder.id}`} id={`bidder-name-mobile-${bid.id}`} className="font-semibold text-sm text-slate-700 truncate max-w-[120px] hover:text-blue-600 transition-colors">{bidder.name}</Link>
                 <div id={`bidder-rating-mobile-${bid.id}`} className="flex items-center gap-1 bg-amber-50 px-1 py-0.5 rounded-md border border-amber-100 shrink-0">
                   <div className="flex items-center gap-0.5 text-[10px] text-amber-600 font-black">
                       <Star className="h-2.5 w-2.5 fill-amber-500" />
@@ -189,7 +190,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
             
             <div id={`bidder-info-desktop-${bid.id}`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 id={`bidder-name-desktop-${bid.id}`} className="font-semibold text-[clamp(0.875rem,3cqi,1rem)] text-slate-700 truncate">{bidder.name}</h4>
+                  <Link href={`/user/${bidder.id}`} id={`bidder-name-desktop-${bid.id}`} className="font-semibold text-[clamp(0.875rem,3cqi,1rem)] text-slate-700 truncate hover:text-blue-600 transition-colors">{bidder.name}</Link>
                   <div id={`bidder-rating-desktop-${bid.id}`} className="flex items-center gap-0.5 text-xs text-amber-500 font-bold">
                     <Star className="h-3 w-3 fill-amber-500" />
                     {bidder.rating}

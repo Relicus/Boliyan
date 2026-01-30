@@ -42,5 +42,5 @@ export async function GET(
     .eq("short_code", id)
     .maybeSingle();
 
-  return redirectToInbox(request.url, data?.id);
+  return redirectToInbox(request.url, (data as any)?.id);
 }

@@ -20,6 +20,8 @@ interface AuthContextType {
   setMyLocation: (location: UserLocation) => void;
   isLoggedIn: boolean;
   isLoading: boolean;
+  isAdminMode: boolean;
+  toggleAdminMode: () => void;
   login: (provider?: 'google' | 'facebook') => Promise<void>;
   logout: () => Promise<void>;
   getUser: (id: string) => User | undefined; // Keep for compat, though less useful with real auth
@@ -36,7 +38,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [myLocation, setMyLocationState] = useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAdminMode, setIsAdminMode] = useState(false);
   const router = useRouter();
+
+  // Load admin mode preference from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('boliyan_admin_mode');
+      if (saved === 'true') setIsAdminMode(true);
+    } catch { /* ignore */ }
+  }, []);
+
+  const toggleAdminMode = useCallback(() => {
+    setIsAdminMode(prev => {
+      const next = !prev;
+      try {
+        if (next) {
+          localStorage.setItem('boliyan_admin_mode', 'true');
+        } else {
+          localStorage.removeItem('boliyan_admin_mode');
+        }
+      } catch { /* ignore */ }
+      // Defer navigation to avoid setState-during-render error
+      setTimeout(() => {
+        router.push(next ? '/admin/reports' : '/');
+      }, 0);
+      return next;
+    });
+  }, [router]);
 
   // Robust Auto-Locate Logic (moved from MarketplaceContext)
   useEffect(() => {
@@ -147,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     type ProfileRow = Database['public']['Tables']['profiles']['Row'];
     type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
     type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
-    type ProfileExtras = { is_verified?: boolean; review_count?: number; phone?: string; whatsapp?: string; name?: string };
+    type ProfileExtras = { is_verified?: boolean; review_count?: number; rating?: number; rating_count?: number; phone?: string; whatsapp?: string; name?: string };
 
     const fetchProfile = useCallback(async (supabaseUser: SupabaseUser) => {
         console.log("[AuthContext] Fetching profile for:", supabaseUser.id);
@@ -181,8 +210,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
 
           // Attempt insertion
-          const { data: inserted, error: insertError } = await supabase
-              .from('profiles')
+          const { data: inserted, error: insertError } = await (supabase
+              .from('profiles') as any)
               .insert([newProfile])
               .select()
               .single();
@@ -228,6 +257,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   myBidsAccepted: 0
               },
               emailVerified: ['google', 'facebook'].includes(supabaseUser.app_metadata.provider || '') || !!supabaseUser.email_confirmed_at,
+              role: (profile.role as 'user' | 'admin') || 'user',
           };
 
           // Determine profile completeness - strictly check DB fields
@@ -341,6 +371,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setMyLocation,
       isLoggedIn: !!user, 
       isLoading,
+      isAdminMode: isAdminMode && user?.role === 'admin', // Only true if user is actually admin
+      toggleAdminMode,
       login, 
       logout, 
       getUser,

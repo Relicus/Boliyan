@@ -65,7 +65,7 @@ export async function generateMetadata({
     };
   }
 
-  const listing = await fetchListingMeta(slugOrId);
+  const listing = (await fetchListingMeta(slugOrId)) as any;
   const title = listing?.title ? `${listing.title} | Boliyan` : "Product | Boliyan";
   const description = listing?.description || "Discover listings on Boliyan.";
   const productSlug = listing?.slug || listing?.id || slugOrId;

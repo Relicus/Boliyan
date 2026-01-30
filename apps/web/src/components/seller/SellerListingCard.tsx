@@ -95,6 +95,16 @@ export default function SellerListingCard({ item, onView, onDelete }: SellerList
                       Inactive
                     </Badge>
                   )}
+                  {item.moderationStatus === 'rejected' && (
+                    <Badge
+                      id={`listing-rejected-badge-${item.id}`}
+                      variant="destructive"
+                      className="text-[9px] font-bold uppercase tracking-tight h-5 px-1.5 cursor-help"
+                      title={item.rejectionReason || 'Listing rejected by admin'}
+                    >
+                      Rejected
+                    </Badge>
+                  )}
                   {/* Slots Badge */}
                    <div className="flex items-center gap-1">
                       <Badge

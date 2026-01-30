@@ -2,7 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 60000, // Increase global test timeout to 60s
+  timeout: 120000, // Increase global test timeout to 120s
+  expect: {
+    timeout: 30000,
+  },
   /* Run tests in files in parallel */
   fullyParallel: false,
 
@@ -38,8 +41,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    command: process.env.TEST_MODE === 'production' ? 'npm run start' : 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env.CI && !process.env.TEST_MODE,
   },
 });

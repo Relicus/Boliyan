@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/tooltip";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface ItemCardProps {
   item: Item;
@@ -399,12 +400,16 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                     </div>
                   )}
                   
-                  <span className={cn(
-                    `text-[clamp(0.8125rem,3.5cqi,0.9375rem)] truncate leading-none`,
-                    viewMode === 'comfortable' ? 'font-medium max-w-[120px] text-slate-500' : 'font-semibold text-slate-600'
-                  )}>
+                  <Link 
+                    href={`/user/${seller?.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className={cn(
+                      `text-[clamp(0.8125rem,3.5cqi,0.9375rem)] truncate leading-none hover:text-blue-600 transition-colors`,
+                      viewMode === 'comfortable' ? 'font-medium max-w-[120px] text-slate-500' : 'font-semibold text-slate-600'
+                    )}
+                  >
                     {seller?.name || 'Unknown Seller'}
-                  </span>
+                  </Link>
 
                   {seller?.isVerified && <VerifiedBadge size="sm" />}
 

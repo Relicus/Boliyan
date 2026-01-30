@@ -59,13 +59,24 @@ function DashboardContent() {
     const fetchMyItems = async () => {
       try {
         const { data, error } = await supabase
-          .from('marketplace_listings')
-          .select('*')
-          .eq('seller_id', user.id);
+          .from('listings')
+          .select('*, profiles!seller_id(*), bids(amount)')
+          .eq('seller_id', user.id)
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         if (data) {
-          const transformed = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
+          const transformed = data.map(row => {
+            const bids = (row as any).bids || [];
+            const highBid = bids.length > 0 ? Math.max(...bids.map((b: any) => b.amount)) : undefined;
+            
+            return transformListingToItem({
+              ...row,
+              profiles: (row as any).profiles,
+              bid_count: bids.length,
+              high_bid: highBid
+            } as any);
+          });
           setMyItems(transformed);
         }
       } catch (err) {
@@ -124,16 +135,8 @@ function DashboardContent() {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6 max-w-7xl mx-auto w-full">
       
-      {/* Header with Add Button */}
+      {/* Dashboard heading for accessibility */}
       <h1 className="sr-only">Dashboard</h1>
-      <div id="dashboard-actions" className="flex items-center justify-end gap-2">
-        <Button asChild variant="outline" size="sm" id="dashboard-messages-btn">
-          <Link href="/inbox">Messages</Link>
-        </Button>
-        <Button asChild size="sm" id="dashboard-new-listing-btn">
-          <Link href="/list">New Listing</Link>
-        </Button>
-      </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl h-auto">

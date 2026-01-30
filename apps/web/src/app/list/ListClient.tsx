@@ -444,7 +444,7 @@ function ListForm() {
           };
 
           if (editingItem) {
-            const { error } = await supabase
+            const { error } = await (supabase as any)
               .rpc('edit_listing_with_cooldown', {
                 p_listing_id: editingItem.id,
                 p_title: listingPayload.title,
@@ -495,7 +495,7 @@ function ListForm() {
           localStorage.removeItem(DRAFT_KEY);
           setTimeout(() => router.push("/"), 800);
         } else {
-          const { error } = await supabase.rpc('create_listing', {
+          const { error } = await (supabase as any).rpc('create_listing', {
             p_title: listingPayload.title,
             p_description: listingPayload.description,
             p_category: listingPayload.category,
@@ -875,21 +875,7 @@ function ListForm() {
                             </div>
                           </div>
                         </div>
-                        
-                        {/* Current New Price - Very Compact */}
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
-                            <Sparkles className="w-3 h-3 text-slate-400" />
-                          </div>
-                          <Input 
-                            id="current-new-price-input" 
-                            type="number" 
-                            placeholder="Latest Price" 
-                            value={currentNewPrice}
-                            onChange={(e) => setCurrentNewPrice(e.target.value)}
-                            className="h-8 text-xs bg-white border-slate-200 pl-7 placeholder:text-slate-400"
-                          />
-                        </div>
+
                       </div>
                     </motion.div>
                   )}

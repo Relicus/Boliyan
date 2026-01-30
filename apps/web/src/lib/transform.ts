@@ -30,7 +30,12 @@ export type ListingWithSeller = ListingRow & {
   slug?: string | null;
   go_live_at?: string | null;
   last_edited_at?: string | null;
+  contact_phone?: string | null;
   contact_whatsapp?: string | null;
+  auction_mode?: string | null;
+  status?: string | null;
+  moderation_status?: 'pending' | 'approved' | 'rejected' | null;
+  rejection_reason?: string | null;
 };
 
 export function transformProfileToUser(profile: ProfileRow): User {
@@ -163,7 +168,11 @@ export function transformListingToItem(listing: ListingWithSeller): Item {
         lng: itemLng,
         address: itemAddress,
         city: listing.seller_location || undefined // Fallback to seller city if no explicit city field on item yet
-    }
+    },
+    
+    // Moderation Fields
+    moderationStatus: listing.moderation_status || undefined,
+    rejectionReason: listing.rejection_reason || undefined
   };
 }
 export type BidWithProfile = Database['public']['Tables']['bids']['Row'] & {
@@ -188,10 +197,6 @@ export type ConversationWithHydration = Database['public']['Tables']['conversati
   listings: ListingWithSeller | null;
   seller_profile: ProfileRow | null;
   bidder_profile: ProfileRow | null;
-  last_message?: string;
-  updated_at?: string;
-  expires_at?: string | null;
-  short_code?: string;
 };
 
 export function transformConversationToHydratedConversation(conv: ConversationWithHydration): Conversation {
@@ -203,12 +208,12 @@ export function transformConversationToHydratedConversation(conv: ConversationWi
     seller: conv.seller_profile ? transformProfileToUser(conv.seller_profile) : undefined,
     bidderId: conv.bidder_id || '',
     bidder: conv.bidder_profile ? transformProfileToUser(conv.bidder_profile) : undefined,
-    lastMessage: conv.last_message,
+    lastMessage: conv.last_message || undefined,
     updatedAt: conv.updated_at || conv.created_at || new Date().toISOString(),
     expiresAt: conv.expires_at || undefined,
     sellerConfirmedAt: conv.seller_confirmed_at || undefined,
     buyerConfirmedAt: conv.buyer_confirmed_at || undefined,
     isSealed: conv.is_sealed || false,
-    shortCode: conv.short_code
+    shortCode: conv.short_code || undefined
   };
 }

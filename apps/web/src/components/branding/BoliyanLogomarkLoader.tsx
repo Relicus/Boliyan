@@ -18,7 +18,7 @@ export const BoliyanLogomarkLoader = ({ className }: BoliyanLogomarkLoaderProps)
   return (
     <motion.svg
       viewBox="0 0 40 40"
-      className={cn("h-6 w-6", className)}
+      className={cn("h-6 w-6 min-h-6 min-w-6", className)}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="Loading"

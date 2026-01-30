@@ -7,696 +7,573 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.1"
-  }
   public: {
     Tables: {
-      bids: {
-        Row: {
-          amount: number
-          bidder_id: string | null
-          created_at: string | null
-          expires_at: string | null
-          id: string
-          listing_id: string | null
-          message: string | null
-          status: string | null
-          update_count: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          amount: number
-          bidder_id?: string | null
-          created_at?: string | null
-          expires_at?: string | null
-          id?: string
-          listing_id?: string | null
-          message?: string | null
-          status?: string | null
-          update_count?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          amount?: number
-          bidder_id?: string | null
-          created_at?: string | null
-          expires_at?: string | null
-          id?: string
-          listing_id?: string | null
-          message?: string | null
-          status?: string | null
-          update_count?: number | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bids_bidder_id_fkey"
-            columns: ["bidder_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bids_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bids_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "marketplace_listings"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      categories: {
-        Row: {
-          created_at: string | null
-          icon: string | null
-          id: string
-          name: string
-          parent_id: string | null
-          sort_order: number | null
-        }
-        Insert: {
-          created_at?: string | null
-          icon?: string | null
-          id?: string
-          name: string
-          parent_id?: string | null
-          sort_order?: number | null
-        }
-        Update: {
-          created_at?: string | null
-          icon?: string | null
-          id?: string
-          name?: string
-          parent_id?: string | null
-          sort_order?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "categories_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      conversations: {
-        Row: {
-          bidder_id: string | null
-          buyer_confirmed_at: string | null
-          created_at: string | null
-          expires_at: string | null
-          id: string
-          is_sealed: boolean | null
-          last_message: string | null
-          listing_id: string | null
-          seller_confirmed_at: string | null
-          seller_id: string | null
-          short_code: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          bidder_id?: string | null
-          buyer_confirmed_at?: string | null
-          created_at?: string | null
-          expires_at?: string | null
-          id?: string
-          is_sealed?: boolean | null
-          last_message?: string | null
-          listing_id?: string | null
-          seller_confirmed_at?: string | null
-          seller_id?: string | null
-          short_code?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          bidder_id?: string | null
-          buyer_confirmed_at?: string | null
-          created_at?: string | null
-          expires_at?: string | null
-          id?: string
-          is_sealed?: boolean | null
-          last_message?: string | null
-          listing_id?: string | null
-          seller_confirmed_at?: string | null
-          seller_id?: string | null
-          short_code?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conversations_bidder_id_fkey"
-            columns: ["bidder_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversations_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversations_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "marketplace_listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversations_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       listings: {
         Row: {
-          asked_price: number
-          auction_mode: string | null
-          category: string | null
-          condition: string | null
-          contact_phone: string | null
-          created_at: string | null
+          id: string
+          seller_id: string | null
+          title: string
           description: string | null
+          asked_price: number
+          category: string | null
+          images: string[] | null
+          auction_mode: string | null
+          status: string | null
+          created_at: string | null
+          search_vector: string | null
+          condition: string | null
+          slug: string | null
           ends_at: string | null
           final_buyer_id: string | null
+          contact_phone: string | null
           go_live_at: string | null
-          id: string
-          images: string[] | null
-          last_edited_at: string | null
-          location_address: string | null
           location_lat: number | null
           location_lng: number | null
-          search_vector: unknown
-          seller_id: string | null
-          slug: string | null
-          status: string | null
-          title: string
+          location_address: string | null
+          contact_whatsapp: string | null
+          listing_duration: number | null
+          last_edited_at: string | null
+          moderation_status: string | null
+          rejection_reason: string | null
+          rejected_at: string | null
+          moderated_by: string | null
         }
         Insert: {
+          id?: string
+          seller_id?: string | null
+          title: string
+          description?: string | null
           asked_price: number
-          auction_mode?: string | null
           category?: string | null
-          condition?: string | null
-          contact_phone?: string | null
+          images?: string[] | null
+          auction_mode?: string | null
+          status?: string | null
           created_at?: string | null
-          description?: string | null
+          search_vector?: string | null
+          condition?: string | null
+          slug?: string | null
           ends_at?: string | null
           final_buyer_id?: string | null
+          contact_phone?: string | null
           go_live_at?: string | null
-          id?: string
-          images?: string[] | null
-          last_edited_at?: string | null
-          location_address?: string | null
           location_lat?: number | null
           location_lng?: number | null
-          search_vector?: unknown
-          seller_id?: string | null
-          slug?: string | null
-          status?: string | null
-          title: string
+          location_address?: string | null
+          contact_whatsapp?: string | null
+          listing_duration?: number | null
+          last_edited_at?: string | null
+          moderation_status?: string | null
+          rejection_reason?: string | null
+          rejected_at?: string | null
+          moderated_by?: string | null
         }
         Update: {
+          id?: string
+          seller_id?: string | null
+          title?: string
+          description?: string | null
           asked_price?: number
-          auction_mode?: string | null
           category?: string | null
-          condition?: string | null
-          contact_phone?: string | null
+          images?: string[] | null
+          auction_mode?: string | null
+          status?: string | null
           created_at?: string | null
-          description?: string | null
+          search_vector?: string | null
+          condition?: string | null
+          slug?: string | null
           ends_at?: string | null
           final_buyer_id?: string | null
+          contact_phone?: string | null
           go_live_at?: string | null
-          id?: string
-          images?: string[] | null
-          last_edited_at?: string | null
-          location_address?: string | null
           location_lat?: number | null
           location_lng?: number | null
-          search_vector?: unknown
-          seller_id?: string | null
-          slug?: string | null
-          status?: string | null
-          title?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "listings_final_buyer_id_fkey"
-            columns: ["final_buyer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "listings_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      messages: {
-        Row: {
-          content: string
-          conversation_id: string | null
-          created_at: string | null
-          id: string
-          is_read: boolean | null
-          sender_id: string | null
-        }
-        Insert: {
-          content: string
-          conversation_id?: string | null
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          sender_id?: string | null
-        }
-        Update: {
-          content?: string
-          conversation_id?: string | null
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          sender_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      notifications: {
-        Row: {
-          body: string | null
-          created_at: string | null
-          id: string
-          is_read: boolean | null
-          link: string | null
-          metadata: Json | null
-          title: string
-          type: string
-          user_id: string
-        }
-        Insert: {
-          body?: string | null
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          link?: string | null
-          metadata?: Json | null
-          title: string
-          type: string
-          user_id: string
-        }
-        Update: {
-          body?: string | null
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          link?: string | null
-          metadata?: Json | null
-          title?: string
-          type?: string
-          user_id?: string
+          location_address?: string | null
+          contact_whatsapp?: string | null
+          listing_duration?: number | null
+          last_edited_at?: string | null
+          moderation_status?: string | null
+          rejection_reason?: string | null
+          rejected_at?: string | null
+          moderated_by?: string | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          avatar_url: string | null
-          buyer_success_rate: number | null
-          created_at: string | null
-          deals_sealed_count: number | null
-          email: string | null
-          full_name: string | null
           id: string
-          is_verified: boolean | null
+          full_name: string | null
+          avatar_url: string | null
           location: string | null
-          location_lat: number | null
-          location_lng: number | null
-          phone: string | null
           rating: number | null
           rating_count: number | null
+          created_at: string | null
+          is_verified: boolean | null
+          email: string | null
+          phone: string | null
           seller_success_rate: number | null
+          buyer_success_rate: number | null
+          deals_sealed_count: number | null
+          location_lat: number | null
+          location_lng: number | null
           whatsapp: string | null
+          role: string | null
+          banned_until: string | null
         }
         Insert: {
-          avatar_url?: string | null
-          buyer_success_rate?: number | null
-          created_at?: string | null
-          deals_sealed_count?: number | null
-          email?: string | null
-          full_name?: string | null
           id: string
-          is_verified?: boolean | null
+          full_name?: string | null
+          avatar_url?: string | null
           location?: string | null
-          location_lat?: number | null
-          location_lng?: number | null
-          phone?: string | null
           rating?: number | null
           rating_count?: number | null
+          created_at?: string | null
+          is_verified?: boolean | null
+          email?: string | null
+          phone?: string | null
           seller_success_rate?: number | null
+          buyer_success_rate?: number | null
+          deals_sealed_count?: number | null
+          location_lat?: number | null
+          location_lng?: number | null
           whatsapp?: string | null
+          role?: string | null
+          banned_until?: string | null
         }
         Update: {
-          avatar_url?: string | null
-          buyer_success_rate?: number | null
-          created_at?: string | null
-          deals_sealed_count?: number | null
-          email?: string | null
-          full_name?: string | null
           id?: string
-          is_verified?: boolean | null
+          full_name?: string | null
+          avatar_url?: string | null
           location?: string | null
-          location_lat?: number | null
-          location_lng?: number | null
-          phone?: string | null
           rating?: number | null
           rating_count?: number | null
+          created_at?: string | null
+          is_verified?: boolean | null
+          email?: string | null
+          phone?: string | null
           seller_success_rate?: number | null
+          buyer_success_rate?: number | null
+          deals_sealed_count?: number | null
+          location_lat?: number | null
+          location_lng?: number | null
           whatsapp?: string | null
+          role?: string | null
+          banned_until?: string | null
+        }
+        Relationships: []
+      }
+      bids: {
+        Row: {
+          id: string
+          listing_id: string | null
+          bidder_id: string | null
+          amount: number
+          message: string | null
+          status: string | null
+          created_at: string | null
+          update_count: number | null
+          updated_at: string | null
+          expires_at: string | null
+        }
+        Insert: {
+          id?: string
+          listing_id?: string | null
+          bidder_id?: string | null
+          amount: number
+          message?: string | null
+          status?: string | null
+          created_at?: string | null
+          update_count?: number | null
+          updated_at?: string | null
+          expires_at?: string | null
+        }
+        Update: {
+          id?: string
+          listing_id?: string | null
+          bidder_id?: string | null
+          amount?: number
+          message?: string | null
+          status?: string | null
+          created_at?: string | null
+          update_count?: number | null
+          updated_at?: string | null
+          expires_at?: string | null
         }
         Relationships: []
       }
       reviews: {
         Row: {
-          content: string | null
+          id: string
+          reviewer_id: string | null
+          reviewed_id: string | null
+          listing_id: string | null
           conversation_id: string | null
-          created_at: string | null
-          id: string
-          listing_id: string
           rating: number
-          reviewed_id: string
-          reviewer_id: string
+          content: string | null
           role: string
+          created_at: string | null
         }
         Insert: {
-          content?: string | null
-          conversation_id?: string | null
-          created_at?: string | null
           id?: string
-          listing_id: string
+          reviewer_id?: string | null
+          reviewed_id?: string | null
+          listing_id?: string | null
+          conversation_id?: string | null
           rating: number
-          reviewed_id: string
-          reviewer_id: string
+          content?: string | null
           role: string
+          created_at?: string | null
         }
         Update: {
-          content?: string | null
-          conversation_id?: string | null
-          created_at?: string | null
           id?: string
-          listing_id?: string
+          reviewer_id?: string | null
+          reviewed_id?: string | null
+          listing_id?: string | null
+          conversation_id?: string | null
           rating?: number
-          reviewed_id?: string
-          reviewer_id?: string
+          content?: string | null
           role?: string
+          created_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "marketplace_listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_reviewed_id_fkey"
-            columns: ["reviewed_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_reviewer_id_fkey"
-            columns: ["reviewer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
-      search_history: {
+      reports: {
         Row: {
-          created_at: string | null
           id: string
-          query: string
-          user_id: string | null
+          reporter_id: string
+          reported_user_id: string
+          reason: string
+          details: string | null
+          status: string
+          resolved_by: string | null
+          resolved_at: string | null
+          created_at: string | null
         }
         Insert: {
-          created_at?: string | null
           id?: string
-          query: string
-          user_id?: string | null
+          reporter_id: string
+          reported_user_id: string
+          reason: string
+          details?: string | null
+          status?: string
+          resolved_by?: string | null
+          resolved_at?: string | null
+          created_at?: string | null
         }
         Update: {
-          created_at?: string | null
           id?: string
-          query?: string
-          user_id?: string | null
+          reporter_id?: string | null
+          reported_user_id?: string
+          reason?: string
+          details?: string | null
+          status?: string
+          resolved_by?: string | null
+          resolved_at?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          id: string
+          listing_id: string | null
+          seller_id: string | null
+          bidder_id: string | null
+          last_message: string | null
+          created_at: string | null
+          updated_at: string | null
+          expires_at: string | null
+          seller_confirmed_at: string | null
+          buyer_confirmed_at: string | null
+          is_sealed: boolean | null
+          short_code: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          id?: string
+          listing_id?: string | null
+          seller_id?: string | null
+          bidder_id?: string | null
+          last_message?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          expires_at?: string | null
+          seller_confirmed_at?: string | null
+          buyer_confirmed_at?: string | null
+          is_sealed?: boolean | null
+          short_code?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          id?: string
+          listing_id?: string | null
+          seller_id?: string | null
+          bidder_id?: string | null
+          last_message?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          expires_at?: string | null
+          seller_confirmed_at?: string | null
+          buyer_confirmed_at?: string | null
+          is_sealed?: boolean | null
+          short_code?: string | null
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          id: string
+          conversation_id: string | null
+          sender_id: string | null
+          content: string | null
+          is_read: boolean | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          conversation_id?: string | null
+          sender_id?: string | null
+          content?: string | null
+          is_read?: boolean | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          conversation_id?: string | null
+          sender_id?: string | null
+          content?: string | null
+          is_read?: boolean | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: string
+          title: string
+          body: string | null
+          link: string | null
+          is_read: boolean | null
+          metadata: Json | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: string
+          title: string
+          body?: string | null
+          link?: string | null
+          is_read?: boolean | null
+          metadata?: Json | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: string
+          title?: string
+          body?: string | null
+          link?: string | null
+          is_read?: boolean | null
+          metadata?: Json | null
+          created_at?: string | null
         }
         Relationships: []
       }
       watchlist: {
         Row: {
-          created_at: string | null
-          listing_id: string
           user_id: string
+          listing_id: string
+          created_at: string | null
         }
         Insert: {
-          created_at?: string | null
-          listing_id: string
           user_id: string
+          listing_id: string
+          created_at?: string | null
         }
         Update: {
-          created_at?: string | null
-          listing_id?: string
           user_id?: string
+          listing_id?: string
+          created_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "watchlist_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "watchlist_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "marketplace_listings"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          id: string
+          name: string
+          icon: string | null
+          parent_id: string | null
+          sort_order: number | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          icon?: string | null
+          parent_id?: string | null
+          sort_order?: number | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          icon?: string | null
+          parent_id?: string | null
+          sort_order?: number | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      search_history: {
+        Row: {
+          id: string
+          user_id: string | null
+          query: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          query: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          query?: string
+          created_at?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
-      listing_bid_stats: {
-        Row: {
-          bid_count: number | null
-          bid_attempts_count: number | null
-          high_bid: number | null
-          high_bidder_id: string | null
-          listing_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bids_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bids_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "marketplace_listings"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       marketplace_listings: {
         Row: {
-          asked_price: number | null
-          auction_mode: string | null
-          bid_count: number | null
-          bid_attempts_count: number | null
-          category: string | null
-          condition: string | null
-          contact_phone: string | null
-          created_at: string | null
-          description: string | null
-          ends_at: string | null
-          go_live_at: string | null
-          high_bid: number | null
-          high_bidder_id: string | null
-          id: string | null
-          images: string[] | null
-          location_address: string | null
-          location_lat: number | null
-          location_lng: number | null
-          search_vector: unknown
-          seller_avatar: string | null
+          id: string
           seller_id: string | null
-          seller_location: string | null
+          title: string | null
+          description: string | null
+          asked_price: number | null
+          category: string | null
+          images: string[] | null
+          auction_mode: string | null
+          status: string | null
+          created_at: string | null
+          search_vector: string | null
+          condition: string | null
           seller_name: string | null
+          seller_avatar: string | null
           seller_rating: number | null
           seller_rating_count: number | null
+          seller_location: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_address: string | null
+          bid_count: number | null
+          bid_attempts_count: number | null
+          high_bid: number | null
+          high_bidder_id: string | null
           slug: string | null
-          status: string | null
-          title: string | null
+          ends_at: string | null
+          go_live_at: string | null
+          contact_phone: string | null
+          moderation_status: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "listings_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
     }
     Functions: {
       accept_bid: {
-        Args: { p_bid_id: string }
+        Args: {
+          p_bid_id: string
+        }
         Returns: {
           bid_id: string
           conversation_id: string
         }[]
       }
-      cleanup_expired_bids: { Args: never; Returns: undefined }
+      reject_bid: {
+        Args: {
+          p_bid_id: string
+        }
+        Returns: void
+      }
       create_listing: {
         Args: {
           p_title: string
-          p_description: string
-          p_category: string
+          p_description: string | null
+          p_category: string | null
           p_asked_price: number
-          p_contact_phone: string
-          p_auction_mode: string
           p_images: string[]
-          p_condition: string
-          p_ends_at: string
-          p_listing_duration: number
-          p_location_lat: number
-          p_location_lng: number
-          p_location_address: string
-          p_slug: string
+          p_contact_phone: string | null
+          p_auction_mode: string | null
+          p_condition: string | null
+          p_listing_duration: number | null
+          p_location_lat: number | null
+          p_location_lng: number | null
+          p_location_address: string | null
         }
-        Returns: string
+        Returns: { id: string }[]
       }
       edit_listing_with_cooldown: {
         Args: {
           p_listing_id: string
           p_title: string
-          p_description: string
-          p_category: string
+          p_description: string | null
+          p_category: string | null
           p_asked_price: number
-          p_contact_phone: string
-          p_auction_mode: string
           p_images: string[]
-          p_condition: string
-          p_ends_at: string
-          p_listing_duration: number
-          p_location_lat: number
-          p_location_lng: number
-          p_location_address: string
+          p_contact_phone: string | null
+          p_auction_mode: string | null
+          p_condition: string | null
+          p_listing_duration: number | null
+          p_location_lat: number | null
+          p_location_lng: number | null
+          p_location_address: string | null
         }
-        Returns: string
+        Returns: { id: string }[]
       }
-      ensure_conversation: {
-        Args: { p_bidder_id: string; p_listing_id: string }
-        Returns: string
-      }
-      expire_old_bids: { Args: never; Returns: undefined }
-      place_bid: {
-        Args: { p_amount: number; p_listing_id: string; p_message: string }
-        Returns: {
-          amount: number
-          bidder_id: string | null
-          created_at: string | null
-          expires_at: string | null
-          id: string
-          listing_id: string | null
-          message: string | null
-          status: string | null
-          update_count: number | null
-          updated_at: string | null
+      delete_listing: {
+        Args: {
+          p_listing_id: string
         }
-        SetofOptions: {
-          from: "*"
-          to: "bids"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      reject_bid: { Args: { p_bid_id: string }; Returns: string }
-      send_message: {
-        Args: { p_content: string; p_conversation_id: string }
-        Returns: {
-          content: string
-          conversation_id: string | null
-          created_at: string | null
-          id: string
-          is_read: boolean | null
-          sender_id: string | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "messages"
-          isOneToOne: true
-          isSetofReturn: false
-        }
+        Returns: void
       }
       update_listing_fields: {
-        Args: { p_listing_id: string; p_status: string | null; p_title: string | null }
-        Returns: string
+        Args: {
+          p_listing_id: string
+          p_status: string | null
+          p_title: string | null
+        }
+        Returns: void
       }
-      delete_listing: { Args: { p_listing_id: string }; Returns: string }
+      place_bid: {
+        Args: {
+          p_listing_id: string
+          p_amount: number
+          p_message: string | null
+        }
+        Returns: Json
+      }
+      ensure_conversation: {
+          Args: {
+              p_listing_id: string
+              p_bidder_id: string
+          }
+          Returns: string
+      }
+      send_message: {
+          Args: {
+              p_conversation_id: string
+              p_content: string
+          }
+          Returns: Database['public']['Tables']['messages']['Row']
+      }
     }
     Enums: {
       [_ in never]: never
@@ -706,126 +583,3 @@ export type Database = {
     }
   }
 }
-
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
-
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
-
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
-
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
-
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
-
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const

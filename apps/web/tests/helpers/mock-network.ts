@@ -95,10 +95,14 @@ export async function mockSupabaseNetwork(page: Page) {
             avatar_url: "https://github.com/shadcn.png",
             city: "Karachi",
             phone: "03001234567",
-            location: { lat: 24.8607, lng: 67.0011, address: "Karachi, Pakistan", city: "Karachi" },
+            location: "Karachi, Pakistan",
+            location_lat: 24.8607,
+            location_lng: 67.0011,
             rating: 5.0,
-            review_count: 10,
-            is_verified: true
+            rating_count: 10,
+            is_verified: true,
+            role: userId.includes('admin') ? 'admin' : 'user',
+            created_at: new Date().toISOString()
         }
     });
   });
@@ -213,7 +217,8 @@ export async function mockSupabaseNetwork(page: Page) {
               bid_count: 5,
               high_bid: 12000,
               high_bidder_id: "other-bidder",
-              condition: "used"
+              condition: "used",
+              moderation_status: "approved"
           },
           {
               id: '00000000-0000-0000-0000-000000000015',
@@ -235,7 +240,8 @@ export async function mockSupabaseNetwork(page: Page) {
               bid_count: 0,
               high_bid: null,
               high_bidder_id: null,
-              condition: "used"
+              condition: "used",
+              moderation_status: "approved"
           }
       ];
 

@@ -34,13 +34,25 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "boliyan-listings.8e7ce4e70585cc080469d856ec2b1c5e.r2.cloudflarestorage.com",
       },
+      {
+        protocol: "https",
+        hostname: "wxdehgjadxlkhvfwjfxd.supabase.co",
+      },
     ],
   },
-  webpack: (config, { dev }) => {
+  webpack: (config, { dev, isServer }) => {
     if (dev) {
       config.watchOptions = {
         ...(config.watchOptions || {}),
-        aggregateTimeout: 2500,
+        aggregateTimeout: 300,
+        // Ignore generated audit reports and database types to prevent HMR loops
+        ignored: [
+          "**/topology-report.json",
+          "**/feature-audit-report.json",
+          "**/topology-diagram.mmd",
+          "**/database.types.ts",
+          "**/.next/**",
+        ],
       };
     }
     return config;

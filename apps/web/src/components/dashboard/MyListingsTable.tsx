@@ -61,15 +61,26 @@ export function MyListingsTable() {
                   </div>
                 </td>
                 <td className="px-4 py-3 font-medium">
-                  ${item.askPrice.toLocaleString()}
+                  Rs. {item.askPrice.toLocaleString()}
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant={
-                    item.status === 'active' ? 'default' : 
-                    item.status === 'completed' ? 'secondary' : 'outline'
-                  }>
-                    {item.status}
-                  </Badge>
+                  <div className="flex items-center gap-1.5">
+                    <Badge variant={
+                      item.status === 'active' ? 'default' : 
+                      item.status === 'completed' ? 'secondary' : 'outline'
+                    }>
+                      {item.status}
+                    </Badge>
+                    {item.moderationStatus === 'rejected' && (
+                      <Badge 
+                        variant="destructive" 
+                        className="cursor-help"
+                        title={item.rejectionReason || 'Listing rejected by admin'}
+                      >
+                        Rejected
+                      </Badge>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-center">
                   {item.bidAttemptsCount ?? item.bidCount}
