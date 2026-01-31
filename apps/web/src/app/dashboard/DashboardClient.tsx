@@ -21,6 +21,7 @@ import { Item } from "@/types";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
+import type { Database } from "@/types/database.types";
 
 function DashboardContent() {
   const { itemsById, bids, user, deleteItem, watchedItemIds } = useApp();
@@ -66,16 +67,32 @@ function DashboardContent() {
 
         if (error) throw error;
         if (data) {
-          const transformed = data.map(row => {
-            const bids = (row as any).bids || [];
-            const highBid = bids.length > 0 ? Math.max(...bids.map((b: any) => b.amount)) : undefined;
-            
-            return transformListingToItem({
-              ...row,
-              profiles: (row as any).profiles,
+          type ListingRow = Database["public"]["Tables"]["listings"]["Row"];
+          type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
+          type ListingWithRelations = ListingRow & {
+            profiles: ProfileRow | null;
+            bids: { amount: number | null }[] | null;
+          };
+
+          const transformed = data.map((row) => {
+            const typedRow = row as unknown as ListingWithRelations;
+            const bids = typedRow.bids ?? [];
+            const highBid = bids.length > 0 ? Math.max(...bids.map((bid) => bid.amount ?? 0)) : undefined;
+            const moderationStatus = typedRow.moderation_status;
+            const normalizedModerationStatus =
+              moderationStatus === "pending" || moderationStatus === "approved" || moderationStatus === "rejected"
+                ? moderationStatus
+                : null;
+
+            const listingForTransform: ListingWithSeller = {
+              ...typedRow,
+              profiles: typedRow.profiles,
               bid_count: bids.length,
-              high_bid: highBid
-            } as any);
+              high_bid: highBid,
+              moderation_status: normalizedModerationStatus,
+            };
+
+            return transformListingToItem(listingForTransform);
           });
           setMyItems(transformed);
         }

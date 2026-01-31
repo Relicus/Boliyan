@@ -15,10 +15,23 @@ import path from 'path';
 
 // --- UTILITIES ---
 
+const ROOT_DIR = process.cwd();
+const SAFE_SEGMENT = /^[a-zA-Z0-9._()\[\]-]+$/;
+
+const resolveSafePath = (rootDir: string, parentDir: string, segment: string): string | null => {
+  if (!SAFE_SEGMENT.test(segment)) return null;
+  if (segment.includes('..') || segment.includes('/') || segment.includes('\\')) return null;
+  const resolved = path.resolve(parentDir, segment);
+  const relative = path.relative(rootDir, resolved);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) return null;
+  return resolved;
+};
+
 function walkSync(dir: string, filelist: string[] = []): string[] {
   const files = fs.readdirSync(dir);
   files.forEach(file => {
-    const filepath = path.join(dir, file);
+    const filepath = resolveSafePath(ROOT_DIR, dir, file);
+    if (!filepath) return;
     if (fs.statSync(filepath).isDirectory()) {
       filelist = walkSync(filepath, filelist);
     } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
@@ -484,9 +497,16 @@ class AnalysisEngine {
   }
 
   private extractStateUsage(content: string, node: ComponentNode) {
-    const hooks = ['useApp', 'useBidding', 'useTime', 'useState', 'useContext'];
-    hooks.forEach(hook => {
-      const regex = new RegExp(`const\\s+\\{([^}]+)\\}\\s*=\\s*${hook}\\(`, 'g');
+    const hookPatterns: Record<string, RegExp> = {
+      useApp: /const\s+\{([^}]+)\}\s*=\s*useApp\(/g,
+      useBidding: /const\s+\{([^}]+)\}\s*=\s*useBidding\(/g,
+      useTime: /const\s+\{([^}]+)\}\s*=\s*useTime\(/g,
+      useState: /const\s+\{([^}]+)\}\s*=\s*useState\(/g,
+      useContext: /const\s+\{([^}]+)\}\s*=\s*useContext\(/g
+    };
+
+    Object.entries(hookPatterns).forEach(([hook, regex]) => {
+      regex.lastIndex = 0;
       let match;
       while ((match = regex.exec(content)) !== null) {
         const destructured = match[1]

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
-import { Check, X, Package, Clock, CheckCircle, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, X, Package, Clock, CheckCircle, XCircle } from "lucide-react";
 import Image from "next/image";
 import {
   Dialog,
@@ -17,6 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import type { Database } from "@/types/database.types";
 
 interface Listing {
   id: string;
@@ -99,12 +100,14 @@ export default function AdminListingsPage() {
   }, [fetchListings, fetchCounts]);
 
   const handleApprove = async (listingId: string) => {
-    const { error } = await (supabase
-      .from("listings") as any)
-      .update({ 
-        moderation_status: "approved",
-        moderated_by: user?.id,
-      })
+    const updates: Database["public"]["Tables"]["listings"]["Update"] = {
+      moderation_status: "approved",
+      moderated_by: user?.id ?? null,
+    };
+
+    const { error } = await supabase
+      .from("listings")
+      .update(updates)
       .eq("id", listingId);
 
     if (!error) {
@@ -128,14 +131,16 @@ export default function AdminListingsPage() {
       ? customReason 
       : REJECTION_REASONS.find(r => r.id === selectedReason)?.label || selectedReason;
 
-    const { error } = await (supabase
-      .from("listings") as any)
-      .update({ 
-        moderation_status: "rejected",
-        rejection_reason: reason,
-        rejected_at: new Date().toISOString(),
-        moderated_by: user?.id,
-      })
+    const updates: Database["public"]["Tables"]["listings"]["Update"] = {
+      moderation_status: "rejected",
+      rejection_reason: reason,
+      rejected_at: new Date().toISOString(),
+      moderated_by: user?.id ?? null,
+    };
+
+    const { error } = await supabase
+      .from("listings")
+      .update(updates)
       .eq("id", selectedListing.id);
 
     if (!error) {
@@ -278,8 +283,6 @@ function ListingCard({
   onApprove: (id: string) => void; 
   onReject: (listing: Listing, presetReason?: string) => void;
 }) {
-  const [imageIndex, setImageIndex] = useState(0);
-  
   // Transform images to URLs
   const storageUrl = process.env.NEXT_PUBLIC_R2_DOMAIN || '';
   const images = (listing.images || []).map(img => {
@@ -287,8 +290,6 @@ function ListingCard({
     if (!storageUrl) return img;
     return `${storageUrl}/${img}`;
   });
-
-  const hasMultipleImages = images.length > 1;
 
   return (
     <Card id={`listing-card-${listing.id}`} className="overflow-hidden border-slate-200">

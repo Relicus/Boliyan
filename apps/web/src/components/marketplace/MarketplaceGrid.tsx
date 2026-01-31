@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, LayoutGroup } from "framer-motion";
 import { useRef, useState, useEffect, useSyncExternalStore } from "react";
 import type { SearchFilters } from "@/types";
 import { useMarketplace } from "@/context/MarketplaceContext";

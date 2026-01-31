@@ -66,7 +66,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          const newNotification = transformNotification(payload.new as Record<string, unknown>);
+          const newNotification = transformNotification(payload.new as NotificationRow);
           setNotifications((prev) => [newNotification, ...prev].slice(0, NOTIFICATION_POOL_LIMIT));
 
           const resolvedLink = resolveNotificationLink(newNotification);
@@ -126,7 +126,7 @@ export function useNotifications() {
 // Transform DB snake_case to camelCase
 type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 
-function transformNotification(row: any): Notification {
+function transformNotification(row: NotificationRow): Notification {
   return {
     id: row.id as string,
     userId: row.user_id as string,

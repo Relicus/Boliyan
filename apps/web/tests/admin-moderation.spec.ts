@@ -1,6 +1,6 @@
 
 import { test, expect } from '@playwright/test';
-import { mockSupabaseNetwork, MOCK_USER_ID, MOCK_EMAIL } from './helpers/mock-network';
+import { mockSupabaseNetwork } from './helpers/mock-network';
 import { loginUser } from './helpers/auth';
 
 test.describe('Admin Moderation Flows', () => {

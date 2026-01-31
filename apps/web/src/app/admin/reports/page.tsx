@@ -9,6 +9,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Flag, CheckCircle, XCircle, Clock, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import type { Database } from "@/types/database.types";
 
 interface Report {
   id: string;
@@ -62,14 +63,16 @@ export default function AdminReportsPage() {
 
   const handleAction = async (reportId: string, action: "resolved" | "dismissed") => {
     const { data: { user } } = await supabase.auth.getUser();
-    
-    await (supabase
-      .from("reports") as any)
-      .update({
-        status: action,
-        resolved_by: user?.id,
-        resolved_at: new Date().toISOString(),
-      })
+
+    const updates: Database["public"]["Tables"]["reports"]["Update"] = {
+      status: action,
+      resolved_by: user?.id ?? null,
+      resolved_at: new Date().toISOString(),
+    };
+
+    await supabase
+      .from("reports")
+      .update(updates)
       .eq("id", reportId);
 
     fetchReports();

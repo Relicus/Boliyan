@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev }) => {
     if (dev) {
       config.watchOptions = {
         ...(config.watchOptions || {}),

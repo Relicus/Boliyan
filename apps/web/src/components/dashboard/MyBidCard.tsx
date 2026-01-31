@@ -16,7 +16,7 @@ import { createBiddingConfig } from "@/types/bidding";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 
 import { useApp } from "@/lib/store";
-import { buildWhatsAppMessageForDeal, getFuzzyLocationString, getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessageForDeal, getWhatsAppUrl, cn } from "@/lib/utils";
 
 interface MyBidCardProps {
   item: Item;

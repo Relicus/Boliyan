@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, ArrowLeft, Clock, Lock, Phone, CheckCheck, Check, Handshake, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
-import { buildWhatsAppMessageForDeal, cn, formatPrice, getFuzzyLocationString, getWhatsAppUrl } from '@/lib/utils';
+import { buildWhatsAppMessageForDeal, cn, formatPrice, getWhatsAppUrl } from '@/lib/utils';
 import { Conversation } from '@/types';
 import { VerifiedBadge } from '@/components/common/VerifiedBadge';
 import { WhatsAppIcon } from '@/components/common/WhatsAppIcon';

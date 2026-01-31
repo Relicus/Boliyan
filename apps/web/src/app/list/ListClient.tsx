@@ -13,7 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, Sparkles, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
+import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { CATEGORIES, LISTING_IMAGE_ACCEPT, LISTING_LIMITS, isAllowedListingImageInput } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -36,6 +36,7 @@ import { MapPicker } from "@/components/common/MapPicker";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useTime } from "@/context/TimeContext";
 import { MapPin } from "lucide-react";
+import type { Database } from "@/types/database.types";
 
 const EDIT_WARNING_TITLE = "Editing resets bids";
 const EDIT_WARNING_DESCRIPTION = "Saving changes will delete all bids and relaunch this listing in 1 hour.";
@@ -115,7 +116,6 @@ function ListForm() {
   const [purchasePrice, setPurchasePrice] = useState<string>("");
   const [purchaseYear, setPurchaseYear] = useState<string>("");
   const [purchaseMonth, setPurchaseMonth] = useState<string>("");
-  const [currentNewPrice, setCurrentNewPrice] = useState<string>("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactWhatsapp, setContactWhatsapp] = useState("");
   const [isWhatsappSameAsPhone, setIsWhatsappSameAsPhone] = useState(true);
@@ -198,7 +198,6 @@ function ListForm() {
     const price = parseFloat(purchasePrice);
     const year = parseInt(purchaseYear);
     if (!category || !price || !year || isNaN(price) || isNaN(year)) return null;
-    const newPrice = parseFloat(currentNewPrice);
     const month = parseInt(purchaseMonth);
     return calculateDepreciation({
       purchasePrice: price,
@@ -206,9 +205,8 @@ function ListForm() {
       purchaseMonth: isNaN(month) ? undefined : month,
       category,
       condition,
-      currentNewPrice: isNaN(newPrice) || newPrice <= 0 ? undefined : newPrice,
     });
-  }, [purchasePrice, purchaseYear, purchaseMonth, category, condition, currentNewPrice]);
+  }, [purchasePrice, purchaseYear, purchaseMonth, category, condition]);
   
   type ImageEntry = {
     id: string;
@@ -444,24 +442,28 @@ function ListForm() {
           };
 
           if (editingItem) {
-            const { error } = await (supabase as any)
-              .rpc('edit_listing_with_cooldown', {
-                p_listing_id: editingItem.id,
-                p_title: listingPayload.title,
-                p_description: listingPayload.description,
-                p_category: listingPayload.category,
-                p_asked_price: listingPayload.asked_price,
-                p_contact_phone: listingPayload.contact_phone,
-                p_contact_whatsapp: listingPayload.contact_whatsapp,
-                p_auction_mode: listingPayload.auction_mode,
-                p_images: listingPayload.images,
-                p_condition: listingPayload.condition,
-                p_ends_at: listingPayload.ends_at,
-                p_listing_duration: listingPayload.listing_duration,
-                p_location_lat: location!.lat,
-                p_location_lng: location!.lng,
-                p_location_address: location!.address
-              });
+            const editArgs: Database["public"]["Functions"]["edit_listing_with_cooldown"]["Args"] & {
+              p_contact_whatsapp: string | null;
+              p_ends_at: string | null;
+            } = {
+              p_listing_id: editingItem.id,
+              p_title: listingPayload.title,
+              p_description: listingPayload.description,
+              p_category: listingPayload.category,
+              p_asked_price: listingPayload.asked_price,
+              p_contact_phone: listingPayload.contact_phone,
+              p_contact_whatsapp: listingPayload.contact_whatsapp,
+              p_auction_mode: listingPayload.auction_mode,
+              p_images: listingPayload.images,
+              p_condition: listingPayload.condition,
+              p_ends_at: listingPayload.ends_at,
+              p_listing_duration: listingPayload.listing_duration,
+              p_location_lat: location!.lat,
+              p_location_lng: location!.lng,
+              p_location_address: location!.address,
+            };
+
+            const { error } = await supabase.rpc('edit_listing_with_cooldown', editArgs);
 
           if (error) {
             if (error.message?.includes('COOLDOWN_ACTIVE')) {
@@ -495,7 +497,11 @@ function ListForm() {
           localStorage.removeItem(DRAFT_KEY);
           setTimeout(() => router.push("/"), 800);
         } else {
-          const { error } = await (supabase as any).rpc('create_listing', {
+          const createArgs: Database["public"]["Functions"]["create_listing"]["Args"] & {
+            p_contact_whatsapp: string | null;
+            p_ends_at: string | null;
+            p_slug: string | null;
+          } = {
             p_title: listingPayload.title,
             p_description: listingPayload.description,
             p_category: listingPayload.category,
@@ -510,8 +516,10 @@ function ListForm() {
             p_location_lat: location!.lat,
             p_location_lng: location!.lng,
             p_location_address: location!.address,
-            p_slug: generateSlug(title)
-          });
+            p_slug: generateSlug(title),
+          };
+
+          const { error } = await supabase.rpc('create_listing', createArgs);
 
           if (error) throw error;
           toast.success("Listing created", {

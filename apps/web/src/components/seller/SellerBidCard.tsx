@@ -25,12 +25,6 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const router = useRouter();
   
   const item = itemsById[bid.itemId];
-  const conversation = conversations.find(c => 
-    c.itemId === bid.itemId && 
-    ((c.sellerId === user?.id && c.bidderId === bidder.id) || 
-     (c.bidderId === user?.id && c.sellerId === bidder.id))
-  );
-  
   // Stable derived values based on bidder profile
   const { distance, duration, isOutside } = useMemo(() => {
     return calculatePrivacySafeDistance(user?.location, bidder.location);

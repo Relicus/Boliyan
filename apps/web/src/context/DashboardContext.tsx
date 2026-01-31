@@ -52,7 +52,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       const isValidStatus = (value: string | null | undefined): value is ManagedListing['status'] =>
         value === 'active' || value === 'completed' || value === 'cancelled' || value === 'hidden';
 
-      const listings: ManagedListing[] = (listingsData as any[] || []).map((item) => ({
+      const listingsSource = (listingsData ?? []) as unknown as ListingWithBidCount[];
+      const listings: ManagedListing[] = listingsSource.map((item) => ({
         ...item,
         // Manual mapping from Snake Case (DB) to Camel Case (App)
         sellerId: item.seller_id || '',

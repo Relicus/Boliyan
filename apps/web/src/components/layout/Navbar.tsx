@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useApp } from "@/lib/store";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 // import { SearchDropdown } from "./SearchDropdown";
@@ -31,7 +31,6 @@ export default function Navbar() {
   const { unreadCount: notificationUnreadCount } = useNotifications();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const currentTab = searchParams.get('tab');
   const dashboardTab = currentTab || 'offers';
   const [isVisible, setIsVisible] = useState(true);

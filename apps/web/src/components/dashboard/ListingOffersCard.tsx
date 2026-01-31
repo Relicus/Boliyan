@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { CardShell } from "@/components/common/CardShell";
 import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
-import { buildWhatsAppMessageForDeal, calculatePrivacySafeDistance, formatCountdown, formatPrice, getFuzzyLocationString, getWhatsAppUrl, cn } from "@/lib/utils";
+import { buildWhatsAppMessageForDeal, calculatePrivacySafeDistance, formatCountdown, formatPrice, getWhatsAppUrl, cn } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { TimerBadge } from "@/components/common/TimerBadge";
 import { DistanceBadge } from "@/components/common/DistanceBadge";

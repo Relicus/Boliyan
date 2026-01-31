@@ -11,6 +11,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Search, Ban, CheckCircle, User, Calendar, Flag } from "lucide-react";
 import { formatDistanceToNow, format, addDays } from "date-fns";
 import Link from "next/link";
+import type { Database } from "@/types/database.types";
 import {
   Dialog,
   DialogContent,
@@ -71,9 +72,13 @@ export default function AdminUsersPage() {
     if (!banDialog) return;
     
     const bannedUntil = addDays(new Date(), parseInt(banDuration));
-    await (supabase
-      .from("profiles") as any)
-      .update({ banned_until: bannedUntil.toISOString() })
+    const updates: Database["public"]["Tables"]["profiles"]["Update"] = {
+      banned_until: bannedUntil.toISOString(),
+    };
+
+    await supabase
+      .from("profiles")
+      .update(updates)
       .eq("id", banDialog.userId);
 
     setBanDialog(null);
@@ -81,9 +86,13 @@ export default function AdminUsersPage() {
   };
 
   const handleUnban = async (userId: string) => {
-    await (supabase
-      .from("profiles") as any)
-      .update({ banned_until: null })
+    const updates: Database["public"]["Tables"]["profiles"]["Update"] = {
+      banned_until: null,
+    };
+
+    await supabase
+      .from("profiles")
+      .update(updates)
       .eq("id", userId);
     fetchUsers();
   };

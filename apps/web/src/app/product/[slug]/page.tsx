@@ -10,6 +10,14 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const isUuid = (value: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 
+type ListingMeta = {
+  id: string | null;
+  slug: string | null;
+  title: string | null;
+  description: string | null;
+  images: string[] | null;
+};
+
 const resolveImageUrl = (image?: string | null) => {
   if (!image) return undefined;
   if (image.startsWith("http")) return image;
@@ -17,7 +25,7 @@ const resolveImageUrl = (image?: string | null) => {
   return `${baseUrl}${trimmed}`;
 };
 
-const fetchListingMeta = async (slugOrId: string) => {
+const fetchListingMeta = async (slugOrId: string): Promise<ListingMeta | null> => {
   if (!supabaseUrl || !supabaseAnonKey) return null;
 
   const supabaseServer = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -65,7 +73,7 @@ export async function generateMetadata({
     };
   }
 
-  const listing = (await fetchListingMeta(slugOrId)) as any;
+  const listing = await fetchListingMeta(slugOrId);
   const title = listing?.title ? `${listing.title} | Boliyan` : "Product | Boliyan";
   const description = listing?.description || "Discover listings on Boliyan.";
   const productSlug = listing?.slug || listing?.id || slugOrId;

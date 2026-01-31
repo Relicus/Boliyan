@@ -45,6 +45,16 @@ interface FeatureIndex {
 }
 
 const SRC_DIR = path.join(process.cwd(), 'src');
+const SAFE_SEGMENT = /^[a-zA-Z0-9._()\[\]-]+$/;
+
+const resolveSafePath = (baseDir: string, segment: string): string | null => {
+  if (!SAFE_SEGMENT.test(segment)) return null;
+  if (segment.includes('..') || segment.includes('/') || segment.includes('\\')) return null;
+  const resolved = path.resolve(baseDir, segment);
+  const relative = path.relative(baseDir, resolved);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) return null;
+  return resolved;
+};
 
 function extractExportsFromFile(filePath: string): string[] {
   try {
@@ -95,7 +105,8 @@ function scanDirectory(dir: string, type: ComponentEntry['type']): ComponentEntr
   for (const file of files) {
     if (file.endsWith('.tsx') || file.endsWith('.ts')) {
       if (file === 'AGENTS.md') continue;
-      const filePath = path.join(dir, file);
+      const filePath = resolveSafePath(dir, file);
+      if (!filePath) continue;
       entries.push({
         name: file.replace(/\.(tsx|ts)$/, ''),
         path: filePath.replace(process.cwd(), ''),
@@ -119,14 +130,16 @@ function extractRoutes(): string[] {
     const items = fs.readdirSync(dir, { withFileTypes: true });
     for (const item of items) {
       if (item.isDirectory()) {
+        const nextDir = resolveSafePath(dir, item.name);
+        if (!nextDir) continue;
         // Dynamic routes like [id]
         const routeSegment = item.name.startsWith('[') ? `:${item.name.slice(1, -1)}` : item.name;
         // Skip route groups like (auth)
         if (item.name.startsWith('(')) {
-          walkDir(path.join(dir, item.name), prefix);
+          walkDir(nextDir, prefix);
         } else {
           routes.push(`${prefix}/${routeSegment}`);
-          walkDir(path.join(dir, item.name), `${prefix}/${routeSegment}`);
+          walkDir(nextDir, `${prefix}/${routeSegment}`);
         }
       }
     }

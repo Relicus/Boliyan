@@ -37,7 +37,7 @@ export async function GET(
     .ilike("slug", `%-${code}`)
     .limit(1);
 
-  const listing = Array.isArray(data) ? (data[0] as any) : null;
+  const listing = Array.isArray(data) ? data[0] : null;
   const target = listing?.slug || listing?.id;
 
   if (!target) {

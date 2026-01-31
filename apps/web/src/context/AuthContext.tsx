@@ -210,8 +210,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
 
           // Attempt insertion
-          const { data: inserted, error: insertError } = await (supabase
-              .from('profiles') as any)
+          const { data: inserted, error: insertError } = await supabase
+              .from('profiles')
               .insert([newProfile])
               .select()
               .single();
@@ -316,7 +316,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (error) console.error(`${provider} login failed:`, error);
+    if (error) console.error("OAuth login failed", { provider, error });
   };
 
   const logout = async () => {

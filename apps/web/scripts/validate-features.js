@@ -20,6 +20,17 @@ const { execSync } = require('child_process');
 
 // Configuration
 const SRC_DIR = path.join(__dirname, '../src');
+const BASE_ROOT = path.resolve(SRC_DIR);
+const SAFE_SEGMENT = /^[a-zA-Z0-9._()\[\]-]+$/;
+
+function resolveSafePath(rootDir, parentDir, segment) {
+  if (!SAFE_SEGMENT.test(segment)) return null;
+  if (segment.includes('..') || segment.includes('/') || segment.includes('\\')) return null;
+  const resolved = path.resolve(parentDir, segment);
+  const relative = path.relative(rootDir, resolved);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) return null;
+  return resolved;
+}
 const REGISTRY_PATH = path.join(__dirname, '../src/lib/feature-registry.json');
 const OUTPUT_PATH = path.join(__dirname, '../feature-audit-report.json');
 
@@ -55,7 +66,8 @@ function findFiles(dir, fileList = []) {
   const files = fs.readdirSync(dir);
   
   files.forEach(file => {
-    const filePath = path.join(dir, file);
+    const filePath = resolveSafePath(BASE_ROOT, dir, file);
+    if (!filePath) return;
     const stat = fs.statSync(filePath);
     
     if (stat.isDirectory()) {

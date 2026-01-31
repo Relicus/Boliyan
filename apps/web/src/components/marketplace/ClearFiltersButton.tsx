@@ -25,7 +25,7 @@ interface ClearFiltersButtonProps {
  * - search query: empty
  */
 function ClearFiltersButton({ className, variant = "inline" }: ClearFiltersButtonProps) {
-  const { filters: mpFilters, setFilter: setMpFilter, updateFilters } = useMarketplace();
+  const { filters: mpFilters, updateFilters } = useMarketplace();
   const { filters: searchFilters, setFilters: setSearchFilters } = useSearch();
 
   // Calculate active filter count

@@ -83,7 +83,7 @@ export default function SignInClient() {
         },
       });
       if (error) {
-         console.error(`${provider} login error:`, error.message);
+         console.error("OAuth login error", { provider, message: error.message });
          setIsShaking(true);
       }
     } catch (err) {
