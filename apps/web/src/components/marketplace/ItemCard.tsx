@@ -174,7 +174,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   };
 
   const getTitleClass = () => {
-    return 'text-[clamp(0.875rem,5cqi,1.25rem)]';
+    switch (viewMode) {
+      case 'spacious': return 'text-[clamp(1.125rem,10cqi,1.875rem)]';
+      case 'comfortable': return 'text-[clamp(1rem,8cqi,1.5rem)]';
+      default: return 'text-[clamp(0.875rem,6cqi,1.125rem)]';
+    }
   };
 
 
@@ -211,7 +215,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             <div
               id={`item-card-${item.id}-image-wrapper`}
               onClick={() => setIsDialogOpen(true)}
-              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 rounded-t-[inherit] cursor-pointer`}
+              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 rounded-t-[inherit] cursor-pointer @container [--badge-text-min:0.5rem] [--badge-text-fluid:2.1cqi] [--badge-text-max:0.7rem] [--badge-icon-min:0.6rem] [--badge-icon-fluid:2.3cqi] [--badge-icon-max:0.8rem] [--badge-pad-x:clamp(0.25rem,1.6cqi,0.5rem)] [--badge-pad-y:clamp(0.2rem,1.2cqi,0.375rem)] [--badge-gap:clamp(0.2rem,1.2cqi,0.375rem)] [--badge-maxw:clamp(6rem,16cqi,7.5rem)]`}
             >
               <div className="relative w-full h-full flex items-center justify-center">
                 <img
@@ -375,7 +379,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               - Added conditional pb-3 to compensate for halo visual overlap
             */}
             <CardContent className={cn(
-              "p-1.5 flex flex-col gap-1 flex-1 z-10 transition-all pb-2",
+              "p-1.5 flex flex-col gap-0.5 flex-1 z-10 transition-all pb-2",
             )}>
               {/* Title - Natural height with clamping */}
               <div className="flex items-start">
@@ -383,8 +387,9 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   id={`item-card-${item.id}-title`} 
                   onClick={() => setIsDialogOpen(true)}
                   className={cn(
-                    `font-bold ${getTitleClass()} leading-tight line-clamp-2 transition-all w-full cursor-pointer text-slate-900 hover:text-blue-600`
+                    `font-bold ${getTitleClass()} leading-normal line-clamp-2 transition-all w-full cursor-pointer text-slate-900 hover:text-blue-600`
                   )} 
+
                   title={item.title}
                 >
                   {item.title}
@@ -461,7 +466,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                 bidCount={item.bidCount}
                 bidAttemptsCount={item.bidAttemptsCount}
                 viewMode={viewMode}
-                className="min-h-[2.25rem]"
+                className="min-h-[2rem]"
                 remainingAttempts={remainingAttempts}
                 showAttempts={user?.id !== seller.id}
                 userCurrentBid={userBid?.amount}

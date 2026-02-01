@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { getAuthRedirectUrl } from "@/lib/nativeAuth";
 
 export default function SignInClient() {
   const router = useRouter();
@@ -71,7 +72,7 @@ export default function SignInClient() {
 
   const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
     setIsLoading(true);
-    const redirectUrl = `${window.location.origin}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`;
+    const redirectUrl = getAuthRedirectUrl(redirect);
     console.log("[OAuth] Redirecting to:", redirectUrl);
     
     try {

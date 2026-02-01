@@ -13,7 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Gavel, EyeOff, Camera, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
+import { Gavel, EyeOff, Camera, Image as ImageIcon, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { CATEGORIES, LISTING_IMAGE_ACCEPT, LISTING_LIMITS, isAllowedListingImageInput } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -226,6 +226,7 @@ function ListForm() {
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessingImages, setIsProcessingImages] = useState(false);
   const [showEditWarning, setShowEditWarning] = useState(false);
+  const [showImageSourceDialog, setShowImageSourceDialog] = useState(false);
 
   const [errors, setErrors] = useState<{
     title?: boolean;
@@ -348,11 +349,16 @@ function ListForm() {
     e.target.value = "";
   };
 
-  const handleNativeImagePick = async (event: React.MouseEvent<HTMLLabelElement>) => {
+  const handleNativeImagePick = (event: React.MouseEvent<HTMLLabelElement>) => {
     if (!isNativeImagePickerAvailable()) return;
     event.preventDefault();
+    setShowImageSourceDialog(true);
+  };
+
+  const handleNativeImageSourcePick = async (source: "camera" | "library") => {
+    setShowImageSourceDialog(false);
     try {
-      const files = await pickNativeImages(NATIVE_IMAGE_PICK_OPTIONS);
+      const files = await pickNativeImages({ ...NATIVE_IMAGE_PICK_OPTIONS, source });
       await addImagesFromFiles(files);
     } catch (error) {
       console.error(error);
@@ -643,6 +649,39 @@ function ListForm() {
                   {EDIT_WARNING_CONFIRM}
                 </Button>
               </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={showImageSourceDialog} onOpenChange={setShowImageSourceDialog}>
+            <DialogContent id="image-source-dialog">
+              <DialogHeader id="image-source-header">
+                <DialogTitle id="image-source-title">Add photo</DialogTitle>
+              </DialogHeader>
+              <div id="image-source-actions" className="grid grid-cols-2 gap-3 px-4 pb-4">
+                <button
+                  id="image-source-camera-btn"
+                  type="button"
+                  className="group w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+                  onClick={() => handleNativeImageSourcePick("camera")}
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <Camera className="h-5 w-5" />
+                  </div>
+                  <div className="mt-3 text-sm font-bold text-slate-900">Camera</div>
+                  <div className="mt-1 text-[11px] font-medium text-slate-500">Take a new photo</div>
+                </button>
+                <button
+                  id="image-source-gallery-btn"
+                  type="button"
+                  className="group w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+                  onClick={() => handleNativeImageSourcePick("library")}
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                    <ImageIcon className="h-5 w-5" />
+                  </div>
+                  <div className="mt-3 text-sm font-bold text-slate-900">Gallery</div>
+                  <div className="mt-1 text-[11px] font-medium text-slate-500">Choose existing</div>
+                </button>
+              </div>
             </DialogContent>
           </Dialog>
           {isLoadingItem ? (

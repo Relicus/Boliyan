@@ -68,10 +68,10 @@ export const TimerBadge = memo(({
   const Icon = isUrgent ? AlertTriangle : Clock;
   
   const variants = {
-    glass: "bg-black/75 text-white border-white/10 shadow-lg px-2 py-1 rounded-md",
-    "glass-light": "bg-white/85 text-slate-800 border-black/5 shadow-lg px-2 py-1 rounded-md",
-    outline: "bg-white text-slate-700 border-slate-200 border px-2 py-1 rounded-md",
-    solid: "bg-slate-900 text-white border-none shadow-sm px-2 py-1 rounded-md",
+    glass: "bg-black/75 text-white border-white/10 shadow-lg px-[var(--badge-pad-x,0.5rem)] py-[var(--badge-pad-y,0.25rem)] rounded-md",
+    "glass-light": "bg-white/85 text-slate-800 border-black/5 shadow-lg px-[var(--badge-pad-x,0.5rem)] py-[var(--badge-pad-y,0.25rem)] rounded-md",
+    outline: "bg-white text-slate-700 border-slate-200 border px-[var(--badge-pad-x,0.5rem)] py-[var(--badge-pad-y,0.25rem)] rounded-md",
+    solid: "bg-slate-900 text-white border-none shadow-sm px-[var(--badge-pad-x,0.5rem)] py-[var(--badge-pad-y,0.25rem)] rounded-md",
     inline: "bg-transparent p-0 border-none shadow-none"
   };
 
@@ -79,20 +79,20 @@ export const TimerBadge = memo(({
     <div 
       id={id}
       className={cn(
-        "inline-flex items-center gap-1.5 transition-all",
+        "inline-flex items-center gap-[var(--badge-gap,0.375rem)] transition-all",
         variants[variant],
         isUrgent && variant !== "inline" && "animate-pulse",
         className
       )}
     >
       <Icon className={cn(
-        "h-[clamp(0.625rem,2.5cqi,0.75rem)] w-[clamp(0.625rem,2.5cqi,0.75rem)] shrink-0",
+        "h-[clamp(var(--badge-icon-min,0.625rem),var(--badge-icon-fluid,2.5cqi),var(--badge-icon-max,0.75rem))] w-[clamp(var(--badge-icon-min,0.625rem),var(--badge-icon-fluid,2.5cqi),var(--badge-icon-max,0.75rem))] shrink-0",
         isUrgent && "text-red-400",
         iconClassName
       )} />
       <span className={cn(
         "font-bold tracking-wide tabular-nums leading-none",
-        variant !== "inline" ? "text-[clamp(0.625rem,2.5cqi,0.75rem)]" : "text-inherit",
+        variant !== "inline" ? "text-[clamp(var(--badge-text-min,0.625rem),var(--badge-text-fluid,2.5cqi),var(--badge-text-max,0.75rem))]" : "text-inherit",
         isExpired && "text-red-500"
       )}>
         {label}

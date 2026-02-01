@@ -30,14 +30,14 @@ export const ConditionBadge = memo(({
   const isClickable = !!onClick;
 
   const sharedClasses = cn(
-    "inline-flex items-center px-2 py-1 rounded-md transition-all",
+    "inline-flex items-center px-[var(--badge-pad-x,0.5rem)] py-[var(--badge-pad-y,0.25rem)] rounded-md transition-all",
     variants[variant],
     isClickable && "cursor-pointer hover:scale-105 hover:shadow-md active:scale-95",
     className
   );
 
   const content = (
-    <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-tighter leading-none whitespace-nowrap">
+    <span className="text-[clamp(var(--badge-text-min,0.5625rem),var(--badge-text-fluid,2.25cqi),var(--badge-text-max,0.75rem))] font-black uppercase tracking-tighter leading-none whitespace-nowrap">
       {label}
     </span>
   );

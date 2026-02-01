@@ -84,18 +84,29 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
     onGeocodingChange?.(isGeocoding);
   }, [isGeocoding, onGeocodingChange]);
 
+  const lastInitialLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+
   // Sync center and address with initialLocation if changed from outside
   useEffect(() => {
-    if (initialLocation && (initialLocation.lat !== center[0] || initialLocation.lng !== center[1])) {
-       setCenter([initialLocation.lat, initialLocation.lng]);
-       if (initialLocation.address) {
-           setAddress(initialLocation.address);
-           // Prevent redundant geocode
-           skipGeocodeRef.current = true;
-           lastGeocodedCoords.current = [initialLocation.lat, initialLocation.lng];
-       }
+    if (!initialLocation) return;
+
+    const last = lastInitialLocationRef.current;
+    if (last && last.lat === initialLocation.lat && last.lng === initialLocation.lng) {
+      return;
     }
-  }, [initialLocation, center]);
+
+    lastInitialLocationRef.current = {
+      lat: initialLocation.lat,
+      lng: initialLocation.lng
+    };
+    setCenter([initialLocation.lat, initialLocation.lng]);
+    if (initialLocation.address) {
+      setAddress(initialLocation.address);
+      // Prevent redundant geocode
+      skipGeocodeRef.current = true;
+      lastGeocodedCoords.current = [initialLocation.lat, initialLocation.lng];
+    }
+  }, [initialLocation]);
   
   // Ref to prevent geocoding loop when location is manually set
   const skipGeocodeRef = useRef(false);
@@ -104,6 +115,25 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
 
   // REMOVED: Initial Location Strategy block (was duplicate of context logic)
   
+  const autoLocateAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    if (autoLocateAttemptedRef.current || initialLocation) {
+      return;
+    }
+
+    autoLocateAttemptedRef.current = true;
+    setIsGeocoding(true);
+    getCurrentLocation({ highAccuracy: true, timeout: 10000 })
+      .then((position) => {
+        setCenter([position.lat, position.lng]);
+      })
+      .catch((error) => {
+        console.error("Auto-locate error:", error);
+        setIsGeocoding(false);
+      });
+  }, [initialLocation]);
+
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -246,23 +276,16 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
   };
 
   const handleLocateMe = () => {
-      // DEBUG: Active Alert Trace
-      window.alert("1. Button Clicked");
-      console.log("[MapPicker] 'Locate Me' button clicked");
-      
       setIsGeocoding(true);
-      window.alert("2. Calling Service...");
-      
+
       getCurrentLocation({ highAccuracy: true, timeout: 10000 })
           .then((position) => {
-              window.alert(`3. Success: ${position.lat.toFixed(4)} from ${position.source}`);
               const lat = position.lat;
               const lng = position.lng;
               console.log(`[MapPicker] Got location from ${position.source}:`, lat, lng);
               setCenter([lat, lng]);
           })
           .catch((error) => {
-              window.alert(`3. Error: ${error.message}`);
               console.error("Location error:", error);
               setIsGeocoding(false);
           });
@@ -319,11 +342,6 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
             size="icon"
             className="absolute top-4 right-4 z-[1000] bg-white shadow-md hover:bg-slate-50 cursor-pointer pointer-events-auto active:scale-95 transition-transform"
             onClick={handleLocateMe}
-            onPointerDown={(e) => {
-              // Ensure touch events trigger it even if click is swallowed
-              e.preventDefault(); 
-              handleLocateMe();
-            }}
             title="Locate Me"
         >
             <Crosshair className="h-5 w-5 text-slate-700" />

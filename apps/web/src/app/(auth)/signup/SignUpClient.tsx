@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Mail, Lock, MapPin, UserPlus, Phone, Facebook, ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { getAuthRedirectUrl } from "@/lib/nativeAuth";
 
 const CITIES = [
   "Karachi",
@@ -114,7 +115,7 @@ export default function SignUpClient() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`,
+          redirectTo: getAuthRedirectUrl(redirect),
         },
       });
       if (error) {

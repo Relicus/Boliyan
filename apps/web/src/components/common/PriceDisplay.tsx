@@ -41,8 +41,17 @@ function getPriceClass(viewMode: BiddingViewMode): string {
   const base = 'font-outfit font-black leading-none transition-all';
   switch (viewMode) {
     case 'modal': return `${base} text-xl`;
-    default: return `${base} text-[clamp(0.75rem,5cqi,1.25rem)]`;
+    case 'compact': return `${base} text-[clamp(0.9rem,8cqi,1.6rem)]`;
+    default: return `${base} text-[clamp(0.75rem,5cqi,1.625rem)]`;
   }
+}
+
+function getRowLabelClass(viewMode: BiddingViewMode, align: 'left' | 'right'): string {
+  const base = `font-bold uppercase tracking-wider absolute ${align}-0 bottom-0 whitespace-nowrap flex items-center gap-0`;
+  if (viewMode === 'compact') {
+    return `text-[clamp(0.48rem,3.2cqi,0.7rem)] ${base}`;
+  }
+  return `text-[clamp(0.4rem,1.6cqi,0.55rem)] ${base}`;
 }
 
 // ============================================
@@ -169,26 +178,17 @@ export const PriceDisplay = memo(({
       id={itemId ? `price-dynamic-value-${orientation === 'stacked' ? 'stacked-' : ''}${itemId}` : undefined}
       className={cn(
         getPriceClass(viewMode), 
-        `flex items-${alignment} gap-1 transition-colors duration-300 min-w-0 truncate`,
+        `flex items-${alignment} gap-1 transition-colors duration-300 min-w-0`,
         alignment === 'baseline' && 'leading-[0.9]',
         displayColor
       )}
     >
-        {/* Show Total Bids Count only when there are bids AND we are showing a price */}
-        {(showTotalBids && config.variant === 'public' && effectiveBidCount > 0 && displayPrice !== null) ? (
-             <span 
-               {...(itemId && !safeShowUserBid ? { 'data-rt-item-id': itemId, 'data-rt-bid-count-small': 'true' } : {})}
-               className="text-[0.8em] font-bold text-slate-400 shrink-0"
-             >
-               ({effectiveBidCount})
-             </span>
-        ) : null}
         {displayPrice !== null ? (
-            <span {...highBidProps} className={`flex items-${alignment} truncate min-w-0`}>
+            <span {...highBidProps} className={`flex items-${alignment} min-w-0`}>
               <RollingPrice key="stable-price-display" price={displayPrice} />
             </span>
         ) : (
-            <span {...bidCountProps} className={`flex items-${alignment} truncate min-w-0`}>
+            <span {...bidCountProps} className={`flex items-${alignment} min-w-0`}>
               {displayText}
             </span>
         )}
@@ -249,24 +249,24 @@ export const PriceDisplay = memo(({
   return (
     <div 
       id={itemId ? `price-display-${itemId}` : undefined}
-      className={cn("flex flex-nowrap justify-between items-end gap-x-3 w-full px-1 overflow-hidden", className)}
+      className={cn("flex flex-wrap justify-between items-end gap-x-3 gap-y-2 w-full px-1", className)}
     >
       {/* Asking Price - Left Aligned */}
       <div className="flex flex-col items-start min-w-0 shrink">
-        <div className="h-4 w-full relative mb-0.5">
+        <div className="h-2 w-full relative mb-0">
           <span 
             className={cn(
-              "text-[clamp(0.4rem,1.6cqi,0.55rem)] font-bold uppercase tracking-wider absolute left-0 bottom-0 whitespace-nowrap flex items-center gap-0.5", 
+              getRowLabelClass(viewMode, 'left'),
               darkMode ? "text-slate-400" : "text-slate-400"
             )}
           >
-            <Tag className="w-[clamp(0.5rem,2cqi,0.625rem)] h-[clamp(0.5rem,2cqi,0.625rem)]" />
+            <Tag className="w-[clamp(0.5rem,2cqi,0.625rem)] h-[clamp(0.5rem,2cqi,0.625rem)] mr-1" />
             Asking
           </span>
         </div>
         <span 
           id={itemId ? `price-asking-value-${itemId}` : undefined}
-          className={cn(getPriceClass(viewMode), "leading-[0.9] flex items-baseline gap-1 truncate", darkMode ? "text-white" : "text-slate-900")}
+          className={cn(getPriceClass(viewMode), "leading-[0.9] flex items-baseline gap-1", darkMode ? "text-white" : "text-slate-900")}
         >
           <RollingPrice price={askPrice} />
         </span>
@@ -275,7 +275,7 @@ export const PriceDisplay = memo(({
       {/* Dynamic Right Side - Right Aligned */}
       <div className="flex flex-col items-end min-w-0 shrink">
           {/* Label Container - Absolute to prevent layout jump during transition */}
-          <div className="h-4 w-full relative mb-0.5">
+          <div className="h-2 w-full relative mb-0">
              <AnimatePresence mode="wait">
                 <motion.span 
                     key={labelText}
@@ -284,12 +284,21 @@ export const PriceDisplay = memo(({
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
                     className={cn(
-                        "text-[clamp(0.4rem,1.6cqi,0.55rem)] font-bold uppercase tracking-wider absolute right-0 bottom-0 whitespace-nowrap mb-0 flex items-center gap-0.5", 
+                        `${getRowLabelClass(viewMode, 'right')} mb-0`,
                         // Mute the colors for the label to keep focus on the number
                         labelColor.replace('text-purple-600', 'text-purple-500').replace('text-amber-600', 'text-amber-500')
                     )}
                 >
-                    {LabelIcon && <LabelIcon className="w-[clamp(0.5rem,2cqi,0.625rem)] h-[clamp(0.5rem,2cqi,0.625rem)]" />}
+                    {/* Move bid count here (Left side) */}
+                    {(showTotalBids && config.variant === 'public' && effectiveBidCount > 0 && displayPrice !== null && !safeShowUserBid) && (
+                      <span 
+                        {...(itemId ? { 'data-rt-item-id': itemId, 'data-rt-bid-count-small': 'true' } : {})}
+                        className="opacity-70 mr-0.5"
+                      >
+                        ({effectiveBidCount})
+                      </span>
+                    )}
+                    {LabelIcon && <LabelIcon className="w-[clamp(0.5rem,2cqi,0.625rem)] h-[clamp(0.5rem,2cqi,0.625rem)] mr-1" />}
                     {labelText}
                 </motion.span>
              </AnimatePresence>

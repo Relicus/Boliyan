@@ -26,12 +26,12 @@ export const LocationBadge = memo(({
 
   return (
     <div className={cn(
-      "inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all",
+      "inline-flex items-center gap-[var(--badge-gap,0.375rem)] px-[var(--badge-pad-x,0.5rem)] py-[var(--badge-pad-y,0.25rem)] rounded-md transition-all",
       variants[variant],
       className
     )}>
-      <MapPin className="h-[clamp(0.625rem,2.5cqi,0.75rem)] w-[clamp(0.625rem,2.5cqi,0.75rem)] shrink-0" />
-      <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none truncate max-w-[120px]">
+      <MapPin className="h-[clamp(var(--badge-icon-min,0.625rem),var(--badge-icon-fluid,2.5cqi),var(--badge-icon-max,0.75rem))] w-[clamp(var(--badge-icon-min,0.625rem),var(--badge-icon-fluid,2.5cqi),var(--badge-icon-max,0.75rem))] shrink-0" />
+      <span className="text-[clamp(var(--badge-text-min,0.625rem),var(--badge-text-fluid,2.5cqi),var(--badge-text-max,0.75rem))] font-black tracking-tight leading-none truncate max-w-[var(--badge-maxw,7.5rem)]">
         {displayText}
       </span>
     </div>

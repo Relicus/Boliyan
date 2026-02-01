@@ -29,13 +29,26 @@ function getProjectId(): string | null {
   return (fromExpoConfig ?? fromEasConfig ?? null) as string | null;
 }
 
-function buildImageFiles(assets: ImagePicker.ImagePickerAsset[]): NativeImageFile[] {
-  return assets.map((asset) => ({
-    uri: asset.uri,
-    mime: asset.mimeType ?? 'image/jpeg',
-    size: asset.fileSize ?? null,
-    name: asset.fileName ?? undefined
-  }));
+function buildImageFiles(
+  assets: ImagePicker.ImagePickerAsset[],
+  options: { preferDataUrl?: boolean } = {}
+): NativeImageFile[] {
+  const preferDataUrl = options.preferDataUrl ?? false;
+
+  return assets.map((asset) => {
+    const mime = asset.mimeType ?? 'image/jpeg';
+    const dataUrl =
+      preferDataUrl && asset.base64
+        ? `data:${mime};base64,${asset.base64}`
+        : asset.uri;
+
+    return {
+      uri: dataUrl,
+      mime,
+      size: asset.fileSize ?? null,
+      name: asset.fileName ?? undefined
+    };
+  });
 }
 
 async function handleGetLocation(request: NativeBridgeRequest) {
@@ -124,7 +137,8 @@ async function handlePickImage(request: NativeBridgeRequest) {
     source === 'camera'
       ? await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality
+          quality,
+          base64: true
         })
       : await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -137,7 +151,7 @@ async function handlePickImage(request: NativeBridgeRequest) {
   }
 
   return buildSuccessResponse(request, {
-    files: buildImageFiles(result.assets)
+    files: buildImageFiles(result.assets, { preferDataUrl: source === 'camera' })
   });
 }
 

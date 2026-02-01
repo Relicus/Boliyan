@@ -7,6 +7,7 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
 import { useRouter } from "next/navigation";
 import { getCurrentLocation } from "@/lib/location";
+import { getAuthRedirectUrl } from "@/lib/nativeAuth";
 
 interface UserLocation {
   lat: number;
@@ -139,9 +140,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
             }
 
-            // 2. Race IP and GPS (uses native GPS on mobile app, browser geolocation on web)
+            // 2. Race IP and GPS (prefer GPS on first load)
             fetchIpLocation();
-            getCurrentLocation({ highAccuracy: false, timeout: 7000 })
+            getCurrentLocation({ highAccuracy: true, timeout: 10000 })
                 .then(async (position) => {
                     if (!mounted) return;
                     const { lat: latitude, lng: longitude, source } = position;
@@ -313,7 +314,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: getAuthRedirectUrl(),
       },
     });
     if (error) console.error("OAuth login failed", { provider, error });

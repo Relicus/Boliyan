@@ -1,4 +1,4 @@
-export const DEFAULT_WEB_ORIGIN = 'https://boliyan.pk';
+export const DEFAULT_WEB_ORIGIN = 'http://192.168.18.187:3000';
 export const DEFAULT_LINK_SCHEME = 'boliyan';
 export const DEFAULT_WEB_PATH = '/';
 
