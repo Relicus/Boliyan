@@ -169,7 +169,7 @@ export const PriceDisplay = memo(({
       id={itemId ? `price-dynamic-value-${orientation === 'stacked' ? 'stacked-' : ''}${itemId}` : undefined}
       className={cn(
         getPriceClass(viewMode), 
-        `flex items-${alignment} gap-1 transition-colors duration-300`,
+        `flex items-${alignment} gap-1 transition-colors duration-300 min-w-0 truncate`,
         alignment === 'baseline' && 'leading-[0.9]',
         displayColor
       )}
@@ -178,17 +178,17 @@ export const PriceDisplay = memo(({
         {(showTotalBids && config.variant === 'public' && effectiveBidCount > 0 && displayPrice !== null) ? (
              <span 
                {...(itemId && !safeShowUserBid ? { 'data-rt-item-id': itemId, 'data-rt-bid-count-small': 'true' } : {})}
-               className="text-[0.8em] font-bold text-slate-400"
+               className="text-[0.8em] font-bold text-slate-400 shrink-0"
              >
                ({effectiveBidCount})
              </span>
         ) : null}
         {displayPrice !== null ? (
-            <span {...highBidProps} className={`flex items-${alignment}`}>
+            <span {...highBidProps} className={`flex items-${alignment} truncate min-w-0`}>
               <RollingPrice key="stable-price-display" price={displayPrice} />
             </span>
         ) : (
-            <span {...bidCountProps} className={`flex items-${alignment}`}>
+            <span {...bidCountProps} className={`flex items-${alignment} truncate min-w-0`}>
               {displayText}
             </span>
         )}
