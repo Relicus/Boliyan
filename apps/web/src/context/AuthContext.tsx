@@ -7,7 +7,7 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
 import { useRouter } from "next/navigation";
 import { getCurrentLocation } from "@/lib/location";
-import { getAuthRedirectUrl } from "@/lib/nativeAuth";
+import { loginWithProvider } from "@/lib/nativeAuth";
 
 interface UserLocation {
   lat: number;
@@ -310,14 +310,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [fetchProfile]);
 
   const login = async (provider: 'google' | 'facebook' = 'google') => {
-    // Redirect to OAuth provider
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: getAuthRedirectUrl(),
-      },
-    });
-    if (error) console.error("OAuth login failed", { provider, error });
+    const result = await loginWithProvider(provider, null);
+    if (result.error) {
+      console.error("OAuth login failed", { provider, error: result.error });
+    }
   };
 
   const logout = async () => {

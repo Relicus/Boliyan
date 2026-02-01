@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { getAuthRedirectUrl } from "@/lib/nativeAuth";
+import { loginWithProvider } from "@/lib/nativeAuth";
 
 export default function SignInClient() {
   const router = useRouter();
@@ -72,20 +72,17 @@ export default function SignInClient() {
 
   const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
     setIsLoading(true);
-    const redirectUrl = getAuthRedirectUrl(redirect);
-    console.log("[OAuth] Redirecting to:", redirectUrl);
-    
+
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          // Pass the redirect param to the callback route
-          redirectTo: redirectUrl,
-        },
-      });
-      if (error) {
-         console.error("OAuth login error", { provider, message: error.message });
-         setIsShaking(true);
+      const result = await loginWithProvider(provider, redirect);
+      if (result.error) {
+        console.error("OAuth login error", { provider, message: result.error.message });
+        setIsShaking(true);
+      }
+      if (result.didComplete) {
+        const target = redirect && redirect.startsWith('/') ? redirect : '/';
+        router.push(target);
+        router.refresh();
       }
     } catch (err) {
       console.error("Unexpected OAuth error:", err);

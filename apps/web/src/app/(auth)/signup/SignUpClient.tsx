@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Mail, Lock, MapPin, UserPlus, Phone, Facebook, ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { getAuthRedirectUrl } from "@/lib/nativeAuth";
+import { loginWithProvider } from "@/lib/nativeAuth";
 
 const CITIES = [
   "Karachi",
@@ -112,15 +112,15 @@ export default function SignUpClient() {
   const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: getAuthRedirectUrl(redirect),
-        },
-      });
-      if (error) {
-         console.error("OAuth login error", { provider, message: error.message });
-         setIsShaking(true);
+      const result = await loginWithProvider(provider, redirect);
+      if (result.error) {
+        console.error("OAuth login error", { provider, message: result.error.message });
+        setIsShaking(true);
+      }
+      if (result.didComplete) {
+        const target = redirect && redirect.startsWith('/') ? redirect : '/';
+        router.push(target);
+        router.refresh();
       }
     } catch (err) {
       console.error("Unexpected OAuth error:", err);

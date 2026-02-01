@@ -1,4 +1,5 @@
 import NetInfo from '@react-native-community/netinfo';
+import * as AuthSession from 'expo-auth-session';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
@@ -15,12 +16,34 @@ import {
   type NativeSecureStorageResult
 } from '../../../packages/shared/nativeBridge';
 import { buildErrorResponse, buildSuccessResponse } from './bridge';
+import {
+  GOOGLE_ANDROID_CLIENT_ID,
+  GOOGLE_AUTH_REDIRECT_PATH,
+  GOOGLE_IOS_CLIENT_ID,
+  LINK_SCHEME
+} from './constants';
 
 const DEFAULT_ERROR_MESSAGE = 'Native bridge error';
 const CANCELLED_MESSAGE = 'Action cancelled';
+const GOOGLE_DISCOVERY_URL = 'https://accounts.google.com';
+const GOOGLE_SCOPES = ['openid', 'profile', 'email'];
+const GOOGLE_CLIENT_ID_ERROR = 'Missing Google client ID';
+const GOOGLE_TOKEN_ERROR = 'Missing Google id_token';
 
 function buildError(code: NativeBridgeError['code'], message: string): NativeBridgeError {
   return { code, message };
+}
+
+function buildNonce(): string {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getGoogleClientId(): string {
+  if (Platform.OS === 'ios') {
+    return GOOGLE_IOS_CLIENT_ID;
+  }
+
+  return GOOGLE_ANDROID_CLIENT_ID;
 }
 
 function getProjectId(): string | null {
@@ -215,6 +238,49 @@ async function handleSecureStorageRemove(request: NativeBridgeRequest) {
   return buildSuccessResponse(request, result);
 }
 
+async function handleGoogleSignIn(request: NativeBridgeRequest) {
+  const clientId = getGoogleClientId();
+  if (!clientId) {
+    return buildErrorResponse(request, buildError('invalid', GOOGLE_CLIENT_ID_ERROR));
+  }
+
+  const redirectUri = AuthSession.makeRedirectUri({
+    scheme: LINK_SCHEME,
+    path: GOOGLE_AUTH_REDIRECT_PATH
+  });
+
+  const discovery = await AuthSession.fetchDiscoveryAsync(GOOGLE_DISCOVERY_URL);
+  const authRequest = new AuthSession.AuthRequest({
+    clientId,
+    redirectUri,
+    scopes: GOOGLE_SCOPES,
+    responseType: AuthSession.ResponseType.IdToken,
+    extraParams: {
+      nonce: buildNonce(),
+      prompt: 'select_account'
+    }
+  });
+
+  const result = await authRequest.promptAsync(discovery, {
+    useProxy: false,
+    preferEphemeralSession: true
+  });
+
+  if (result.type !== 'success') {
+    return buildErrorResponse(request, buildError('not_found', CANCELLED_MESSAGE));
+  }
+
+  const idToken = result.params?.id_token;
+  if (!idToken) {
+    return buildErrorResponse(request, buildError('invalid', GOOGLE_TOKEN_ERROR));
+  }
+
+  return buildSuccessResponse(request, {
+    idToken,
+    accessToken: result.params?.access_token ?? null
+  });
+}
+
 export async function handleBridgeRequest(
   request: NativeBridgeRequest
 ): Promise<NativeBridgeResponse> {
@@ -240,6 +306,8 @@ export async function handleBridgeRequest(
         return await handleSecureStorageSet(request);
       case NativeBridgeMethod.SecureStorageRemove:
         return await handleSecureStorageRemove(request);
+      case NativeBridgeMethod.GoogleSignIn:
+        return await handleGoogleSignIn(request);
       default:
         return buildErrorResponse(request, buildError('unsupported', DEFAULT_ERROR_MESSAGE));
     }

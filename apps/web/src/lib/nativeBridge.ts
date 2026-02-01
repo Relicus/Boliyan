@@ -1,16 +1,18 @@
 import type {
   NativeBridge,
-  NativeBridgeMethod,
+  NativeBridgeMethod as NativeBridgeMethodType,
   NativeBridgePayloadMap,
   NativeBridgeResultMap
 } from '../../../../packages/shared/nativeBridge';
 import {
+  NativeBridgeMethod as NativeBridgeMethodEnum,
   NativeBridgeGlobalName,
   NativeBridgeReadyFlag
 } from '../../../../packages/shared/nativeBridge';
 
 export const NATIVE_BRIDGE_GLOBAL_NAME = NativeBridgeGlobalName;
 export const NATIVE_BRIDGE_READY_FLAG = NativeBridgeReadyFlag;
+export const NativeBridgeMethod = NativeBridgeMethodEnum;
 
 function getBridgeFromWindow(): NativeBridge | null {
   if (typeof window === 'undefined') {
@@ -32,7 +34,7 @@ export function getNativeBridge(): NativeBridge | null {
   return getBridgeFromWindow();
 }
 
-export async function requestNative<T extends NativeBridgeMethod>(
+export async function requestNative<T extends NativeBridgeMethodType>(
   method: T,
   payload?: NativeBridgePayloadMap[T]
 ): Promise<NativeBridgeResultMap[T] | null> {

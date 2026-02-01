@@ -8,7 +8,8 @@ export const NativeBridgeMethod = {
   PlaySound: 'playSound',
   SecureStorageGet: 'secureStorageGet',
   SecureStorageSet: 'secureStorageSet',
-  SecureStorageRemove: 'secureStorageRemove'
+  SecureStorageRemove: 'secureStorageRemove',
+  GoogleSignIn: 'googleSignIn'
 } as const;
 
 export const NativeBridgeGlobalName = 'BoliyanNativeBridge' as const;
@@ -83,6 +84,11 @@ export interface NativeSecureStorageResult {
   value?: string | null;
 }
 
+export interface NativeGoogleSignInResult {
+  idToken: string;
+  accessToken?: string | null;
+}
+
 export type NativeBridgePayloadMap = {
   [NativeBridgeMethod.GetLocation]?: {
     highAccuracy?: boolean;
@@ -102,6 +108,7 @@ export type NativeBridgePayloadMap = {
   [NativeBridgeMethod.SecureStorageGet]: NativeSecureStoragePayload;
   [NativeBridgeMethod.SecureStorageSet]: NativeSecureStoragePayload;
   [NativeBridgeMethod.SecureStorageRemove]: NativeSecureStoragePayload;
+  [NativeBridgeMethod.GoogleSignIn]?: undefined;
 };
 
 export type NativeBridgeResultMap = {
@@ -115,6 +122,7 @@ export type NativeBridgeResultMap = {
   [NativeBridgeMethod.SecureStorageGet]: NativeSecureStorageResult;
   [NativeBridgeMethod.SecureStorageSet]: NativeSecureStorageResult;
   [NativeBridgeMethod.SecureStorageRemove]: NativeSecureStorageResult;
+  [NativeBridgeMethod.GoogleSignIn]: NativeGoogleSignInResult;
 };
 
 export type NativeBridgeErrorCode = 'unsupported' | 'denied' | 'invalid' | 'not_found' | 'unknown';

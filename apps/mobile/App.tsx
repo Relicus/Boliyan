@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   DEFAULT_WEB_PATH,
   LINK_PREFIX,
+  GOOGLE_AUTH_REDIRECT_PATH,
   ORIGIN_WHITELIST,
   WEB_ORIGIN,
   WEBVIEW_ERROR_THRESHOLD_MS
@@ -50,6 +51,10 @@ function isInternalUrl(url: string): boolean {
   return url.startsWith(WEB_ORIGIN) || url.startsWith(INTERNAL_SCHEME_PREFIX);
 }
 
+function isAuthSessionRedirect(url: string): boolean {
+  return url.startsWith(`${LINK_PREFIX}${GOOGLE_AUTH_REDIRECT_PATH}`);
+}
+
 export default function App() {
   const webViewRef = useRef<WebView>(null);
   const [webUrl, setWebUrl] = useState(buildWebUrl(DEFAULT_WEB_PATH));
@@ -67,6 +72,9 @@ export default function App() {
 
   const handleDeepLink = useCallback(
     (url: string) => {
+      if (isAuthSessionRedirect(url)) {
+        return;
+      }
       const path = extractPathFromUrl(url);
       const nextUrl = buildWebUrl(path);
       setWebUrl(nextUrl);
