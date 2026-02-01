@@ -26,9 +26,10 @@ import { createBiddingConfig } from "@/types/bidding";
 interface ProductContentProps {
   item: Item;
   seller: User;
+  onClose?: () => void;
 }
 
-function ProductContent({ item, seller }: ProductContentProps) {
+function ProductContent({ item, seller, onClose }: ProductContentProps) {
   const router = useRouter();
   const { user, toggleWatch, watchedItemIds, bids } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
@@ -82,47 +83,34 @@ function ProductContent({ item, seller }: ProductContentProps) {
 
   return (
     <div id={`product-page-${item.id}`} className="min-h-screen bg-slate-50/50 pb-20">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-        <Button 
-          id="back-to-marketplace-btn"
-          variant="ghost" 
-          onClick={() => router.push("/")}
-          className="rounded-full hover:bg-slate-100 group"
-        >
-          <ArrowLeft className="h-5 w-5 mr-2 transition-transform group-hover:-translate-x-1" />
-          <span className="font-bold">Marketplace</span>
-        </Button>
-
-        <div className="flex gap-2">
-          <Button 
-            id={`share-btn-${item.id}`}
-            variant="outline" 
-            size="icon" 
-            className="rounded-full h-10 w-10"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: item.title, url: window.location.href });
-              }
-            }}
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
-          <Button 
-            id={`watch-btn-${item.id}`}
-            variant={isWatched ? "secondary" : "outline"} 
-            size="icon" 
-            className={`rounded-full h-10 w-10 transition-colors ${isWatched ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}`}
-            onClick={() => toggleWatch(item.id)}
-          >
-            <Bookmark className={`h-4 w-4 ${isWatched ? 'fill-current' : ''}`} />
-          </Button>
-        </div>
-      </header>
-
-      <main className="container mx-auto max-w-7xl mt-6 px-4">
+      <main className="container mx-auto max-w-7xl pt-6 px-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-7 space-y-6">
-            <div className="relative aspect-square sm:aspect-[4/3] rounded-3xl overflow-hidden bg-white shadow-xl border border-slate-100 group">
+          <div className="lg:col-span-7 space-y-4">
+            {/* Mobile back button - inline */}
+            <Button 
+              id="back-to-marketplace-btn-mobile"
+              variant="outline" 
+              size="sm"
+              onClick={() => onClose ? onClose() : router.push("/")}
+              className="rounded-full hover:bg-slate-50 lg:hidden"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+
+            <div className="relative">
+              {/* Desktop floating back button - beside image */}
+              <Button 
+                id="back-to-marketplace-btn"
+                variant="outline" 
+                onClick={() => onClose ? onClose() : router.push("/")}
+                className="absolute -left-28 top-4 z-10 rounded-full bg-white shadow-lg border-slate-200 hover:bg-slate-50 hover:scale-105 transition-all hidden xl:flex"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              
+              <div className="relative aspect-square sm:aspect-[4/3] rounded-3xl overflow-hidden bg-white shadow-xl border border-slate-100 group">
               <AnimatePresence mode="wait">
                 <motion.img
                   id={`main-product-image`}
@@ -206,69 +194,29 @@ function ProductContent({ item, seller }: ProductContentProps) {
                 ))}
               </div>
             )}
-
-            <div id={`seller-card-${item.id}`} className="bg-white rounded-2xl border-2 border-slate-100 shadow-sm group hover:border-blue-100 transition-colors overflow-hidden">
-              <div className="p-4 flex items-center gap-3">
-                <div className="relative shrink-0">
-                  <img src={seller.avatar} className="h-12 w-12 rounded-full object-cover bg-slate-100 ring-2 ring-slate-50" alt={seller.name} />
-                  {seller.isVerified && (
-                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
-                        <VerifiedBadge size="sm" showTooltip={false} />
-                    </div>
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-slate-700 truncate text-lg leading-tight">
-                    {seller.name}
-                  </h3>
-                  <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mt-1">
-                    <RatingBadge rating={seller.rating} count={seller.reviewCount} size="md" />
-                    {seller.isVerified && (
-                      <>
-                        <span className="text-slate-300">•</span>
-                        <div className="flex items-center gap-1 text-blue-600 font-bold">
-                          <BadgeCheck className="h-3 w-3 fill-current stroke-white" />
-                          <span>Verified</span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative h-px w-full bg-slate-50">
-                  <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-100 rounded-full border border-slate-200" />
-                  <div className="border-t-2 border-dashed border-slate-200 w-full h-full opacity-50" />
-                  <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-100 rounded-full border border-slate-200" />
-              </div>
-
-              <div className="p-3 bg-slate-50/50 flex items-center justify-between text-xs font-bold text-slate-600">
-                  <div className="flex items-center gap-1.5 truncate pr-2">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
-                    <Clock className="w-3 h-3" />
-                    {duration} min
-                  </div>
-                </div>
             </div>
           </div>
 
           <div className="lg:col-span-5 space-y-6 lg:row-span-2">
               <div 
-                className={`bg-white rounded-3xl p-6 shadow-lg border border-slate-100 space-y-4 sticky top-24 transition-all
+                className={`bg-white rounded-3xl px-6 pt-4 pb-6 shadow-lg border border-slate-100 space-y-4 sticky top-24 transition-all
                   ${isHighBidder ? 'ring-4 ring-amber-400' : ''}
                 `}
               >
                 <div className="space-y-2">
-                  <ListingBadges item={item} seller={seller} showTimer={false} />
+                  <ListingBadges 
+                    item={item} 
+                    seller={seller} 
+                    showTimer={false}
+                    onConditionClick={(condition) => router.push(`/?condition=${encodeURIComponent(condition)}`)}
+                    onCategoryClick={(category) => router.push(`/?category=${encodeURIComponent(category)}`)}
+                  />
                   <h1 className="text-[clamp(1.5rem,4cqi,2.2rem)] font-black text-slate-900 leading-tight">
                     {item.title}
                   </h1>
                 </div>
 
-                <div className="flex flex-col gap-3 py-3 border-y border-slate-50">
+                <div className="flex flex-col gap-3 py-3 border-t border-slate-100">
                   <PriceDisplay 
                     config={biddingConfig}
                     askPrice={item.askPrice}
@@ -332,6 +280,73 @@ function ProductContent({ item, seller }: ProductContentProps) {
                 </div>
 
                 {error && <p className="text-red-500 text-sm font-bold text-center mt-2 mb-4">{error}</p>}
+
+                {/* Share & Watch Actions */}
+                <div className="flex gap-2 pt-3">
+                  <Button 
+                    id={`watch-btn-${item.id}`}
+                    variant={isWatched ? "secondary" : "outline"} 
+                    className={`flex-1 rounded-xl transition-colors ${isWatched ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}`}
+                    onClick={() => toggleWatch(item.id)}
+                  >
+                    <Bookmark className={`h-4 w-4 mr-2 ${isWatched ? 'fill-current' : ''}`} />
+                    {isWatched ? "Watching" : "Watch"}
+                  </Button>
+                  <Button 
+                    id={`share-btn-${item.id}`}
+                    variant="outline" 
+                    className="flex-1 rounded-xl"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({ title: item.title, url: window.location.href });
+                      }
+                    }}
+                  >
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share
+                  </Button>
+                </div>
+
+                {/* Seller Profile Card - moved from left column */}
+                <div id={`seller-card-${item.id}`} className="mt-4 bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
+                  <div className="p-4 flex items-center gap-3">
+                    <div className="relative shrink-0">
+                      <img src={seller.avatar} className="h-12 w-12 rounded-full object-cover bg-slate-100 ring-2 ring-white" alt={seller.name} />
+                      {seller.isVerified && (
+                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                            <VerifiedBadge size="sm" showTooltip={false} />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-slate-700 truncate text-base leading-tight">
+                        {seller.name}
+                      </h3>
+                      <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mt-1">
+                        <RatingBadge rating={seller.rating} count={seller.reviewCount} size="md" />
+                        {seller.isVerified && (
+                          <>
+                            <span className="text-slate-300">•</span>
+                            <div className="flex items-center gap-1 text-blue-600 font-bold">
+                              <BadgeCheck className="h-3 w-3 fill-current stroke-white" />
+                              <span>Verified</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="px-4 pb-3 flex items-center justify-between text-xs font-bold text-slate-500">
+                    <div className="flex items-center gap-1.5 truncate pr-2">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
+                      <Clock className="w-3 h-3" />
+                      {duration} min
+                    </div>
+                  </div>
+                </div>
               </div>
           </div>
 
@@ -357,7 +372,7 @@ function ProductContent({ item, seller }: ProductContentProps) {
   );
 }
 
-export default function ProductPageClient({ params }: { params: { id?: string; slug?: string } }) {
+export default function ProductPageClient({ params, onClose }: { params: { id?: string; slug?: string }, onClose?: () => void }) {
   const slugOrId = params.slug || params.id || '';
   
   const router = useRouter();
@@ -446,13 +461,13 @@ export default function ProductPageClient({ params }: { params: { id?: string; s
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <h1 className="text-2xl font-bold text-slate-900">Item not found</h1>
-        <Button onClick={() => router.push("/")} variant="outline">
+        <Button onClick={() => onClose ? onClose() : router.push("/")} variant="outline">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Marketplace
+          {onClose ? "Back" : "Back to Marketplace"}
         </Button>
       </div>
     );
   }
 
-  return <ProductContent item={item} seller={seller} />;
+  return <ProductContent item={item} seller={seller} onClose={onClose} />;
 }

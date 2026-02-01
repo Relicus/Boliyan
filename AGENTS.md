@@ -11,17 +11,24 @@ The product runs in a combined buyer + seller mode; analytics is unified across 
 Built with Next.js 16.1 (React 19), Tailwind CSS v4, and Framer Motion.
 Data is managed via raw SQL in `packages/database` and a custom Context-based store in `apps/web`.
 
-## COMMANDS (Run from `apps/web/`)
+## COMMANDS (Run from project root with `just`)
 
 | Action | Command | Notes |
 |--------|---------|-------|
-| Dev Server | `npm run dev` | Runs on localhost:3000 |
-| Lint | `npm run lint` | Uses ESLint 9 + eslint-config-next |
-| Pre-flight Check | `npx tsc --noEmit -p apps/web/tsconfig.json` | Project-wide TypeScript check |
-| Build | `npm run build` | Full production build |
-| Test (All) | `npx playwright test` | Runs all E2E tests |
-| Test (Single) | `npx playwright test tests/my-test.spec.ts` | Run specific test file |
-| Test (UI) | `npx playwright test --ui` | Opens interactive test runner |
+| Dev Server | `just dev` | Runs on localhost:3000 |
+| Lint | `just lint` | Uses ESLint 9 + eslint-config-next |
+| Type Check | `just typecheck` | Project-wide TypeScript check |
+| Build | `just build` | Full production build |
+| Pre-flight | `just checks` | Runs lint + typecheck + build |
+| Validate | `just validate` | Runs feature validation script |
+| Test (All) | `just e2e` | Runs all E2E tests (production mode) |
+| Test (Dev) | `just e2e-dev` | Runs E2E tests (dev mode) |
+| Clean Cache | `just clean` | Clears `.next` cache |
+| Kill Node | `just kill-node` | Terminates zombie Node processes |
+| DB Pull | `just db-pull` | Pull remote database schema |
+| DB Diff | `just db-diff name` | Generate migration diff |
+| DB Push | `just db-push` | Push local migrations to remote |
+| DB Reset | `just db-reset` | Reset local database |
 
 ## DESIGN PHILOSOPHY (APPLE-STYLE MINIMALISM)
 Core Tenet: "Subtract before you add. If a visual cue works, delete the text."
@@ -100,7 +107,7 @@ Core Tenet: "Subtract before you add. If a visual cue works, delete the text."
 2. Always check IDs: verify the `id` exists or add it.
 3. Verify animations: ensure Framer Motion transitions are smooth and avoid layout shifts.
 4. SQL first: DDL changes must be reflected in `packages/database/schema.sql`.
-5. Pre-flight requirement: always run `npx tsc --noEmit -p apps/web/tsconfig.json` before finishing a task.
+5. Pre-flight requirement: always run `just checks` before finishing a task.
 
 ## PROJECT MANIFESTO
 D:\VSCode\Boliyan\MANIFESTO.md

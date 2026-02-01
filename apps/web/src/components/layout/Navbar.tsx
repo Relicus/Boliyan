@@ -33,6 +33,7 @@ export default function Navbar() {
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab');
   const dashboardTab = currentTab || 'offers';
+  const isProductPage = pathname.startsWith('/product');
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -51,8 +52,8 @@ export default function Navbar() {
       if (typeof window !== 'undefined') {
         const currentScrollY = window.scrollY;
         
-        // Disable hide effect for Inbox and restricted views
-        if (pathname === '/inbox' || pathname === '/signin' || pathname === '/signup') {
+        // Disable hide effect for Inbox, restricted views, and product pages (overlay mode)
+        if (pathname === '/inbox' || pathname === '/signin' || pathname === '/signup' || pathname.startsWith('/product')) {
           setIsVisible(true);
           lastScrollY.current = currentScrollY;
           return;
@@ -89,6 +90,7 @@ export default function Navbar() {
       )}
     >
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-0">
+        {/* LayoutGroup - layout animations on children are conditionally disabled on product pages */}
         <LayoutGroup>
         {/* ... existing navbar content ... */}
 
@@ -132,7 +134,7 @@ export default function Navbar() {
 
         {/* Global Search Bar (Full Width on Mobile) */}
         <motion.div 
-          layout
+          layout={!pathname.startsWith('/product')}
           transition={{ type: "spring", bounce: 0, duration: 0.4 }}
           className="flex-1 px-3 md:px-6 lg:px-0 lg:pl-10 max-w-4xl flex justify-center lg:justify-start"
         >
@@ -140,7 +142,7 @@ export default function Navbar() {
         </motion.div>
 
         <motion.div 
-          layout
+          layout={!pathname.startsWith('/product')}
           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
           id="navbar-right-section-11" 
           className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto lg:pr-6"
@@ -165,7 +167,7 @@ export default function Navbar() {
             {isLoading ? (
               <motion.div
                 key="loading"
-                layout="position"
+                layout={isProductPage ? false : "position"}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -178,7 +180,7 @@ export default function Navbar() {
             ) : isLoggedIn && user ? (
               <motion.div
                 key="logged-in"
-                layout="position"
+                layout={isProductPage ? false : "position"}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -357,7 +359,7 @@ export default function Navbar() {
             ) : (
               <motion.div
                 key="signed-out"
-                layout="position"
+                layout={isProductPage ? false : "position"}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}

@@ -10,17 +10,38 @@ interface ListingBadgesProps {
   seller: User;
   showTimer?: boolean;
   className?: string;
+  onConditionClick?: (condition: string) => void;
+  onCategoryClick?: (category: string) => void;
 }
 
-export function ListingBadges({ item, seller, showTimer = true, className }: ListingBadgesProps) {
+export function ListingBadges({ 
+  item, 
+  seller, 
+  showTimer = true, 
+  className,
+  onConditionClick,
+  onCategoryClick 
+}: ListingBadgesProps) {
   const badgeStyle = "px-3 py-1.5";
   const itemId = item.id;
   
   return (
     <div id={`listing-badges-${itemId}`} className={`flex flex-wrap gap-2 ${className}`}>
       {/* Primary Status Row */}
-      <ConditionBadge id={`condition-badge-${itemId}`} condition={item.condition} variant="outline" className={badgeStyle} />
-      <CategoryBadge id={`category-badge-${itemId}`} category={item.category} variant="outline" className={badgeStyle} />
+      <ConditionBadge 
+        id={`condition-badge-${itemId}`} 
+        condition={item.condition} 
+        variant="outline" 
+        className={badgeStyle} 
+        onClick={onConditionClick ? () => onConditionClick(item.condition) : undefined}
+      />
+      <CategoryBadge 
+        id={`category-badge-${itemId}`} 
+        category={item.category} 
+        variant="outline" 
+        className={badgeStyle} 
+        onClick={onCategoryClick ? () => onCategoryClick(item.category) : undefined}
+      />
       {showTimer && (
         <TimerBadge
           id={`timer-badge-${itemId}`}
@@ -49,3 +70,4 @@ export function ListingBadges({ item, seller, showTimer = true, className }: Lis
     </div>
   );
 }
+

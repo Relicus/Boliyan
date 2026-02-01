@@ -11,7 +11,6 @@ import { BiddingControls } from "@/components/common/BiddingControls";
 import { calculatePrivacySafeDistance } from "@/lib/utils";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
-import ProductDetailsModal from "./ProductDetailsModal";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { RatingBadge } from "@/components/common/RatingBadge";
@@ -48,7 +47,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   );
 
   const [isOutbidTrigger, setIsOutbidTrigger] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const cardRef = React.useRef<HTMLDivElement | null>(null);
@@ -81,7 +79,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     isSubmitting,
     cooldownRemaining,
     derivedStatus
-  } = useBidding(item, seller!, () => setIsDialogOpen(false)); // Assert non-null for hook but UI will be safe
+  } = useBidding(item, seller!, () => {}); // No modal callback needed - using overlay navigation
 
 
   
@@ -208,10 +206,10 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               "border-none shadow-none h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)] bg-white"
             )}>
 
-            <div
+            <Link
+              href={`/product/${item.slug || item.id}`}
               id={`item-card-${item.id}-image-wrapper`}
-              onClick={() => setIsDialogOpen(true)}
-              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 rounded-t-[inherit] cursor-pointer`}
+              className={`relative ${getHeightClass()} bg-slate-100 overflow-hidden shrink-0 z-0 rounded-t-[inherit] cursor-pointer block`}
             >
               <div className="relative w-full h-full flex items-center justify-center">
                 <img
@@ -365,7 +363,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   )}
                 </div>
               )}
-            </div>
+            </Link>
 
             {/* 
               Content Section:
@@ -379,16 +377,16 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
             )}>
               {/* Title - Natural height with clamping */}
               <div className="flex items-start">
-                <h3 
+                <Link 
+                  href={`/product/${item.slug || item.id}`}
                   id={`item-card-${item.id}-title`} 
-                  onClick={() => setIsDialogOpen(true)}
                   className={cn(
                     `font-bold ${getTitleClass()} leading-tight line-clamp-2 transition-all w-full cursor-pointer text-slate-900 hover:text-blue-600`
                   )} 
                   title={item.title}
                 >
                   {item.title}
-                </h3>
+                </Link>
               </div>
 
               {/* Seller Info - Between Title and Price */}
@@ -514,12 +512,6 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
           </Card>
         </motion.div>
 
-      <ProductDetailsModal 
-        item={item} 
-        seller={seller} 
-        isOpen={isDialogOpen} 
-        onClose={setIsDialogOpen} 
-      />
     </>
   );
 });
