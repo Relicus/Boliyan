@@ -353,4 +353,24 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Default Button Press Animation - provides instant feedback on all clickable elements */
+  button:not(:disabled):active,
+  [role="button"]:not(:disabled):active,
+  a[class*="btn"]:active,
+  .btn:active {
+    transform: scale(0.97);
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Ensure buttons have smooth transform reset */
+  button,
+  [role="button"],
+  a[class*="btn"],
+  .btn {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                background-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+  }
 }
