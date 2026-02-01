@@ -1,13 +1,6 @@
 "use client";
 
 import { ReactNode, useEffect } from "react";
-import dynamic from "next/dynamic";
-
-// Dynamic import for idle-time preloading
-const ProductPageClientPreload = dynamic(
-  () => import("@/app/product/[slug]/ProductPageClient"),
-  { ssr: false }
-);
 
 /**
  * Marketplace Layout with Parallel Route Slot
@@ -27,8 +20,8 @@ export default function MarketplaceLayout({
   // Preload ProductPageClient during idle time after initial render
   useEffect(() => {
     const preload = () => {
-      // Trigger dynamic import preload
-      ProductPageClientPreload.preload?.();
+      // Trigger dynamic import preload by just importing the module
+      import("@/app/product/[slug]/ProductPageClient");
     };
     
     // Use requestIdleCallback for idle-time preload, fallback to setTimeout

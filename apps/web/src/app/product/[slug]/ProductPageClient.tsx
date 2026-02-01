@@ -357,7 +357,7 @@ function ProductContent({ item, seller }: ProductContentProps) {
   );
 }
 
-export default function ProductPageClient({ params }: { params: { id?: string; slug?: string } }) {
+export default function ProductPageClient({ params, onClose }: { params: { id?: string; slug?: string }; onClose?: () => void }) {
   const slugOrId = params.slug || params.id || '';
   
   const router = useRouter();
