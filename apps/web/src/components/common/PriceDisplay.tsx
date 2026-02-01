@@ -249,10 +249,10 @@ export const PriceDisplay = memo(({
   return (
     <div 
       id={itemId ? `price-display-${itemId}` : undefined}
-      className={cn("flex flex-wrap justify-between items-end gap-x-3 gap-y-1 w-full px-1", className)}
+      className={cn("flex flex-nowrap justify-between items-end gap-x-3 w-full px-1 overflow-hidden", className)}
     >
       {/* Asking Price - Left Aligned */}
-      <div className="flex flex-col items-start min-w-0 shrink-0">
+      <div className="flex flex-col items-start min-w-0 shrink">
         <div className="h-4 w-full relative mb-0.5">
           <span 
             className={cn(
@@ -266,14 +266,14 @@ export const PriceDisplay = memo(({
         </div>
         <span 
           id={itemId ? `price-asking-value-${itemId}` : undefined}
-          className={cn(getPriceClass(viewMode), "leading-[0.9] flex items-baseline gap-1", darkMode ? "text-white" : "text-slate-900")}
+          className={cn(getPriceClass(viewMode), "leading-[0.9] flex items-baseline gap-1 truncate", darkMode ? "text-white" : "text-slate-900")}
         >
           <RollingPrice price={askPrice} />
         </span>
       </div>
 
       {/* Dynamic Right Side - Right Aligned */}
-      <div className="flex flex-col items-end min-w-0">
+      <div className="flex flex-col items-end min-w-0 shrink">
           {/* Label Container - Absolute to prevent layout jump during transition */}
           <div className="h-4 w-full relative mb-0.5">
              <AnimatePresence mode="wait">

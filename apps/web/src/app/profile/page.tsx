@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useApp } from "@/lib/store";
 import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { AchievementSection } from "@/components/dashboard/AchievementSection";
@@ -9,10 +9,28 @@ import { UserCircle, Trophy, Star } from "lucide-react";
 import ProfileCompleteness from "@/components/profile/ProfileCompleteness";
 import ReviewList from "@/components/profile/ReviewList";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { user } = useApp();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
+
+  // Auth protection: redirect to signin if not logged in
+  useEffect(() => {
+    if (user === null) {
+      router.replace('/signin?redirect=/profile');
+    }
+  }, [user, router]);
+
+  // Don't render content until we know user state
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-5xl p-4 md:p-8 space-y-6">

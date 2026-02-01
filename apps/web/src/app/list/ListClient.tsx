@@ -51,19 +51,19 @@ function ListForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("id");
-  const { items, user, myLocation, openAuthModal, isLoading: isAuthLoading } = useApp();
+  const { items, user, myLocation, isLoading: isAuthLoading } = useApp();
   const { now } = useTime();
   
   useEffect(() => {
     if (!isAuthLoading && !user) {
-      openAuthModal();
+      router.replace('/signin?redirect=/list');
       return;
     }
     
     if (user && (!user.emailVerified || !user.profileComplete)) {
       router.push(`/complete-profile?redirect=${encodeURIComponent(window.location.pathname)}`);
     }
-  }, [user, isAuthLoading, openAuthModal, router]);
+  }, [user, isAuthLoading, router]);
   
   const [fetchedItem, setFetchedItem] = useState<Item | null>(null);
   const [isLoadingItem, setIsLoadingItem] = useState(!!editId);
@@ -571,6 +571,15 @@ function ListForm() {
 
     submitListing();
   };
+
+  // Auth guard: show loading spinner while checking or redirecting
+  if (isAuthLoading || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+      </div>
+    );
+  }
 
   return (
     <div id="list-page-container" className="container mx-auto max-w-2xl py-12 px-4">

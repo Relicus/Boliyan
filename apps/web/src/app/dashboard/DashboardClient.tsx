@@ -35,7 +35,13 @@ function DashboardContent() {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
   const [viewingItem, setViewingItem] = useState<Item | null>(null);
-  
+
+  // Auth protection: redirect to signin if not logged in
+  useEffect(() => {
+    if (user === null) {
+      router.replace('/signin?redirect=/dashboard');
+    }
+  }, [user, router]);
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -46,12 +52,6 @@ function DashboardContent() {
       router.replace(`/dashboard?tab=${initialTab}`, { scroll: false });
     }
   }, [initialTab, router, tabParam]);
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    router.push(`/dashboard?tab=${value}`, { scroll: false });
-  };
-
 
   // Fetch My Listings independently of the discovery feed
   useEffect(() => {
@@ -103,6 +103,20 @@ function DashboardContent() {
 
     fetchMyItems();
   }, [user]);
+
+  // Don't render content until we know user state
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+      </div>
+    );
+  }
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    router.push(`/dashboard?tab=${value}`, { scroll: false });
+  };
 
   const handleDeleteClick = (item: Item) => {
     setItemToDelete(item);

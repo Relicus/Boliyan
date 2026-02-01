@@ -5,7 +5,7 @@ import { ConversationList } from '@/components/inbox/ConversationList';
 import { ChatWindow } from '@/components/inbox/ChatWindow';
 import { cn } from '@/lib/utils';
 import { useApp } from '@/lib/store';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Search, ShoppingBag, Store } from 'lucide-react';
@@ -14,11 +14,19 @@ import { Input } from '@/components/ui/input';
 function InboxContent() {
   const { conversations, user } = useApp();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<'all' | 'offers' | 'bids' | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const countBadgeBase = "ml-2 inline-flex min-w-5 h-4 items-center justify-center rounded-full px-1.5 text-[10px] font-extrabold backdrop-blur-md bg-white/70 border border-white/70 shadow-[0_4px_10px_rgba(15,23,42,0.12)]";
+
+  // Auth protection: redirect to signin if not logged in
+  useEffect(() => {
+    if (user === null) {
+      router.replace('/signin?redirect=/inbox');
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -92,6 +100,7 @@ function InboxContent() {
   const displayedAllConversations = isSearching ? filteredAllConversations : conversations;
   const displayedOfferConversations = isSearching ? filteredAllConversations : offerConversations;
   const displayedBidConversations = isSearching ? filteredAllConversations : bidConversations;
+  
   useEffect(() => {
     if (!selectedIdParam) return;
     if (resolvedSelectedId === selectedIdParam) return;
@@ -100,11 +109,21 @@ function InboxContent() {
       return () => clearTimeout(timer);
     }
   }, [conversations, resolvedSelectedId, selectedIdParam]);
+
   const handleTabChange = (value: string) => {
     if (value === 'all' || value === 'offers' || value === 'bids') {
       setActiveTab(value);
     }
   };
+
+  // Don't render content until we know user state
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+      </div>
+    );
+  }
 
   return (
     <div id="inbox-container" className="flex flex-1 bg-muted/20 w-full h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)]">
