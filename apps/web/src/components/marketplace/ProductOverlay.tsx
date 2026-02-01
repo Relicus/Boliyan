@@ -63,8 +63,8 @@ export function ProductOverlay({ slug }: ProductOverlayProps) {
         transition={{ duration: 0.2, ease: "easeOut" }}
         className="fixed top-16 left-0 right-0 bottom-0 z-[41] bg-slate-50 overflow-y-auto overscroll-contain"
       >
-        {/* Reuse existing ProductPageClient with onClose callback */}
-        <ProductPageClient params={{ slug }} onClose={handleClose} />
+        {/* Reuse existing ProductPageClient */}
+        <ProductPageClient params={{ slug }} />
       </motion.div>
     </>
   );

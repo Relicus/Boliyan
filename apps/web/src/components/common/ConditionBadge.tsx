@@ -8,15 +8,13 @@ interface ConditionBadgeProps {
   condition: string;
   variant?: "glass" | "glass-light" | "outline" | "solid";
   className?: string;
-  onClick?: () => void;
 }
 
 export const ConditionBadge = memo(({ 
   id,
   condition, 
   variant = "outline", 
-  className = "",
-  onClick
+  className = "" 
 }: ConditionBadgeProps) => {
   const label = getConditionLabel(condition);
 
@@ -27,43 +25,17 @@ export const ConditionBadge = memo(({
     solid: "bg-slate-800 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.1)]"
   };
 
-  const isClickable = !!onClick;
-
-  const sharedClasses = cn(
-    "inline-flex items-center px-2 py-1 rounded-md transition-all",
-    variants[variant],
-    isClickable && "cursor-pointer hover:scale-105 hover:shadow-md active:scale-95",
-    className
-  );
-
-  const content = (
-    <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-tighter leading-none whitespace-nowrap">
-      {label}
-    </span>
-  );
-
-  if (isClickable) {
-    return (
-      <button
-        id={id}
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick();
-        }}
-        className={sharedClasses}
-      >
-        {content}
-      </button>
-    );
-  }
-
   return (
-    <div id={id} className={sharedClasses}>
-      {content}
+    <div id={id} className={cn(
+      "inline-flex items-center px-2 py-1 rounded-md transition-all",
+      variants[variant],
+      className
+    )}>
+      <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-tighter leading-none whitespace-nowrap">
+        {label}
+      </span>
     </div>
   );
 });
 
 ConditionBadge.displayName = "ConditionBadge";
-

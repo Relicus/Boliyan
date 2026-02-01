@@ -1,13 +1,11 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
-
 import { User } from "@/types";
+import { supabase } from "@/lib/supabase";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
-import { supabase, supabaseStorageKey } from "@/lib/supabase";
-import { hydrateStorageFromNative } from "@/lib/nativeStorage";
+import { useRouter } from "next/navigation";
 
 interface UserLocation {
   lat: number;
@@ -49,10 +47,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const saved = localStorage.getItem('boliyan_admin_mode');
       if (saved === 'true') setIsAdminMode(true);
     } catch { /* ignore */ }
-  }, []);
-
-  useEffect(() => {
-    void hydrateStorageFromNative(supabaseStorageKey);
   }, []);
 
   const toggleAdminMode = useCallback(() => {

@@ -34,7 +34,7 @@ interface PriceDisplayProps {
 // ============================================
 
 function getLabelClass(): string {
-  return 'text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1 truncate min-w-0';
+  return 'text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1';
 }
 
 function getPriceClass(viewMode: BiddingViewMode): string {
@@ -249,10 +249,10 @@ export const PriceDisplay = memo(({
   return (
     <div 
       id={itemId ? `price-display-${itemId}` : undefined}
-      className={cn("flex justify-between items-end gap-x-2 w-full px-1", className)}
+      className={cn("flex flex-wrap justify-between items-end gap-x-3 gap-y-1 w-full px-1", className)}
     >
       {/* Asking Price - Left Aligned */}
-      <div className="flex flex-col items-start min-w-0 shrink">
+      <div className="flex flex-col items-start min-w-0 shrink-0">
         <div className="h-4 w-full relative mb-0.5">
           <span 
             className={cn(
@@ -273,7 +273,7 @@ export const PriceDisplay = memo(({
       </div>
 
       {/* Dynamic Right Side - Right Aligned */}
-      <div className="flex flex-col items-end min-w-0 shrink">
+      <div className="flex flex-col items-end min-w-0">
           {/* Label Container - Absolute to prevent layout jump during transition */}
           <div className="h-4 w-full relative mb-0.5">
              <AnimatePresence mode="wait">

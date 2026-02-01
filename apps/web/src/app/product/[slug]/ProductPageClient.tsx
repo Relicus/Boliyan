@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, MapPin, Clock, Bookmark, Maximize2, Share2, ArrowLeft, BadgeCheck } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useBidding } from "@/hooks/useBidding";
-import { getFuzzyLocationString, calculatePrivacySafeDistance, getDistanceDisplayInfo } from "@/lib/utils";
+import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { RatingBadge } from "@/components/common/RatingBadge";
@@ -63,11 +63,13 @@ function ProductContent({ item, seller }: ProductContentProps) {
     }
   }, [isSuccess, bidAmount, item?.title]);
 
-  const { durationLabel, shouldHide } = useMemo(() => {
-    const { distance: dist, duration: dur } = (user?.location && seller?.location) 
+  const { duration } = useMemo(() => {
+    const { duration: dur } = (user?.location && seller?.location) 
       ? calculatePrivacySafeDistance(user.location, seller.location) 
-      : { distance: 0, duration: 0 };
-    return getDistanceDisplayInfo(dist, dur);
+      : { duration: 0 };
+    return { 
+      duration: dur
+    };
   }, [seller, user]);
 
   const biddingConfig = useMemo(() => 
@@ -245,12 +247,10 @@ function ProductContent({ item, seller }: ProductContentProps) {
                     <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
                   </div>
-                  {!shouldHide && durationLabel && (
-                    <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
-                      <Clock className="w-3 h-3" />
-                      {durationLabel}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
+                    <Clock className="w-3 h-3" />
+                    {duration} min
+                  </div>
                 </div>
             </div>
           </div>
@@ -357,7 +357,7 @@ function ProductContent({ item, seller }: ProductContentProps) {
   );
 }
 
-export default function ProductPageClient({ params, onClose }: { params: { id?: string; slug?: string }; onClose?: () => void }) {
+export default function ProductPageClient({ params }: { params: { id?: string; slug?: string } }) {
   const slugOrId = params.slug || params.id || '';
   
   const router = useRouter();
