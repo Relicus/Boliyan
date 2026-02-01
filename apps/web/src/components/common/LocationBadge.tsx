@@ -30,7 +30,7 @@ export const LocationBadge = memo(({
       variants[variant],
       className
     )}>
-      <MapPin className="h-3 w-3 shrink-0" />
+      <MapPin className="h-[clamp(0.625rem,2.5cqi,0.75rem)] w-[clamp(0.625rem,2.5cqi,0.75rem)] shrink-0" />
       <span className="text-[clamp(0.625rem,2.5cqi,0.75rem)] font-black tracking-tight leading-none truncate max-w-[120px]">
         {displayText}
       </span>

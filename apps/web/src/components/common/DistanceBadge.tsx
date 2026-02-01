@@ -36,7 +36,7 @@ export const DistanceBadge = memo(({
       variants[variant],
       className
     )}>
-      <Icon className={cn("h-3 w-3 shrink-0", !isFar && variant !== "inline" && "text-red-500", iconClassName)} />
+      <Icon className={cn("h-[clamp(0.625rem,2.5cqi,0.75rem)] w-[clamp(0.625rem,2.5cqi,0.75rem)] shrink-0", !isFar && variant !== "inline" && "text-red-500", iconClassName)} />
       <span className={cn(
         "font-bold tracking-wide tabular-nums leading-none",
         variant !== "inline" ? "text-[clamp(0.625rem,2.5cqi,0.75rem)]" : "text-inherit"

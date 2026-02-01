@@ -201,6 +201,80 @@
     font-family: var(--font-outfit);
   }
 
+  /* ============================================
+   * FLUID TYPOGRAPHY UTILITIES (Container Query Based)
+   * Use these for automatic shrinking based on parent container size.
+   * cqi = container query inline (width-based), scales with parent.
+   * ============================================ */
+  
+  /* Text sizes that shrink with container */
+  .text-fluid-xs {
+    font-size: clamp(0.5rem, 2cqi, 0.65rem);
+  }
+  .text-fluid-sm {
+    font-size: clamp(0.5625rem, 2.25cqi, 0.75rem);
+  }
+  .text-fluid-base {
+    font-size: clamp(0.625rem, 2.5cqi, 0.875rem);
+  }
+  .text-fluid-lg {
+    font-size: clamp(0.875rem, 4cqi, 1.25rem);
+  }
+  .text-fluid-xl {
+    font-size: clamp(1rem, 5cqi, 1.5rem);
+  }
+  .text-fluid-2xl {
+    font-size: clamp(1.25rem, 6cqi, 2rem);
+  }
+  .text-fluid-price {
+    font-size: clamp(1rem, 6cqi, 1.5rem);
+  }
+  
+  /* Icon sizes that shrink with container */
+  .icon-fluid-xs {
+    width: clamp(0.5rem, 2cqi, 0.625rem);
+    height: clamp(0.5rem, 2cqi, 0.625rem);
+  }
+  .icon-fluid-sm {
+    width: clamp(0.625rem, 2.5cqi, 0.75rem);
+    height: clamp(0.625rem, 2.5cqi, 0.75rem);
+  }
+  .icon-fluid-base {
+    width: clamp(0.75rem, 3cqi, 1rem);
+    height: clamp(0.75rem, 3cqi, 1rem);
+  }
+  .icon-fluid-lg {
+    width: clamp(1rem, 4cqi, 1.25rem);
+    height: clamp(1rem, 4cqi, 1.25rem);
+  }
+
+  /* Gap utilities that shrink */
+  .gap-fluid-xs {
+    gap: clamp(0.125rem, 0.5cqi, 0.25rem);
+  }
+  .gap-fluid-sm {
+    gap: clamp(0.25rem, 1cqi, 0.5rem);
+  }
+  .gap-fluid-base {
+    gap: clamp(0.375rem, 1.5cqi, 0.75rem);
+  }
+
+  /* Padding utilities that shrink */
+  .p-fluid-xs {
+    padding: clamp(0.25rem, 1cqi, 0.5rem);
+  }
+  .p-fluid-sm {
+    padding: clamp(0.375rem, 1.5cqi, 0.75rem);
+  }
+  .px-fluid-sm {
+    padding-left: clamp(0.375rem, 1.5cqi, 0.75rem);
+    padding-right: clamp(0.375rem, 1.5cqi, 0.75rem);
+  }
+  .py-fluid-xs {
+    padding-top: clamp(0.125rem, 0.5cqi, 0.25rem);
+    padding-bottom: clamp(0.125rem, 0.5cqi, 0.25rem);
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

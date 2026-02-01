@@ -256,11 +256,11 @@ export const PriceDisplay = memo(({
         <div className="h-4 w-full relative mb-0.5">
           <span 
             className={cn(
-              "text-[0.65rem] font-bold uppercase tracking-wider absolute left-0 bottom-0 whitespace-nowrap flex items-center gap-1", 
+              "text-[clamp(0.5rem,2cqi,0.65rem)] font-bold uppercase tracking-wider absolute left-0 bottom-0 whitespace-nowrap flex items-center gap-0.5", 
               darkMode ? "text-slate-400" : "text-slate-400"
             )}
           >
-            <Tag className="w-3 h-3" />
+            <Tag className="w-[clamp(0.625rem,2.5cqi,0.75rem)] h-[clamp(0.625rem,2.5cqi,0.75rem)]" />
             Asking
           </span>
         </div>
@@ -284,12 +284,12 @@ export const PriceDisplay = memo(({
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
                     className={cn(
-                        "text-[0.65rem] font-bold uppercase tracking-wider absolute right-0 bottom-0 whitespace-nowrap mb-0 flex items-center gap-1", 
+                        "text-[clamp(0.5rem,2cqi,0.65rem)] font-bold uppercase tracking-wider absolute right-0 bottom-0 whitespace-nowrap mb-0 flex items-center gap-0.5", 
                         // Mute the colors for the label to keep focus on the number
                         labelColor.replace('text-purple-600', 'text-purple-500').replace('text-amber-600', 'text-amber-500')
                     )}
                 >
-                    {LabelIcon && <LabelIcon className="w-3 h-3" />}
+                    {LabelIcon && <LabelIcon className="w-[clamp(0.625rem,2.5cqi,0.75rem)] h-[clamp(0.625rem,2.5cqi,0.75rem)]" />}
                     {labelText}
                 </motion.span>
              </AnimatePresence>
