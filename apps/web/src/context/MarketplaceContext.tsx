@@ -205,15 +205,45 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           if (cachedItems) {
               setItemsById(prev => upsertEntities(prev, cachedItems));
               setFeedIds(cachedItems.map(i => i.id));
-              setHasMore(cachedItems.length === ITEMS_PER_PAGE);
               setIsLoading(false);
               usedCache = true;
               
-              if (!isStale) {
+              // Always validate server count to ensure hasMore is accurate
+              // This is a lightweight HEAD query that only counts, doesn't fetch rows
+              let serverQuery = supabase
+                  .from('marketplace_listings')
+                  .select('id', { count: 'exact', head: true })
+                  .eq('status', 'active')
+                  .lte('go_live_at', new Date().toISOString());
+              
+              // Apply same filters to get accurate count
+              if (filters.category && filters.category !== "All Items") {
+                  serverQuery = serverQuery.eq('category', filters.category);
+              }
+              if (filters.condition && filters.condition !== 'all') {
+                  serverQuery = serverQuery.eq('condition', filters.condition);
+              }
+              if (filters.listingType === 'public') {
+                  serverQuery = serverQuery.eq('auction_mode', 'visible');
+              } else if (filters.listingType === 'hidden') {
+                  serverQuery = serverQuery.in('auction_mode', ['hidden', 'sealed']);
+              }
+              
+              const { count: serverCount } = await serverQuery;
+              
+              if (serverCount !== null && serverCount > cachedItems.length) {
+                  // Server has more items than cache - enable loading more
+                  setHasMore(true);
+              } else {
+                  setHasMore(cachedItems.length === ITEMS_PER_PAGE);
+              }
+              
+              if (!isStale && (serverCount === null || serverCount <= cachedItems.length)) {
+                  // Cache is fresh AND complete - safe to skip refetch
                   loadingLockRef.current = false;
                   return;
               }
-              // Stale cache - show revalidating indicator while fetching fresh data
+              // Stale cache or incomplete - show revalidating indicator while fetching fresh data
               setIsRevalidating(true);
           }
       }
