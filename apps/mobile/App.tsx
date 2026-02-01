@@ -106,12 +106,29 @@ export default function App() {
   }, [handleDeepLink]);
 
   const handleMessage = useCallback(async (event: { nativeEvent: { data: string } }) => {
+    // Check if it's a console log message first
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data && data.type === 'CONSOLE_LOG') {
+        const prefix = `[WebView:${data.level}]`;
+        const args = data.args || [];
+        console.log(prefix, ...args);
+        return;
+      }
+    } catch (e) {
+      console.log('[App] Received raw message:', event.nativeEvent.data);
+    }
+    
+    // Process as bridge request
     const request = parseBridgeRequest(event.nativeEvent.data);
     if (!request) {
+      // Invalid request and not a console log - ignore
       return;
     }
 
+    console.log('[App] Processing bridge request:', request.type);
     const response = await handleBridgeRequest(request);
+    console.log('[App] Sending response back to WebView:', response);
     webViewRef.current?.postMessage(JSON.stringify(response));
   }, []);
 

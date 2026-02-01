@@ -4,12 +4,10 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, MapPin, Clock, Bookmark, Maximize2, Share2, ArrowLeft, BadgeCheck } from "lucide-react";
 import { useApp } from "@/lib/store";
+import { shareContent } from "@/lib/nativeShare";
 import { useBidding } from "@/hooks/useBidding";
 import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
-import { CategoryBadge } from "@/components/common/CategoryBadge";
-import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { RatingBadge } from "@/components/common/RatingBadge";
-import { TimerBadge } from "@/components/common/TimerBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -100,9 +98,7 @@ function ProductContent({ item, seller }: ProductContentProps) {
             size="icon" 
             className="rounded-full h-10 w-10"
             onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: item.title, url: window.location.href });
-              }
+              void shareContent({ title: item.title, url: window.location.href });
             }}
           >
             <Share2 className="h-4 w-4" />

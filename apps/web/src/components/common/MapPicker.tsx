@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { PAKISTAN_CITIES, CITY_COORDINATES } from "@/lib/constants/locations";
 import { Button } from "@/components/ui/button";
+import { getCurrentLocation } from "@/lib/location";
 
 // Dynamically import the Map component to avoid SSR issues
 const LeafletMap = dynamic(
@@ -245,24 +246,26 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
   };
 
   const handleLocateMe = () => {
-      if ('geolocation' in navigator) {
-          setIsGeocoding(true);
-          navigator.geolocation.getCurrentPosition(
-              (position) => {
-                  const lat = position.coords.latitude;
-                  const lng = position.coords.longitude;
-                   setCenter([lat, lng]);
-                  // Let the useEffect handle the reverse geocoding
-                  // We DON'T set isGeocoding(false) here, useEffect will do it after fetching address
-              },
-
-              (error) => {
-                  console.error("Geolocation error:", error);
-                  setIsGeocoding(false);
-                  // Optional: Show toast error
-              }
-          );
-      }
+      // DEBUG: Active Alert Trace
+      window.alert("1. Button Clicked");
+      console.log("[MapPicker] 'Locate Me' button clicked");
+      
+      setIsGeocoding(true);
+      window.alert("2. Calling Service...");
+      
+      getCurrentLocation({ highAccuracy: true, timeout: 10000 })
+          .then((position) => {
+              window.alert(`3. Success: ${position.lat.toFixed(4)} from ${position.source}`);
+              const lat = position.lat;
+              const lng = position.lng;
+              console.log(`[MapPicker] Got location from ${position.source}:`, lat, lng);
+              setCenter([lat, lng]);
+          })
+          .catch((error) => {
+              window.alert(`3. Error: ${error.message}`);
+              console.error("Location error:", error);
+              setIsGeocoding(false);
+          });
   };
 
   return (
@@ -314,8 +317,13 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
             type="button"
             variant="secondary"
             size="icon"
-            className="absolute top-4 right-4 z-[400] bg-white shadow-md hover:bg-slate-50"
+            className="absolute top-4 right-4 z-[1000] bg-white shadow-md hover:bg-slate-50 cursor-pointer pointer-events-auto active:scale-95 transition-transform"
             onClick={handleLocateMe}
+            onPointerDown={(e) => {
+              // Ensure touch events trigger it even if click is swallowed
+              e.preventDefault(); 
+              handleLocateMe();
+            }}
             title="Locate Me"
         >
             <Crosshair className="h-5 w-5 text-slate-700" />

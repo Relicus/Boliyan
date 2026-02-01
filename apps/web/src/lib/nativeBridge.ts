@@ -39,8 +39,17 @@ export async function requestNative<T extends NativeBridgeMethod>(
   const bridge = getBridgeFromWindow();
 
   if (!bridge) {
+    console.warn(`[NativeBridge] requestNative called for ${method} but bridge not found on window`);
     return null;
   }
 
-  return bridge[method](payload);
+  console.log(`[NativeBridge] Sending request: ${method}`, payload);
+  try {
+    const result = await bridge[method](payload);
+    console.log(`[NativeBridge] Got response for ${method}:`, result);
+    return result;
+  } catch (err) {
+    console.error(`[NativeBridge] Error calling ${method}:`, err);
+    throw err;
+  }
 }

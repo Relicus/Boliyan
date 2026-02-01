@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
 import { useRouter } from "next/navigation";
+import { getCurrentLocation } from "@/lib/location";
 
 interface UserLocation {
   lat: number;
@@ -138,26 +139,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
             }
 
-            // 2. Race IP and GPS
+            // 2. Race IP and GPS (uses native GPS on mobile app, browser geolocation on web)
             fetchIpLocation();
-            if ('geolocation' in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        if (!mounted) return;
-                        const { latitude, longitude } = position.coords;
-                        try {
-                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
-                            const data = await res.json();
-                            const city = data.address?.city || data.address?.town || data.address?.village || data.address?.suburb || "Current Location";
-                            saveLocation(latitude, longitude, city, true);
-                        } catch {
-                            saveLocation(latitude, longitude, "Current Location", true);
-                        }
-                    },
-                    () => {},
-                    { timeout: 7000, maximumAge: 0 }
-                );
-            }
+            getCurrentLocation({ highAccuracy: false, timeout: 7000 })
+                .then(async (position) => {
+                    if (!mounted) return;
+                    const { lat: latitude, lng: longitude, source } = position;
+                    console.log(`[AuthContext] Got location from ${source}:`, latitude, longitude);
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
+                        const data = await res.json();
+                        const city = data.address?.city || data.address?.town || data.address?.village || data.address?.suburb || "Current Location";
+                        saveLocation(latitude, longitude, city, true);
+                    } catch {
+                        saveLocation(latitude, longitude, "Current Location", true);
+                    }
+                })
+                .catch(() => {
+                    // GPS failed, IP fallback already running
+                });
         } catch { /* ignore */ }
     };
 

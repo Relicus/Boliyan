@@ -39,8 +39,13 @@ function buildImageFiles(assets: ImagePicker.ImagePickerAsset[]): NativeImageFil
 }
 
 async function handleGetLocation(request: NativeBridgeRequest) {
+  console.log('[NativeBridge] handleGetLocation called:', request);
+  
   const permission = await Location.requestForegroundPermissionsAsync();
+  console.log('[NativeBridge] Location permission status:', permission.status);
+  
   if (permission.status !== 'granted') {
+    console.log('[NativeBridge] Location permission denied');
     return buildErrorResponse(request, buildError('denied', 'Location permission denied'));
   }
 
@@ -48,7 +53,10 @@ async function handleGetLocation(request: NativeBridgeRequest) {
   const accuracy = payload?.highAccuracy
     ? Location.Accuracy.Highest
     : Location.Accuracy.Balanced;
+  
+  console.log('[NativeBridge] Getting position with accuracy:', accuracy);
   const position = await Location.getCurrentPositionAsync({ accuracy });
+  console.log('[NativeBridge] Got position:', position.coords);
 
   return buildSuccessResponse(request, {
     lat: position.coords.latitude,

@@ -23,6 +23,7 @@ import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { uploadListingImage } from "@/lib/uploadImage";
+import { isNativeImagePickerAvailable, pickNativeImages } from "@/lib/nativeImages";
 import { supabase } from "@/lib/supabase";
 import { generateSlug, formatPrice, formatCountdown } from "@/lib/utils";
 import { toast } from "sonner";
@@ -46,6 +47,12 @@ const GO_LIVE_NOTE = "Goes live in 1 hour after saving.";
 const EDIT_COOLDOWN_TOAST = "You can edit this listing again in";
 const MAX_IMAGES = 5;
 const DRAFT_KEY = "boliyan_listing_draft";
+const NATIVE_IMAGE_PICK_FAILED = "Unable to open photo library.";
+const NATIVE_IMAGE_PICK_OPTIONS = {
+  allowsMultiple: true,
+  quality: 0.9,
+  source: "library"
+} as const;
 
 function ListForm() {
   const router = useRouter();
@@ -269,74 +276,88 @@ function ListForm() {
 
   const isValidPhone = (value: string) => value.replace(/\D/g, "").length >= 10;
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      if (isProcessingImages) {
-        toast.info("Please wait for image processing to finish.");
-        e.target.value = "";
-        return;
-      }
-      const newFiles = Array.from(files);
-      const allowedFiles = newFiles.filter(isAllowedListingImageInput);
-      const rejectedCount = newFiles.length - allowedFiles.length;
-      if (rejectedCount > 0) {
-        toast.error("Only JPG, PNG, or iPhone HEIC/HEIF images are allowed.");
-      }
-      if (allowedFiles.length === 0) return;
+  const addImagesFromFiles = async (files: File[]) => {
+    if (files.length === 0) return;
+    if (isProcessingImages) {
+      toast.info("Please wait for image processing to finish.");
+      return;
+    }
 
-      const remainingSlots = Math.max(0, MAX_IMAGES - imageEntries.length);
-      if (remainingSlots === 0) {
-        toast.error(`Image limit reached (max ${MAX_IMAGES}).`);
-        return;
-      }
+    const allowedFiles = files.filter(isAllowedListingImageInput);
+    const rejectedCount = files.length - allowedFiles.length;
+    if (rejectedCount > 0) {
+      toast.error("Only JPG, PNG, or iPhone HEIC/HEIF images are allowed.");
+    }
+    if (allowedFiles.length === 0) return;
 
-      if (allowedFiles.length > remainingSlots) {
-        toast.info(`Only ${remainingSlots} more image${remainingSlots === 1 ? "" : "s"} allowed.`);
-      }
+    const remainingSlots = Math.max(0, MAX_IMAGES - imageEntries.length);
+    if (remainingSlots === 0) {
+      toast.error(`Image limit reached (max ${MAX_IMAGES}).`);
+      return;
+    }
 
-      const filesToProcess = allowedFiles.slice(0, remainingSlots);
-      const processedEntries: ImageEntry[] = [];
-      let rejectedOversize = 0;
-      let rejectedProcessing = 0;
+    if (allowedFiles.length > remainingSlots) {
+      toast.info(`Only ${remainingSlots} more image${remainingSlots === 1 ? "" : "s"} allowed.`);
+    }
 
-      setIsProcessingImages(true);
-      try {
-        for (const file of filesToProcess) {
-          try {
-            const processed = await processListingImage(file);
-            processedEntries.push({
-              id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-              url: URL.createObjectURL(processed),
-              file: processed,
-              isNew: true
-            });
-          } catch (error) {
-            if (error instanceof Error && error.message.includes("exceeds 1MB")) {
-              rejectedOversize += 1;
-            } else {
-              rejectedProcessing += 1;
-            }
+    const filesToProcess = allowedFiles.slice(0, remainingSlots);
+    const processedEntries: ImageEntry[] = [];
+    let rejectedOversize = 0;
+    let rejectedProcessing = 0;
+
+    setIsProcessingImages(true);
+    try {
+      for (const file of filesToProcess) {
+        try {
+          const processed = await processListingImage(file);
+          processedEntries.push({
+            id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            url: URL.createObjectURL(processed),
+            file: processed,
+            isNew: true
+          });
+        } catch (error) {
+          if (error instanceof Error && error.message.includes("exceeds 1MB")) {
+            rejectedOversize += 1;
+          } else {
+            rejectedProcessing += 1;
           }
         }
-      } finally {
-        setIsProcessingImages(false);
       }
-
-      if (rejectedOversize > 0) {
-        toast.error("Some images exceed 1MB after compression.");
-      }
-      if (rejectedProcessing > 0) {
-        toast.error("Some images could not be processed.");
-      }
-
-      if (processedEntries.length > 0) {
-        setImageEntries(prev => [...prev, ...processedEntries]);
-      } else {
-        toast.error("No images were added.");
-      }
+    } finally {
+      setIsProcessingImages(false);
     }
+
+    if (rejectedOversize > 0) {
+      toast.error("Some images exceed 1MB after compression.");
+    }
+    if (rejectedProcessing > 0) {
+      toast.error("Some images could not be processed.");
+    }
+
+    if (processedEntries.length > 0) {
+      setImageEntries(prev => [...prev, ...processedEntries]);
+    } else {
+      toast.error("No images were added.");
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    await addImagesFromFiles(files);
     e.target.value = "";
+  };
+
+  const handleNativeImagePick = async (event: React.MouseEvent<HTMLLabelElement>) => {
+    if (!isNativeImagePickerAvailable()) return;
+    event.preventDefault();
+    try {
+      const files = await pickNativeImages(NATIVE_IMAGE_PICK_OPTIONS);
+      await addImagesFromFiles(files);
+    } catch (error) {
+      console.error(error);
+      toast.error(NATIVE_IMAGE_PICK_FAILED);
+    }
   };
 
   const removeImage = (index: number) => {
@@ -692,6 +713,7 @@ function ListForm() {
                     <label 
                       id="add-image-label"
                       className="h-28 w-28 shrink-0 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all group"
+                      onClick={handleNativeImagePick}
                     >
                       <Camera id="camera-icon" className="h-7 w-7 text-slate-400 mb-1 group-hover:text-blue-500 transition-colors" />
                       <span id="add-photo-text" className="text-[11px] text-slate-500 font-bold group-hover:text-blue-600">Add Photo</span>
