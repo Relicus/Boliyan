@@ -8,10 +8,6 @@ import {
   MapPin, 
   Banknote, 
   Sparkles,
-  Layers,
-  Star,
-  ThumbsUp,
-  Hammer,
   ArrowDownWideNarrow,
   ArrowUpNarrowWide
 } from "lucide-react";
@@ -206,38 +202,23 @@ export default function Sidebar() {
               onValueChange={(val) => setFilter('condition', val)}
             >
               <SelectTrigger id="sidebar-condition-select" className="w-full bg-white border-slate-200 focus:ring-blue-500/20 rounded-xl">
-                <SelectValue placeholder="Any Condition" />
+                <SelectValue placeholder="📦 All" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-slate-200 shadow-xl">
                 <SelectItem value="all" className="rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Layers className="h-4 w-4 text-slate-400" />
-                    <span className="font-medium">Any Condition</span>
-                  </div>
+                  <span className="font-medium">📦 All</span>
                 </SelectItem>
                 <SelectItem value="new" className="rounded-lg text-blue-600 font-bold">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" />
-                    <span>Brand New</span>
-                  </div>
+                  <span>🌟 New</span>
                 </SelectItem>
                 <SelectItem value="like_new" className="rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-amber-500" />
-                    <span>Like New</span>
-                  </div>
+                  <span>✨ Mint</span>
                 </SelectItem>
                 <SelectItem value="used" className="rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <ThumbsUp className="h-4 w-4 text-slate-500" />
-                    <span>Used (Good)</span>
-                  </div>
+                  <span>👌 Used</span>
                 </SelectItem>
                 <SelectItem value="fair" className="rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Hammer className="h-4 w-4 text-slate-500" />
-                    <span>Fair</span>
-                  </div>
+                  <span>🔨 Fair</span>
                 </SelectItem>
               </SelectContent>
             </Select>

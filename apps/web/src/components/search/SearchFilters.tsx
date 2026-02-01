@@ -118,14 +118,14 @@ export default function SearchFilters({ isOpen, onClose, isMobile }: SearchFilte
                  onValueChange={(val: SearchCondition) => updateFilter('condition', val)}
               >
                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Any Condition" />
+                    <SelectValue placeholder="📦 All" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">Any Condition</SelectItem>
-                    <SelectItem value="new">🌟 Brand New</SelectItem>
-                    <SelectItem value="like_new">✨ Like New / Mint</SelectItem>
-                    <SelectItem value="used">👌 Gently Used</SelectItem>
-                    <SelectItem value="fair">🔨 Heavily Used (Fair)</SelectItem>
+                    <SelectItem value="all">📦 All</SelectItem>
+                    <SelectItem value="new">🌟 New</SelectItem>
+                    <SelectItem value="like_new">✨ Mint</SelectItem>
+                    <SelectItem value="used">👌 Used</SelectItem>
+                    <SelectItem value="fair">🔨 Fair</SelectItem>
                 </SelectContent>
              </Select>
         </div>

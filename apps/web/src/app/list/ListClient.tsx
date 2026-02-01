@@ -794,8 +794,8 @@ function ListForm() {
                       <SelectValue placeholder="Select Condition" />
                     </SelectTrigger>
                     <SelectContent id="condition-select-content">
-                      <SelectItem value="new">🌟 Brand New</SelectItem>
-                      <SelectItem value="like_new">✨ Like New</SelectItem>
+                      <SelectItem value="new">🌟 New</SelectItem>
+                      <SelectItem value="like_new">✨ Mint</SelectItem>
                       <SelectItem value="used">👌 Used</SelectItem>
                       <SelectItem value="fair">🔨 Fair</SelectItem>
                     </SelectContent>

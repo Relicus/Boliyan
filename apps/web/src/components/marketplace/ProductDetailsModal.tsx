@@ -24,7 +24,7 @@ interface ProductDetailsModalProps {
 }
 
 export default function ProductDetailsModal({ item, seller, isOpen, onClose }: ProductDetailsModalProps) {
-  const { user, bids, toggleWatch, watchedItemIds, myLocation } = useApp();
+  const { user, bids, toggleWatch, watchedItemIds, myLocation, setFilter } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
 
 
@@ -127,6 +127,14 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                 isOutside={isOutside}
                 duration={duration}
                 distance={distance}
+                onCategoryClick={() => {
+                  setFilter('category', item.category);
+                  onClose(false);
+                }}
+                onConditionClick={() => {
+                  setFilter('condition', item.condition);
+                  onClose(false);
+                }}
               />
 
               {/* Right Column: Dashboard */}

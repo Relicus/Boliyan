@@ -62,10 +62,10 @@ export const ActiveFilters = memo(({ className, variant = "sidebar" }: ActiveFil
   // Condition filter
   if (filters.condition && filters.condition !== "all") {
     const conditionLabels: Record<string, string> = {
-      new: "Brand New",
-      like_new: "Like New",
-      used: "Used",
-      fair: "Fair",
+      new: "🌟 New",
+      like_new: "✨ Mint",
+      used: "👌 Used",
+      fair: "🔨 Fair",
     };
     activeFilters.push({
       id: "condition",

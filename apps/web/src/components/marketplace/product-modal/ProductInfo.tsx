@@ -15,6 +15,8 @@ interface ProductInfoProps {
   isOutside: boolean;
   duration: number;
   distance: number;
+  onCategoryClick?: () => void;
+  onConditionClick?: () => void;
 }
 
 export const ProductInfo = memo(function ProductInfo({
@@ -22,7 +24,9 @@ export const ProductInfo = memo(function ProductInfo({
   seller,
   isOutside,
   duration,
-  distance
+  distance,
+  onCategoryClick,
+  onConditionClick
 }: ProductInfoProps) {
   return (
     <div id={`product-details-left-${item.id}`} className="flex flex-col gap-3 min-w-0 h-full">
@@ -31,7 +35,12 @@ export const ProductInfo = memo(function ProductInfo({
           <h3 className="text-xl sm:text-2xl font-black font-outfit text-slate-900 leading-tight mb-2 line-clamp-2">
             {item.title}
           </h3>
-          <ListingBadges item={item} seller={seller} />
+          <ListingBadges 
+            item={item} 
+            seller={seller} 
+            onCategoryClick={onCategoryClick}
+            onConditionClick={onConditionClick}
+          />
         </div>
       </div>
 

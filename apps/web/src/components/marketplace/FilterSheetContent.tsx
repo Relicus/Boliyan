@@ -167,11 +167,11 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
             </Label>
             <div className="grid grid-cols-2 gap-2">
               {([
-                { id: 'all', label: 'Any Condition', icon: Layers },
-                { id: 'new', label: 'Brand New', icon: Sparkles },
-                { id: 'like_new', label: 'Like New', icon: Star },
-                { id: 'used', label: 'Used (Good)', icon: ThumbsUp },
-                { id: 'fair', label: 'Fair', icon: Hammer }
+                { id: 'all', label: '📦 All', icon: Layers },
+                { id: 'new', label: '🌟 New', icon: Sparkles },
+                { id: 'like_new', label: '✨ Mint', icon: Star },
+                { id: 'used', label: '👌 Used', icon: ThumbsUp },
+                { id: 'fair', label: '🔨 Fair', icon: Hammer }
               ] as const).map((c) => {
                   const Icon = c.icon;
                   return (

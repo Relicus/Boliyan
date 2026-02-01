@@ -1,113 +1,98 @@
 "use client";
 
-import { memo, useMemo, useEffect } from "react";
-import { Clock } from "lucide-react";
-import { motion } from "framer-motion";
+import { memo, useEffect, useState, useCallback } from "react";
+import { Clock, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTime } from "@/context/TimeContext";
 
 interface TimerBadgeProps {
-  id?: string;
-  expiryAt: string;
-  variant?: "glass" | "glass-light" | "outline" | "solid";
+  expiryAt: string | Date | null | undefined;
+  variant?: "glass" | "glass-light" | "outline" | "solid" | "inline";
   className?: string;
-  onUrgentChange?: (isUrgent: boolean) => void;
+  iconClassName?: string;
   onExpire?: () => void;
 }
 
 export const TimerBadge = memo(({ 
-  id,
   expiryAt, 
-  variant = "outline", 
+  variant = "glass", 
   className = "",
-  onUrgentChange,
+  iconClassName = "",
   onExpire
 }: TimerBadgeProps) => {
-  // Use global time heartbeat instead of local interval
   const { now } = useTime();
+  const [hasExpired, setHasExpired] = useState(false);
 
-  const { text, isUrgent, isExpired } = useMemo(() => {
-    const diff = new Date(expiryAt).getTime() - now;
-    const expired = diff <= 0;
-    const hoursLeft = Math.max(0, Math.floor(diff / 3600000));
-    const minsLeft = Math.max(0, Math.floor((diff % 3600000) / 60000));
-    const secsLeft = Math.max(0, Math.floor((diff % 60000) / 1000));
-
-    const urgent = hoursLeft < 2 && !expired;
+  // Calculate time remaining
+  const getTimeRemaining = useCallback(() => {
+    if (!expiryAt) return { label: "", isUrgent: false, isExpired: true };
     
-    let timeString = "";
-    if (expired) {
-      timeString = "EXPIRED";
-    } else if (hoursLeft >= 24) {
-      timeString = `${Math.floor(hoursLeft / 24)}d ${hoursLeft % 24}h`;
-    } else {
-      timeString = `${hoursLeft}h ${minsLeft}m ${secsLeft}s`;
+    const expiry = new Date(expiryAt).getTime();
+    const remaining = expiry - now;
+    
+    if (remaining <= 0) {
+      return { label: "Expired", isUrgent: true, isExpired: true };
     }
-
-    return { text: timeString, isUrgent: urgent, isExpired: expired };
+    
+    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    
+    // Determine urgency (less than 2 hours)
+    const isUrgent = hours < 2;
+    
+    if (hours >= 24) {
+      const days = Math.floor(hours / 24);
+      return { label: `${days}d left`, isUrgent: false, isExpired: false };
+    } else if (hours > 0) {
+      return { label: `${hours}h ${minutes}m`, isUrgent, isExpired: false };
+    } else {
+      return { label: `${minutes}m`, isUrgent: true, isExpired: false };
+    }
   }, [expiryAt, now]);
 
-  // Handle urgency callback
-  useEffect(() => {
-    onUrgentChange?.(isUrgent);
-  }, [isUrgent, onUrgentChange]);
+  const { label, isUrgent, isExpired } = getTimeRemaining();
 
   // Handle expiration callback
   useEffect(() => {
-    if (isExpired) {
+    if (isExpired && !hasExpired) {
+      setHasExpired(true);
       onExpire?.();
     }
-  }, [isExpired, onExpire]);
+  }, [isExpired, hasExpired, onExpire]);
 
-  // Expired takes priority, then urgent, then default
-  const getVariantClass = () => {
-    if (isExpired) {
-      return "bg-slate-200 text-slate-500 border-slate-300 opacity-60";
-    }
-    const variantStyles = {
-      glass: isUrgent 
-        ? "bg-red-500/95 text-white border-white/20 shadow-sm ring-1 ring-inset ring-white/10" 
-        : "bg-black/80 text-white border-white/10 shadow-sm ring-1 ring-inset ring-white/5",
-      "glass-light": isUrgent
-        ? "bg-red-100/90 text-red-700 border-red-200/50 shadow-sm ring-1 ring-inset ring-red-200/20"
-        : "bg-white/90 text-slate-800 border-slate-200/50 shadow-sm ring-1 ring-inset ring-white/50",
-      outline: isUrgent
-        ? "bg-red-50 text-red-600 border-red-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5)]"
-        : "bg-white text-slate-700 border-slate-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)]",
-      solid: isUrgent
-        ? "bg-red-600 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]"
-        : "bg-slate-900 text-white border-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.1)]"
-    };
-    return variantStyles[variant];
+  // Don't render if no expiry data
+  if (!expiryAt || !label) return null;
+
+  const Icon = isUrgent ? AlertTriangle : Clock;
+  
+  const variants = {
+    glass: "bg-black/75 text-white border-white/10 shadow-lg px-2 py-1 rounded-md",
+    "glass-light": "bg-white/85 text-slate-800 border-black/5 shadow-lg px-2 py-1 rounded-md",
+    outline: "bg-white text-slate-700 border-slate-200 border px-2 py-1 rounded-md",
+    solid: "bg-slate-900 text-white border-none shadow-sm px-2 py-1 rounded-md",
+    inline: "bg-transparent p-0 border-none shadow-none"
   };
 
   return (
-    <motion.div 
-      id={id}
-      initial={false}
-      animate={isUrgent ? {
-        scale: [1, 1.06, 1, 1.06, 1],
-        transition: {
-          duration: 2,
-          repeat: Infinity,
-          times: [0, 0.1, 0.2, 0.3, 1],
-          ease: "easeInOut"
-        }
-      } : { scale: 1 }}
-      className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all font-black font-outfit tabular-nums",
-        getVariantClass(),
-        className
-      )}
-    >
-      <Clock className={cn(
-        "h-[clamp(0.625rem,2.5cqi,0.875rem)] w-[clamp(0.625rem,2.5cqi,0.875rem)] shrink-0",
-        isUrgent && "animate-[spin_4s_linear_infinite]"
+    <div className={cn(
+      "inline-flex items-center gap-1.5 transition-all",
+      variants[variant],
+      isUrgent && variant !== "inline" && "animate-pulse",
+      className
+    )}>
+      <Icon className={cn(
+        "h-[clamp(0.625rem,2.5cqi,0.75rem)] w-[clamp(0.625rem,2.5cqi,0.75rem)] shrink-0",
+        isUrgent && "text-red-400",
+        iconClassName
       )} />
-      <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] uppercase tracking-tight leading-none">
-        {text}
+      <span className={cn(
+        "font-bold tracking-wide tabular-nums leading-none",
+        variant !== "inline" ? "text-[clamp(0.625rem,2.5cqi,0.75rem)]" : "text-inherit",
+        isExpired && "text-red-500"
+      )}>
+        {label}
       </span>
-    </motion.div>
+    </div>
   );
 });
 

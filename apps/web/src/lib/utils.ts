@@ -351,21 +351,37 @@ export function getListingShortCode(slug?: string): string | undefined {
 }
 
 /**
- * Maps database condition strings to UI display labels.
+ * Centralized condition configuration - SINGLE SOURCE OF TRUTH
  * 
- * Mappings:
- * - new -> "🌟 New"
- * - like_new -> "✨ Mint"
- * - used -> "👌 Used"
- * - fair -> "🔨 Fair"
- * - default -> "👌 Used"
+ * Use this everywhere: badges, filters, dropdowns, active filters.
+ * Structure:
+ * - id: Database value ('new', 'like_new', 'used', 'fair')
+ * - label: Display label for filters/dropdowns
+ * - badgeLabel: Short label for badges (with emoji)
+ * - icon: Lucide icon name for filter UI
+ */
+export const CONDITION_OPTIONS = [
+  { id: 'new', label: 'New', badgeLabel: '🌟 New', icon: 'Sparkles' },
+  { id: 'like_new', label: 'Like New', badgeLabel: '✨ Mint', icon: 'Star' },
+  { id: 'used', label: 'Used', badgeLabel: '👌 Used', icon: 'ThumbsUp' },
+  { id: 'fair', label: 'Fair', badgeLabel: '🔨 Fair', icon: 'Wrench' },
+] as const;
+
+export type ConditionId = typeof CONDITION_OPTIONS[number]['id'];
+
+/**
+ * Maps database condition strings to badge display labels.
  */
 export function getConditionLabel(condition: string): string {
-  switch (condition) {
-    case 'new': return '🌟 New';
-    case 'like_new': return '✨ Mint';
-    case 'used': return '👌 Used';
-    case 'fair': return '🔨 Fair';
-    default: return '👌 Used';
-  }
+  const found = CONDITION_OPTIONS.find(c => c.id === condition);
+  return found?.badgeLabel ?? '👌 Used';
 }
+
+/**
+ * Maps database condition strings to filter display labels.
+ */
+export function getConditionFilterLabel(condition: string): string {
+  const found = CONDITION_OPTIONS.find(c => c.id === condition);
+  return found?.label ?? 'Used';
+}
+

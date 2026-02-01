@@ -10,7 +10,7 @@ import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
 import { useRouter } from "next/navigation";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
-import { TimerBadge } from "@/components/common/TimerBadge";
+
 import { DistanceBadge } from "@/components/common/DistanceBadge";
 import Link from "next/link";
 
@@ -109,11 +109,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
           <div id={`bid-card-mobile-price-section-${bid.id}`} className="text-right shrink-0 flex flex-col items-end">
             <span className="text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1">Bid Amount</span>
             <p id={`bid-amount-mobile-${bid.id}`} className="price-font font-black text-blue-600 leading-none truncate text-[clamp(1rem,5cqi,1.25rem)]">Rs. {formatPrice(bid.amount)}</p>
-            {!isExpired && (bid.status === 'pending' || bid.status === 'shortlisted') && (
-                 <div className="mt-1 flex justify-end">
-                    <TimerBadge expiryAt={expiresAt.toISOString()} variant="solid" className="bg-transparent text-slate-400 p-0 shadow-none animate-none" />
-                 </div>
-            )}
+
             {isExpired && bid.status !== 'accepted' && (
                 <div className="text-[9px] font-bold mt-1 text-right text-red-500 uppercase tracking-tighter">
                    Expired
@@ -207,11 +203,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
               <div className="text-right">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-0.5">Bid Amount</span>
                 <p id={`bid-amount-desktop-${bid.id}`} className="price-font font-black text-xl text-blue-600 leading-none">Rs. {formatPrice(bid.amount)}</p>
-                {!isExpired && (bid.status === 'pending' || bid.status === 'shortlisted') && (
-                  <div className="mt-1.5 flex justify-end">
-                    <TimerBadge expiryAt={expiresAt.toISOString()} variant="solid" className="bg-transparent text-slate-400 p-0 shadow-none animate-none" />
-                  </div>
-                )}
+
                 {isExpired && bid.status !== 'accepted' && (
                   <div className="text-[10px] font-bold mt-1.5 text-right text-red-500 uppercase tracking-widest">
                     Expired
