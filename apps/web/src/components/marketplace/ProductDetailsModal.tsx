@@ -103,19 +103,33 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
           <X className="h-5 w-5" />
         </DialogClose>
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.08, delayChildren: 0.05 }
+            }
+          }}
           className="flex flex-col h-auto min-h-full md:h-full md:overflow-hidden"
         >
           {/* Top Section: Dynamic Gallery */}
-          <ProductGallery 
-            item={item}
-            currentImg={currentImg}
-            setCurrentImg={setCurrentImg}
-            setShowFullscreen={setShowFullscreen}
-            isWatched={isWatched}
-            onToggleWatch={toggleWatch}
-          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 12 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.22, ease: "easeOut" } }
+            }}
+          >
+            <ProductGallery 
+              item={item}
+              currentImg={currentImg}
+              setCurrentImg={setCurrentImg}
+              setShowFullscreen={setShowFullscreen}
+              isWatched={isWatched}
+              onToggleWatch={toggleWatch}
+            />
+          </motion.div>
 
 
           {/* Bottom Section: Product Details & Bidding */}
@@ -123,16 +137,30 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
             <div id={`product-details-grid-${item.id}`} className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] w-full">
               
               {/* Left Column: Info */}
-              <ProductInfo 
-                item={item}
-                seller={seller}
-                isOutside={isOutside}
-                duration={duration}
-                distance={distance}
-              />
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, x: -12 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.22, ease: "easeOut" } }
+                }}
+              >
+                <ProductInfo 
+                  item={item}
+                  seller={seller}
+                  isOutside={isOutside}
+                  duration={duration}
+                  distance={distance}
+                />
+              </motion.div>
 
               {/* Right Column: Dashboard */}
-              <div id={`product-details-right-${item.id}`} className="h-full min-w-0">
+              <motion.div 
+                id={`product-details-right-${item.id}`} 
+                className="h-full min-w-0"
+                variants={{
+                  hidden: { opacity: 0, x: 12 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.22, ease: "easeOut" } }
+                }}
+              >
                   <BiddingDashboard 
                     item={item}
                     user={user}
@@ -158,7 +186,7 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     maxBid={maxBid}
                     derivedStatus={derivedStatus}
                   />
-              </div>
+              </motion.div>
 
             </div>
           </div>

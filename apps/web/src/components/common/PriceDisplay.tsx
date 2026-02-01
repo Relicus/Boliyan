@@ -34,14 +34,14 @@ interface PriceDisplayProps {
 // ============================================
 
 function getLabelClass(): string {
-  return 'text-[clamp(0.5625rem,2.25cqi,0.75rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1';
+  return 'text-[clamp(0.4rem,1.8cqi,0.6rem)] font-black uppercase tracking-[0.08em] text-slate-500/80 mb-1';
 }
 
 function getPriceClass(viewMode: BiddingViewMode): string {
   const base = 'font-outfit font-black leading-none transition-all';
   switch (viewMode) {
     case 'modal': return `${base} text-xl`;
-    default: return `${base} text-[clamp(1rem,6cqi,1.5rem)]`;
+    default: return `${base} text-[clamp(0.75rem,5cqi,1.25rem)]`;
   }
 }
 
@@ -256,11 +256,11 @@ export const PriceDisplay = memo(({
         <div className="h-4 w-full relative mb-0.5">
           <span 
             className={cn(
-              "text-[clamp(0.5rem,2cqi,0.65rem)] font-bold uppercase tracking-wider absolute left-0 bottom-0 whitespace-nowrap flex items-center gap-0.5", 
+              "text-[clamp(0.4rem,1.6cqi,0.55rem)] font-bold uppercase tracking-wider absolute left-0 bottom-0 whitespace-nowrap flex items-center gap-0.5", 
               darkMode ? "text-slate-400" : "text-slate-400"
             )}
           >
-            <Tag className="w-[clamp(0.625rem,2.5cqi,0.75rem)] h-[clamp(0.625rem,2.5cqi,0.75rem)]" />
+            <Tag className="w-[clamp(0.5rem,2cqi,0.625rem)] h-[clamp(0.5rem,2cqi,0.625rem)]" />
             Asking
           </span>
         </div>
@@ -284,12 +284,12 @@ export const PriceDisplay = memo(({
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
                     className={cn(
-                        "text-[clamp(0.5rem,2cqi,0.65rem)] font-bold uppercase tracking-wider absolute right-0 bottom-0 whitespace-nowrap mb-0 flex items-center gap-0.5", 
+                        "text-[clamp(0.4rem,1.6cqi,0.55rem)] font-bold uppercase tracking-wider absolute right-0 bottom-0 whitespace-nowrap mb-0 flex items-center gap-0.5", 
                         // Mute the colors for the label to keep focus on the number
                         labelColor.replace('text-purple-600', 'text-purple-500').replace('text-amber-600', 'text-amber-500')
                     )}
                 >
-                    {LabelIcon && <LabelIcon className="w-[clamp(0.625rem,2.5cqi,0.75rem)] h-[clamp(0.625rem,2.5cqi,0.75rem)]" />}
+                    {LabelIcon && <LabelIcon className="w-[clamp(0.5rem,2cqi,0.625rem)] h-[clamp(0.5rem,2cqi,0.625rem)]" />}
                     {labelText}
                 </motion.span>
              </AnimatePresence>

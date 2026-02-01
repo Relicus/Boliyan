@@ -57,11 +57,23 @@ function DialogOverlay({
   className,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+  const [showBlur, setShowBlur] = React.useState(false)
+
+  // Progressive blur loading - delay GPU-heavy effect
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShowBlur(true), 300)
+    return () => {
+      clearTimeout(timer)
+      setShowBlur(false) // Reset on unmount
+    }
+  }, [])
+
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/40 backdrop-blur-sm",
+        "fixed inset-0 z-50 bg-black/50 transition-[backdrop-filter] duration-300",
+        showBlur && "backdrop-blur-sm",
         className
       )}
       {...props}
@@ -71,11 +83,12 @@ function DialogOverlay({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.15 }}
       />
     </DialogPrimitive.Overlay>
   )
 }
+
 
 function DialogContent({
   className,
@@ -104,10 +117,10 @@ function DialogContent({
               {...props}
             >
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                initial={{ opacity: 0, scale: 0.97, y: 6 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 8 }}
-                transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                exit={{ opacity: 0, scale: 0.97, y: 6 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
               >
                 {children}
                 {showCloseButton && (
