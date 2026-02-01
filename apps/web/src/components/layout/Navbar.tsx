@@ -27,7 +27,7 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
 
 export default function Navbar() {
-  const { user, isLoggedIn, logout, items, bids, messages, isLoading, resetFilters, isAdminMode, toggleAdminMode } = useApp();
+  const { user, isLoggedIn, logout, items, bids, conversations, messages, isLoading, resetFilters, isAdminMode, toggleAdminMode } = useApp();
   const { unreadCount: notificationUnreadCount } = useNotifications();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -37,8 +37,11 @@ export default function Navbar() {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
 
-  // Other notifications
-  const unreadMsgCount = (messages || []).filter(m => !m.isRead && m.senderId !== user?.id).length;
+  // Filter messages to only include those from active conversations (prevents ghost badges from stale cache)
+  const activeConversationIds = new Set((conversations || []).map(c => c.id));
+  const unreadMsgCount = (messages || [])
+    .filter(m => activeConversationIds.has(m.conversationId))
+    .filter(m => !m.isRead && m.senderId !== user?.id).length;
   
   const myItems = user ? items.filter(i => i.sellerId === user.id) : [];
   const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length;

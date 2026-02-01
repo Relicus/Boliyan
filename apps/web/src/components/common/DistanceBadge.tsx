@@ -19,7 +19,11 @@ export const DistanceBadge = memo(({
   className = "",
   iconClassName = ""
 }: DistanceBadgeProps) => {
-  const { isFar, label } = getDistanceDisplayInfo(distance, duration);
+  const { isFar, shouldHide, label } = getDistanceDisplayInfo(distance, duration);
+  
+  // Don't render anything if distance is too far (>100km) or duration > 24h
+  if (shouldHide || !label) return null;
+  
   const Icon = isFar ? Compass : MapPin;
   
   const variants = {

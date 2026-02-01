@@ -19,6 +19,9 @@ out/
 # Next.js
 .next/
 
+# Expo
+.expo/
+
 # Environment
 .env
 .env.local

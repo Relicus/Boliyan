@@ -135,16 +135,46 @@ export function calculatePrivacySafeDistance(
 }
 
 /**
- * Logic to determine if a distance should be considered "Far".
- * Returns formatting info and the appropriate icon.
+ * Helper to format duration into human-readable units.
+ * - Less than 60 mins: "Xmin"  
+ * - 60-1440 mins (1-24h): "Xh"
+ * - More than 1440 mins: null (hidden)
+ */
+function formatDuration(minutes: number): string | null {
+  if (minutes <= 0 || minutes > 1440) return null; // Hide if invalid or > 24 hours
+  if (minutes < 60) return `${minutes}min`;
+  const hours = Math.round(minutes / 60);
+  return `${hours}h`;
+}
+
+/**
+ * Logic to determine if a distance should be shown and how to format it.
+ * 
+ * Display Rules:
+ * 1. Hide if distance > 100km
+ * 2. Hide if duration > 24 hours (1440 mins)
+ * 3. Show hours if duration >= 60 mins
+ * 4. Show mins if duration < 60 mins
  */
 export function getDistanceDisplayInfo(distance: number, duration: number) {
-  const isFar = distance > 100;
+  // Hide entirely if too far (>100km) or would take more than a day
+  const shouldHide = distance > 100 || duration > 1440;
+  const isFar = shouldHide;
+  
+  // Format duration appropriately
+  const formattedDuration = formatDuration(duration);
+  
+  // Build labels
+  const label = shouldHide ? null : `${distance}km • ${formattedDuration}`;
+  const distanceLabel = shouldHide ? null : `${distance} km`;
+  const durationLabel = shouldHide ? null : formattedDuration;
+  
   return {
     isFar,
-    label: isFar ? "Far" : `${distance}km • ${duration}min`,
-    distanceLabel: isFar ? "Far" : `${distance} km`,
-    durationLabel: isFar ? "Far" : `${duration} mins`,
+    shouldHide,
+    label,
+    distanceLabel,
+    durationLabel,
   };
 }
 
@@ -240,10 +270,10 @@ function buildWhatsAppMessage({
   const safeCity = city?.trim();
   const safeProductUrl = productUrl?.trim() || 'https://boliyan.pk';
   
-  // Only show location if we have valid distance data and it's not "far" (>100km)
-  const isFar = typeof distance === 'number' && distance > 100;
-  const hasLocation = typeof distance === 'number' && distance > 0 && typeof duration === 'number' && !isFar;
-  const locationText = hasLocation ? `~${distance}km • ${duration}min` : null;
+  // Use centralized formatting - will return null if too far
+  const { label: locationText } = (typeof distance === 'number' && typeof duration === 'number')
+    ? getDistanceDisplayInfo(distance, duration)
+    : { label: null };
 
   const title = role === 'seller' ? 'Deal Follow-Up' : 'Item Inquiry';
   const bidLabel = role === 'seller' ? 'Your Bid' : 'My Bid';

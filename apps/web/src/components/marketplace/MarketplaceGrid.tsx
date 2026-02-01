@@ -161,7 +161,7 @@ export default function MarketplaceGrid() {
   };
 
   return (
-    <div id="marketplace-grid-root" className="px-4 pb-4 pt-2 md:px-4 md:pb-4 md:pt-2">
+    <div id="marketplace-grid-root" className="px-2 pb-4 pt-2 md:px-4 md:pb-4 md:pt-2">
       {/* Subtle Refresh Indicator - shows during background cache revalidation */}
       {isRevalidating && (
         <div id="revalidating-indicator" className="fixed top-0 left-0 right-0 z-50 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-pulse" />

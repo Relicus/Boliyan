@@ -3,7 +3,7 @@
 > **[OPEN PROJECT INDEX](file:///d:/VSCode/Boliyan/INDEX.md)** | **[THE MANIFESTO](file:///d:/VSCode/Boliyan/MANIFESTO.md)**
 
 **Context:** Monorepo (Next.js 16 + SQL), Manual Dependency Management.
-**Last Updated:** 2026-01-25
+**Last Updated:** 2026-02-01
 
 ## OVERVIEW
 Boliyan is a premium classifieds marketplace focused on high-intent bidding and strictly gated communication ("No chat before deal").
@@ -13,22 +13,25 @@ Data is managed via raw SQL in `packages/database` and a custom Context-based st
 
 ## COMMANDS (Run from project root with `just`)
 
-| Action | Command | Notes |
-|--------|---------|-------|
-| Dev Server | `just dev` | Runs on localhost:3000 |
-| Lint | `just lint` | Uses ESLint 9 + eslint-config-next |
-| Type Check | `just typecheck` | Project-wide TypeScript check |
-| Build | `just build` | Full production build |
-| Pre-flight | `just checks` | Runs lint + typecheck + build |
-| Validate | `just validate` | Runs feature validation script |
-| Test (All) | `just e2e` | Runs all E2E tests (production mode) |
-| Test (Dev) | `just e2e-dev` | Runs E2E tests (dev mode) |
-| Clean Cache | `just clean` | Clears `.next` cache |
-| Kill Node | `just kill-node` | Terminates zombie Node processes |
-| DB Pull | `just db-pull` | Pull remote database schema |
-| DB Diff | `just db-diff name` | Generate migration diff |
-| DB Push | `just db-push` | Push local migrations to remote |
-| DB Reset | `just db-reset` | Reset local database |
+| Category | Command | Notes |
+|----------|---------|-------|
+| **Core** | `just dev` | Start Next.js dev server (localhost:3000) |
+| | `just build` | Production build |
+| | `just lint` | ESLint 9 + eslint-config-next |
+| | `just typecheck` | TypeScript type checking |
+| **QA** | `just checks` | Run lint, typecheck, and build |
+| | `just validate` | Feature validation script |
+| | `just e2e` | Playwright E2E tests |
+| | `just e2e-dev` | Playwright E2E in dev mode |
+| **Maintenance** | `just clean` | Clear .next cache |
+| | `just kill-node` | Kill zombie Node.exe processes |
+| **Database** | `just db-pull` | Pull remote Supabase schema |
+| | `just db-diff <name>` | Generate migration diff |
+| | `just db-push` | Push local migrations |
+| | `just db-reset` | Reset local database |
+| **Mobile** | `just mobile` | Start Expo dev server |
+| | `just mobile-android` | Run on Android |
+| | `just mobile-ios` | Run on iOS |
 
 ## DESIGN PHILOSOPHY (APPLE-STYLE MINIMALISM)
 Core Tenet: "Subtract before you add. If a visual cue works, delete the text."
@@ -92,7 +95,7 @@ Core Tenet: "Subtract before you add. If a visual cue works, delete the text."
 - Framework: Playwright.
 - Selectors: use the mandatory `id` attributes (`page.locator('#place-bid-btn-i123')`).
 - State: mock data loads by default in `AppProvider` for tests.
-- Checks: run `npm run checks`.
+- Checks: run `just checks`.
 
 ## ROADMAP AND CURRENT PRIORITIES
 - Notification system (outbid, deal accepted, message alerts).

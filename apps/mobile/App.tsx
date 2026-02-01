@@ -1,0 +1,202 @@
+import { StatusBar } from 'expo-status-bar';
+import NetInfo, { type NetInfoState } from '@react-native-community/netinfo';
+import { Linking, Platform, StyleSheet, View } from 'react-native';
+import { WebView } from 'react-native-webview';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import {
+  DEFAULT_WEB_PATH,
+  LINK_PREFIX,
+  ORIGIN_WHITELIST,
+  WEB_ORIGIN,
+  WEBVIEW_ERROR_THRESHOLD_MS
+} from './src/constants';
+import { createBridgeScript, parseBridgeRequest } from './src/bridge';
+import { handleBridgeRequest } from './src/bridgeHandlers';
+import { ErrorScreen } from './src/screens/ErrorScreen';
+import { LoadingScreen } from './src/screens/LoadingScreen';
+import { OfflineScreen } from './src/screens/OfflineScreen';
+
+const INTERNAL_SCHEME_PREFIX = LINK_PREFIX;
+
+function buildWebUrl(path: string): string {
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${WEB_ORIGIN}${normalizedPath}`;
+}
+
+function extractPathFromUrl(rawUrl: string): string {
+  if (rawUrl.startsWith(INTERNAL_SCHEME_PREFIX)) {
+    return rawUrl.replace(INTERNAL_SCHEME_PREFIX, '/');
+  }
+
+  try {
+    const url = new URL(rawUrl);
+    if (url.origin === WEB_ORIGIN) {
+      return `${url.pathname}${url.search}${url.hash}`;
+    }
+  } catch (err) {
+    return DEFAULT_WEB_PATH;
+  }
+
+  return DEFAULT_WEB_PATH;
+}
+
+function isInternalUrl(url: string): boolean {
+  return url.startsWith(WEB_ORIGIN) || url.startsWith(INTERNAL_SCHEME_PREFIX);
+}
+
+export default function App() {
+  const webViewRef = useRef<WebView>(null);
+  const [webUrl, setWebUrl] = useState(buildWebUrl(DEFAULT_WEB_PATH));
+  const [isOnline, setIsOnline] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [loadStartAt, setLoadStartAt] = useState<number | null>(null);
+  const bridgeScript = useMemo(createBridgeScript, []);
+
+  const handleRetry = useCallback(() => {
+    setHasError(false);
+    setIsLoaded(false);
+    webViewRef.current?.reload();
+  }, []);
+
+  const handleDeepLink = useCallback(
+    (url: string) => {
+      const path = extractPathFromUrl(url);
+      const nextUrl = buildWebUrl(path);
+      setWebUrl(nextUrl);
+      webViewRef.current?.stopLoading();
+      webViewRef.current?.injectJavaScript(
+        `window.location.href = ${JSON.stringify(nextUrl)}; true;`
+      );
+    },
+    []
+  );
+
+  useEffect(() => {
+    const subscription = NetInfo.addEventListener((state: NetInfoState) => {
+      setIsOnline(Boolean(state.isConnected));
+    });
+
+    return () => subscription();
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      const initialUrl = await Linking.getInitialURL();
+      if (initialUrl) {
+        handleDeepLink(initialUrl);
+      }
+    };
+
+    const listener = Linking.addEventListener('url', (event: { url: string }) => {
+      if (event.url) {
+        handleDeepLink(event.url);
+      }
+    });
+
+    init();
+
+    return () => listener.remove();
+  }, [handleDeepLink]);
+
+  const handleMessage = useCallback(async (event: { nativeEvent: { data: string } }) => {
+    const request = parseBridgeRequest(event.nativeEvent.data);
+    if (!request) {
+      return;
+    }
+
+    const response = await handleBridgeRequest(request);
+    webViewRef.current?.postMessage(JSON.stringify(response));
+  }, []);
+
+  const handleWebViewError = useCallback(() => {
+    setHasError(true);
+  }, []);
+
+  const handleLoadStart = useCallback(() => {
+    setLoadStartAt(Date.now());
+  }, []);
+
+  const handleLoadEnd = useCallback(() => {
+    setIsLoaded(true);
+    setHasError(false);
+  }, []);
+
+  const handleShouldStart = useCallback((request: { url: string }) => {
+    if (isInternalUrl(request.url)) {
+      return true;
+    }
+
+    Linking.openURL(request.url).catch(() => undefined);
+    return false;
+  }, []);
+
+  useEffect(() => {
+    if (!loadStartAt || isLoaded) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setHasError(true);
+    }, WEBVIEW_ERROR_THRESHOLD_MS);
+
+    return () => clearTimeout(timeout);
+  }, [isLoaded, loadStartAt]);
+
+  if (!isOnline) {
+    return <OfflineScreen onRetry={handleRetry} />;
+  }
+
+  if (hasError) {
+    return <ErrorScreen onRetry={handleRetry} />;
+  }
+
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView nativeID="mobile-app-root" style={styles.container}>
+        <StatusBar style="light" />
+        {!isLoaded && <LoadingScreen />}
+        <View style={styles.webViewContainer}>
+          <WebView
+            ref={webViewRef}
+            nativeID="mobile-webview"
+            source={{ uri: webUrl }}
+            onMessage={handleMessage}
+            injectedJavaScriptBeforeContentLoaded={bridgeScript}
+            originWhitelist={ORIGIN_WHITELIST}
+            onError={handleWebViewError}
+            onHttpError={handleWebViewError}
+            onLoadStart={handleLoadStart}
+            onLoadEnd={handleLoadEnd}
+            onShouldStartLoadWithRequest={handleShouldStart}
+            sharedCookiesEnabled
+            allowsInlineMediaPlayback
+            javaScriptEnabled
+            domStorageEnabled
+            mediaPlaybackRequiresUserAction
+            userAgent={Platform.OS === 'ios' ? undefined : 'BoliyanMobile'}
+            // Native pull-to-refresh: drag down to reload the page
+            pullToRefreshEnabled
+            onRefresh={() => webViewRef.current?.reload()}
+          />
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0b0b0b'
+  },
+  webViewContainer: {
+    flex: 1
+  }
+});
