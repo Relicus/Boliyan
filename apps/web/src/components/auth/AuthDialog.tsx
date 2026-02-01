@@ -13,7 +13,17 @@ export function AuthDialog() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const redirectUrl = useMemo(() => {
-    const fullPath = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
+    // Don't create redirect loops - if we're already on signin/signup, redirect to home
+    if (pathname === '/signin' || pathname === '/signup') {
+      const existingRedirect = searchParams?.get('redirect');
+      if (existingRedirect) return existingRedirect;
+      return encodeURIComponent('/');
+    }
+    // Strip any existing redirect params to prevent double-encoding
+    const cleanParams = new URLSearchParams(searchParams?.toString() || '');
+    cleanParams.delete('redirect');
+    const queryString = cleanParams.toString();
+    const fullPath = pathname + (queryString ? `?${queryString}` : "");
     return encodeURIComponent(fullPath);
   }, [pathname, searchParams]);
 
@@ -75,3 +85,4 @@ export function AuthDialog() {
     </Dialog>
   );
 }
+

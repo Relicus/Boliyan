@@ -355,9 +355,13 @@
   }
 
   /* Default Button Press Animation - provides instant feedback on all clickable elements */
+  /* Covers: native buttons, role="button", anchors styled as buttons (shadcn asChild) */
   button:not(:disabled):active,
   [role="button"]:not(:disabled):active,
-  a[class*="btn"]:active,
+  a.inline-flex:active,
+  a[class*="bg-primary"]:active,
+  a[class*="bg-slate"]:active,
+  a[class*="bg-blue"]:active,
   .btn:active {
     transform: scale(0.97);
     transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
@@ -366,7 +370,10 @@
   /* Ensure buttons have smooth transform reset */
   button,
   [role="button"],
-  a[class*="btn"],
+  a.inline-flex,
+  a[class*="bg-primary"],
+  a[class*="bg-slate"],
+  a[class*="bg-blue"],
   .btn {
     transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
                 background-color 0.2s ease,
