@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import { useState, useMemo, useEffect } from "react";
 import { Item, User } from "@/types";
 import { Dialog, DialogContent, DialogClose, DialogTitle } from "@/components/ui/dialog";
@@ -102,64 +102,37 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
         >
           <X className="h-5 w-5" />
         </DialogClose>
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: { staggerChildren: 0.08, delayChildren: 0.05 }
-            }
-          }}
-          className="flex flex-col h-auto min-h-full md:h-full md:overflow-hidden"
-        >
+        <div className="flex flex-col h-auto min-h-full md:h-full md:overflow-hidden">
           {/* Top Section: Dynamic Gallery */}
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 12 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.22, ease: "easeOut" } }
-            }}
-          >
-            <ProductGallery 
-              item={item}
-              currentImg={currentImg}
-              setCurrentImg={setCurrentImg}
-              setShowFullscreen={setShowFullscreen}
-              isWatched={isWatched}
-              onToggleWatch={toggleWatch}
-            />
-          </motion.div>
-
+          <ProductGallery 
+            item={item}
+            currentImg={currentImg}
+            setCurrentImg={setCurrentImg}
+            setShowFullscreen={setShowFullscreen}
+            isWatched={isWatched}
+            onToggleWatch={toggleWatch}
+          />
 
           {/* Bottom Section: Product Details & Bidding */}
-          <div id={`product-details-body-${item.id}`} className="flex-none md:flex-1 flex flex-col p-4 sm:p-6 pb-6 sm:pb-8 bg-white relative z-10 md:overflow-y-auto">
+          <div 
+            id={`product-details-body-${item.id}`} 
+            className="flex-none md:flex-1 flex flex-col p-4 sm:p-6 pb-6 sm:pb-8 bg-white relative z-10 md:overflow-y-auto"
+          >
             <div id={`product-details-grid-${item.id}`} className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] w-full">
               
               {/* Left Column: Info */}
-              <motion.div
-                variants={{
-                  hidden: { opacity: 0, x: -12 },
-                  visible: { opacity: 1, x: 0, transition: { duration: 0.22, ease: "easeOut" } }
-                }}
-              >
-                <ProductInfo 
-                  item={item}
-                  seller={seller}
-                  isOutside={isOutside}
-                  duration={duration}
-                  distance={distance}
-                />
-              </motion.div>
+              <ProductInfo 
+                item={item}
+                seller={seller}
+                isOutside={isOutside}
+                duration={duration}
+                distance={distance}
+              />
 
               {/* Right Column: Dashboard */}
-              <motion.div 
+              <div 
                 id={`product-details-right-${item.id}`} 
                 className="h-full min-w-0"
-                variants={{
-                  hidden: { opacity: 0, x: 12 },
-                  visible: { opacity: 1, x: 0, transition: { duration: 0.22, ease: "easeOut" } }
-                }}
               >
                   <BiddingDashboard 
                     item={item}
@@ -186,11 +159,11 @@ export default function ProductDetailsModal({ item, seller, isOpen, onClose }: P
                     maxBid={maxBid}
                     derivedStatus={derivedStatus}
                   />
-              </motion.div>
+              </div>
 
             </div>
           </div>
-        </motion.div>
+        </div>
       </DialogContent>
 
       <FullscreenGallery 
