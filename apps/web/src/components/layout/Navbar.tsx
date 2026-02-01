@@ -364,7 +364,19 @@ export default function Navbar() {
                 transition={{ duration: 0.2 }}
               >
                 <Button id="navbar-signin-btn" asChild className="h-11 px-6 bg-blue-600 hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-200">
-                  <Link href={`/signin?redirect=${encodeURIComponent(pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : ""))}`}>Sign In</Link>
+                  <Link href={(() => {
+                    // Prevent redirect loops
+                    if (pathname === '/signin' || pathname === '/signup') {
+                      const existing = searchParams?.get('redirect');
+                      return existing ? `/signin?redirect=${existing}` : '/signin?redirect=%2F';
+                    }
+                    // Strip any existing redirect params
+                    const cleanParams = new URLSearchParams(searchParams?.toString() || '');
+                    cleanParams.delete('redirect');
+                    const query = cleanParams.toString();
+                    const path = pathname + (query ? `?${query}` : '');
+                    return `/signin?redirect=${encodeURIComponent(path)}`;
+                  })()}>Sign In</Link>
                 </Button>
               </motion.div>
             )}
