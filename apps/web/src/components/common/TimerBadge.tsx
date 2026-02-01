@@ -1,11 +1,12 @@
 "use client";
 
-import { memo, useEffect, useState, useCallback } from "react";
+import { memo, useEffect, useCallback, useRef } from "react";
 import { Clock, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTime } from "@/context/TimeContext";
 
 interface TimerBadgeProps {
+  id?: string;
   expiryAt: string | Date | null | undefined;
   variant?: "glass" | "glass-light" | "outline" | "solid" | "inline";
   className?: string;
@@ -14,6 +15,7 @@ interface TimerBadgeProps {
 }
 
 export const TimerBadge = memo(({ 
+  id,
   expiryAt, 
   variant = "glass", 
   className = "",
@@ -21,7 +23,7 @@ export const TimerBadge = memo(({
   onExpire
 }: TimerBadgeProps) => {
   const { now } = useTime();
-  const [hasExpired, setHasExpired] = useState(false);
+  const hasExpiredRef = useRef(false);
 
   // Calculate time remaining
   const getTimeRemaining = useCallback(() => {
@@ -52,13 +54,13 @@ export const TimerBadge = memo(({
 
   const { label, isUrgent, isExpired } = getTimeRemaining();
 
-  // Handle expiration callback
+  // Handle expiration callback using ref to avoid lint error
   useEffect(() => {
-    if (isExpired && !hasExpired) {
-      setHasExpired(true);
+    if (isExpired && !hasExpiredRef.current) {
+      hasExpiredRef.current = true;
       onExpire?.();
     }
-  }, [isExpired, hasExpired, onExpire]);
+  }, [isExpired, onExpire]);
 
   // Don't render if no expiry data
   if (!expiryAt || !label) return null;
@@ -74,12 +76,15 @@ export const TimerBadge = memo(({
   };
 
   return (
-    <div className={cn(
-      "inline-flex items-center gap-1.5 transition-all",
-      variants[variant],
-      isUrgent && variant !== "inline" && "animate-pulse",
-      className
-    )}>
+    <div 
+      id={id}
+      className={cn(
+        "inline-flex items-center gap-1.5 transition-all",
+        variants[variant],
+        isUrgent && variant !== "inline" && "animate-pulse",
+        className
+      )}
+    >
       <Icon className={cn(
         "h-[clamp(0.625rem,2.5cqi,0.75rem)] w-[clamp(0.625rem,2.5cqi,0.75rem)] shrink-0",
         isUrgent && "text-red-400",
