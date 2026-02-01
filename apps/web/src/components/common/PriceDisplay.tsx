@@ -42,6 +42,7 @@ function getPriceClass(viewMode: BiddingViewMode): string {
   switch (viewMode) {
     case 'modal': return `${base} text-xl`;
     case 'compact': return `${base} text-[clamp(0.9rem,8cqi,1.6rem)]`;
+    case 'comfortable': return `${base} text-[clamp(0.9rem,6cqi,1.75rem)]`;
     default: return `${base} text-[clamp(0.75rem,5cqi,1.625rem)]`;
   }
 }
@@ -50,6 +51,9 @@ function getRowLabelClass(viewMode: BiddingViewMode, align: 'left' | 'right'): s
   const base = `font-bold uppercase tracking-wider absolute ${align}-0 bottom-0 whitespace-nowrap flex items-center gap-0`;
   if (viewMode === 'compact') {
     return `text-[clamp(0.48rem,3.2cqi,0.7rem)] ${base}`;
+  }
+  if (viewMode === 'comfortable') {
+    return `text-[clamp(0.5rem,2cqi,0.7rem)] ${base}`;
   }
   return `text-[clamp(0.4rem,1.6cqi,0.55rem)] ${base}`;
 }

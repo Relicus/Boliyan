@@ -74,6 +74,18 @@ export default function MarketplaceGrid() {
 
   const isDesktop = useSyncExternalStore(subscribeToViewport, getViewportSnapshot, getServerSnapshot);
   const [manualViewMode, setManualViewMode] = useState<ViewMode | null>(null);
+  
+  // Load view preference on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedView = localStorage.getItem('boliyan_view_mode') as ViewMode | null;
+      if (savedView && ['compact', 'comfortable', 'spacious'].includes(savedView)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setManualViewMode(savedView);
+      }
+    }
+  }, []);
+
   const viewMode = manualViewMode ?? (isDesktop ? 'comfortable' : 'compact');
   const [isChangingView, setIsChangingView] = useState(false);
   const viewChangeTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -100,6 +112,7 @@ export default function MarketplaceGrid() {
     
     setIsChangingView(true);
     setManualViewMode(newMode);
+    localStorage.setItem('boliyan_view_mode', newMode);
     
     // Brief window to show skeletons and allow browser to recalc layout
     viewChangeTimerRef.current = setTimeout(() => {
@@ -141,9 +154,9 @@ export default function MarketplaceGrid() {
   const getGridClasses = () => {
     switch (viewMode) {
       case 'spacious':
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3";
+        return "grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(0,440px))] justify-center";
       case 'comfortable':
-        return "grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+        return "grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(0,320px))] justify-center";
       case 'compact':
       default:
         return "grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(165px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]";
