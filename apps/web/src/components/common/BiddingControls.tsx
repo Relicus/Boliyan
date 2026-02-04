@@ -393,6 +393,7 @@ export const BiddingControls = memo(({
           {/* Decrement Button */}
           <button
             id={buildId('decrement-btn')}
+            aria-label="Decrease bid amount"
             onPointerDown={(e) => handleStartLongPress(e, -1)}
             onPointerUp={handleStopLongPress}
             onPointerLeave={handleStopLongPress}
@@ -406,7 +407,7 @@ export const BiddingControls = memo(({
                 : "bg-slate-50 hover:bg-slate-100 border-r border-slate-200 text-slate-500 hover:text-red-600 active:bg-slate-200"
             )}
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M18 12H6" />
             </svg>
           </button>
@@ -416,6 +417,8 @@ export const BiddingControls = memo(({
             <motion.input
               id={buildId('bid-input')}
               type="text"
+              inputMode="numeric"
+              aria-label="Bid amount"
               value={bidAmount}
               initial={false}
               disabled={isDisabled || isQuotaReached}
@@ -450,6 +453,7 @@ export const BiddingControls = memo(({
           {/* Increment Button */}
           <button
             id={buildId('increment-btn')}
+            aria-label="Increase bid amount"
             onPointerDown={(e) => handleStartLongPress(e, 1)}
             onPointerUp={handleStopLongPress}
             onPointerLeave={handleStopLongPress}
@@ -463,7 +467,7 @@ export const BiddingControls = memo(({
                 : "bg-slate-50 hover:bg-slate-100 border-l border-slate-200 text-slate-500 hover:text-amber-600 active:bg-slate-200"
             )}
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6v12m6-6H6" />
             </svg>
           </button>

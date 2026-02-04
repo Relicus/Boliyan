@@ -202,7 +202,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
       <motion.div
         ref={setCardRef}
         id={`item-card-${item.id}`}
-
+        role="article"
+        aria-label={`${item.title} - ${item.askPrice ? `Asking ${item.askPrice}` : 'No asking price'}`}
         initial={false}
             animate={{
               scale: shouldReduceAnimations ? 1 : (isFadingOut ? 0.95 : (isSuccess ? 1.05 : 1)),
@@ -305,6 +306,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   <TooltipTrigger asChild>
                     <motion.button
                       id={`item-card-${item.id}-watch-btn`}
+                      aria-label={isWatched ? `Remove ${item.title} from watchlist` : `Add ${item.title} to watchlist`}
+                      aria-pressed={isWatched}
                       onClick={(e) => {
                         e.stopPropagation();
                         haptic.light();
@@ -322,7 +325,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                         isWatched ? "border-blue-400/50" : "border-white/10"
                       )}
                     >
-                      <Bookmark className={cn("h-3 w-3", isWatched && "fill-current")} />
+                      <Bookmark className={cn("h-3 w-3", isWatched && "fill-current")} aria-hidden="true" />
                     </motion.button>
                   </TooltipTrigger>
                   <TooltipContent side="left">

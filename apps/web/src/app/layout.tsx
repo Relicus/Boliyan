@@ -85,6 +85,8 @@ export const viewport: Viewport = {
 import { NotificationProvider } from "@/context/NotificationContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import GlobalSonic from "@/components/common/GlobalSonic";
+import { OfflineBanner } from "@/components/ui/OfflineBanner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function RootLayout({
   children,
@@ -99,6 +101,7 @@ export default function RootLayout({
       >
         <AppProvider>
           <GlobalSonic />
+          <OfflineBanner />
           <NotificationProvider>
             <TooltipProvider>
               <Suspense fallback={<div className="h-16 border-b bg-white" />}>
@@ -107,7 +110,9 @@ export default function RootLayout({
               <div id="layout-wrapper-02" className="flex pt-16 min-h-[100dvh]">
                 <Sidebar />
                 <main id="main-content-03" className="flex-1 flex flex-col w-full min-w-0 min-h-[calc(100dvh-4rem)] pb-16 md:pb-0">
-                  {children}
+                  <ErrorBoundary>
+                    {children}
+                  </ErrorBoundary>
                   <Footer />
                 </main>
               </div>
