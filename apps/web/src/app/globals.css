@@ -354,6 +354,11 @@
     @apply bg-background text-foreground;
   }
 
+  /* Remove 300ms mobile tap delay */
+  a, button, [role="button"], input, select, textarea, label {
+    touch-action: manipulation;
+  }
+
   /* Default Button Press Animation - provides instant feedback on all clickable elements */
   /* Covers: native buttons, role="button", anchors styled as buttons (shadcn asChild) */
   button:not(:disabled):active,
