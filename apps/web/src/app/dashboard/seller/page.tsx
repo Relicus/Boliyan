@@ -11,10 +11,29 @@ import { BarChart3, Gavel, Store, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/lib/store';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function SellerDashboardPage() {
   const { bids, itemsById, user } = useApp();
+  const router = useRouter();
   const myBids = user ? bids.filter(bid => bid.bidderId === user.id) : [];
+
+  // Auth protection: redirect to signin if not logged in
+  useEffect(() => {
+    if (user === null) {
+      router.replace('/signin?redirect=/dashboard/seller');
+    }
+  }, [user, router]);
+
+  // Don't render content until we know user state
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+      </div>
+    );
+  }
 
   return (
     <DashboardProvider>

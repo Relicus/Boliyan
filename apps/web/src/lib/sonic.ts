@@ -4,6 +4,9 @@
  * Organic, tactile woodblock sounds for all interactions.
  */
 
+// PERFORMANCE: Disable Tone.js entirely for testing on low-end devices
+const SONIC_ENABLED = false;
+
 import * as Tone from 'tone';
 
 class SonicEngine {
@@ -21,6 +24,7 @@ class SonicEngine {
   private reverb: Tone.Reverb | null = null;
 
   private async init() {
+    if (!SONIC_ENABLED) return;
     if (this.isInitialized) return;
     await Tone.start();
 

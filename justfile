@@ -88,8 +88,12 @@ db-reset:
 mobile-install:
     npm --prefix apps/mobile install
 
-# Start Expo dev server with cache clear on LAN (scan QR with Expo Go app)
+# Start Expo dev server on LAN (fast start, use cached bundle)
 mobile:
+    cd apps/mobile && npx expo start --lan
+
+# Start Expo dev server with cache clear (use if weird errors occur)
+mobile-clean:
     cd apps/mobile && npx expo start -c --lan
 
 # Start Expo for Android

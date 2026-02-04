@@ -1,4 +1,4 @@
-export const DEFAULT_WEB_ORIGIN = 'http://192.168.18.187:3000';
+export const DEFAULT_WEB_ORIGIN = 'http://192.168.18.189:3000';
 export const DEFAULT_LINK_SCHEME = 'boliyan';
 export const DEFAULT_WEB_PATH = '/';
 export const GOOGLE_AUTH_REDIRECT_PATH = 'auth/google';
