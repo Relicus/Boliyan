@@ -201,6 +201,50 @@ async function handleNetworkState(request: NativeBridgeRequest) {
   });
 }
 
+async function handleTriggerHaptic(request: NativeBridgeRequest) {
+  const payload = request.payload as { type: string } | undefined;
+  const hapticType = payload?.type;
+
+  if (!hapticType) {
+    return buildErrorResponse(request, buildError('invalid', 'Haptic type required'));
+  }
+
+  try {
+    // Dynamically import Haptics (already installed as expo-haptics)
+    const Haptics = await import('expo-haptics');
+
+    switch (hapticType) {
+      case 'light':
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        break;
+      case 'medium':
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        break;
+      case 'heavy':
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        break;
+      case 'selection':
+        await Haptics.selectionAsync();
+        break;
+      case 'success':
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackStyle.Success);
+        break;
+      case 'warning':
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackStyle.Warning);
+        break;
+      case 'error':
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackStyle.Error);
+        break;
+      default:
+        return buildErrorResponse(request, buildError('invalid', `Unknown haptic type: ${hapticType}`));
+    }
+
+    return buildSuccessResponse(request, { ok: true });
+  } catch (error) {
+    return buildErrorResponse(request, buildError('unknown', 'Haptic failed'));
+  }
+}
+
 async function handlePlaySound(request: NativeBridgeRequest) {
   return buildErrorResponse(request, buildError('unsupported', 'Sound bridge not configured'));
 }
@@ -300,6 +344,8 @@ export async function handleBridgeRequest(
         return await handleNetworkState(request);
       case NativeBridgeMethod.PlaySound:
         return await handlePlaySound(request);
+      case NativeBridgeMethod.TriggerHaptic:
+        return await handleTriggerHaptic(request);
       case NativeBridgeMethod.SecureStorageGet:
         return await handleSecureStorageGet(request);
       case NativeBridgeMethod.SecureStorageSet:

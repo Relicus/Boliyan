@@ -6,6 +6,7 @@ export const NativeBridgeMethod = {
   Share: 'share',
   GetNetworkState: 'getNetworkState',
   PlaySound: 'playSound',
+  TriggerHaptic: 'triggerHaptic',
   SecureStorageGet: 'secureStorageGet',
   SecureStorageSet: 'secureStorageSet',
   SecureStorageRemove: 'secureStorageRemove',
@@ -24,6 +25,18 @@ export const NativeSoundType = {
 } as const;
 
 export type NativeSoundType = (typeof NativeSoundType)[keyof typeof NativeSoundType];
+
+export const NativeHapticType = {
+  Light: 'light',
+  Medium: 'medium',
+  Heavy: 'heavy',
+  Selection: 'selection',
+  Success: 'success',
+  Warning: 'warning',
+  Error: 'error'
+} as const;
+
+export type NativeHapticType = (typeof NativeHapticType)[keyof typeof NativeHapticType];
 
 export type NativePermissionStatus = 'granted' | 'denied' | 'undetermined';
 export type NativePlatform = 'ios' | 'android';
@@ -105,11 +118,18 @@ export type NativeBridgePayloadMap = {
   [NativeBridgeMethod.PlaySound]?: {
     type: NativeSoundType;
   };
+  [NativeBridgeMethod.TriggerHaptic]?: {
+    type: NativeHapticType;
+  };
   [NativeBridgeMethod.SecureStorageGet]: NativeSecureStoragePayload;
   [NativeBridgeMethod.SecureStorageSet]: NativeSecureStoragePayload;
   [NativeBridgeMethod.SecureStorageRemove]: NativeSecureStoragePayload;
   [NativeBridgeMethod.GoogleSignIn]?: undefined;
 };
+
+export interface NativeHapticResult {
+  ok: boolean;
+}
 
 export type NativeBridgeResultMap = {
   [NativeBridgeMethod.GetLocation]: NativeLocationResult;
@@ -119,6 +139,7 @@ export type NativeBridgeResultMap = {
   [NativeBridgeMethod.Share]: NativeShareResult;
   [NativeBridgeMethod.GetNetworkState]: NativeNetworkState;
   [NativeBridgeMethod.PlaySound]: NativeSoundResult;
+  [NativeBridgeMethod.TriggerHaptic]: NativeHapticResult;
   [NativeBridgeMethod.SecureStorageGet]: NativeSecureStorageResult;
   [NativeBridgeMethod.SecureStorageSet]: NativeSecureStorageResult;
   [NativeBridgeMethod.SecureStorageRemove]: NativeSecureStorageResult;
