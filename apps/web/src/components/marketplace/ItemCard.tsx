@@ -20,6 +20,7 @@ import { LocationBadge } from "@/components/common/LocationBadge";
 import { DistanceBadge } from "@/components/common/DistanceBadge";
 import { useTrackVisibility } from "@/hooks/useTrackVisibility";
 import { useShouldReduceAnimations } from "@/hooks/useReducedMotion";
+import { useHaptic } from "@/hooks/useHaptic";
 import {
   Tooltip,
 
@@ -38,6 +39,7 @@ interface ItemCardProps {
 
 const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) => {
   const { user, bids, watchedItemIds, toggleWatch, setFilter, myLocation } = useApp();
+  const haptic = useHaptic();
   const isWatched = watchedItemIds.includes(item.id);
   const visibilityRef = useTrackVisibility(item.id);
   const shouldReduceAnimations = useShouldReduceAnimations();
@@ -305,6 +307,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                       id={`item-card-${item.id}-watch-btn`}
                       onClick={(e) => {
                         e.stopPropagation();
+                        haptic.light();
                         toggleWatch(item.id);
                       }}
                       initial={false}

@@ -2,40 +2,43 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Store, PlusCircle, MessageSquare, LayoutDashboard, BarChart3, type LucideIcon } from "lucide-react";
+import { Store, PlusCircle, MessageSquare, LayoutDashboard, Bookmark, type LucideIcon } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import FilterSheetContent from "@/components/marketplace/FilterSheetContent";
 import { useState } from "react";
+import { NotificationBadge } from "@/components/common/NotificationBadge";
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { messages, items, bids, user } = useApp();
-
-
+  const { messages, items, bids, user, watchedItemIds } = useApp();
 
   const unreadCount = user ? messages.filter(m => !m.isRead && m.senderId !== user.id).length : 0;
   
-  const myItems = user ? items.filter(i => i.sellerId === user.id) : [];
-  const receivedBidsCount = user ? bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length : 0;
+  // Dashboard count: pending/accepted bids on my listings (matches navbar)
+  const myItemIds = user ? new Set(items.filter(i => i.sellerId === user.id).map(i => i.id)) : new Set();
+  const totalDashboardCount = user 
+    ? bids.filter(b => myItemIds.has(b.itemId) && (b.status === 'pending' || b.status === 'accepted')).length 
+    : 0;
   
-  const myBidsItems = user ? items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id)) : [];
-  const outbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
-  const totalDashboardCount = receivedBidsCount + outbidCount;
+  // Watchlist count
+  const watchlistCount = watchedItemIds?.length || 0;
   
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const navItems: { label: string; icon: LucideIcon; href: string; isDrawer?: boolean }[] = [
+  // Nav order: Market, Watch, +Sell, Chat, Dash
+  const navItems: { label: string; icon: LucideIcon; href: string; isDrawer?: boolean; badgeCount?: number }[] = [
     {
       label: "Market",
       icon: Store,
       href: "/",
     },
     {
-      label: "Analytics",
-      icon: BarChart3,
-      href: "/dashboard/seller",
+      label: "Watch",
+      icon: Bookmark,
+      href: "/dashboard?tab=watchlist",
+      badgeCount: watchlistCount,
     },
     {
       label: "Sell",
@@ -43,14 +46,16 @@ export default function BottomNav() {
       href: "/list",
     },
     {
-      label: "Inbox",
+      label: "Chat",
       icon: MessageSquare,
       href: "/inbox",
+      badgeCount: unreadCount,
     },
     {
       label: "Dash",
       icon: LayoutDashboard,
       href: "/dashboard?tab=offers",
+      badgeCount: totalDashboardCount,
     },
   ];
 
@@ -63,10 +68,8 @@ export default function BottomNav() {
         {navItems.map((item) => {
           let isActive = false;
           
-          if (item.label === "Dash") {
+          if (item.label === "Dash" || item.label === "Watch") {
             isActive = pathname === "/dashboard";
-          } else if (item.label === "Analytics") {
-            isActive = pathname === "/dashboard/seller";
           } else {
             isActive = item.href ? pathname === item.href : false;
           }
@@ -99,15 +102,12 @@ export default function BottomNav() {
                     fill="none"
                   />
                 </div>
-                {item.label === "Inbox" && unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
-                    {unreadCount}
-                  </span>
-                )}
-                {item.label === "Dash" && totalDashboardCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white">
-                    {totalDashboardCount}
-                  </span>
+                {item.badgeCount !== undefined && item.badgeCount > 0 && (
+                  <NotificationBadge 
+                    count={item.badgeCount} 
+                    size="sm" 
+                    className="absolute -top-1 -right-1" 
+                  />
                 )}
                 <span 
                   id={`bottom-nav-text-${item.label.toLowerCase()}`}

@@ -13,7 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Gavel, EyeOff, Camera, Image as ImageIcon, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone } from "lucide-react";
+import { Gavel, EyeOff, Camera, Image as ImageIcon, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone, RotateCcw } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { CATEGORIES, LISTING_IMAGE_ACCEPT, LISTING_LIMITS, isAllowedListingImageInput } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -55,6 +55,7 @@ const NATIVE_IMAGE_PICK_OPTIONS = {
 } as const;
 
 function ListForm() {
+  const draftToastShownRef = React.useRef(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("id");
@@ -141,6 +142,8 @@ function ListForm() {
   // Restore Draft from LocalStorage
   useEffect(() => {
     if (editingItem || isAuthLoading || !user) return;
+    // Guard: only show toast once using ref
+    if (draftToastShownRef.current) return;
 
     const savedDraft = localStorage.getItem(DRAFT_KEY);
     if (savedDraft) {
@@ -161,6 +164,7 @@ function ListForm() {
         if (draft.duration) setDuration(draft.duration);
         
         setIsDraftRestored(true);
+        draftToastShownRef.current = true;
         // Toast once
         toast.success("Draft restored", {
           description: "All text fields recovered. Please re-upload images."
@@ -599,6 +603,35 @@ function ListForm() {
     submitListing();
   };
 
+  const resetForm = () => {
+    setTitle("");
+    setCategory("");
+    setAskPrice("");
+    setDescription("");
+    setCondition("used");
+    setIsPublic(true);
+    setDuration("720");
+    setContactPhone(user?.phone || "");
+    setContactWhatsapp(user?.whatsapp || user?.phone || "");
+    setIsWhatsappSameAsPhone(true);
+    setPurchasePrice("");
+    setPurchaseYear("");
+    setPurchaseMonth("");
+    setShowPriceEstimator(false);
+    setLocation(myLocation || null);
+    // Revoke object URLs for blob images
+    imageEntries.forEach(entry => {
+      if (entry.url.startsWith("blob:")) {
+        URL.revokeObjectURL(entry.url);
+      }
+    });
+    setImageEntries([]);
+    setErrors({});
+    setIsDraftRestored(false);
+    localStorage.removeItem(DRAFT_KEY);
+    toast.success("Form reset");
+  };
+
   // Auth guard: show loading spinner while checking or redirecting
   if (isAuthLoading || !user) {
     return (
@@ -612,12 +645,29 @@ function ListForm() {
     <div id="list-page-container" className="container mx-auto max-w-2xl py-12 px-4">
       <Card id="list-item-card" className="border-none shadow-lg bg-white">
         <CardHeader id="list-item-header" className="space-y-1">
-          <CardTitle id="list-item-title-heading" className="text-2xl font-bold text-slate-900">
-            {isLoadingItem ? "Loading..." : editingItem ? "Edit Listing" : "Create New Listing"}
-          </CardTitle>
-          <CardDescription id="list-item-description-text">
-            {isLoadingItem ? "Fetching item details..." : editingItem ? "Update your item details and bidding strategy." : "Enter your item details and set a fair price to attract the best bids."}
-          </CardDescription>
+          <div className="flex items-start justify-between gap-2">
+            <div className="space-y-1">
+              <CardTitle id="list-item-title-heading" className="text-2xl font-bold text-slate-900">
+                {isLoadingItem ? "Loading..." : editingItem ? "Edit Listing" : "Create New Listing"}
+              </CardTitle>
+              <CardDescription id="list-item-description-text">
+                {isLoadingItem ? "Fetching item details..." : editingItem ? "Update your item details and bidding strategy." : "Enter your item details and set a fair price to attract the best bids."}
+              </CardDescription>
+            </div>
+            {!isLoadingItem && !editingItem && (
+              <Button
+                id="reset-form-btn"
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={resetForm}
+                className="shrink-0 text-slate-500 hover:text-red-600 hover:bg-red-50 gap-1.5"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">Reset All</span>
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent id="list-item-form" className="space-y-6">
           <Dialog open={showEditWarning} onOpenChange={setShowEditWarning}>

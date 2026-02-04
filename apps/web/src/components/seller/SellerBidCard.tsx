@@ -10,6 +10,7 @@ import { useApp } from "@/lib/store";
 import { useTime } from "@/context/TimeContext";
 import { useRouter } from "next/navigation";
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
+import { useHaptic } from "@/hooks/useHaptic";
 
 import { DistanceBadge } from "@/components/common/DistanceBadge";
 import Link from "next/link";
@@ -23,6 +24,7 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const { rejectBid, acceptBid, conversations, user, itemsById } = useApp();
   const { now } = useTime();
   const router = useRouter();
+  const haptic = useHaptic();
   
   const item = itemsById[bid.itemId];
   // Stable derived values based on bidder profile
@@ -48,10 +50,12 @@ export default function SellerBidCard({ bid, bidder }: SellerBidCardProps) {
   const isExpired = bid.status === 'expired' || expiresAt.getTime() <= now;
   
   const handleReject = () => {
+    haptic.warning();
     rejectBid(bid.id);
   };
 
   const handleAccept = async () => {
+    haptic.success();
     const convId = await acceptBid(bid.id);
     if (convId) {
         router.push(`/inbox?id=${convId}`);

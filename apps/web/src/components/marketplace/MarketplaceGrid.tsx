@@ -154,9 +154,11 @@ export default function MarketplaceGrid() {
   const getGridClasses = () => {
     switch (viewMode) {
       case 'spacious':
-        return "grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(0,440px))] justify-center";
+        // Cards stretch to fill row, min 400px each
+        return "grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))]";
       case 'comfortable':
-        return "grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(0,320px))] justify-center";
+        // Cards stretch to fill row, min 300px each
+        return "grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(300px,1fr))]";
       case 'compact':
       default:
         return "grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(165px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]";

@@ -9,6 +9,7 @@ import { MAX_BID_ATTEMPTS } from "@/lib/bidding";
 import RollingPrice from "./RollingPrice";
 import { BoliyanUrduMark } from "@/components/branding/BoliyanLogo";
 import { BoliyanLogomarkLoader } from "@/components/branding/BoliyanLogomarkLoader";
+import { useHaptic } from "@/hooks/useHaptic";
 
 export type BiddingViewMode = 'compact' | 'comfortable' | 'spacious' | 'modal';
 
@@ -216,6 +217,7 @@ export const BiddingControls = memo(({
 }: BiddingControlsProps) => {
 
   const router = useRouter();
+  const haptic = useHaptic();
   const [isFocused, setIsFocused] = useState(false);
   const numericBid = parseFloat(bidAmount.replace(/[^0-9.-]+/g, '')) || 0;
   const buildId = useCallback((suffix: string) => `${idPrefix}-${suffix}`, [idPrefix]);
@@ -235,6 +237,9 @@ export const BiddingControls = memo(({
     
     // Clear any existing timers just in case
     handleStopLongPress();
+
+    // Haptic feedback on stepper press
+    haptic.selection();
 
     // Trigger immediate action
     onSmartAdjust(e as React.MouseEvent, direction);
@@ -468,7 +473,10 @@ export const BiddingControls = memo(({
       {/* Action Button Foundation (L0) */}
       <motion.button
         id={buildId('place-bid-btn')}
-        onClick={isOwner ? handleEditClick : onBid}
+        onClick={(e) => {
+          haptic.medium(); // Haptic feedback on bid button
+          isOwner ? handleEditClick(e) : onBid(e);
+        }}
         disabled={isDisabled || isQuotaReached || isCoolingDown || isSuccess}
         initial={false}
         animate={{

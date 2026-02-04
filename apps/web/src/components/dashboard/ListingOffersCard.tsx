@@ -14,6 +14,7 @@ import { buildWhatsAppMessageForDeal, calculatePrivacySafeDistance, formatCountd
 import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { TimerBadge } from "@/components/common/TimerBadge";
 import { DistanceBadge } from "@/components/common/DistanceBadge";
+import { useHaptic } from "@/hooks/useHaptic";
 
 interface ListingOffersCardProps {
   item: Item;
@@ -23,6 +24,7 @@ interface ListingOffersCardProps {
 export default function ListingOffersCard({ item, offers }: ListingOffersCardProps) {
   const { user, conversations, acceptBid, rejectBid, startConversation, myLocation } = useApp();
   const { now } = useTime();
+  const haptic = useHaptic();
   
   const [isExpanded, setIsExpanded] = useState(false);
   const [processingBidId, setProcessingBidId] = useState<string | null>(null);
@@ -52,6 +54,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   const handleAccept = async (bidId: string) => {
     if (isPendingGoLive) return;
     if (processingBidId) return;
+    haptic.success();
     setProcessingBidId(bidId);
     try {
       const convId = await acceptBid(bidId);
@@ -67,6 +70,7 @@ export default function ListingOffersCard({ item, offers }: ListingOffersCardPro
   const handleReject = async (bidId: string) => {
     if (isPendingGoLive) return;
     if (processingBidId) return;
+    haptic.warning();
     setProcessingBidId(bidId);
     try {
       await rejectBid(bidId);

@@ -17,6 +17,7 @@ import { useApp } from "@/lib/store";
 import { usePathname, useSearchParams } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
+import { NotificationBadge } from "@/components/common/NotificationBadge";
 // import { SearchDropdown } from "./SearchDropdown";
 import SearchBar from "@/components/search/SearchBar";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
@@ -34,7 +35,13 @@ export default function Navbar() {
   const currentTab = searchParams.get('tab');
   const dashboardTab = currentTab || 'offers';
   const [isVisible, setIsVisible] = useState(true);
+  const [hasMounted, setHasMounted] = useState(false);
   const lastScrollY = useRef(0);
+
+  // Prevent hydration mismatch - only render auth-dependent UI after mount
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   // Memoize badge counts to prevent expensive recalculations on every render
   const unreadMsgCount = useMemo(() => 
@@ -42,16 +49,14 @@ export default function Navbar() {
     [messages, user?.id]
   );
   
+  // Dashboard badge = total offers on my listings (matches Dashboard "Selling" tab)
   const dashboardAlertCount = useMemo(() => {
     if (!user) return 0;
-    const myItems = items.filter(i => i.sellerId === user.id);
-    const myItemIds = new Set(myItems.map(i => i.id));
-    const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItemIds.has(b.itemId)).length;
-    
-    const myBidsItems = items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id));
-    const currentOutbidCount = myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length;
-    
-    return receivedBidsCount + currentOutbidCount;
+    const myItemIds = new Set(items.filter(i => i.sellerId === user.id).map(i => i.id));
+    return bids.filter(b => 
+      myItemIds.has(b.itemId) && 
+      (b.status === 'pending' || b.status === 'accepted')
+    ).length;
   }, [user, items, bids]);
 
   useEffect(() => {
@@ -170,7 +175,7 @@ export default function Navbar() {
           </Button>
 
           <AnimatePresence mode="wait">
-            {isLoading ? (
+            {(!hasMounted || isLoading) ? (
               <motion.div
                 key="loading"
                 layout="position"
@@ -214,20 +219,8 @@ export default function Navbar() {
                     <LayoutDashboard id="navbar-dash-icon" className={cn("h-5 w-5", pathname === '/dashboard' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard' ? 2.5 : 1.5} />
                     <span>Dash</span>
                     {dashboardAlertCount > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white">
-                        {dashboardAlertCount}
-                      </span>
+                      <NotificationBadge count={dashboardAlertCount} className="absolute -top-1 -right-1" />
                     )}
-                  </Link>
-                </Button>
-
-                <Button id="navbar-analytics-btn" asChild variant="ghost" className={cn(
-                  "flex items-center gap-2 rounded-full px-4 relative transition-colors hover:bg-slate-100/80",
-                  pathname === '/dashboard/seller' ? "text-blue-600 font-bold" : "text-slate-600 font-medium"
-                )}>
-                  <Link href="/dashboard/seller">
-                    <BarChart3 id="navbar-analytics-icon" className={cn("h-5 w-5", pathname === '/dashboard/seller' && "stroke-[2.5]")} strokeWidth={pathname === '/dashboard/seller' ? 2.5 : 1.5} />
-                    <span>Analytics</span>
                   </Link>
                 </Button>
 
@@ -239,9 +232,7 @@ export default function Navbar() {
                     <MessageSquare id="navbar-chat-icon" className={cn("h-5 w-5", pathname.startsWith('/inbox') && "stroke-[2.5]")} strokeWidth={pathname.startsWith('/inbox') ? 2.5 : 1.5} />
                     <span>Chat</span>
                     {unreadMsgCount > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
-                        {unreadMsgCount}
-                      </span>
+                      <NotificationBadge count={unreadMsgCount} className="absolute -top-1 -right-1" />
                     )}
                   </Link>
                 </Button>
@@ -288,10 +279,7 @@ export default function Navbar() {
                     </Avatar>
                     {/* Notification dot on avatar - shown below lg (1024px) when there are unread notifications */}
                     {notificationUnreadCount > 0 && (
-                      <span className="lg:hidden absolute -top-0.5 -right-0.5 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-600 ring-2 ring-white"></span>
-                      </span>
+                      <NotificationBadge count={notificationUnreadCount} variant="dot" className="lg:hidden absolute -top-0.5 -right-0.5" />
                     )}
                   </div>
                 </DropdownMenuTrigger>
@@ -312,9 +300,7 @@ export default function Navbar() {
                       <Bell className="mr-2.5 h-4 w-4 opacity-70" />
                       Notifications
                       {notificationUnreadCount > 0 && (
-                        <span className="ml-auto flex h-5 min-w-[1.25rem] px-1.5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-bold text-blue-700">
-                          {notificationUnreadCount}
-                        </span>
+                        <NotificationBadge count={notificationUnreadCount} className="ml-auto" />
                       )}
                     </Link>
                   </DropdownMenuItem>
@@ -322,6 +308,12 @@ export default function Navbar() {
                     <Link id="navbar-profile-link" href="/profile" className="flex items-center w-full">
                       <UserCircle className="mr-2.5 h-4 w-4 opacity-70" />
                       Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-xl py-2.5 cursor-pointer focus:bg-slate-50 focus:text-blue-600">
+                    <Link id="navbar-analytics-link" href="/dashboard/seller" className="flex items-center w-full">
+                      <BarChart3 className="mr-2.5 h-4 w-4 opacity-70" />
+                      Analytics
                     </Link>
                   </DropdownMenuItem>
                   {/* Admin Mode Toggle - only visible to admin users */}

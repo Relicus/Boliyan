@@ -1,5 +1,5 @@
 import { TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { NotificationBadge } from "@/components/common/NotificationBadge";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +22,6 @@ export function DashboardTab({
   badgeClassName,
   className,
 }: DashboardTabProps) {
-  const iconBadgeBase = "absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 flex min-w-4 h-4 items-center justify-center rounded-full px-1 text-[9px] font-extrabold backdrop-blur-md bg-white/70 border border-white/70 shadow-[0_4px_10px_rgba(15,23,42,0.12)]";
-
   return (
     <TabsTrigger
       id={id}
@@ -37,23 +35,19 @@ export function DashboardTab({
       <div className="relative">
         <Icon className="w-6 h-6 sm:w-5 sm:h-5" />
         {count !== undefined && count > 0 && (
-          <span className={cn(iconBadgeBase, "md:hidden", badgeClassName)}>
-            {count}
-          </span>
+          <NotificationBadge 
+            count={count} 
+            size="sm" 
+            className={cn("absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 md:hidden", badgeClassName)} 
+          />
         )}
       </div>
       <span className="text-[10px] sm:text-xs md:text-sm truncate">{label}</span>
       {count !== undefined && count > 0 && (
-        <Badge 
-          variant="destructive" 
-          className={cn(
-            "hidden md:flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 py-0 text-[10px]",
-            // We can override background if destructive isn't red enough, but destructive is usually correct.
-            // Keeping it simple as requested "shadcn type"
-          )}
-        >
-          {count}
-        </Badge>
+        <NotificationBadge 
+          count={count} 
+          className="hidden md:flex shrink-0" 
+        />
       )}
     </TabsTrigger>
   );

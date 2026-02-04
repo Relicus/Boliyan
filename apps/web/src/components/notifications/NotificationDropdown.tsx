@@ -1,7 +1,7 @@
 'use client';
  
 import { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
+import { NotificationBadge } from '@/components/common/NotificationBadge';
 import { Bell, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,10 +44,7 @@ export function NotificationDropdown() {
         >
           <Bell className={cn("!h-6 !w-6 text-slate-600 transition-colors duration-300", isOpen && "text-blue-600 fill-blue-50")} strokeWidth={isOpen ? 2.5 : 2} />
           {unreadCount > 0 && (
-            <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600 ring-2 ring-white"></span>
-            </span>
+            <NotificationBadge count={unreadCount} variant="dot" className="absolute top-0 right-0" />
           )}
           <span className="sr-only">Notifications</span>
         </Button>
@@ -57,9 +54,7 @@ export function NotificationDropdown() {
           <div className="flex items-center gap-2">
             <h4 className="font-bold text-sm text-slate-900">Notifications</h4>
             {unreadCount > 0 && (
-              <Badge variant="secondary" className="h-5 px-1.5 min-w-[1.25rem] bg-blue-100 text-blue-700 hover:bg-blue-200 border-none font-bold text-[10px] flex items-center justify-center rounded-full">
-                {unreadCount}
-              </Badge>
+              <NotificationBadge count={unreadCount} />
             )}
           </div>
           {unreadCount > 0 && (
