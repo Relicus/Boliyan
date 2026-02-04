@@ -21,6 +21,7 @@ import { DistanceBadge } from "@/components/common/DistanceBadge";
 import { useTrackVisibility } from "@/hooks/useTrackVisibility";
 import { useShouldReduceAnimations } from "@/hooks/useReducedMotion";
 import { useHaptic } from "@/hooks/useHaptic";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import {
   Tooltip,
 
@@ -242,13 +243,14 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               )}
             >
               <div className="relative w-full h-full flex items-center justify-center">
-                <img
+                <OptimizedImage
                   id={`item-card-${item.id}-image-main`}
                   src={mainImage}
                   alt={`${item.title} main image`}
-                  loading="lazy"
-                  decoding="async"
-                  className="object-cover w-full h-full object-center"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover object-center"
+                  fallbackSrc="/images/placeholder.jpg"
                 />
               </div>
 
