@@ -49,6 +49,7 @@ export function ContinueBrowsingModal({
       <DialogContent 
         id="continue-browsing-modal"
         className="sm:max-w-md"
+        aria-labelledby="continue-browsing-title"
         aria-describedby="continue-browsing-description"
       >
         <DialogHeader>

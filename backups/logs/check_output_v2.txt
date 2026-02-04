@@ -1,0 +1,22 @@
+Searching for "apple notifications" in 'listings' table...
+Found 1 matching items in 'listings' table.
+ID: 0965c7b7-f452-400b-b17f-7dd72706cea1, Status: active, Seller ID: 2b3bdb74-d0c7-457f-96d9-dc4560d7233c
+Checking for seller profile 2b3bdb74-d0c7-457f-96d9-dc4560d7233c...
+Profile found: Waleed, Verified: false
+Checking if item appears in 'marketplace_listings' view...
+Found 1 matches in 'marketplace_listings' view.
+Item IS visible in the view.
+Counting total active items in marketplace_listings...
+Total active items: 25
+Checking first page of marketplace items (8 items, created_at DESC)...
+First page items:
+1. Apple Notifications (0965c7b7-f452-400b-b17f-7dd72706cea1) - Created At: 2026-01-25T14:57:58.228038+00:00
+   *** TARGET ITEM IS ON FIRST PAGE ***
+2. Richard RM 123456 (1e29f9fd-f890-4683-96a3-fa3138d4e693) - Created At: 2026-01-23T14:51:02.766663+00:00
+3. iPhone 13 Pro - 256GB - Sierra Blue (b0661082-2e15-4246-b33e-964cbbeddef1) - Created At: 2026-01-17T17:31:04.004041+00:00
+4. Solid Sheesham Dining Table (6 Seater) (01d89edb-d8c6-4b44-bf4e-57788d08b381) - Created At: 2026-01-17T17:31:04.004041+00:00
+5. Sony WH-1000XM4 Noise Cancelling Headphones (28b04625-e097-4f50-9a96-b32867c94a2a) - Created At: 2026-01-17T17:31:04.004041+00:00
+6. Vintage Nikon F3 (a575a1e0-d422-4db2-a422-d1a7ae0318f1) - Created At: 2026-01-17T17:31:04.004041+00:00
+7. Canon EOS R5 Body Only (aa64a3d2-dac0-469b-916f-70d5c22eaaab) - Created At: 2026-01-17T17:31:04.004041+00:00
+8. MacBook Pro M1 13-inch 2020 (49b393e6-1d4e-4193-b736-9ead1c7b0d34) - Created At: 2026-01-17T17:31:04.004041+00:00
+Check finished.

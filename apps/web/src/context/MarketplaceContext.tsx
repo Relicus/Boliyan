@@ -428,9 +428,17 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
            }
 
        } catch (err: unknown) {
-           console.error("Fetch Items Error:", err);
-           if (err && typeof err === 'object') {
-              console.error("Fetch Items Error Details:", JSON.stringify(err, null, 2));
+           // Supabase errors have specific structure: { message, details, hint, code }
+           if (err && typeof err === 'object' && 'message' in err) {
+               const supabaseError = err as { message: string; details?: string; hint?: string; code?: string };
+               console.error("[MarketplaceContext] Fetch Items Error:", {
+                   message: supabaseError.message,
+                   details: supabaseError.details,
+                   hint: supabaseError.hint,
+                   code: supabaseError.code,
+               });
+           } else {
+               console.error("[MarketplaceContext] Fetch Items Error (unknown):", err);
            }
        } finally {
           setIsLoading(false);
