@@ -25,3 +25,29 @@ export function useReducedMotion(): boolean {
 
   return prefersReducedMotion;
 }
+
+/**
+ * Returns true if the device is likely low-performance.
+ * Checks for: < 4 cores, or deviceMemory < 4GB
+ */
+export function useLowPerformanceDevice(): boolean {
+  const [isLowPerf, setIsLowPerf] = useState(false);
+
+  useEffect(() => {
+    const cores = navigator.hardwareConcurrency || 4;
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4;
+    setIsLowPerf(cores < 4 || memory < 4);
+  }, []);
+
+  return isLowPerf;
+}
+
+/**
+ * Combined hook: returns true if animations should be simplified.
+ */
+export function useShouldReduceAnimations(): boolean {
+  const prefersReduced = useReducedMotion();
+  const isLowPerf = useLowPerformanceDevice();
+  
+  return prefersReduced || isLowPerf;
+}

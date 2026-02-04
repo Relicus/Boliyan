@@ -19,6 +19,7 @@ import { TimerBadge } from "@/components/common/TimerBadge";
 import { LocationBadge } from "@/components/common/LocationBadge";
 import { DistanceBadge } from "@/components/common/DistanceBadge";
 import { useTrackVisibility } from "@/hooks/useTrackVisibility";
+import { useShouldReduceAnimations } from "@/hooks/useReducedMotion";
 import {
   Tooltip,
 
@@ -39,6 +40,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   const { user, bids, watchedItemIds, toggleWatch, setFilter, myLocation } = useApp();
   const isWatched = watchedItemIds.includes(item.id);
   const visibilityRef = useTrackVisibility(item.id);
+  const shouldReduceAnimations = useShouldReduceAnimations();
 
   // Unified Bidding Configuration
 
@@ -122,6 +124,12 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
   }, [item, user, bids]);
 
   useEffect(() => {
+    // Skip expensive animations on low-performance devices
+    if (shouldReduceAnimations) {
+      prevNudgeBid.current = item.currentHighBid;
+      return;
+    }
+    
     if (prevNudgeBid.current === item.currentHighBid) return;
     if (item.currentHighBid === null || item.currentHighBid === undefined) {
       prevNudgeBid.current = item.currentHighBid;
@@ -138,7 +146,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     }
 
     prevNudgeBid.current = item.currentHighBid;
-  }, [item.currentHighBid]);
+  }, [item.currentHighBid, shouldReduceAnimations]);
 
   // Safe Privacy-Preserving Distance Calculation
   const { distance, duration, isOutside } = useMemo(() => {
@@ -195,11 +203,11 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
 
         initial={false}
             animate={{
-              scale: isFadingOut ? 0.95 : (isSuccess ? 1.05 : 1),
+              scale: shouldReduceAnimations ? 1 : (isFadingOut ? 0.95 : (isSuccess ? 1.05 : 1)),
               opacity: isFadingOut ? 0 : 1,
-              x: (isOutbidTrigger && item.isPublicBid) || isSuccess ? [0, -4, 4, -4, 4, 0] : 0,
+              x: shouldReduceAnimations ? 0 : ((isOutbidTrigger && item.isPublicBid) || isSuccess ? [0, -4, 4, -4, 4, 0] : 0),
             }}
-            transition={{
+            transition={shouldReduceAnimations ? { duration: 0.15 } : {
               x: { duration: 0.4 },
               scale: { type: "spring", stiffness: 300, damping: 20 },
               opacity: { duration: 0.8, ease: "easeOut" },

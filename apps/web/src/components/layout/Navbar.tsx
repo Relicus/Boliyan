@@ -22,8 +22,8 @@ import SearchBar from "@/components/search/SearchBar";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useNotifications } from "@/context/NotificationContext";
 import Skeleton from "@/components/ui/Skeleton";
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 
 export default function Navbar() {
@@ -36,15 +36,23 @@ export default function Navbar() {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
 
-  // Other notifications
-  const unreadMsgCount = (messages || []).filter(m => !m.isRead && m.senderId !== user?.id).length;
+  // Memoize badge counts to prevent expensive recalculations on every render
+  const unreadMsgCount = useMemo(() => 
+    (messages || []).filter(m => !m.isRead && m.senderId !== user?.id).length,
+    [messages, user?.id]
+  );
   
-  const myItems = user ? items.filter(i => i.sellerId === user.id) : [];
-  const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItems.some(i => i.id === b.itemId)).length;
-  
-  const myBidsItems = user ? items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id)) : [];
-  const currentOutbidCount = user ? myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length : 0;
-  const dashboardAlertCount = receivedBidsCount + currentOutbidCount;
+  const dashboardAlertCount = useMemo(() => {
+    if (!user) return 0;
+    const myItems = items.filter(i => i.sellerId === user.id);
+    const myItemIds = new Set(myItems.map(i => i.id));
+    const receivedBidsCount = bids.filter(b => b.status === 'pending' && myItemIds.has(b.itemId)).length;
+    
+    const myBidsItems = items.filter(i => bids.some(b => b.bidderId === user.id && b.itemId === i.id));
+    const currentOutbidCount = myBidsItems.filter(i => i.currentHighBidderId && i.currentHighBidderId !== user.id).length;
+    
+    return receivedBidsCount + currentOutbidCount;
+  }, [user, items, bids]);
 
   useEffect(() => {
     const controlNavbar = () => {
@@ -89,8 +97,8 @@ export default function Navbar() {
       )}
     >
       <div id="navbar-container-02" className="w-full flex h-16 items-center justify-between px-4 lg:px-0">
-        <LayoutGroup>
-        {/* ... existing navbar content ... */}
+        {/* Removed LayoutGroup for performance - was causing expensive layout recalculations */}
+        <>
 
         <div id="navbar-left-section-03" className="flex items-center gap-4 shrink-0 lg:w-72 lg:justify-center">
           <div className="flex items-center gap-3">
@@ -382,7 +390,7 @@ export default function Navbar() {
             )}
           </AnimatePresence>
         </motion.div>
-        </LayoutGroup>
+        </>
       </div>
     </nav>
   );
