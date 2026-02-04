@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { getNativeBridge } from '@/lib/nativeBridge';
-import { NativeHapticType } from '@boliyan/shared/nativeBridge';
+import { NativeHapticType } from '../../../../packages/shared/nativeBridge';
 
 /**
  * Hook for triggering native haptic feedback from web components.
