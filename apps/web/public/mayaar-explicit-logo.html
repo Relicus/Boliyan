@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mayaar "Descriptive" Logo Concepts</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Koulen&family=Noto+Sans+Arabic:wght@700&family=Outfit:wght@400;500;700;900&display=swap');
+
+    :root {
+      --navy: #1B2A38;
+      --gold: #D4AF37;
+      --cream: #F5F2E9;
+      --slate: #475569;
+      --white: #ffffff;
+    }
+
+    body {
+      background-color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      padding: 40px;
+      margin: 0;
+      color: var(--navy);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 60px;
+      color: var(--navy);
+    }
+
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .concept-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .concept-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .concept-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .concept-desc {
+      font-size: 0.9rem;
+      color: #666;
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 80%;
+      line-height: 1.5;
+    }
+
+    /* SVG STYLES */
+    svg {
+      max-width: 100%;
+      height: auto;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Visual Literalism: "The Icon Explains The Business"</h1>
+
+  <div class="concept-grid">
+
+    <!-- FINAL BADGE: TRUSTED QUALITY (Corrected) -->
+    <div class="concept-card">
+      <div class="concept-title">The Final Badge (Refined)</div>
+      <div class="concept-desc">
+        <strong>Color Match:</strong> Frame and text now use the <em>exact same gradient</em> as the icon.<br>
+        <strong>Curve Fix:</strong> Text curve radius adjusted to be perfectly concentric with the rings.
+      </div>
+      
+      <svg width="280" height="280" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Extracted Exact Gradient from Icon -->
+          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#d97706" />
+            <stop offset="50%" stop-color="#f59e0b" />
+            <stop offset="100%" stop-color="#b45309" />
+          </linearGradient>
+        </defs>
+
+        <!-- GOLD BADGE FRAME: Dashed Style -->
+        <!-- Stroke uses the gradient url(#goldGrad) -->
+        <circle cx="150" cy="150" r="140" stroke="url(#goldGrad)" stroke-width="6" fill="white"/>
+        <circle cx="150" cy="150" r="128" stroke="url(#goldGrad)" stroke-width="2" stroke-dasharray="6 6"/>
+        
+        <!-- THE EXISTING GOLD LOGO ICON -->
+        <image href="mayaar-icon-gold.svg" x="55" y="60" width="190" height="140"/>
+        
+        <!-- CURVED TEXT BELOW -->
+        <!-- Fixed Radius: Badge is r=140. Text should be around r=100-110 to sit nicely inside. -->
+        <!-- Previous path was "M 50,160 A 100,100..." which is an arc of radius 100 starting at x=50. 
+             To be properly centered concentric to (150,150), we should describe the arc relative to the center.
+             Let's use a path that is DEFINITELY concentric. 
+             Arc from (40, 150) to (260, 150) with r=110 -->
+        <path id="curveBottomCorrect" d="M 40,150 A 110,110 0 0,0 260,150" fill="none"/>
+        
+        <text fill="url(#goldGrad)" font-family="'Outfit', sans-serif" font-size="16" font-weight="900" letter-spacing="6">
+          <textPath href="#curveBottomCorrect" startOffset="50%" text-anchor="middle">TRUSTED QUALITY</textPath>
+        </text>
+      </svg>
+    </div>
+
+    <!-- MINIMAL VERSION -->
+    <div class="concept-card">
+      <div class="concept-title">Minimal (No Text)</div>
+      <div class="concept-desc">
+        Gradient-matched frame + Icon.
+      </div>
+      
+      <svg width="280" height="280" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+         <defs>
+          <linearGradient id="goldGradMin" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#d97706" />
+            <stop offset="50%" stop-color="#f59e0b" />
+            <stop offset="100%" stop-color="#b45309" />
+          </linearGradient>
+        </defs>
+        
+        <!-- GOLD BADGE FRAME -->
+        <circle cx="150" cy="150" r="140" stroke="url(#goldGradMin)" stroke-width="6" fill="white"/>
+        <circle cx="150" cy="150" r="128" stroke="url(#goldGradMin)" stroke-width="2" stroke-dasharray="6 6"/>
+        
+        <!-- THE EXISTING GOLD LOGO ICON (Centered) -->
+        <image href="mayaar-icon-gold.svg" x="55" y="75" width="190" height="150"/>
+      </svg>
+    </div>
+
+  </div>
+
+  </div>
+
+</body>
+</html>

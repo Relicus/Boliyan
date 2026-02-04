@@ -6,7 +6,7 @@
   <title>Mayaar Laptop Logo - All Variations</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --font-noto-urdu: 'Noto Sans Arabic', sans-serif;
@@ -35,7 +35,7 @@
 
     .logo-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: 32px;
       max-width: 1400px;
       margin: 0 auto;
@@ -44,7 +44,16 @@
     .variation-card {
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 12px;
+    }
+
+    .variation-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
     }
 
     .variation-label {
@@ -58,7 +67,6 @@
     .variation-subtitle {
       font-size: 11px;
       color: #94a3b8;
-      margin-top: -8px;
     }
 
     /* ==========================================
@@ -68,7 +76,7 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 28px 40px;
+      padding: 24px 32px;
       background: white;
       border-radius: 20px;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
@@ -79,212 +87,120 @@
 
     .logo-container:hover {
       transform: scale(1.02);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     }
 
-    /* ICON */
-    .logo-icon {
-      width: 72px;
-      height: 54px;
-      flex-shrink: 0;
-    }
-
-    .logo-icon img {
+    /* SVG Sizing */
+    svg.logo-full {
       width: 100%;
-      height: 100%;
-      object-fit: contain;
-      transform: scaleX(-1);
-    }
-
-    /* TEXT BLOCK */
-    .logo-text {
-      display: flex;
-      flex-direction: column;
-      width: max-content;
-    }
-
-    .urdu-text {
-      font-family: var(--font-noto-urdu);
-      font-size: 2.25rem;
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: -4px;
-      text-align: center;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .english-container {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      padding: 0 2px;
-      margin-top: 8px;
-    }
-
-    .english-char {
-      font-family: var(--font-outfit);
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      line-height: 1;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      height: auto;
+      max-width: 240px;
+      display: block;
+      overflow: visible;
     }
 
     /* ==========================================
-       GRADIENT VARIATIONS
+       LOGO SVG TYPOGRAPHY
        ========================================== */
+    .text-urdu {
+      font-family: 'Noto Sans Arabic', sans-serif;
+      font-weight: 800;
+      font-size: 34px; 
+      fill: var(--text-main, black);
+
+    }
+    .text-english {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 4px;
+      fill: var(--text-sub, #475569);
+    }
+
+    /* ==========================================
+       VARIATION VARIABLES
+       ========================================== */
+
+    /* EMERALD (Default) */
+    .emerald {
+      --icon-fill: url(#emerald-gradient);
+      --icon-stroke: #059669;
+      --text-main: url(#emerald-gradient);
+      --text-sub: #10b981;
+    }
+
+    /* BLUE */
+    .blue {
+      --icon-fill: url(#blue-gradient);
+      --icon-stroke: #2563eb;
+      --text-main: url(#blue-gradient);
+      --text-sub: #3b82f6;
+    }
     
-    /* EMERALD */
-    .emerald .urdu-text {
-      background: linear-gradient(to bottom right, #059669, #10b981, #047857);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .emerald .english-char {
-      background: linear-gradient(to bottom right, #34d399, #a7f3d0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* GOLD */
+    .gold {
+      --icon-fill: url(#gold-gradient);
+      --icon-stroke: #d97706;
+      --text-main: url(#gold-gradient);
+      --text-sub: #f59e0b;
     }
 
-    /* BLUE (Boliyan Style) */
-    .blue .urdu-text {
-      background: linear-gradient(to bottom right, #2563eb, #3b82f6, #1d4ed8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .blue .english-char {
-      background: linear-gradient(to bottom right, #60a5fa, #bfdbfe);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* PURPLE */
+    .purple {
+      --icon-fill: url(#purple-gradient);
+      --icon-stroke: #7c3aed;
+      --text-main: url(#purple-gradient);
+      --text-sub: #a78bfa;
     }
 
-    /* GOLD / AMBER (Premium) */
-    .gold .urdu-text {
-      background: linear-gradient(to bottom right, #d97706, #f59e0b, #b45309);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .gold .english-char {
-      background: linear-gradient(to bottom right, #fbbf24, #fde68a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* ROSE */
+    .rose {
+      --icon-fill: url(#rose-gradient);
+      --icon-stroke: #e11d48;
+      --text-main: url(#rose-gradient);
+      --text-sub: #fb7185;
     }
 
-    /* PURPLE / VIOLET */
-    .purple .urdu-text {
-      background: linear-gradient(to bottom right, #7c3aed, #8b5cf6, #6d28d9);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .purple .english-char {
-      background: linear-gradient(to bottom right, #a78bfa, #ddd6fe);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* SLATE */
+    .slate {
+      --icon-fill: url(#slate-gradient);
+      --icon-stroke: #334155;
+      --text-main: url(#slate-gradient);
+      --text-sub: #64748b;
     }
 
-    /* ROSE / PINK */
-    .rose .urdu-text {
-      background: linear-gradient(to bottom right, #e11d48, #f43f5e, #be123c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .rose .english-char {
-      background: linear-gradient(to bottom right, #fb7185, #fecdd3);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* SLATE / GRAYSCALE (Print) */
-    .slate .urdu-text {
-      background: linear-gradient(to bottom right, #334155, #475569, #1e293b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .slate .english-char {
-      background: linear-gradient(to bottom right, #64748b, #cbd5e1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* DARK MODE - White on Dark */
+    /* DARK MODE */
     .dark-mode {
-      background: #0f172a;
-    }
-    .dark-mode .urdu-text {
-      background: linear-gradient(to bottom right, #f8fafc, #e2e8f0, #f1f5f9);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .dark-mode .english-char {
-      background: linear-gradient(to bottom right, #94a3b8, #cbd5e1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      background: #0f172a !important;
+      border-color: #1e293b !important;
+      --icon-fill: #ffffff;
+      --icon-stroke: #ffffff;
+      --text-main: #ffffff;
+      --text-sub: #f8fafc;
     }
 
-    /* BILLBOARD - High Contrast Emerald on Dark */
+    /* BILLBOARD EMERALD */
     .billboard {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      padding: 40px 56px;
-    }
-    .billboard .urdu-text {
-      font-size: 2.5rem;
-      background: linear-gradient(to bottom right, #34d399, #10b981, #6ee7b7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .billboard .english-char {
-      font-size: 13px;
-      background: linear-gradient(to bottom right, #a7f3d0, #d1fae5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .billboard .logo-icon {
-      width: 88px;
-      height: 66px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+      border: none !important;
+      --icon-fill: url(#billboard-emerald-gradient);
+      --icon-stroke: #34d399;
+      --text-main: url(#billboard-emerald-gradient);
+      --text-sub: #6ee7b7;
     }
 
     /* BILLBOARD GOLD */
     .billboard-gold {
-      background: linear-gradient(135deg, #1c1917 0%, #292524 100%);
-      padding: 40px 56px;
+      background: linear-gradient(135deg, #1c1917 0%, #292524 100%) !important;
+      border: none !important;
+      --icon-fill: url(#billboard-gold-gradient);
+      --icon-stroke: #fbbf24;
+      --text-main: url(#billboard-gold-gradient);
+      --text-sub: #fde68a;
     }
-    .billboard-gold .urdu-text {
-      font-size: 2.5rem;
-      background: linear-gradient(to bottom right, #fbbf24, #f59e0b, #fde68a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .billboard-gold .english-char {
-      font-size: 13px;
-      background: linear-gradient(to bottom right, #fde68a, #fef3c7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .billboard-gold .logo-icon {
-      width: 88px;
-      height: 66px;
+
+    /* Icon Color Variations Target */
+    .logo-container svg {
+      /* properties inherited from container variables */
     }
 
     /* Section divider */
@@ -299,158 +215,273 @@
       padding-bottom: 8px;
       border-bottom: 2px solid #e2e8f0;
     }
+
+    /* Download Button */
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: center;
+      padding: 8px 20px;
+      margin-top: 8px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 100px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .download-btn:hover {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Template helpers */
+    #logo-template { display: none; }
   </style>
 </head>
 <body>
-  <h1>معیار LAPTOP — Logo Variations</h1>
+  <h1>معیار LAPTOPS — Logo Variations</h1>
   
-  <div class="logo-grid">
-    
-    <div class="section-title">🎨 Color Variations</div>
+  <!-- SVG Gradient Definitions (hidden, references for the system) -->
+  <svg width="0" height="0" style="position: absolute; visibility: hidden;">
+    <defs>
+      <!-- Emerald Gradient -->
+      <linearGradient id="emerald-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#059669"/>
+        <stop offset="50%" stop-color="#10b981"/>
+        <stop offset="100%" stop-color="#047857"/>
+      </linearGradient>
+      
+      <!-- Blue Gradient -->
+      <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2563eb"/>
+        <stop offset="50%" stop-color="#3b82f6"/>
+        <stop offset="100%" stop-color="#1d4ed8"/>
+      </linearGradient>
+      
+      <!-- Gold Gradient -->
+      <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#d97706"/>
+        <stop offset="50%" stop-color="#f59e0b"/>
+        <stop offset="100%" stop-color="#b45309"/>
+      </linearGradient>
+      
+      <!-- Purple Gradient -->
+      <linearGradient id="purple-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#7c3aed"/>
+        <stop offset="50%" stop-color="#8b5cf6"/>
+        <stop offset="100%" stop-color="#6d28d9"/>
+      </linearGradient>
+      
+      <!-- Rose Gradient -->
+      <linearGradient id="rose-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#e11d48"/>
+        <stop offset="50%" stop-color="#f43f5e"/>
+        <stop offset="100%" stop-color="#be123c"/>
+      </linearGradient>
+      
+      <!-- Slate Gradient -->
+      <linearGradient id="slate-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#334155"/>
+        <stop offset="50%" stop-color="#475569"/>
+        <stop offset="100%" stop-color="#1e293b"/>
+      </linearGradient>
+      
+      <!-- White Gradient (Dark Mode) - Switched to pure white -->
+      <linearGradient id="white-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="50%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#ffffff"/>
+      </linearGradient>
+      
+      <!-- Billboard Emerald Gradient -->
+      <linearGradient id="billboard-emerald-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#34d399"/>
+        <stop offset="50%" stop-color="#10b981"/>
+        <stop offset="100%" stop-color="#6ee7b7"/>
+      </linearGradient>
+      
+      <!-- Billboard Gold Gradient -->
+      <linearGradient id="billboard-gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fbbf24"/>
+        <stop offset="50%" stop-color="#f59e0b"/>
+        <stop offset="100%" stop-color="#fde68a"/>
+      </linearGradient>
+      
+      <!-- Reusable Icon Symbol -->
+      <symbol id="mayaar-icon" viewBox="0 0 178.5 147.2">
+        <g transform="translate(150 130) scale(0.47) translate(-499 -295)">
+          <path fill="var(--icon-fill, black)" d="M284.1,231.8c44.3,5.4,88,10.6,131.8,15.9c7,0.8,14,1.7,20.9,3.1c7.3,1.5,8.4,5.5,3.2,10.9c-8.1,8.3-18.3,10.4-29.4,9.3c-23.9-2.5-47.7-6.6-71.4-10.3c-43.7-6.8-87.4-13.9-130.9-22c-3.8-0.7-8.2-0.1-12.1-4.1C225.5,226.5,254.4,227.4,284.1,231.8z"/>
+          <path fill="var(--icon-fill, black)" d="M452.7,67.3c-31.2,4.5-61.8,8.8-92.4,13.2c-8.8,1.2-17.5,2.5-26.3,3.5c-7.9,0.9-13.1,4.4-16.3,12.2c-16.2,39.8-33.3,79.3-52.2,117.9c-1,2.1-1.5,4.8-4.5,6c-1.9-2.1-0.6-4.2,0-6.2c9-32.7,21.3-64.3,33.2-96c3.6-9.6,7.5-19.1,10.8-28.8c3.9-11.4,11.7-17.7,23.3-19.4c60.7-9.2,120.9-20.5,181.4-30.8c3.8-0.6,7.7-0.9,11.5-0.8c13.5,0.5,22.4,9.7,22.3,23.3c-0.1,13.1-4.7,25.4-7.6,38c-13.2,55.9-26.9,111.8-40,167.7c-3.9,16.8-12.9,26.9-30.6,29c-29.1,3.4-58.2,6.6-86.6,14.2c-0.9,0.2-3.8,0.9-4.7,1.1c-1.8,0.4-3.9,1-5.1-0.8c-1.4-2.3,0.4-3.9,1.9-5.2c7.4-7,16.5-11.2,25.8-14.9c17.8-7.1,36.5-11.3,55.3-14.6c11.8-2,18.1-7.9,21.1-19.7c15.4-61.3,31.3-122.4,47.1-183.6c0.3-1.3,0.7-2.6,0.9-4c1.5-7.8-1.8-11.3-9.7-10.2C491.9,61.2,472.6,64.3,452.7,67.3z"/>
+          <polyline fill="none" class="tick" stroke="var(--icon-stroke, black)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" transform="rotate(-8, 398.9, 155.35)" points="350.7,155.3 362.8,180.8 447.1,129.9"/>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
 
-    <!-- EMERALD -->
+  <!-- GRID CONTAINER -->
+  <div id="logo-grid" class="logo-grid"></div>
+
+  <!-- TEMPLATE -->
+  <template id="logo-template">
     <div class="variation-card">
-      <div class="variation-label">Emerald Green</div>
-      <div class="variation-subtitle">Primary Brand Color</div>
-      <div class="logo-container emerald">
-        <div class="logo-icon"><img src="mayaar-icon-new.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
+      <div class="logo-container">
+        <!-- Pure SVG Construction -->
+        <svg class="logo-full" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" style="width: auto; height: 80px;">
+            <style>
+              .text-urdu { font-family: 'Noto Sans Arabic', sans-serif; font-weight: 700; font-size: 36px; }
+              .text-english { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 12px; }
+            </style>
+            <!-- Icon Symbol Reference -->
+            <use href="#mayaar-icon" x="0" y="4" width="86" height="66" />
+            
+            <!-- Text Components -->
+            <g transform="translate(100, 48)">
+                <text class="text-urdu" fill="var(--text-main)" x="0" y="-10">معیار</text>
+                <text class="text-english" fill="var(--text-sub)" x="0" y="14" textLength="82" lengthAdjust="spacing">LAPTOPS</text>
+            </g>
+        </svg>
       </div>
-    </div>
-
-    <!-- BLUE -->
-    <div class="variation-card">
-      <div class="variation-label">Boliyan Blue</div>
-      <div class="variation-subtitle">Matches Boliyan Branding</div>
-      <div class="logo-container blue">
-        <div class="logo-icon"><img src="mayaar-icon-blue.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
+      <div class="variation-info">
+        <span class="variation-label">Label</span>
+        <span class="variation-subtitle">Subtitle</span>
       </div>
+      <button class="download-btn" onclick="downloadLogo(this)">
+        <svg width="16" height="16" fill="none" style="margin-right: 8px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Download SVG
+      </button>
     </div>
+  </template>
 
-    <!-- GOLD -->
-    <div class="variation-card">
-      <div class="variation-label">Premium Gold</div>
-      <div class="variation-subtitle">Luxury / Premium Feel</div>
-      <div class="logo-container gold">
-        <div class="logo-icon"><img src="mayaar-icon-gold.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <script>
+    // Logo variations config - edit here to add/modify variations
+    const variations = [
+      { section: '🎨 Color Variations' },
+      { class: 'emerald', label: 'Emerald Green', subtitle: 'Primary Brand Color' },
+      { class: 'blue', label: 'Boliyan Blue', subtitle: 'Matches Boliyan Branding' },
+      { class: 'gold', label: 'Premium Gold', subtitle: 'Luxury / Premium Feel' },
+      { class: 'purple', label: 'Royal Purple', subtitle: 'Tech / Gaming Vibe' },
+      { class: 'rose', label: 'Rose Pink', subtitle: 'Bold / Modern' },
+      { class: 'slate', label: 'Slate Gray', subtitle: 'Print / Monochrome' },
+      { section: '🌙 Dark Mode & Billboard' },
+      { class: 'dark-mode', label: 'Dark Mode (White)', subtitle: 'For Dark Backgrounds' },
+      { class: 'billboard', label: 'Billboard - Emerald', subtitle: 'High Contrast for Signage' },
+      { class: 'billboard-gold', label: 'Billboard - Gold', subtitle: 'Premium Signage' },
+    ];
 
-    <!-- PURPLE -->
-    <div class="variation-card">
-      <div class="variation-label">Royal Purple</div>
-      <div class="variation-subtitle">Tech / Gaming Vibe</div>
-      <div class="logo-container purple">
-        <div class="logo-icon"><img src="mayaar-icon-purple.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    // Generate logos from template
+    const grid = document.getElementById('logo-grid');
+    const template = document.getElementById('logo-template');
 
-    <!-- ROSE -->
-    <div class="variation-card">
-      <div class="variation-label">Rose Pink</div>
-      <div class="variation-subtitle">Bold / Modern</div>
-      <div class="logo-container rose">
-        <div class="logo-icon"><img src="mayaar-icon-rose.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    variations.forEach(v => {
+      if (v.section) {
+        // Section divider
+        const divider = document.createElement('div');
+        divider.className = 'section-title';
+        divider.textContent = v.section;
+        grid.appendChild(divider);
+      } else {
+        // Logo card
+        const clone = template.content.cloneNode(true);
+        clone.querySelector('.variation-label').textContent = v.label;
+        clone.querySelector('.variation-subtitle').textContent = v.subtitle;
+        clone.querySelector('.logo-container').classList.add(v.class);
+        
+        // Add click listener for lightbox directly here
+        const container = clone.querySelector('.logo-container');
+        container.addEventListener('click', function() {
+            // Lightbox logic
+            const lightbox = document.getElementById('lightbox');
+            const lightboxContent = document.getElementById('lightbox-content');
+            const clone = this.cloneNode(true);
+            lightboxContent.innerHTML = '';
+            lightboxContent.appendChild(clone);
+            lightbox.classList.add('active');
+        });
 
-    <!-- SLATE -->
-    <div class="variation-card">
-      <div class="variation-label">Slate Gray</div>
-      <div class="variation-subtitle">Print / Monochrome</div>
-      <div class="logo-container slate">
-        <div class="logo-icon"><img src="mayaar-icon-slate.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
-      </div>
-    </div>
+        grid.appendChild(clone);
+      }
+    });
 
-    <div class="section-title">🌙 Dark Mode & Billboard</div>
+    // Download Function
+    function downloadLogo(btn) {
+      // Prevent bubbling to lightbox
+      event.stopPropagation();
 
-    <!-- DARK MODE -->
-    <div class="variation-card">
-      <div class="variation-label">Dark Mode (White)</div>
-      <div class="variation-subtitle">For Dark Backgrounds</div>
-      <div class="logo-container dark-mode">
-        <div class="logo-icon"><img src="mayaar-icon-white.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      const card = btn.closest('.variation-card');
+      const svgOriginal = card.querySelector('svg.logo-full');
+      const label = card.querySelector('.variation-label').textContent.trim();
+      
+      // Get computed styles to bake them in
+      const container = card.querySelector('.logo-container');
+      const cardStyle = getComputedStyle(container);
+      
+      const iconFill = cardStyle.getPropertyValue('--icon-fill').trim();
+      const iconStroke = cardStyle.getPropertyValue('--icon-stroke').trim();
+      const textMain = cardStyle.getPropertyValue('--text-main').trim();
+      const textSub = cardStyle.getPropertyValue('--text-sub').trim();
 
-    <!-- BILLBOARD EMERALD -->
-    <div class="variation-card">
-      <div class="variation-label">Billboard - Emerald</div>
-      <div class="variation-subtitle">High Contrast for Signage</div>
-      <div class="logo-container billboard">
-        <div class="logo-icon"><img src="mayaar-icon-new.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      // Clone the SVG
+      const clone = svgOriginal.cloneNode(true);
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      
+      // Set a larger physical size for professional use (8K resolution equivalent)
+      // while keeping the same viewBox for internal coordinates
+      clone.setAttribute('width', '8000');
+      clone.setAttribute('height', '3200');
+      clone.removeAttribute('style'); // Remove the "height: 80px" browser style
+      
+      // Inject the computed variables as inline styles on the root
+      clone.style.setProperty('--icon-fill', iconFill);
+      clone.style.setProperty('--icon-stroke', iconStroke);
+      clone.style.setProperty('--text-main', textMain);
+      clone.style.setProperty('--text-sub', textSub);
+      
+      // Also specifically set fill on text elements if they are gradients to ensure compatibility
+      // (Though var() usually works if defs are present)
 
-    <!-- BILLBOARD GOLD -->
-    <div class="variation-card">
-      <div class="variation-label">Billboard - Gold</div>
-      <div class="variation-subtitle">Premium Signage</div>
-      <div class="logo-container billboard-gold">
-        <div class="logo-icon"><img src="mayaar-icon-gold.svg" alt="Icon" /></div>
-        <div class="logo-text">
-          <span class="urdu-text">معیار</span>
-          <div class="english-container">
-            <span class="english-char">L</span><span class="english-char">A</span><span class="english-char">P</span><span class="english-char">T</span><span class="english-char">O</span><span class="english-char">P</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      // CRITICAL: We need the <defs> from the main document (gradients, symbols)
+      // otherwise styles referencing url(#id) or use href="#id" will break.
+      const mainDefs = document.querySelector('body > svg > defs'); // Selector aligned with structure
+      if (mainDefs) {
+          clone.prepend(mainDefs.cloneNode(true));
+      }
 
-  </div>
+      // Serialize
+      const serializer = new XMLSerializer();
+      let source = serializer.serializeToString(clone);
+      
+      // Add XML declaration
+      if(!source.match(/^<\?xml/)) {
+          source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+      }
+
+      const url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
+      
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      // Sanitize filename
+      const safeLabel = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      downloadLink.download = `mayaar-logo-${safeLabel}.svg`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+  </script>
 
   <!-- LIGHTBOX MODAL -->
   <div id="lightbox" class="lightbox">
     <div class="lightbox-content" id="lightbox-content"></div>
-    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <button class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('active')">&times;</button>
   </div>
 
   <style>
@@ -474,19 +505,16 @@
     }
 
     .lightbox-content {
-      transform: scale(4);
+      transform: scale(3);
       max-width: 90vw;
       max-height: 90vh;
     }
 
     .lightbox-content .logo-container {
-      transform: scale(1);
       cursor: default;
       box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
-    }
-
-    .lightbox-content .logo-container:hover {
-      transform: scale(1);
+      /* Ensure scale override in lightbox */
+      transform: none !important; 
     }
 
     .lightbox-close {
@@ -518,9 +546,9 @@
       opacity: 0;
       transition: opacity 0.2s;
     }
-
-    .variation-card {
-      position: relative;
+    
+    .lightbox-content .logo-container::after {
+        display: none;
     }
 
     .logo-container:hover::after {
@@ -529,32 +557,16 @@
   </style>
 
   <script>
-    // Lightbox functionality
+    // Lightbox close helpers
     const lightbox = document.getElementById('lightbox');
-    const lightboxContent = document.getElementById('lightbox-content');
-
-    document.querySelectorAll('.logo-container').forEach(container => {
-      container.addEventListener('click', function() {
-        const clone = this.cloneNode(true);
-        lightboxContent.innerHTML = '';
-        lightboxContent.appendChild(clone);
-        lightbox.classList.add('active');
-      });
-    });
-
-    function closeLightbox() {
-      lightbox.classList.remove('active');
-    }
-
     lightbox.addEventListener('click', function(e) {
       if (e.target === lightbox) {
-        closeLightbox();
+        lightbox.classList.remove('active');
       }
     });
-
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
-        closeLightbox();
+        lightbox.classList.remove('active');
       }
     });
   </script>
