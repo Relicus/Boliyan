@@ -118,14 +118,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const [hasMore, setHasMore] = useState(true);
   const [lastBidTimestamp, setLastBidTimestamp] = useState<number | null>(null);
   const loadingLockRef = React.useRef(false);
-  const getItemsPerPage = (width: number) => {
-    if (width >= 1920) return 40;
-    if (width >= 1280) return 24;
-    return 12;
-  };
-  const [itemsPerPage, setItemsPerPage] = useState(() =>
-    typeof window === 'undefined' ? 12 : getItemsPerPage(window.innerWidth)
-  );
+  const ITEMS_PER_PAGE = 12;
   const NEWEST_CACHE_TTL_MS = 90_000;
 
   const [filters, setFilters] = useState<MarketplaceFilters>({
@@ -167,17 +160,6 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     } catch { /* ignore */ }
   }, []);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const handleResize = () => {
-      const nextSize = getItemsPerPage(window.innerWidth);
-      setItemsPerPage((prev) => (prev === nextSize ? prev : nextSize));
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // 2. Initial Sync: If no saved filter, match user's physical location
   useEffect(() => {
@@ -215,7 +197,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       if (loadingLockRef.current) return;
       loadingLockRef.current = true;
       
-      const cacheKey = generateCacheKey('marketplace', { ...filters, page: targetPage, pageSize: itemsPerPage });
+      const cacheKey = generateCacheKey('marketplace', { ...filters, page: targetPage });
       let usedCache = false;
 
       // --- 1. CHECK CACHE (L1/L2) ---
@@ -256,7 +238,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                   // Server has more items than cache - enable loading more
                   setHasMore(true);
               } else {
-                  setHasMore(cachedItems.length === itemsPerPage);
+                  setHasMore(cachedItems.length === ITEMS_PER_PAGE);
               }
               
               if (!isStale && (serverCount === null || serverCount <= cachedItems.length)) {
@@ -387,8 +369,8 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
            }
 
            // --- PAGINATION ---
-            const from = (targetPage - 1) * itemsPerPage;
-            const to = from + itemsPerPage - 1;
+            const from = (targetPage - 1) * ITEMS_PER_PAGE;
+            const to = from + ITEMS_PER_PAGE - 1;
             query = query.range(from, to);
 
            const { data: listingsData, error: listingsError, count } = await query;
@@ -442,10 +424,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
            
            if (count !== null) {
-               setHasMore((targetPage * itemsPerPage) < count);
+               setHasMore((targetPage * ITEMS_PER_PAGE) < count);
            } else {
                // Fallback if count is missing (shouldn't happen with count: 'exact')
-               setHasMore(fetchedItems.length === itemsPerPage);
+               setHasMore(fetchedItems.length === ITEMS_PER_PAGE);
            }
 
        } catch (err: unknown) {
@@ -467,7 +449,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
           setIsRevalidating(false);
           loadingLockRef.current = false;
       }
-  }, [filters, itemsPerPage]);
+  }, [filters, ITEMS_PER_PAGE]);
 
   const refresh = useCallback(async () => {
     await fetchItems(1, true, true);
@@ -477,13 +459,6 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   // --- EFFECT: Trigger Fetch on Filter Change ---
   // Use serialized filters string for stable comparison (object refs trigger false positives)
   const filtersKey = JSON.stringify(filters);
-  useEffect(() => {
-      setPage(1);
-      pageRef.current = 1; // Reset ref to match state
-      fetchItems(1, true);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemsPerPage]);
-
   useEffect(() => {
       setPage(1);
       pageRef.current = 1; // Reset ref to match state
