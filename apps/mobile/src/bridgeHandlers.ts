@@ -2,7 +2,6 @@ import NetInfo from '@react-native-community/netinfo';
 import * as AuthSession from 'expo-auth-session';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import { Platform, Share } from 'react-native';
@@ -29,6 +28,8 @@ const GOOGLE_DISCOVERY_URL = 'https://accounts.google.com';
 const GOOGLE_SCOPES = ['openid', 'profile', 'email'];
 const GOOGLE_CLIENT_ID_ERROR = 'Missing Google client ID';
 const GOOGLE_TOKEN_ERROR = 'Missing Google id_token';
+const NOTIFICATIONS_UNSUPPORTED_MESSAGE =
+  'Push notifications require a development build';
 
 function buildError(code: NativeBridgeError['code'], message: string): NativeBridgeError {
   return { code, message };
@@ -50,6 +51,17 @@ function getProjectId(): string | null {
   const fromExpoConfig = Constants.expoConfig?.extra?.eas?.projectId;
   const fromEasConfig = Constants.easConfig?.projectId;
   return (fromExpoConfig ?? fromEasConfig ?? null) as string | null;
+}
+
+function isExpoGo(): boolean {
+  return (
+    Constants.appOwnership === 'expo' ||
+    Constants.executionEnvironment === 'storeClient'
+  );
+}
+
+async function loadNotifications() {
+  return import('expo-notifications');
 }
 
 function buildImageFiles(
@@ -103,6 +115,14 @@ async function handleGetLocation(request: NativeBridgeRequest) {
 }
 
 async function handleRequestNotificationPermission(request: NativeBridgeRequest) {
+  if (isExpoGo()) {
+    return buildErrorResponse(
+      request,
+      buildError('unsupported', NOTIFICATIONS_UNSUPPORTED_MESSAGE)
+    );
+  }
+
+  const Notifications = await loadNotifications();
   const current = await Notifications.getPermissionsAsync();
   const resolved =
     current.status === 'granted'
@@ -115,6 +135,14 @@ async function handleRequestNotificationPermission(request: NativeBridgeRequest)
 }
 
 async function handleGetPushToken(request: NativeBridgeRequest) {
+  if (isExpoGo()) {
+    return buildErrorResponse(
+      request,
+      buildError('unsupported', NOTIFICATIONS_UNSUPPORTED_MESSAGE)
+    );
+  }
+
+  const Notifications = await loadNotifications();
   const permission = await Notifications.getPermissionsAsync();
   if (permission.status !== 'granted') {
     const requested = await Notifications.requestPermissionsAsync();
@@ -209,8 +237,38 @@ async function handleTriggerHaptic(request: NativeBridgeRequest) {
     return buildErrorResponse(request, buildError('invalid', 'Haptic type required'));
   }
 
+  // Map haptic types to vibration durations (in ms) for Android fallback
+  const vibrationMap: Record<string, number | number[]> = {
+    light: 10,
+    medium: 25,
+    heavy: 50,
+    selection: 8,
+    success: [0, 15, 60, 15],
+    warning: [0, 25, 80, 25],
+    error: [0, 40, 80, 40, 80, 40]
+  };
+
+  // On Android, use Vibration API directly as primary method
+  // expo-haptics often silently fails on budget Android devices
+  if (Platform.OS === 'android') {
+    try {
+      const { Vibration } = await import('react-native');
+      const pattern = vibrationMap[hapticType];
+      
+      if (pattern) {
+        Vibration.vibrate(pattern);
+        return buildSuccessResponse(request, { ok: true });
+      }
+      
+      return buildErrorResponse(request, buildError('invalid', `Unknown haptic type: ${hapticType}`));
+    } catch (error) {
+      console.warn('[Haptic] Android Vibration failed:', error);
+      return buildErrorResponse(request, buildError('unknown', 'Haptic failed'));
+    }
+  }
+
+  // On iOS, use expo-haptics for premium haptic feedback
   try {
-    // Dynamically import Haptics (already installed as expo-haptics)
     const Haptics = await import('expo-haptics');
 
     switch (hapticType) {
@@ -241,6 +299,7 @@ async function handleTriggerHaptic(request: NativeBridgeRequest) {
 
     return buildSuccessResponse(request, { ok: true });
   } catch (error) {
+    console.warn('[Haptic] iOS expo-haptics failed:', error);
     return buildErrorResponse(request, buildError('unknown', 'Haptic failed'));
   }
 }

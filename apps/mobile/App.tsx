@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import NetInfo, { type NetInfoState } from '@react-native-community/netinfo';
-import { Linking, Platform, StyleSheet, View } from 'react-native';
+import { Linking, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -61,8 +61,11 @@ export default function App() {
   const [isOnline, setIsOnline] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isWebViewAtTop, setIsWebViewAtTop] = useState(true);
   const [loadStartAt, setLoadStartAt] = useState<number | null>(null);
   const bridgeScript = useMemo(createBridgeScript, []);
+  const userAgent = Platform.OS === 'ios' ? undefined : 'BoliyanMobile';
 
   const handleRetry = useCallback(() => {
     setHasError(false);
@@ -151,6 +154,23 @@ export default function App() {
   const handleLoadEnd = useCallback(() => {
     setIsLoaded(true);
     setHasError(false);
+    setIsRefreshing(false);
+  }, []);
+
+  const handleWebViewScroll = useCallback((event: { nativeEvent: { contentOffset: { y: number } } }) => {
+    const offsetY = event.nativeEvent.contentOffset?.y ?? 0;
+    setIsWebViewAtTop(offsetY <= 0);
+  }, []);
+
+  const handleNativeRefresh = useCallback(() => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+
+    setHasError(false);
+    setIsLoaded(false);
+    setIsRefreshing(true);
+    webViewRef.current?.reload();
   }, []);
 
   const handleShouldStart = useCallback((request: { url: string }) => {
@@ -187,29 +207,63 @@ export default function App() {
       <SafeAreaView nativeID="mobile-app-root" style={styles.container}>
         <StatusBar style="light" />
         {!isLoaded && <LoadingScreen />}
-        <View style={styles.webViewContainer}>
-          <WebView
-            ref={webViewRef}
-            nativeID="mobile-webview"
-            source={{ uri: webUrl }}
-            onMessage={handleMessage}
-            injectedJavaScriptBeforeContentLoaded={bridgeScript}
-            originWhitelist={ORIGIN_WHITELIST}
-            onError={handleWebViewError}
-            onHttpError={handleWebViewError}
-            onLoadStart={handleLoadStart}
-            onLoadEnd={handleLoadEnd}
-            onShouldStartLoadWithRequest={handleShouldStart}
-            sharedCookiesEnabled
-            allowsInlineMediaPlayback
-            javaScriptEnabled
-            domStorageEnabled
-            mediaPlaybackRequiresUserAction
-            userAgent={Platform.OS === 'ios' ? undefined : 'BoliyanMobile'}
-            // Native pull-to-refresh disabled in favor of web-side PullToRefresh component
-            pullToRefreshEnabled={false}
-          />
-        </View>
+        {Platform.OS === 'android' ? (
+          <ScrollView
+            contentContainerStyle={styles.webViewContainer}
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefreshing}
+                onRefresh={handleNativeRefresh}
+                tintColor="#f4f4f4"
+                enabled={isWebViewAtTop}
+              />
+            }
+            scrollEnabled={false}
+          >
+            <WebView
+              ref={webViewRef}
+              nativeID="mobile-webview"
+              source={{ uri: webUrl }}
+              onMessage={handleMessage}
+              injectedJavaScriptBeforeContentLoaded={bridgeScript}
+              originWhitelist={ORIGIN_WHITELIST}
+              onError={handleWebViewError}
+              onHttpError={handleWebViewError}
+              onLoadStart={handleLoadStart}
+              onLoadEnd={handleLoadEnd}
+              onShouldStartLoadWithRequest={handleShouldStart}
+              onScroll={handleWebViewScroll}
+              sharedCookiesEnabled
+              allowsInlineMediaPlayback
+              javaScriptEnabled
+              domStorageEnabled
+              mediaPlaybackRequiresUserAction
+              userAgent={userAgent}
+            />
+          </ScrollView>
+        ) : (
+          <View style={styles.webViewContainer}>
+            <WebView
+              ref={webViewRef}
+              nativeID="mobile-webview"
+              source={{ uri: webUrl }}
+              onMessage={handleMessage}
+              injectedJavaScriptBeforeContentLoaded={bridgeScript}
+              originWhitelist={ORIGIN_WHITELIST}
+              onError={handleWebViewError}
+              onHttpError={handleWebViewError}
+              onLoadStart={handleLoadStart}
+              onLoadEnd={handleLoadEnd}
+              onShouldStartLoadWithRequest={handleShouldStart}
+              sharedCookiesEnabled
+              allowsInlineMediaPlayback
+              javaScriptEnabled
+              domStorageEnabled
+              mediaPlaybackRequiresUserAction
+              userAgent={userAgent}
+            />
+          </View>
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );

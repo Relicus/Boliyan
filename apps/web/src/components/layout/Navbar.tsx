@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, LogOut, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3, MapPin, Bell, Shield, Users, Flag } from "lucide-react";
+import { Plus, LogOut, LogIn, UserCircle, MessageSquare, Store, LayoutDashboard, BarChart3, MapPin, Bell, Shield, Users, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -363,7 +363,7 @@ export default function Navbar() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2 }}
               >
-                <Button id="navbar-signin-btn" asChild className="h-11 px-6 bg-blue-600 hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-200">
+                <Button id="navbar-signin-btn" asChild className="px-4 bg-blue-600 hover:bg-blue-700 font-bold text-sm shadow-lg shadow-blue-100 border-0">
                   <Link href={(() => {
                     // Prevent redirect loops
                     if (pathname === '/signin' || pathname === '/signup') {
@@ -376,7 +376,10 @@ export default function Navbar() {
                     const query = cleanParams.toString();
                     const path = pathname + (query ? `?${query}` : '');
                     return `/signin?redirect=${encodeURIComponent(path)}`;
-                  })()}>Sign In</Link>
+                  })()}>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Link>
                 </Button>
               </motion.div>
             )}

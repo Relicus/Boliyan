@@ -12,6 +12,7 @@ interface PullToRefreshProps {
   threshold?: number;
   className?: string;
   disabled?: boolean;
+  mode?: "drag" | "touch";
 }
 
 export function PullToRefresh({ 
@@ -19,19 +20,24 @@ export function PullToRefresh({
   children, 
   threshold = 120, // Distance to pull before trigger
   className,
-  disabled = false
+  disabled = false,
+  mode = "drag"
 }: PullToRefreshProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPulling, setIsPulling] = useState(false);
   const [canPull, setCanPull] = useState(true);
+  const [pullDistance, setPullDistance] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const pullDistanceRef = useRef(0);
+  const startYRef = useRef<number | null>(null);
+  const isTouchingRef = useRef(false);
   
   const haptic = useHaptic();
   const controls = useAnimation();
   const y = useMotionValue(0);
+  const isTouchMode = mode === "touch";
   
   // Transform pull distance to rotation/scale for visual feedback
-  const pullProgress = useTransform(y, [0, threshold], [0, 100]);
   const rotate = useTransform(y, [0, threshold], [0, 180]);
   const opacity = useTransform(y, [0, threshold / 2, threshold], [0, 0.5, 1]);
   
@@ -46,6 +52,81 @@ export function PullToRefresh({
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isTouchMode) return;
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (disabled || isRefreshing) return;
+      if (window.scrollY > 0) return;
+      isTouchingRef.current = true;
+      startYRef.current = event.touches[0]?.clientY ?? null;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (!isTouchingRef.current || startYRef.current === null) return;
+      const currentY = event.touches[0]?.clientY ?? startYRef.current;
+      const delta = currentY - startYRef.current;
+      if (delta <= 0) {
+        isTouchingRef.current = false;
+        startYRef.current = null;
+        pullDistanceRef.current = 0;
+        if (pullDistance !== 0) {
+          setPullDistance(0);
+        }
+        return;
+      }
+
+      const capped = Math.min(delta, threshold * 1.5);
+      pullDistanceRef.current = capped;
+      setIsPulling(true);
+      setPullDistance(capped);
+    };
+
+    const handleTouchEnd = async () => {
+      if (!isTouchingRef.current) return;
+      isTouchingRef.current = false;
+      startYRef.current = null;
+      if (isPulling) {
+        setIsPulling(false);
+      }
+
+      const shouldRefresh =
+        !disabled &&
+        !isRefreshing &&
+        canPull &&
+        pullDistanceRef.current > threshold;
+
+      pullDistanceRef.current = 0;
+      if (pullDistance !== 0) {
+        setPullDistance(0);
+      }
+
+      if (!shouldRefresh) return;
+
+      setIsRefreshing(true);
+      haptic.medium();
+
+      try {
+        await onRefresh();
+        haptic.success();
+      } finally {
+        setIsRefreshing(false);
+      }
+    };
+
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchcancel", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [canPull, disabled, haptic, isRefreshing, isTouchMode, onRefresh, threshold]);
 
   const handleDragEnd = async (_: unknown, info: PanInfo) => {
     if (disabled || isRefreshing) {
@@ -90,16 +171,23 @@ export function PullToRefresh({
       {/* Refresh Indicator */}
       <motion.div
         className="absolute left-0 right-0 top-0 flex justify-center items-start pointer-events-none z-10"
-        style={{ y: useTransform(y, (val) => val / 2) }} // Parallax effect
+        style={{
+          y: isTouchMode
+            ? Math.min(pullDistance / 2, 60)
+            : useTransform(y, (val) => val / 2)
+        }}
       >
         <motion.div 
           className="bg-white rounded-full p-2 shadow-md border border-slate-100 flex items-center justify-center mt-4"
-          style={{ opacity, scale: opacity }}
+          style={{
+            opacity: isTouchMode ? Math.min(pullDistance / threshold, 1) : opacity,
+            scale: isTouchMode ? Math.min(pullDistance / threshold, 1) : opacity
+          }}
         >
           {isRefreshing ? (
             <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
           ) : (
-            <motion.div style={{ rotate }}>
+            <motion.div style={isTouchMode ? undefined : { rotate }}>
               <ArrowDown className="w-5 h-5 text-slate-500" />
             </motion.div>
           )}
@@ -107,18 +195,24 @@ export function PullToRefresh({
       </motion.div>
 
       {/* Content */}
-      <motion.div
-        drag={canPull && !disabled && !isRefreshing ? "y" : false}
-        dragConstraints={{ top: 0, bottom: threshold * 1.5 }}
-        dragElastic={0.2}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        animate={controls}
-        style={{ y }}
-        className="touch-pan-y" // Allow vertical scrolling when not pulling
-      >
-        {children}
-      </motion.div>
+      {isTouchMode ? (
+        <div className="touch-pan-y">
+          {children}
+        </div>
+      ) : (
+        <motion.div
+          drag={canPull && !disabled && !isRefreshing ? "y" : false}
+          dragConstraints={{ top: 0, bottom: threshold * 1.5 }}
+          dragElastic={0.2}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          animate={controls}
+          style={{ y }}
+          className="touch-pan-y" // Allow vertical scrolling when not pulling
+        >
+          {children}
+        </motion.div>
+      )}
     </div>
   );
 }

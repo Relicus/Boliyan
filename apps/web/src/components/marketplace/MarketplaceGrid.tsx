@@ -68,6 +68,8 @@ const getViewportSnapshot = () => (typeof window !== "undefined" ? window.innerW
 const getServerSnapshot = () => false;
 
 export default function MarketplaceGrid() {
+  const isNativeWebView =
+    typeof navigator !== "undefined" && navigator.userAgent.includes("BoliyanMobile");
   const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, isRevalidating, hasMore, loadMore, liveFeed, refresh } = useMarketplace();
   const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters } = useSearch();
   
@@ -178,7 +180,7 @@ export default function MarketplaceGrid() {
       setMpFilter('category', val);
   };
 
-  return (
+  const gridContent = (
     <div id="marketplace-grid-root" className="px-4 pb-4 pt-2 md:px-4 md:pb-4 md:pt-2">
       {/* Subtle Refresh Indicator - shows during background cache revalidation */}
       {isRevalidating && (
@@ -200,7 +202,6 @@ export default function MarketplaceGrid() {
         onContinue={liveFeed.continueWatching}
         onPause={liveFeed.pauseUpdates}
       />
-      <PullToRefresh onRefresh={refresh}>
       <div className="mb-4 md:mb-0 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-0 md:bg-transparent md:border-0 md:shadow-none">
         <div className="flex flex-col gap-2 pt-2 pb-2 md:py-0">
           {/* MOBILE: New Enhanced "Search & Filter" Mobile Header */}
@@ -469,7 +470,12 @@ export default function MarketplaceGrid() {
       {!isLoading && displayItems.length === 0 && (
         <EmptyState />
       )}
-      </PullToRefresh>
-    </div>
+      </div>
   );
+
+  if (isNativeWebView) {
+    return gridContent;
+  }
+
+  return <PullToRefresh onRefresh={refresh}>{gridContent}</PullToRefresh>;
 }

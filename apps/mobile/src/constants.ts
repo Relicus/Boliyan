@@ -1,7 +1,37 @@
 import Constants from 'expo-constants';
 
-const debuggerHost = Constants.expoConfig?.hostUri;
-const localhost = debuggerHost?.split(':')[0] || 'localhost';
+type ExpoClientManifest = {
+  debuggerHost?: string;
+};
+
+type ExpoClientManifest2 = {
+  extra?: {
+    expoClient?: {
+      hostUri?: string;
+    };
+  };
+};
+
+const expoConstants = Constants as Constants & {
+  manifest?: ExpoClientManifest;
+  manifest2?: ExpoClientManifest2;
+};
+
+function extractHost(hostUri: string): string {
+  const normalized = hostUri
+    .replace('exp://', '')
+    .replace('http://', '')
+    .replace('https://', '')
+    .split('/')[0];
+  return normalized.split(':')[0];
+}
+
+const debuggerHost =
+  Constants.expoConfig?.hostUri ??
+  expoConstants.manifest?.debuggerHost ??
+  expoConstants.manifest2?.extra?.expoClient?.hostUri ??
+  null;
+const localhost = debuggerHost ? extractHost(debuggerHost) : 'localhost';
 export const DEFAULT_WEB_ORIGIN = `http://${localhost}:3000`;
 export const DEFAULT_LINK_SCHEME = 'boliyan';
 export const DEFAULT_WEB_PATH = '/';

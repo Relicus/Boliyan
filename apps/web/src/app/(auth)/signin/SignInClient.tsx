@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock, ArrowRight } from "lucide-react";
+import { BoliyanLogomark } from "@/components/branding/BoliyanLogo";
 import { supabase } from "@/lib/supabase";
 import { loginWithProvider } from "@/lib/nativeAuth";
 
@@ -109,7 +110,7 @@ export default function SignInClient() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
       >
-        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm text-center p-8 space-y-6">
+        <Card className="border-0 shadow-none bg-transparent sm:border sm:shadow-xl sm:bg-white/80 sm:backdrop-blur-sm sm:rounded-xl rounded-none text-center p-8 space-y-6">
           <div className="mx-auto h-20 w-20 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center">
             <Mail className="h-10 w-10" />
           </div>
@@ -146,11 +147,11 @@ export default function SignInClient() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <Card id="signin-card" className="border-none shadow-xl bg-white/80 backdrop-blur-sm">
+      <Card id="signin-card" className="border-0 shadow-none bg-transparent sm:border sm:shadow-xl sm:bg-white/80 sm:backdrop-blur-sm sm:rounded-xl rounded-none">
         <CardHeader id="signin-header" className="text-center space-y-2 pb-4">
           <div className="mx-auto mb-2">
-            <div className="h-14 w-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
-              <LogIn className="h-7 w-7 text-white" />
+            <div className="h-16 w-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+              <BoliyanLogomark className="h-10 w-10 text-white" />
             </div>
           </div>
           <CardTitle id="signin-title" className="text-2xl font-black text-slate-900">
@@ -252,7 +253,10 @@ export default function SignInClient() {
                   className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full"
                 />
               ) : (
-                "Sign In"
+                <>
+                  Sign In
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
               )}
             </Button>
           </motion.form>
@@ -263,7 +267,7 @@ export default function SignInClient() {
               <span className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-500">Or continue with</span>
+              <span className="bg-white sm:bg-white px-2 text-slate-400">or</span>
             </div>
           </div>
 
@@ -299,15 +303,19 @@ export default function SignInClient() {
               {/* Facebook Login disabled due to account restriction */}
             </div>
 
-          <div className="mt-6 text-center text-sm text-slate-600">
-            Don't have an account?{" "}
-            <Link
-              id="signup-link"
-              href={`/signup${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
-              className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+          {/* Sign Up Section - Made prominent for Pakistan audience */}
+          <div className="mt-6 pt-6 border-t border-slate-200">
+            <p className="text-center text-sm text-slate-500 mb-3">نیا اکاؤنٹ بنائیں</p>
+            <Button
+              id="signup-btn"
+              asChild
+              variant="outline"
+              className="w-full h-12 font-bold text-base border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50"
             >
-              Sign Up
-            </Link>
+              <Link href={`/signup${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}>
+                Sign Up — سائن اپ
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
