@@ -140,6 +140,8 @@ export default function MarketplaceGrid() {
   
   // Infinite Scroll Trigger
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const gridContainerRef = useRef<HTMLDivElement>(null);
+  const autoFillAttemptsRef = useRef(0);
   const entry = useIntersectionObserver(loadMoreRef, {
     threshold: 0,
     rootMargin: '800px', // Aggressive prefetch: Trigger when 800px from bottom (approx 3 screen heights)
@@ -151,6 +153,32 @@ export default function MarketplaceGrid() {
       loadMore();
     }
   }, [entry, hasMore, isLoadingMore, isLoading, loadMore, isSearchActive]);
+
+  useEffect(() => {
+    if (isSearchActive || isLoading || isLoadingMore || !hasMore) {
+      return;
+    }
+
+    if (!gridContainerRef.current || typeof window === 'undefined') {
+      return;
+    }
+
+    const gridHeight = gridContainerRef.current.getBoundingClientRect().height;
+    const viewportHeight = window.innerHeight;
+    const needsMore = gridHeight < viewportHeight * 1.2;
+
+    if (!needsMore) {
+      autoFillAttemptsRef.current = 0;
+      return;
+    }
+
+    if (autoFillAttemptsRef.current >= 6) {
+      return;
+    }
+
+    autoFillAttemptsRef.current += 1;
+    loadMore();
+  }, [displayItems.length, hasMore, isLoading, isLoadingMore, isSearchActive, loadMore]);
 
 
 
@@ -405,6 +433,7 @@ export default function MarketplaceGrid() {
       
       <div 
         id="marketplace-grid-container"
+        ref={gridContainerRef}
         className={`grid gap-3 ${getGridClasses()}`}
         style={getGridStyle()}
       >
