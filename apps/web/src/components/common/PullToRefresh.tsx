@@ -36,6 +36,7 @@ export function PullToRefresh({
   const controls = useAnimation();
   const y = useMotionValue(0);
   const isTouchMode = mode === "touch";
+  const indicatorY = useTransform(y, (val) => val / 2);
   
   // Transform pull distance to rotation/scale for visual feedback
   const rotate = useTransform(y, [0, threshold], [0, 180]);
@@ -126,7 +127,7 @@ export function PullToRefresh({
       window.removeEventListener("touchend", handleTouchEnd);
       window.removeEventListener("touchcancel", handleTouchEnd);
     };
-  }, [canPull, disabled, haptic, isRefreshing, isTouchMode, onRefresh, threshold]);
+  }, [canPull, disabled, haptic, isPulling, isRefreshing, isTouchMode, onRefresh, pullDistance, threshold]);
 
   const handleDragEnd = async (_: unknown, info: PanInfo) => {
     if (disabled || isRefreshing) {
@@ -174,7 +175,7 @@ export function PullToRefresh({
         style={{
           y: isTouchMode
             ? Math.min(pullDistance / 2, 60)
-            : useTransform(y, (val) => val / 2)
+            : indicatorY
         }}
       >
         <motion.div 

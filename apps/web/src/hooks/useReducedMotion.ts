@@ -8,12 +8,16 @@ import { useState, useEffect } from "react";
  * SSR-safe: defaults to false during hydration.
  */
 export function useReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPrefersReducedMotion(mediaQuery.matches);
 
     const handleChange = (event: MediaQueryListEvent) => {
       setPrefersReducedMotion(event.matches);
@@ -31,15 +35,15 @@ export function useReducedMotion(): boolean {
  * Checks for: < 4 cores, or deviceMemory < 4GB
  */
 export function useLowPerformanceDevice(): boolean {
-  const [isLowPerf, setIsLowPerf] = useState(false);
+  return useState(() => {
+    if (typeof navigator === 'undefined') {
+      return false;
+    }
 
-  useEffect(() => {
     const cores = navigator.hardwareConcurrency || 4;
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4;
-    setIsLowPerf(cores < 4 || memory < 4);
-  }, []);
-
-  return isLowPerf;
+    return cores < 4 || memory < 4;
+  })[0];
 }
 
 /**

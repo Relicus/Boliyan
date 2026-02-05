@@ -26,7 +26,7 @@ export function useHaptic() {
 
       try {
         await bridge.triggerHaptic({ type });
-      } catch (error) {
+      } catch {
         // Silently fail - haptics are enhancement
       }
     },

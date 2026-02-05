@@ -479,7 +479,11 @@ export const BiddingControls = memo(({
         id={buildId('place-bid-btn')}
         onClick={(e) => {
           haptic.medium(); // Haptic feedback on bid button
-          isOwner ? handleEditClick(e) : onBid(e);
+          if (isOwner) {
+            handleEditClick(e);
+          } else {
+            onBid(e);
+          }
         }}
         disabled={isDisabled || isQuotaReached || isCoolingDown || isSuccess}
         initial={false}

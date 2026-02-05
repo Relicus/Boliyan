@@ -35,13 +35,8 @@ export default function Navbar() {
   const currentTab = searchParams.get('tab');
   const dashboardTab = currentTab || 'offers';
   const [isVisible, setIsVisible] = useState(true);
-  const [hasMounted, setHasMounted] = useState(false);
+  const hasMounted = typeof window !== 'undefined';
   const lastScrollY = useRef(0);
-
-  // Prevent hydration mismatch - only render auth-dependent UI after mount
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
 
   // Memoize badge counts to prevent expensive recalculations on every render
   const unreadMsgCount = useMemo(() => 
