@@ -11,6 +11,7 @@ export default function SearchBar() {
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const effectiveValue = isOpen ? inputValue : (filters.query || '');
 
   useEffect(() => {
@@ -33,12 +34,14 @@ export default function SearchBar() {
   const handleSearch = (query: string) => {
     setFilters({ ...filters, query });
     setIsOpen(false);
-    // Optionally navigate to home if not already there
-    // router.push('/'); 
+    // Aggressively blur to dismiss mobile keyboard
+    inputRef.current?.blur();
+    (document.activeElement as HTMLElement)?.blur();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleSearch(effectiveValue);
     }
   };
@@ -53,6 +56,7 @@ export default function SearchBar() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         <Input
+          ref={inputRef}
           id="navbar-search-input"
           value={effectiveValue}
           onChange={(e) => {
@@ -84,7 +88,7 @@ export default function SearchBar() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 p-2"
+            className="fixed md:absolute top-16 md:top-full left-0 right-0 md:left-0 md:right-0 md:mt-2 mx-4 md:mx-0 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 p-2"
           >
             {suggestions.length === 0 && inputValue.length > 2 ? (
                 <div className="p-4 text-center text-sm text-slate-500">
