@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const DEFAULT_BLUR_DATA_URL = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNlMmU4ZjA7c3RvcC1vcGFjaXR5OjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNjYmQzZGQ7c3RvcC1vcGFjaXR5OjEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0idXJsKCNnKSIvPjwvc3ZnPg==";
 
 // Fallback image for errors
-const FALLBACK_IMAGE = "/images/placeholder.jpg";
+const FALLBACK_IMAGE = "/images/placeholder.svg";
 
 interface OptimizedImageProps extends Omit<ImageProps, "onError" | "onLoad"> {
   /**
@@ -83,7 +83,7 @@ const OptimizedImage = memo(({
   const imageSrc = hasError ? fallbackSrc : src;
   
   return (
-    <div className={cn("relative overflow-hidden", containerClassName)}>
+    <div className={cn("relative overflow-hidden", props.fill && "w-full h-full", containerClassName)}>
       <Image
         src={imageSrc}
         alt={alt}
@@ -94,8 +94,8 @@ const OptimizedImage = memo(({
         className={cn(
           className,
           fadeIn && "transition-opacity duration-300",
-          fadeIn && !isLoaded && "opacity-0",
-          fadeIn && isLoaded && "opacity-100"
+          fadeIn && !isLoaded && !hasError && "opacity-0", 
+          fadeIn && (isLoaded || hasError) && "opacity-100"
         )}
         {...props}
       />
