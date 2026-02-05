@@ -56,6 +56,7 @@ interface MarketplaceContextType {
   lastBidTimestamp: number | null;
   setLastBidTimestamp: (ts: number | null) => void;
   refreshInvolvedItems: () => Promise<void>;
+  refresh: () => Promise<void>;
   // Live polling for new listings (only when sortBy: 'newest')
   liveFeed: {
     pendingCount: number;
@@ -113,10 +114,11 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isRevalidating, setIsRevalidating] = useState(false); // Background refresh of stale cache
   const [page, setPage] = useState(1);
+  const pageRef = useRef(1); // Ref to track page without recreating loadMore
   const [hasMore, setHasMore] = useState(true);
   const [lastBidTimestamp, setLastBidTimestamp] = useState<number | null>(null);
   const loadingLockRef = React.useRef(false);
-  const ITEMS_PER_PAGE = 8;
+  const ITEMS_PER_PAGE = 12;
   const NEWEST_CACHE_TTL_MS = 90_000;
 
   const [filters, setFilters] = useState<MarketplaceFilters>({
@@ -190,7 +192,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   // Note: Geolocation helper functions kept if needed for future hybrid sorting, 
   // though primary filtering is now Server-Side where possible.
   
-  const fetchItems = useCallback(async (targetPage: number, reset: boolean = false) => {
+  const fetchItems = useCallback(async (targetPage: number, reset: boolean = false, force: boolean = false) => {
       if (loadingLockRef.current) return;
       loadingLockRef.current = true;
       
@@ -198,7 +200,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       let usedCache = false;
 
       // --- 1. CHECK CACHE (L1/L2) ---
-      if (reset) {
+      if (reset && !force) {
           const cacheOptions = filters.sortBy === 'newest' ? { ttl: NEWEST_CACHE_TTL_MS } : undefined;
           const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey, cacheOptions);
           
@@ -448,12 +450,21 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
       }
   }, [filters, ITEMS_PER_PAGE]);
 
+  const refresh = useCallback(async () => {
+    await fetchItems(1, true, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // --- EFFECT: Trigger Fetch on Filter Change ---
+  // Use serialized filters string for stable comparison (object refs trigger false positives)
+  const filtersKey = JSON.stringify(filters);
   useEffect(() => {
       setPage(1);
+      pageRef.current = 1; // Reset ref to match state
       // Removed 500ms debounce - category/sort changes should be instant
       fetchItems(1, true);
-  }, [fetchItems]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtersKey]);
 
   // --- Realtime Subscription (Bids) ---
   const handleRealtimeBid = useCallback((newBid: Bid) => {
@@ -527,13 +538,18 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     onNewListings: handleNewListings,
   });
 
+  // Sync pageRef with page state for stable loadMore access
+  useEffect(() => { pageRef.current = page; }, [page]);
+
   const loadMore = useCallback(() => {
       // Prevent loading more if initial load is processing (isLoading)
       if (isLoading || isLoadingMore || !hasMore || loadingLockRef.current) return;
-      const nextPage = page + 1;
+      const nextPage = pageRef.current + 1;
+      pageRef.current = nextPage; // Update ref immediately
       setPage(nextPage);
       fetchItems(nextPage, false);
-  }, [isLoading, isLoadingMore, hasMore, page, fetchItems]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isLoadingMore, hasMore]); // Stable deps only
 
   const addItem = useCallback((newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => {
     console.log("addItem - logic pending refactor in selling phase", newItem);
@@ -946,6 +962,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds,
     rejectBid, acceptBid, confirmExchange, filters, setFilter,
     updateFilters, lastBidTimestamp, setLastBidTimestamp, refreshInvolvedItems,
+    refresh,
     liveFeed
   }), [
     items, bids, itemsById, bidsById, feedIds, involvedIds,
@@ -953,7 +970,7 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     // All functions now stable via useCallback
     loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch,
     rejectBid, acceptBid, confirmExchange, setFilter, updateFilters,
-    setLastBidTimestamp, refreshInvolvedItems, liveFeed
+    setLastBidTimestamp, refreshInvolvedItems, refresh, liveFeed
   ]);
 
   return (

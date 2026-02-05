@@ -15,6 +15,7 @@ import CategoryNav from "@/components/search/CategoryNav";
 import { LocationSelector } from "./LocationSelector";
 import { Button } from "@/components/ui/button";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { useSkeletonCount } from "@/hooks/useSkeletonCount";
 
 import { 
   Select,
@@ -29,6 +30,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CATEGORIES } from "@/lib/constants";
 import { NewListingsToast } from "@/components/ui/NewListingsToast";
 import { ContinueBrowsingModal } from "@/components/ui/ContinueBrowsingModal";
+import { PullToRefresh } from "@/components/common/PullToRefresh";
 
 // Listing type options for dropdown
 const LISTING_TYPES = [
@@ -66,7 +68,7 @@ const getViewportSnapshot = () => (typeof window !== "undefined" ? window.innerW
 const getServerSnapshot = () => false;
 
 export default function MarketplaceGrid() {
-  const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, isRevalidating, hasMore, loadMore, liveFeed } = useMarketplace();
+  const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, isRevalidating, hasMore, loadMore, liveFeed, refresh } = useMarketplace();
   const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters } = useSearch();
   
   // Live feed toast dismiss state
@@ -87,6 +89,7 @@ export default function MarketplaceGrid() {
   }, []);
 
   const viewMode = manualViewMode ?? (isDesktop ? 'comfortable' : 'compact');
+  const skeletonCount = useSkeletonCount(viewMode);
   const [isChangingView, setIsChangingView] = useState(false);
   const viewChangeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -197,6 +200,7 @@ export default function MarketplaceGrid() {
         onContinue={liveFeed.continueWatching}
         onPause={liveFeed.pauseUpdates}
       />
+      <PullToRefresh onRefresh={refresh}>
       <div className="mb-4 md:mb-0 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-0 md:bg-transparent md:border-0 md:shadow-none">
         <div className="flex flex-col gap-2 pt-2 pb-2 md:py-0">
           {/* MOBILE: New Enhanced "Search & Filter" Mobile Header */}
@@ -407,7 +411,7 @@ export default function MarketplaceGrid() {
           // Skeletons during Load or View Change
           // No AnimatePresence wrapper -> Instant mount/unmount logic, but we can animate Entry of new items.
           <>
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: skeletonCount }).map((_, i) => (
               <div key={`skeleton-initial-${i}`}>
                 <ItemCardSkeleton viewMode={viewMode} />
               </div>
@@ -465,6 +469,7 @@ export default function MarketplaceGrid() {
       {!isLoading && displayItems.length === 0 && (
         <EmptyState />
       )}
+      </PullToRefresh>
     </div>
   );
 }

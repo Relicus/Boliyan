@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mayaar Banner - Component Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-dark: #0a1628;
+      --navy: #0d1f33;
+      --navy-light: #1a3a5c;
+      --gold-light: #fde68a;
+      --gold: #f59e0b;
+      --gold-dark: #d97706;
+      --gold-darker: #b45309;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #1e293b;
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    h2 {
+      color: #94a3b8;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 40px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .component-card {
+      background: var(--navy);
+      border-radius: 12px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .preview-area {
+      width: 100%;
+      min-height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    /* Make all SVGs scalable */
+    svg {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="component-grid">
+
+    <!-- ========================================
+         ELEMENT 1: LOGO PLACEHOLDER
+         ======================================== -->
+    <div class="component-card" id="component-logo-placeholder">
+      <h2>1. Logo Placeholder</h2>
+      <div class="preview-area">
+        <svg id="logo-placeholder" viewBox="0 0 200 120" width="200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="placeholder-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#334155"/>
+              <stop offset="100%" stop-color="#1e293b"/>
+            </linearGradient>
+          </defs>
+          <rect x="10" y="10" width="180" height="100" rx="8" fill="url(#placeholder-grad)" stroke="#475569" stroke-width="2" stroke-dasharray="8 4"/>
+          <text x="100" y="55" font-family="Outfit" font-size="12" fill="#64748b" text-anchor="middle">LOGO</text>
+          <text x="100" y="72" font-family="Outfit" font-size="10" fill="#475569" text-anchor="middle">Insert Here</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ELEMENT 2: HEADLINE - "PREMIUM IMPORTED LAPTOPS"
+         ======================================== -->
+    <div class="component-card" id="component-headline">
+      <h2>2. Headline</h2>
+      <div class="preview-area">
+        <svg id="headline-svg" viewBox="0 0 400 100" width="400" xmlns="http://www.w3.org/2000/svg">
+          <style>
+            .headline-text { 
+              font-family: 'Outfit', sans-serif; 
+              font-weight: 800; 
+              fill: white;
+              text-anchor: middle;
+            }
+          </style>
+          <text x="200" y="40" class="headline-text" font-size="32">PREMIUM</text>
+          <text x="200" y="80" class="headline-text" font-size="32">IMPORTED LAPTOPS</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ELEMENT 3: GOLDEN ELLIPTICAL RINGS
+         ======================================== -->
+    <div class="component-card" id="component-golden-rings">
+      <h2>3. Golden Elliptical Rings</h2>
+      <div class="preview-area">
+        <svg id="golden-rings-svg" viewBox="0 0 400 200" width="400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#fde68a"/>
+              <stop offset="25%" stop-color="#f59e0b"/>
+              <stop offset="50%" stop-color="#d97706"/>
+              <stop offset="75%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#fde68a"/>
+            </linearGradient>
+            <filter id="ring-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Outer Ring -->
+          <ellipse cx="200" cy="120" rx="180" ry="50" fill="none" stroke="url(#ring-gradient)" stroke-width="4" filter="url(#ring-glow)" opacity="0.9"/>
+          <!-- Middle Ring -->
+          <ellipse cx="200" cy="115" rx="150" ry="40" fill="none" stroke="url(#ring-gradient)" stroke-width="3" filter="url(#ring-glow)" opacity="0.7"/>
+          <!-- Inner Ring -->
+          <ellipse cx="200" cy="110" rx="120" ry="30" fill="none" stroke="url(#ring-gradient)" stroke-width="2" filter="url(#ring-glow)" opacity="0.5"/>
+          <!-- Center placeholder for laptops -->
+          <rect x="100" y="30" width="200" height="120" rx="4" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="4 2" opacity="0.5"/>
+          <text x="200" y="95" font-family="Outfit" font-size="10" fill="#64748b" text-anchor="middle">Laptop Images Here</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ELEMENT 4: QUALITY GUARANTEED SEAL
+         ======================================== -->
+    <div class="component-card" id="component-quality-seal">
+      <h2>4. Quality Guaranteed Seal</h2>
+      <div class="preview-area">
+        <svg id="quality-seal-svg" viewBox="0 0 200 200" width="200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="seal-gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fde68a"/>
+              <stop offset="30%" stop-color="#f59e0b"/>
+              <stop offset="60%" stop-color="#d97706"/>
+              <stop offset="100%" stop-color="#92400e"/>
+            </linearGradient>
+            <linearGradient id="seal-gold-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d97706"/>
+              <stop offset="50%" stop-color="#b45309"/>
+              <stop offset="100%" stop-color="#78350f"/>
+            </linearGradient>
+            <filter id="seal-shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+            </filter>
+            <!-- Curved text paths -->
+            <path id="seal-curve-top" d="M 30,100 A 70,70 0 0,1 170,100" fill="none"/>
+            <path id="seal-curve-bottom" d="M 170,100 A 70,70 0 0,1 30,100" fill="none"/>
+          </defs>
+          
+          <g filter="url(#seal-shadow)">
+            <!-- Starburst Background -->
+            <g transform="translate(100,100)">
+              <!-- 16-point star -->
+              <polygon fill="url(#seal-gold-grad)" points="0,-90 12,-35 45,-64 22,-22 64,-45 35,-12 90,0 35,12 64,45 22,22 45,64 12,35 0,90 -12,35 -45,64 -22,22 -64,45 -35,12 -90,0 -35,-12 -64,-45 -22,-22 -45,-64 -12,-35"/>
+            </g>
+            
+            <!-- Inner Circle - Dark -->
+            <circle cx="100" cy="100" r="58" fill="url(#seal-gold-dark)"/>
+            
+            <!-- Inner Circle - Gold Border -->
+            <circle cx="100" cy="100" r="52" fill="#1a3a5c" stroke="url(#seal-gold-grad)" stroke-width="3"/>
+            
+            <!-- Checkmark -->
+            <polyline points="70,100 90,120 130,75" fill="none" stroke="url(#seal-gold-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <!-- Curved Text - QUALITY -->
+            <text font-family="'Outfit', sans-serif" font-size="16" font-weight="800" fill="url(#seal-gold-grad)" letter-spacing="2">
+              <textPath href="#seal-curve-top" startOffset="50%" text-anchor="middle">QUALITY</textPath>
+            </text>
+            
+            <!-- Curved Text - GUARANTEED -->
+            <text font-family="'Outfit', sans-serif" font-size="14" font-weight="800" fill="url(#seal-gold-grad)" letter-spacing="1">
+              <textPath href="#seal-curve-bottom" startOffset="50%" text-anchor="middle">GUARANTEED</textPath>
+            </text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ELEMENT 5: "WALK IN TODAY!" CTA
+         ======================================== -->
+    <div class="component-card" id="component-cta">
+      <h2>5. Call-to-Action Text</h2>
+      <div class="preview-area">
+        <svg id="cta-svg" viewBox="0 0 400 140" width="400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="text-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
+            </filter>
+            <linearGradient id="arrow-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fde68a"/>
+              <stop offset="100%" stop-color="#d97706"/>
+            </linearGradient>
+          </defs>
+          <text x="200" y="50" font-family="'Outfit', sans-serif" font-size="48" font-weight="900" fill="white" text-anchor="middle" filter="url(#text-glow)">WALK IN</text>
+          <text x="200" y="100" font-family="'Outfit', sans-serif" font-size="48" font-weight="900" fill="white" text-anchor="middle" filter="url(#text-glow)">TODAY!</text>
+          <!-- Arrow -->
+          <path d="M200 115 L200 130 M190 122 L200 135 L210 122" fill="none" stroke="url(#arrow-gold)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ELEMENT 6: ISLAMABAD LOCATION BADGE
+         ======================================== -->
+    <div class="component-card" id="component-location-badge">
+      <h2>6. Location Badge</h2>
+      <div class="preview-area">
+        <svg id="location-badge-svg" viewBox="0 0 300 60" width="300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="badge-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fde68a"/>
+              <stop offset="50%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#d97706"/>
+            </linearGradient>
+            <filter id="badge-shadow" x="-10%" y="-10%" width="120%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#f59e0b" flood-opacity="0.3"/>
+            </filter>
+          </defs>
+          <rect x="50" y="10" width="200" height="40" rx="20" fill="url(#badge-gold)" filter="url(#badge-shadow)"/>
+          <text x="150" y="38" font-family="'Outfit', sans-serif" font-size="20" font-weight="700" fill="#0a1628" text-anchor="middle" letter-spacing="4">ISLAMABAD</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ELEMENT 7: CONTACT INFO SECTION
+         ======================================== -->
+    <div class="component-card" id="component-contact-info">
+      <h2>7. Contact Information</h2>
+      <div class="preview-area">
+        <svg id="contact-info-svg" viewBox="0 0 500 100" width="500" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="contact-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#fde68a"/>
+              <stop offset="100%" stop-color="#f59e0b"/>
+            </linearGradient>
+          </defs>
+          <!-- Phone/WhatsApp -->
+          <text x="250" y="25" font-family="'Outfit', sans-serif" font-size="20" font-weight="700" fill="white" text-anchor="middle">
+            Phone/WhatsApp: 0305-2444541 | 0314-7838123
+          </text>
+          <!-- Address -->
+          <text x="250" y="55" font-family="'Outfit', sans-serif" font-size="16" font-weight="500" fill="#cbd5e1" text-anchor="middle">
+            Address: Basement, Plaza 49, Giga Downtown, Islamabad
+          </text>
+          <!-- Website -->
+          <text x="250" y="85" font-family="'Outfit', sans-serif" font-size="14" font-weight="600" fill="url(#contact-gold)" text-anchor="middle">
+            www.mayaarlaptops.com
+          </text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ELEMENT 8: DECORATIVE CORNER PATTERN (Top Right)
+         ======================================== -->
+    <div class="component-card" id="component-corner-pattern">
+      <h2>8. Corner Decoration (Islamic/Tech Style)</h2>
+      <div class="preview-area">
+        <svg id="corner-pattern-svg" viewBox="0 0 200 200" width="200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="pattern-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fde68a" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0.2"/>
+            </linearGradient>
+          </defs>
+          <!-- 8-pointed star pattern -->
+          <g transform="translate(150, 50)" opacity="0.7">
+            <polygon fill="none" stroke="url(#pattern-gold)" stroke-width="1.5" points="0,-40 11,-11 40,0 11,11 0,40 -11,11 -40,0 -11,-11"/>
+            <polygon fill="none" stroke="url(#pattern-gold)" stroke-width="1.5" points="0,-40 11,-11 40,0 11,11 0,40 -11,11 -40,0 -11,-11" transform="rotate(45)"/>
+            <circle cx="0" cy="0" r="8" fill="none" stroke="url(#pattern-gold)" stroke-width="1"/>
+          </g>
+          <!-- Second star -->
+          <g transform="translate(100, 120)" opacity="0.4">
+            <polygon fill="none" stroke="url(#pattern-gold)" stroke-width="1" points="0,-30 8,-8 30,0 8,8 0,30 -8,8 -30,0 -8,-8"/>
+            <polygon fill="none" stroke="url(#pattern-gold)" stroke-width="1" points="0,-30 8,-8 30,0 8,8 0,30 -8,8 -30,0 -8,-8" transform="rotate(45)"/>
+          </g>
+          <!-- Circuit lines -->
+          <path d="M0 50 L50 50 L50 100 M50 50 L80 50" stroke="url(#pattern-gold)" stroke-width="1" fill="none" opacity="0.3"/>
+          <circle cx="50" cy="50" r="3" fill="#f59e0b" opacity="0.5"/>
+          <circle cx="80" cy="50" r="2" fill="#f59e0b" opacity="0.3"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========================================
+         ELEMENT 9: CIRCUIT BOARD DECORATION
+         ======================================== -->
+    <div class="component-card" id="component-circuit">
+      <h2>9. Circuit Board Lines</h2>
+      <div class="preview-area">
+        <svg id="circuit-svg" viewBox="0 0 300 150" width="300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="circuit-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0"/>
+              <stop offset="50%" stop-color="#0ea5e9" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- Horizontal lines with nodes -->
+          <path d="M0 30 L80 30 L100 50 L180 50" stroke="url(#circuit-grad)" stroke-width="1.5" fill="none"/>
+          <circle cx="80" cy="30" r="3" fill="#0ea5e9" opacity="0.6"/>
+          <circle cx="100" cy="50" r="4" fill="#0ea5e9" opacity="0.8"/>
+          
+          <path d="M0 80 L60 80 L80 60 L150 60 L170 80 L300 80" stroke="url(#circuit-grad)" stroke-width="1" fill="none"/>
+          <circle cx="80" cy="60" r="2" fill="#0ea5e9" opacity="0.5"/>
+          <circle cx="170" cy="80" r="3" fill="#0ea5e9" opacity="0.6"/>
+          
+          <path d="M120 100 L200 100 L220 120 L300 120" stroke="url(#circuit-grad)" stroke-width="1" fill="none"/>
+          <circle cx="200" cy="100" r="2" fill="#0ea5e9" opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

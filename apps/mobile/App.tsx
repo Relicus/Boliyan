@@ -206,9 +206,8 @@ export default function App() {
             domStorageEnabled
             mediaPlaybackRequiresUserAction
             userAgent={Platform.OS === 'ios' ? undefined : 'BoliyanMobile'}
-            // Native pull-to-refresh: drag down to reload the page
-            pullToRefreshEnabled
-            onRefresh={() => webViewRef.current?.reload()}
+            // Native pull-to-refresh disabled in favor of web-side PullToRefresh component
+            pullToRefreshEnabled={false}
           />
         </View>
       </SafeAreaView>

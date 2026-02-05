@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mayaar Banner 2000x5000 Composite</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 2000px;
+            height: 5000px;
+            background-color: #0a1628;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 
+           Layer 1: The AI Generated Texture 
+           We use it as a background pattern to give the "Texture" and "Dust" look.
+           We scale it to cover width, and let height crop or repeat with mirroring to avoid seams.
+        */
+        .ai-texture-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Using the AI image generated in step 124 */
+            background-image: url('file:///C:/Users/ASUS/.gemini/antigravity/brain/446d497e-f320-4e65-baf7-3a210c555e4b/mayaar_banner_bg_gen_1770315187800.png');
+            background-size: 2000px auto; /* Fit width, let height repeat */
+            background-repeat: repeat-y;
+            opacity: 0.6; /* Blend with the solid navy below */
+            filter: contrast(1.2) brightness(0.8);
+            z-index: 1;
+        }
+
+        /* Layer 2: Deep Blue Gradient Overlay to unify the color */
+        .gradient-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                rgba(10, 22, 40, 0.9) 0%, 
+                rgba(26, 58, 92, 0.7) 40%, 
+                rgba(10, 22, 40, 0.95) 100%
+            );
+            z-index: 2;
+            mix-blend-mode: multiply;
+        }
+
+        /* Layer 3: Vector Patterns (Sharp Lines) */
+        /* Top Right Islamic Star */
+        .pattern-corner {
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 1400px;
+            height: 1400px;
+            z-index: 3;
+            opacity: 0.8; 
+            /* Golden blend */
+            filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.3));
+        }
+
+        /* Bottom Left Circuits */
+        .circuit-corner {
+            position: absolute;
+            bottom: 50px;
+            left: -50px;
+            width: 1600px;
+            height: 1200px;
+            z-index: 3;
+            opacity: 0.6;
+            mix-blend-mode: screen;
+        }
+
+        /* Extra Particles for depth */
+        .particle-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            background-image: radial-gradient(circle at 50% 50%, rgba(253, 230, 138, 0.4) 1px, transparent 1px);
+            background-size: 300px 300px;
+            opacity: 0.3;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- AI Texture Base -->
+    <div class="ai-texture-layer"></div>
+
+    <!-- Gradient Unification -->
+    <div class="gradient-overlay"></div>
+
+    <!-- Particle Grain -->
+    <div class="particle-layer"></div>
+
+    <!-- Vector Overlay: Islamic Patterns -->
+    <svg class="pattern-corner" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="goldLine" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fde68a" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="#d97706" stop-opacity="0.4"/>
+            </linearGradient>
+            <pattern id="starPattern" x="0" y="0" width="150" height="150" patternUnits="userSpaceOnUse">
+                 <g transform="translate(75,75) scale(1.2)">
+                    <polygon points="0,-50 12,-12 50,0 12,12 0,50 -12,12 -50,0 -12,-12" fill="none" stroke="url(#goldLine)" stroke-width="2"/>
+                    <polygon points="0,-50 12,-12 50,0 12,12 0,50 -12,12 -50,0 -12,-12" fill="none" stroke="url(#goldLine)" stroke-width="1" transform="rotate(45)"/>
+                 </g>
+            </pattern>
+            <radialGradient id="fadeMaskGrad" cx="100%" cy="0%" r="100%">
+                <stop offset="0%" stop-color="white" stop-opacity="1"/>
+                <stop offset="80%" stop-color="white" stop-opacity="0"/>
+            </radialGradient>
+            <mask id="fadeMask">
+                <rect x="0" y="0" width="600" height="600" fill="url(#fadeMaskGrad)"/>
+            </mask>
+        </defs>
+        <rect x="0" y="0" width="600" height="600" fill="url(#starPattern)" mask="url(#fadeMask)"/>
+    </svg>
+
+    <!-- Vector Overlay: Circuits -->
+    <svg class="circuit-corner" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="circuitCyan" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0ea5e9" stop-opacity="1"/>
+                <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+            </linearGradient>
+        </defs>
+        <g stroke="url(#circuitCyan)" stroke-width="2" fill="none" opacity="0.8">
+             <!-- Abstract Circuit Lines -->
+             <path d="M0 500 L200 500 L250 450 L400 450"/>
+             <circle cx="200" cy="500" r="4" fill="#0ea5e9"/>
+             <path d="M50 600 L50 520 L150 420 L150 300"/>
+             <circle cx="150" cy="300" r="3" fill="#0ea5e9"/>
+             <path d="M0 400 L80 400 L120 360 L300 360"/>
+             <path d="M250 600 L250 500 L350 400 L500 400"/>
+             <circle cx="350" cy="400" r="5" fill="#0ea5e9"/>
+        </g>
+    </svg>
+
+</body>
+</html>
