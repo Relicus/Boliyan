@@ -221,7 +221,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               isOutbidTrigger && item.isPublicBid && "ring-2 ring-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]",
               isExpired && "pointer-events-none grayscale"
             )}
-            style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+            style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)', contentVisibility: 'auto', containIntrinsicSize: 'auto 400px' }}
           >
             <Card className={cn(
               "border-none shadow-none h-full flex flex-col relative z-10 rounded-[calc(0.75rem-3px)] bg-white"
