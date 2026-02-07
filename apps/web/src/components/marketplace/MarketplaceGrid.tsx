@@ -506,5 +506,5 @@ export default function MarketplaceGrid() {
     return gridContent;
   }
 
-  return <PullToRefresh onRefresh={refresh}>{gridContent}</PullToRefresh>;
+  return <PullToRefresh onRefresh={refresh} mode="touch">{gridContent}</PullToRefresh>;
 }

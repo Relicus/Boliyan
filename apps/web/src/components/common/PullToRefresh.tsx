@@ -13,6 +13,8 @@ interface PullToRefreshProps {
   className?: string;
   disabled?: boolean;
   mode?: "drag" | "touch";
+  /** Fraction of viewport height from top where pull gesture is recognised (default 0.3 = top 30%) */
+  pullZone?: number;
 }
 
 export function PullToRefresh({ 
@@ -21,7 +23,8 @@ export function PullToRefresh({
   threshold = 120, // Distance to pull before trigger
   className,
   disabled = false,
-  mode = "drag"
+  mode = "drag",
+  pullZone = 0.3
 }: PullToRefreshProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPulling, setIsPulling] = useState(false);
@@ -60,8 +63,14 @@ export function PullToRefresh({
     const handleTouchStart = (event: TouchEvent) => {
       if (disabled || isRefreshing) return;
       if (window.scrollY > 0) return;
+
+      // Only recognise pulls that start in the upper zone of the viewport
+      const startY = event.touches[0]?.clientY ?? 0;
+      const zoneLimit = window.innerHeight * pullZone;
+      if (startY > zoneLimit) return;
+
       isTouchingRef.current = true;
-      startYRef.current = event.touches[0]?.clientY ?? null;
+      startYRef.current = startY;
     };
 
     const handleTouchMove = (event: TouchEvent) => {
@@ -127,7 +136,7 @@ export function PullToRefresh({
       window.removeEventListener("touchend", handleTouchEnd);
       window.removeEventListener("touchcancel", handleTouchEnd);
     };
-  }, [canPull, disabled, haptic, isPulling, isRefreshing, isTouchMode, onRefresh, pullDistance, threshold]);
+  }, [canPull, disabled, haptic, isPulling, isRefreshing, isTouchMode, onRefresh, pullDistance, pullZone, threshold]);
 
   const handleDragEnd = async (_: unknown, info: PanInfo) => {
     if (disabled || isRefreshing) {
