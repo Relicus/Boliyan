@@ -4,18 +4,21 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useRef,
 import { Item, Bid } from "@/types";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/lib/supabase";
-import { transformListingToItem, transformBidToHydratedBid, ListingWithSeller, BidWithProfile } from "@/lib/transform";
+import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { generateCacheKey, getFromCache, setCache } from "@/lib/cache";
-import { useBidRealtime } from "@/hooks/useBidRealtime";
 import { useListingsPolling } from "@/hooks/useListingsPolling";
-import { sonic } from "@/lib/sonic";
 import type { Database } from "@/types/database.types";
-import { normalize, upsertEntities, upsertEntity, removeEntity } from "@/lib/store-helpers";
+import { upsertEntities, upsertEntity, removeEntity } from "@/lib/store-helpers";
 import { useViewport } from "./ViewportContext";
 import { calculateDistance, sortByDistance } from "@/lib/searchUtils";
+import { useBids } from "./BidContext";
+import { useWatchlist } from "./WatchlistContext";
 
-interface MarketplaceFilters {
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
+export interface MarketplaceFilters {
   category: string | null;
   search: string;
   radius: number;
@@ -29,7 +32,7 @@ interface MarketplaceFilters {
   listingType: 'all' | 'public' | 'hidden';
 }
 
-interface MarketplaceContextType {
+export interface MarketplaceContextType {
   items: Item[];
   bids: Bid[];
   itemsById: Record<string, Item>;
@@ -38,7 +41,7 @@ interface MarketplaceContextType {
   involvedIds: string[];
   isLoading: boolean;
   isLoadingMore: boolean;
-  isRevalidating: boolean; // Background refresh of stale cache
+  isRevalidating: boolean;
   hasMore: boolean;
   loadMore: () => void;
   addItem: (item: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => void;
@@ -57,7 +60,6 @@ interface MarketplaceContextType {
   setLastBidTimestamp: (ts: number | null) => void;
   refreshInvolvedItems: () => Promise<void>;
   refresh: () => Promise<void>;
-  // Live polling for new listings (only when sortBy: 'newest')
   liveFeed: {
     pendingCount: number;
     loadPending: () => void;
@@ -71,62 +73,147 @@ interface MarketplaceContextType {
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
 
 type MarketplaceListingRow = Database['public']['Views']['marketplace_listings']['Row'];
-type WatchlistRow = Database['public']['Tables']['watchlist']['Row'];
 
-export function MarketplaceProvider({ children }: { children: React.ReactNode }) {
+// ---------------------------------------------------------------------------
+// MarketplaceCore — the actual provider logic
+// Runs INSIDE BidProvider + WatchlistProvider so it can consume both hooks.
+// ---------------------------------------------------------------------------
+
+function MarketplaceCore({ children }: { children: React.ReactNode }) {
   const { user, myLocation } = useAuth();
   const { visibleIds } = useViewport();
 
+  // --- Import from split contexts ---
+  const bidCtx = useBids();
+  const watchCtx = useWatchlist();
+
+  // --- Item state (stays here) ---
   const [itemsById, setItemsById] = useState<Record<string, Item>>({});
-  const [bidsById, setBidsById] = useState<Record<string, Bid>>({});
   const [feedIds, setFeedIds] = useState<string[]>([]);
   const [involvedIds, setInvolvedIds] = useState<string[]>([]);
-  const [watchedItemIds, setWatchedItemIds] = useState<string[]>([]);
-  
-  // Refs for stable callback access to frequently-changing state
-  // This prevents recreating 11+ functions on every state change
-  const itemsByIdRef = useRef(itemsById);
-  const bidsByIdRef = useRef(bidsById);
-  const watchedItemIdsRef = useRef(watchedItemIds);
-  const initialSyncDone = useRef(false);
 
+  const itemsByIdRef = useRef(itemsById);
   useEffect(() => { itemsByIdRef.current = itemsById; }, [itemsById]);
-  useEffect(() => { bidsByIdRef.current = bidsById; }, [bidsById]);
-  
-  // Fix: Use ref to access latest watchlist in fetchItems without triggering re-fetch loop
-  useEffect(() => {
-    watchedItemIdsRef.current = watchedItemIds;
-  }, [watchedItemIds]);
+
+  const initialSyncDone = useRef(false);
 
   // Derived arrays for backward compatibility
   const items = useMemo(() => feedIds.map(id => itemsById[id]).filter(Boolean), [feedIds, itemsById]);
-  const bids = useMemo(() => Object.values(bidsById), [bidsById]);
 
-  // Combined IDs for realtime subscription (Participation + Viewport)
+  // Combined IDs for realtime subscription
   const activeIds = useMemo(() => {
     const combined = new Set(visibleIds);
     involvedIds.forEach(id => combined.add(id));
     return combined;
   }, [visibleIds, involvedIds]);
 
+  useEffect(() => {
+    const sharedActiveIds = (globalThis as Record<string, unknown>).__activeBidIds as Set<string> | undefined;
+    if (!sharedActiveIds) return;
+    sharedActiveIds.clear();
+    activeIds.forEach((id) => sharedActiveIds.add(id));
+  }, [activeIds]);
 
+  // --- Expose bridge callbacks to BidContext via refs ---
+  // BidContext calls these refs when bids land or succeed
+  const onBidLandedRef = useRef<(bid: Bid) => void>(() => {});
+  const onBidPlacedSuccessRef = useRef<(itemId: string) => void>(() => {});
+  const onBidRollbackRef = useRef<(itemId: string) => void>(() => {});
+
+  onBidLandedRef.current = useCallback((newBid: Bid) => {
+    setItemsById(prevItems => {
+      const item = prevItems[newBid.itemId];
+      if (!item) return prevItems;
+
+      const currentMax = item.currentHighBid || 0;
+      const isNewHigh = newBid.amount > currentMax;
+      const isSameHighBidder = item.currentHighBidderId === newBid.bidderId;
+      const nextAttempts = (item.bidAttemptsCount ?? item.bidCount) + 1;
+
+      const updatedItem = {
+        ...item,
+        bidCount: isSameHighBidder ? item.bidCount : item.bidCount + 1,
+        bidAttemptsCount: nextAttempts,
+        currentHighBid: (isNewHigh || isSameHighBidder) ? newBid.amount : currentMax,
+        currentHighBidderId: (isNewHigh || isSameHighBidder) ? newBid.bidderId : item.currentHighBidderId
+      };
+
+      return upsertEntity(prevItems, updatedItem);
+    });
+  }, []);
+
+  onBidPlacedSuccessRef.current = useCallback((itemId: string) => {
+    setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
+    void watchCtx.addToWatchlist(itemId);
+  }, [watchCtx]);
+
+  onBidRollbackRef.current = useCallback((itemId: string) => {
+    void (async () => {
+      const { data, error } = await supabase
+        .from('marketplace_listings')
+        .select('*')
+        .eq('id', itemId)
+        .single();
+
+      if (error || !data) return;
+
+      const reconciledItem = transformListingToItem(data as unknown as ListingWithSeller);
+      setItemsById(prev => upsertEntity(prev, reconciledItem));
+    })();
+  }, []);
+
+  // Register bridge refs on BidContext (via the global that BidContext reads)
+  useEffect(() => {
+    (globalThis as Record<string, unknown>).__bidBridge = {
+      onBidLanded: onBidLandedRef,
+      onBidPlacedSuccess: onBidPlacedSuccessRef,
+      onBidRollback: onBidRollbackRef,
+    };
+    return () => {
+      delete (globalThis as Record<string, unknown>).__bidBridge;
+    };
+  }, []);
+
+  const onInvolvedChangeRef = useRef<(action: 'add' | 'remove', itemId: string) => void>(() => {});
+
+  onInvolvedChangeRef.current = useCallback((action: 'add' | 'remove', itemId: string) => {
+    if (action === 'add') {
+      setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
+      return;
+    }
+
+    const stillHasBid = Object.values(bidCtx.bidsById).some((bid) => bid.itemId === itemId);
+    if (stillHasBid) return;
+    setInvolvedIds(prev => prev.filter(id => id !== itemId));
+  }, [bidCtx.bidsById]);
+
+  useEffect(() => {
+    (globalThis as Record<string, unknown>).__marketplaceBridge = {
+      onInvolvedChange: onInvolvedChangeRef,
+    };
+    return () => {
+      delete (globalThis as Record<string, unknown>).__marketplaceBridge;
+    };
+  }, []);
+
+  // --- Loading / Pagination ---
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isRevalidating, setIsRevalidating] = useState(false); // Background refresh of stale cache
+  const [isRevalidating, setIsRevalidating] = useState(false);
   const [page, setPage] = useState(1);
-  const pageRef = useRef(1); // Ref to track page without recreating loadMore
+  const pageRef = useRef(1);
   const [hasMore, setHasMore] = useState(true);
-  const [lastBidTimestamp, setLastBidTimestamp] = useState<number | null>(null);
   const loadingLockRef = React.useRef(false);
   const ITEMS_PER_PAGE = 12;
   const NEWEST_CACHE_TTL_MS = 90_000;
 
+  // --- Filters ---
   const [filters, setFilters] = useState<MarketplaceFilters>({
     category: null,
     search: "",
     radius: 500,
     locationMode: 'country',
-    city: "", 
+    city: "",
     currentCoords: null,
     sortBy: 'trending',
     minPrice: null,
@@ -138,28 +225,27 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   // 1. Initial Load: Restore saved browsing filters
   useEffect(() => {
     try {
-        const saved = localStorage.getItem('boliyan_filters');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            const isValidCity = parsed.city && 
-                                parsed.city !== "" && 
-                                parsed.city !== "Set Location" &&
-                                parsed.city !== "Locating...";
+      const saved = localStorage.getItem('boliyan_filters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const isValidCity = parsed.city &&
+          parsed.city !== "" &&
+          parsed.city !== "Set Location" &&
+          parsed.city !== "Locating...";
 
-            if (isValidCity) {
-                setFilters(prev => ({
-                    ...prev,
-                    radius: parsed.radius ?? prev.radius,
-                    locationMode: parsed.locationMode ?? prev.locationMode,
-                    city: parsed.city,
-                    currentCoords: parsed.currentCoords ?? prev.currentCoords
-                }));
-                initialSyncDone.current = true;
-            }
+        if (isValidCity) {
+          setFilters(prev => ({
+            ...prev,
+            radius: parsed.radius ?? prev.radius,
+            locationMode: parsed.locationMode ?? prev.locationMode,
+            city: parsed.city,
+            currentCoords: parsed.currentCoords ?? prev.currentCoords
+          }));
+          initialSyncDone.current = true;
         }
+      }
     } catch { /* ignore */ }
   }, []);
-
 
   // 2. Initial Sync: If no saved filter, match user's physical location
   useEffect(() => {
@@ -176,94 +262,82 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
   // 3. Persist browsing filters on change
   useEffect(() => {
-      try {
-          const toSave = {
-              radius: filters.radius,
-              locationMode: filters.locationMode,
-              city: filters.city,
-              currentCoords: filters.currentCoords
-          };
-          localStorage.setItem('boliyan_filters', JSON.stringify(toSave));
-      } catch (e) {
-          console.warn("Failed to save filters", e);
-      }
+    try {
+      const toSave = {
+        radius: filters.radius,
+        locationMode: filters.locationMode,
+        city: filters.city,
+        currentCoords: filters.currentCoords
+      };
+      localStorage.setItem('boliyan_filters', JSON.stringify(toSave));
+    } catch (e) {
+      console.warn("Failed to save filters", e);
+    }
   }, [filters.radius, filters.locationMode, filters.city, filters.currentCoords]);
 
-  // --- HELPER FUNCTIONS ---
-  // Note: Geolocation helper functions kept if needed for future hybrid sorting, 
-  // though primary filtering is now Server-Side where possible.
-  
+  // --- FETCH ITEMS ---
   const fetchItems = useCallback(async (targetPage: number, reset: boolean = false, force: boolean = false) => {
-      if (loadingLockRef.current) return;
-      loadingLockRef.current = true;
-      
-      const cacheKey = generateCacheKey('marketplace', { ...filters, page: targetPage });
-      let usedCache = false;
+    if (loadingLockRef.current) return;
+    loadingLockRef.current = true;
 
-      // --- 1. CHECK CACHE (L1/L2) ---
-      if (reset && !force) {
-          const cacheOptions = filters.sortBy === 'newest' ? { ttl: NEWEST_CACHE_TTL_MS } : undefined;
-          const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey, cacheOptions);
-          
-          if (cachedItems) {
-              setItemsById(prev => upsertEntities(prev, cachedItems));
-              setFeedIds(cachedItems.map(i => i.id));
-              setIsLoading(false);
-              usedCache = true;
-              
-              // Always validate server count to ensure hasMore is accurate
-              // This is a lightweight HEAD query that only counts, doesn't fetch rows
-              let serverQuery = supabase
-                  .from('marketplace_listings')
-                  .select('id', { count: 'exact', head: true })
-                  .eq('status', 'active')
-                  .lte('go_live_at', new Date().toISOString());
-              
-              // Apply same filters to get accurate count
-              if (filters.category && filters.category !== "All Items") {
-                  serverQuery = serverQuery.eq('category', filters.category);
-              }
-              if (filters.condition && filters.condition !== 'all') {
-                  serverQuery = serverQuery.eq('condition', filters.condition);
-              }
-              if (filters.listingType === 'public') {
-                  serverQuery = serverQuery.eq('auction_mode', 'visible');
-              } else if (filters.listingType === 'hidden') {
-                  serverQuery = serverQuery.in('auction_mode', ['hidden', 'sealed']);
-              }
-              
-              const { count: serverCount } = await serverQuery;
-              
-              if (serverCount !== null && serverCount > cachedItems.length) {
-                  // Server has more items than cache - enable loading more
-                  setHasMore(true);
-              } else {
-                  setHasMore(cachedItems.length === ITEMS_PER_PAGE);
-              }
-              
-              if (!isStale && (serverCount === null || serverCount <= cachedItems.length)) {
-                  // Cache is fresh AND complete - safe to skip refetch
-                  loadingLockRef.current = false;
-                  return;
-              }
-              // Stale cache or incomplete - show revalidating indicator while fetching fresh data
-              setIsRevalidating(true);
-          }
+    const cacheKey = generateCacheKey('marketplace', { ...filters, page: targetPage });
+    let usedCache = false;
+
+    // --- 1. CHECK CACHE (L1/L2) ---
+    if (reset && !force) {
+      const cacheOptions = filters.sortBy === 'newest' ? { ttl: NEWEST_CACHE_TTL_MS } : undefined;
+      const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey, cacheOptions);
+
+      if (cachedItems) {
+        setItemsById(prev => upsertEntities(prev, cachedItems));
+        setFeedIds(cachedItems.map(i => i.id));
+        setIsLoading(false);
+        usedCache = true;
+
+        let serverQuery = supabase
+          .from('marketplace_listings')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'active')
+          .lte('go_live_at', new Date().toISOString());
+
+        if (filters.category && filters.category !== "All Items") {
+          serverQuery = serverQuery.eq('category', filters.category);
+        }
+        if (filters.condition && filters.condition !== 'all') {
+          serverQuery = serverQuery.eq('condition', filters.condition);
+        }
+        if (filters.listingType === 'public') {
+          serverQuery = serverQuery.eq('auction_mode', 'visible');
+        } else if (filters.listingType === 'hidden') {
+          serverQuery = serverQuery.in('auction_mode', ['hidden', 'sealed']);
+        }
+
+        const { count: serverCount } = await serverQuery;
+
+        if (serverCount !== null && serverCount > cachedItems.length) {
+          setHasMore(true);
+        } else {
+          setHasMore(cachedItems.length === ITEMS_PER_PAGE);
+        }
+
+        if (!isStale && (serverCount === null || serverCount <= cachedItems.length)) {
+          loadingLockRef.current = false;
+          return;
+        }
+        setIsRevalidating(true);
       }
+    }
 
-
-      if (!usedCache) {
-          if (reset) {
-              setIsLoading(true);
-          } else {
-              setIsLoadingMore(true);
-          }
+    if (!usedCache) {
+      if (reset) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
       }
+    }
 
-        try {
-            // PHASE 4: Use 'marketplace_listings' Master View for server-side aggregation
-            // This replaces the raw 'listings' fetch + 'profiles' join + separate 'bids' fetch
-            let query = supabase.from('marketplace_listings').select(`
+    try {
+      let query = supabase.from('marketplace_listings').select(`
                 id,
                 title,
                 description,
@@ -293,237 +367,172 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
                 location_address
             `, { count: 'exact' }).eq('status', 'active');
 
-            query = query.lte('go_live_at', new Date().toISOString());
+      query = query.lte('go_live_at', new Date().toISOString());
 
-            // --- APPLY FILTERS ---
-          if (filters.category && filters.category !== "All Items") {
-              query = query.eq('category', filters.category);
-          }
-
-          if (filters.search) {
-              const searchTerm = `%${filters.search}%`;
-              query = query.or(`title.ilike.${searchTerm},description.ilike.${searchTerm}`);
-          }
-
-          if (filters.minPrice !== null) {
-              query = query.gte('asked_price', filters.minPrice);
-          }
-          if (filters.maxPrice !== null) {
-              query = query.lte('asked_price', filters.maxPrice);
-          }
-          
-          if (filters.condition && filters.condition !== 'all') {
-              query = query.eq('condition', filters.condition);
-          }
-
-
-          if (filters.listingType === 'public') {
-              query = query.eq('auction_mode', 'visible');
-          } else if (filters.listingType === 'hidden') {
-               // Match 'hidden' primarily, keeping 'sealed' as fallback for any legacy records
-               query = query.in('auction_mode', ['hidden', 'sealed']);
-          } // 'all' does nothing
-
-           // --- APPLY SORT ---
-           switch (filters.sortBy) {
-              case 'trending': 
-                  // Sort by bid_count (popularity), then by created_at (freshness)
-                  query = query.order('bid_count', { ascending: false })
-                               .order('created_at', { ascending: false });
-                  break;
-              
-              case 'newest':
-                  // Fix: Explicitly sort by date to prevent fall-through to luxury
-                  query = query.order('created_at', { ascending: false });
-                  break;
-
-              case 'luxury':
-                  query = query.order('asked_price', { ascending: false });
-                  break;
-
-              case 'watchlist':
-                   // Fix: Filter by watched IDs using Ref to avoid dependency loop
-                   const currentWatchedIds = watchedItemIdsRef.current;
-                   if (currentWatchedIds.length > 0) {
-                       query = query.in('id', currentWatchedIds);
-                   } else {
-                       // Return no results if watchlist is empty
-                       query = query.eq('id', '00000000-0000-0000-0000-000000000000');
-                   }
-                   query = query.order('created_at', { ascending: false });
-                   break;
-
-              case 'ending_soon':
-                  // Sort by ends_at ascending (soonest first)
-                  // Note: 'ends_at' is available in the marketplace_listings view
-                  query = query.order('ends_at', { ascending: true });
-                  break;
-
-              case 'nearest':
-                  // Fallback: Default to newest until PostGIS is implemented
-                  query = query.order('created_at', { ascending: false });
-                  break;
-
-              default:
-                  query = query.order('created_at', { ascending: false });
-           }
-
-           // --- PAGINATION ---
-            const from = (targetPage - 1) * ITEMS_PER_PAGE;
-            const to = from + ITEMS_PER_PAGE - 1;
-            query = query.range(from, to);
-
-           const { data: listingsData, error: listingsError, count } = await query;
-
-           if (listingsError) throw listingsError;
-
-           let fetchedItems: Item[] = [];
-            if (listingsData) {
-                let items = (listingsData as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
-
-                // --- CLIENT-SIDE LOCATION FILTERING ---
-                // Since we don't have PostGIS yet, we filter by radius client-side
-                if (filters.currentCoords && filters.radius < 500) {
-                    items = items.filter(item => {
-                        const itemLat = item.location?.lat;
-                        const itemLng = item.location?.lng;
-                        if (itemLat === undefined || itemLng === undefined) return false;
-                        
-                        const dist = calculateDistance(
-                            filters.currentCoords!.lat, 
-                            filters.currentCoords!.lng, 
-                            itemLat, 
-                            itemLng
-                        );
-                        return dist <= filters.radius;
-                    });
-                }
-
-                // --- CLIENT-SIDE SORTING OVERRIDES ---
-                if (filters.sortBy === 'nearest' && filters.currentCoords) {
-                    items = sortByDistance(items, filters.currentCoords.lat, filters.currentCoords.lng);
-                }
-
-                fetchedItems = items;
-            }
-
-            // --- UPDATE STATE ---
-            if (reset) {
-                setItemsById(prev => upsertEntities(prev, fetchedItems));
-                setFeedIds(fetchedItems.map(i => i.id));
-                setCache(cacheKey, fetchedItems);
-            } else {
-                setItemsById(prev => upsertEntities(prev, fetchedItems));
-                setFeedIds(prev => {
-                    const existingIds = new Set(prev);
-                    const trulyNewIds = fetchedItems.map(i => i.id).filter(id => !existingIds.has(id));
-                    return [...prev, ...trulyNewIds];
-                });
-                setCache(cacheKey, fetchedItems);
-            }
-
-           
-           if (count !== null) {
-               setHasMore((targetPage * ITEMS_PER_PAGE) < count);
-           } else {
-               // Fallback if count is missing (shouldn't happen with count: 'exact')
-               setHasMore(fetchedItems.length === ITEMS_PER_PAGE);
-           }
-
-       } catch (err: unknown) {
-           // Supabase errors have specific structure: { message, details, hint, code }
-           if (err && typeof err === 'object' && 'message' in err) {
-               const supabaseError = err as { message: string; details?: string; hint?: string; code?: string };
-               console.error("[MarketplaceContext] Fetch Items Error:", {
-                   message: supabaseError.message,
-                   details: supabaseError.details,
-                   hint: supabaseError.hint,
-                   code: supabaseError.code,
-               });
-           } else {
-               console.error("[MarketplaceContext] Fetch Items Error (unknown):", err);
-           }
-       } finally {
-          setIsLoading(false);
-          setIsLoadingMore(false);
-          setIsRevalidating(false);
-          loadingLockRef.current = false;
+      // --- APPLY FILTERS ---
+      if (filters.category && filters.category !== "All Items") {
+        query = query.eq('category', filters.category);
       }
-  }, [filters, ITEMS_PER_PAGE]);
+
+      if (filters.search) {
+        const searchTerm = `%${filters.search}%`;
+        query = query.or(`title.ilike.${searchTerm},description.ilike.${searchTerm}`);
+      }
+
+      if (filters.minPrice !== null) {
+        query = query.gte('asked_price', filters.minPrice);
+      }
+      if (filters.maxPrice !== null) {
+        query = query.lte('asked_price', filters.maxPrice);
+      }
+
+      if (filters.condition && filters.condition !== 'all') {
+        query = query.eq('condition', filters.condition);
+      }
+
+      if (filters.listingType === 'public') {
+        query = query.eq('auction_mode', 'visible');
+      } else if (filters.listingType === 'hidden') {
+        query = query.in('auction_mode', ['hidden', 'sealed']);
+      }
+
+      // --- APPLY SORT ---
+      switch (filters.sortBy) {
+        case 'trending':
+          query = query.order('bid_count', { ascending: false })
+            .order('created_at', { ascending: false });
+          break;
+
+        case 'newest':
+          query = query.order('created_at', { ascending: false });
+          break;
+
+        case 'luxury':
+          query = query.order('asked_price', { ascending: false });
+          break;
+
+        case 'watchlist': {
+          const currentWatchedIds = watchCtx.watchedItemIdsRef.current;
+          if (currentWatchedIds && currentWatchedIds.length > 0) {
+            query = query.in('id', currentWatchedIds);
+          } else {
+            query = query.eq('id', '00000000-0000-0000-0000-000000000000');
+          }
+          query = query.order('created_at', { ascending: false });
+          break;
+        }
+
+        case 'ending_soon':
+          query = query.order('ends_at', { ascending: true });
+          break;
+
+        case 'nearest':
+          query = query.order('created_at', { ascending: false });
+          break;
+
+        default:
+          query = query.order('created_at', { ascending: false });
+      }
+
+      // --- PAGINATION ---
+      const from = (targetPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+      query = query.range(from, to);
+
+      const { data: listingsData, error: listingsError, count } = await query;
+
+      if (listingsError) throw listingsError;
+
+      let fetchedItems: Item[] = [];
+      if (listingsData) {
+        let fetchedArr = (listingsData as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
+
+        // --- CLIENT-SIDE LOCATION FILTERING ---
+        if (filters.currentCoords && filters.radius < 500) {
+          fetchedArr = fetchedArr.filter(item => {
+            const itemLat = item.location?.lat;
+            const itemLng = item.location?.lng;
+            if (itemLat === undefined || itemLng === undefined) return false;
+
+            const dist = calculateDistance(
+              filters.currentCoords!.lat,
+              filters.currentCoords!.lng,
+              itemLat,
+              itemLng
+            );
+            return dist <= filters.radius;
+          });
+        }
+
+        // --- CLIENT-SIDE SORTING OVERRIDES ---
+        if (filters.sortBy === 'nearest' && filters.currentCoords) {
+          fetchedArr = sortByDistance(fetchedArr, filters.currentCoords.lat, filters.currentCoords.lng);
+        }
+
+        fetchedItems = fetchedArr;
+      }
+
+      // --- UPDATE STATE ---
+      if (reset) {
+        setItemsById(prev => upsertEntities(prev, fetchedItems));
+        setFeedIds(fetchedItems.map(i => i.id));
+        setCache(cacheKey, fetchedItems);
+      } else {
+        setItemsById(prev => upsertEntities(prev, fetchedItems));
+        setFeedIds(prev => {
+          const existingIds = new Set(prev);
+          const trulyNewIds = fetchedItems.map(i => i.id).filter(id => !existingIds.has(id));
+          return [...prev, ...trulyNewIds];
+        });
+        setCache(cacheKey, fetchedItems);
+      }
+
+      if (count !== null) {
+        setHasMore((targetPage * ITEMS_PER_PAGE) < count);
+      } else {
+        setHasMore(fetchedItems.length === ITEMS_PER_PAGE);
+      }
+
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'message' in err) {
+        const supabaseError = err as { message: string; details?: string; hint?: string; code?: string };
+        console.error("[MarketplaceContext] Fetch Items Error:", {
+          message: supabaseError.message,
+          details: supabaseError.details,
+          hint: supabaseError.hint,
+          code: supabaseError.code,
+        });
+      } else {
+        console.error("[MarketplaceContext] Fetch Items Error (unknown):", err);
+      }
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+      setIsRevalidating(false);
+      loadingLockRef.current = false;
+    }
+  }, [filters, ITEMS_PER_PAGE, watchCtx.watchedItemIdsRef]);
 
   const refresh = useCallback(async () => {
     await fetchItems(1, true, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchItems]);
 
   // --- EFFECT: Trigger Fetch on Filter Change ---
-  // Use serialized filters string for stable comparison (object refs trigger false positives)
   const filtersKey = JSON.stringify(filters);
   useEffect(() => {
-      setPage(1);
-      pageRef.current = 1; // Reset ref to match state
-      // Removed 500ms debounce - category/sort changes should be instant
-      fetchItems(1, true);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    setPage(1);
+    pageRef.current = 1;
+    fetchItems(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtersKey]);
 
-  // --- Realtime Subscription (Bids) ---
-  const handleRealtimeBid = useCallback((newBid: Bid) => {
-      // Play sound if someone ELSE bids on an item the user is watching
-      // Use ref to avoid re-subscription on watchlist toggle
-      if (user && newBid.bidderId !== user.id && watchedItemIdsRef.current.includes(newBid.itemId)) {
-          sonic.tick(); // Subtle notification
-      }
-
-      setBidsById(prev => {
-          // Regression Guard: Protect optimistic state
-          // If our local optimistic update is ahead of the server echo (due to latency/cache),
-          // preserve the higher local count so beads don't flicker/reset.
-          const existing = prev[newBid.id];
-          if (existing) {
-              const localCount = existing.update_count || 0;
-              const serverCount = newBid.update_count || 0;
-              
-              if (localCount > serverCount) {
-                  // Keep our local optimistic count
-                  newBid.update_count = localCount;
-              }
-          }
-          return upsertEntity(prev, newBid);
-      });
-
-      setItemsById(prevItems => {
-        const item = prevItems[newBid.itemId];
-        if (!item) return prevItems;
-
-        const currentMax = item.currentHighBid || 0;
-        const isNewHigh = newBid.amount > currentMax;
-        const isSameHighBidder = item.currentHighBidderId === newBid.bidderId;
-        const nextAttempts = (item.bidAttemptsCount ?? item.bidCount) + 1;
-
-        const updatedItem = {
-           ...item,
-           bidCount: isSameHighBidder ? item.bidCount : item.bidCount + 1,
-           bidAttemptsCount: nextAttempts,
-           currentHighBid: (isNewHigh || isSameHighBidder) ? newBid.amount : currentMax,
-           currentHighBidderId: (isNewHigh || isSameHighBidder) ? newBid.bidderId : item.currentHighBidderId
-        };
-
-        return upsertEntity(prevItems, updatedItem);
-      });
-  }, [user]);
-
-  useBidRealtime(handleRealtimeBid, activeIds, user?.id);
-
   // --- LIVE FEED POLLING (New Listings) ---
-  // Only active when sortBy: 'newest' and tab is visible
   const handleNewListings = useCallback((newItems: Item[]) => {
-    // Prepend new items to the feed
     setItemsById(prev => upsertEntities(prev, newItems));
     setFeedIds(prev => {
       const existingIds = new Set(prev);
       const newIds = newItems.map(i => i.id).filter(id => !existingIds.has(id));
-      return [...newIds, ...prev]; // Prepend
+      return [...newIds, ...prev];
     });
   }, []);
 
@@ -539,321 +548,50 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     onNewListings: handleNewListings,
   });
 
-  // Sync pageRef with page state for stable loadMore access
+  // Sync pageRef with page state
   useEffect(() => { pageRef.current = page; }, [page]);
 
   const loadMore = useCallback(() => {
-      // Prevent loading more if initial load is processing (isLoading)
-      if (isLoading || isLoadingMore || !hasMore || loadingLockRef.current) return;
-      const nextPage = pageRef.current + 1;
-      pageRef.current = nextPage; // Update ref immediately
-      setPage(nextPage);
-      fetchItems(nextPage, false);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isLoadingMore, hasMore]); // Stable deps only
+    if (isLoading || isLoadingMore || !hasMore || loadingLockRef.current) return;
+    const nextPage = pageRef.current + 1;
+    pageRef.current = nextPage;
+    setPage(nextPage);
+    fetchItems(nextPage, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isLoadingMore, hasMore]);
 
   const addItem = useCallback((newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => {
     console.log("addItem - logic pending refactor in selling phase", newItem);
   }, []);
 
   const updateItem = useCallback(async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>>) => {
-     const { error } = await supabase.rpc('update_listing_fields', {
-       p_listing_id: id,
-       p_status: updates.status ?? null,
-       p_title: updates.title ?? null
-     });
-     
-     if (error) {
-         console.error("Failed to update item:", error);
-     } else {
-         setItemsById(prev => {
-            if (!prev[id]) return prev;
-            return upsertEntity(prev, { ...prev[id], ...updates });
-         });
-     }
+    const { error } = await supabase.rpc('update_listing_fields', {
+      p_listing_id: id,
+      p_status: updates.status ?? null,
+      p_title: updates.title ?? null
+    });
+
+    if (error) {
+      console.error("Failed to update item:", error);
+    } else {
+      setItemsById(prev => {
+        if (!prev[id]) return prev;
+        return upsertEntity(prev, { ...prev[id], ...updates });
+      });
+    }
   }, []);
 
   const deleteItem = useCallback(async (id: string) => {
     const { error } = await supabase.rpc('delete_listing', { p_listing_id: id });
 
     if (error) {
-        console.error("Failed to delete item:", error);
+      console.error("Failed to delete item:", error);
     } else {
-        setItemsById(prev => removeEntity(prev, id));
-        setFeedIds(prev => prev.filter(fid => fid !== id));
-        setInvolvedIds(prev => prev.filter(iid => iid !== id));
+      setItemsById(prev => removeEntity(prev, id));
+      setFeedIds(prev => prev.filter(fid => fid !== id));
+      setInvolvedIds(prev => prev.filter(iid => iid !== id));
     }
   }, []);
-
-
-  const placeBid = useCallback(async (itemId: string, amount: number, type: 'public' | 'private'): Promise<boolean> => {
-    if (!user) {
-        console.error("Must be logged in to bid");
-        return false;
-    }
-    
-    // Note: Validation (70% minimum, etc.) is already done in useBidding hook
-    // We just need to insert into database and update local state
-    
-    // Find item if available (may not be in current filtered view)
-    const originalItem = itemsByIdRef.current[itemId];
-    const existingBid = Object.values(bidsByIdRef.current).find(b => b.itemId === itemId && b.bidderId === user.id);
-    
-    // --- OPTIMISTIC UPDATE START ---
-    // 1. Create a temporary bid object
-    const optimisticBidId = existingBid ? existingBid.id : `temp-${Date.now()}`;
-    const optimisticBid: Bid = {
-        id: optimisticBidId,
-        itemId: itemId,
-        bidderId: user.id,
-        amount: amount,
-        status: 'pending',
-        message: type === 'private' ? 'Private Bid' : 'Public Bid',
-        createdAt: new Date().toISOString(),
-        bidder: user,
-        update_count: existingBid ? (existingBid.update_count || 0) + 1 : 0
-    } as unknown as Bid;
-
-    // 2. Update local Bids state
-    setBidsById(prev => upsertEntity(prev, optimisticBid));
-
-    // 3. Update local Items state
-    if (originalItem) {
-        const currentMax = originalItem.currentHighBid || 0;
-        const isNewHigh = amount > currentMax;
-        const nextAttempts = (originalItem.bidAttemptsCount ?? originalItem.bidCount) + 1;
-        const updatedItem = {
-            ...originalItem,
-            bidCount: existingBid ? originalItem.bidCount : originalItem.bidCount + 1,
-            bidAttemptsCount: nextAttempts,
-            currentHighBid: isNewHigh ? amount : currentMax,
-            currentHighBidderId: isNewHigh ? user.id : originalItem.currentHighBidderId
-        };
-        setItemsById(prev => upsertEntity(prev, updatedItem));
-    }
-    // --- OPTIMISTIC UPDATE END ---
-
-
-    // Debug: Check auth state before making the call
-    const { data: sessionData } = await supabase.auth.getSession();
-    console.log('[placeBid] Auth state:', {
-      hasSession: !!sessionData.session,
-      authUid: sessionData.session?.user?.id,
-      appUserId: user.id,
-      idsMatch: sessionData.session?.user?.id === user.id
-    });
-
-    const { data, error } = await supabase.rpc('place_bid', {
-      p_listing_id: itemId,
-      p_amount: amount,
-      p_message: type === 'private' ? 'Private Bid' : 'Public Bid'
-    });
-    
-    console.log('[placeBid] Supabase response:', { hasData: !!data, error });
-
-    // Only trust the bid when Supabase confirms it.
-    if (error || !data) {
-        console.error("Failed to place bid:", {
-            message: error?.message || 'No data returned',
-            details: error?.details,
-            hint: error?.hint,
-            dataPresent: !!data
-        });
-        
-        // Handle Server-Level Cooldown Error
-        if (error?.message?.includes('COOLDOWN_ACTIVE')) {
-           setLastBidTimestamp(Date.now());
-        }
-
-        // Rollback optimistic bids update
-        setBidsById(prev => {
-             if (existingBid) {
-                 return upsertEntity(prev, existingBid);
-             }
-             return removeEntity(prev, optimisticBid.id);
-        });
-        // Rollback items update if we modified it
-        if (originalItem) {
-            setItemsById(prev => upsertEntity(prev, originalItem));
-        }
-
-        return false;
-    }
-    
-    const bidRow = data as Database['public']['Tables']['bids']['Row'];
-    const resolvedBid: Bid = {
-        id: bidRow.id,
-        itemId: bidRow.listing_id || itemId,
-        bidderId: bidRow.bidder_id || user.id,
-        bidder: user,
-        amount: Number(bidRow.amount ?? amount),
-        status: (bidRow.status || 'pending') as Bid['status'],
-        type: type === 'private' ? 'private' : 'public',
-        createdAt: bidRow.created_at || new Date().toISOString(),
-        update_count: bidRow.update_count ?? optimisticBid.update_count
-    };
-
-    setBidsById(prev => {
-        const next = { ...prev };
-        if (optimisticBidId !== resolvedBid.id) {
-            delete next[optimisticBidId];
-        }
-        return upsertEntity(next, resolvedBid);
-    });
-
-    // Add to involved and watchlist on success
-    setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
-    if (!watchedItemIdsRef.current.includes(itemId)) {
-         setWatchedItemIds(prev => [...prev, itemId]);
-         // Persist to database
-         supabase
-             .from('watchlist')
-             .insert({ user_id: user.id, listing_id: itemId })
-             .then(({ error }) => {
-                 if (error) console.error("Auto-add to watchlist failed:", error);
-             });
-    }
-    
-    // Set global cooldown timestamp
-    setLastBidTimestamp(Date.now());
-    
-    return true;
-  }, [user]);
-
-  // --- EFFECT: Fetch User Bids on Mount/User Change ---
-  useEffect(() => {
-    if (!user) {
-        setBidsById({});
-        return;
-    }
-
-    const fetchUserBids = async () => {
-        // Fetch bids relevant to the user:
-        // 1. Bids the user has placed (as a buyer)
-        // 2. Bids placed on the user's listings (as a seller)
-        // We split these into two queries for maximum reliability and better performance
-        try {
-            const [myBidsRes, incomingBidsRes] = await Promise.all([
-                // Bids I made
-                supabase
-                    .from('bids')
-                    .select('*, profiles(*)')
-                    .eq('bidder_id', user.id),
-                // Bids on my items
-                supabase
-                    .from('bids')
-                    .select('*, profiles(*), listings!inner(seller_id)')
-                    .eq('listings.seller_id', user.id)
-            ]);
-
-            if (myBidsRes.error) throw myBidsRes.error;
-            if (incomingBidsRes.error) throw incomingBidsRes.error;
-
-            const allBidsRaw = [...(myBidsRes.data || []), ...(incomingBidsRes.data || [])];
-            
-            // Deduplicate by ID
-            const uniqueBidsMap = new Map();
-            allBidsRaw.forEach(bid => uniqueBidsMap.set(bid.id, bid));
-            const uniqueBids = Array.from(uniqueBidsMap.values());
-
-            // Transform and hydrate
-            const hydratedBids = uniqueBids.map(b => transformBidToHydratedBid(b as unknown as BidWithProfile));
-            setBidsById(normalize(hydratedBids));
-
-            // Sync lastBidTimestamp from server history for accurate cooldowns
-            const myBids = hydratedBids.filter(b => b.bidderId === user.id);
-            if (myBids.length > 0) {
-                // Find the most recent bid timestamp
-                const latestBidTime = Math.max(...myBids.map(b => new Date(b.createdAt).getTime()));
-                setLastBidTimestamp(latestBidTime);
-            }
-        } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err);
-            console.error("Error fetching user bids:", message);
-        }
-    };
-
-    fetchUserBids();
-  }, [user]);
-
-  // --- EFFECT: Fetch Watchlist on Mount/User Change ---
-  useEffect(() => {
-    if (!user) {
-        setWatchedItemIds([]);
-        return;
-    }
-
-    const fetchWatchlist = async () => {
-        const { data, error } = await supabase
-            .from('watchlist')
-            .select('listing_id')
-            .eq('user_id', user.id);
-        
-        if (error) {
-            console.error("Error fetching watchlist:", error);
-        } else if (data) {
-            const ids = (data as WatchlistRow[])
-              .map((row) => row.listing_id)
-              .filter((id): id is string => !!id);
-            setWatchedItemIds(ids);
-        }
-    };
-
-    fetchWatchlist();
-  }, [user]);
-
-
-  const toggleWatch = useCallback(async (itemId: string) => {
-    if (!user) {
-        // UI fallback only? Or prompt login? For now just local until refresh or login check
-        console.warn("User not logged in, watchlist is local-only temporarily");
-        setWatchedItemIds(prev => 
-          prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
-        );
-        return;
-    }
-
-    const isWatched = watchedItemIdsRef.current.includes(itemId);
-    
-    // Optimistic Update
-    setWatchedItemIds(prev => 
-      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
-    );
-
-    if (isWatched) {
-        // Remove
-        const { error } = await supabase
-            .from('watchlist')
-            .delete()
-            .match({ user_id: user.id, listing_id: itemId });
-        
-        if (error) {
-            console.error("Failed to remove from watchlist:", error);
-            // Rollback
-            setWatchedItemIds(prev => [...prev, itemId]);
-        } else {
-            // Check if we should remove from involvedIds (only if no bid)
-            const hasBid = Object.values(bidsByIdRef.current).some(b => b.itemId === itemId && b.bidderId === user.id);
-            if (!hasBid) {
-                setInvolvedIds(prev => prev.filter(id => id !== itemId));
-            }
-        }
-    } else {
-        // Add
-        const { error } = await supabase
-            .from('watchlist')
-            .insert({ user_id: user.id, listing_id: itemId });
-            
-          if (error) {
-            console.error("Failed to add to watchlist:", error);
-             // Rollback
-             setWatchedItemIds(prev => prev.filter(id => id !== itemId));
-        } else {
-            setInvolvedIds(prev => Array.from(new Set([...prev, itemId])));
-        }
-    }
-
-  }, [user]);
 
   const setFilter = useCallback(<K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -863,53 +601,10 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     setFilters(prev => ({ ...prev, ...updates }));
   }, []);
 
-  const rejectBid = useCallback(async (bidId: string) => {
-      const { error } = await supabase.rpc('reject_bid', { p_bid_id: bidId });
-      if (error) console.error("Failed to reject bid", error);
-      else setBidsById(prev => {
-          if (!prev[bidId]) return prev;
-          return upsertEntity(prev, { ...prev[bidId], status: 'ignored' });
-      });
-  }, []);
-
-  const acceptBid = useCallback(async (bidId: string) => {
-      const { data, error } = await supabase.rpc('accept_bid', { p_bid_id: bidId });
-      if (error || !data) return undefined;
-      const result = Array.isArray(data) ? data[0] : data;
-      if (!result?.conversation_id) return undefined;
-      setBidsById(prev => {
-          if (!prev[bidId]) return prev;
-          return upsertEntity(prev, { ...prev[bidId], status: 'accepted' });
-      });
-      return result.conversation_id as string;
-  }, []);
-
-
-  const confirmExchange = useCallback(async (conversationId: string, role: 'buyer' | 'seller') => {
-    if (!user) return false;
-
-    const timestamp = new Date().toISOString();
-    const update: Database['public']['Tables']['conversations']['Update'] = role === 'seller' 
-        ? { seller_confirmed_at: timestamp } 
-        : { buyer_confirmed_at: timestamp };
-
-    const { error } = await supabase
-        .from('conversations')
-        .update(update)
-        .eq('id', conversationId);
-        
-    if (error) {
-        console.error("Failed to confirm exchange:", error);
-        return false;
-    }
-    return true;
-  }, [user]);
-
   const refreshInvolvedItems = React.useCallback(async () => {
     if (!user) return;
 
     try {
-      // Fetch item IDs from bids and watchlist
       const [bidsRes, watchlistRes] = await Promise.all([
         supabase.from('bids').select('listing_id').eq('bidder_id', user.id),
         supabase.from('watchlist').select('listing_id').eq('user_id', user.id)
@@ -917,15 +612,14 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
 
       const bidItemIds = (bidsRes.data || []).map(b => b.listing_id).filter((id): id is string => !!id);
       const watchlistIds = (watchlistRes.data || []).map(w => w.listing_id).filter((id): id is string => !!id);
-      
+
       const allInvolvedIds = Array.from(new Set([...bidItemIds, ...watchlistIds]));
-      
+
       if (allInvolvedIds.length === 0) {
         setInvolvedIds([]);
         return;
       }
 
-      // Fetch full item details for these IDs
       const { data, error } = await supabase
         .from('marketplace_listings')
         .select('*')
@@ -957,21 +651,38 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
     pauseUpdates,
   }), [pendingCount, loadPending, isPollingActive, showContinuePrompt, continueWatching, pauseUpdates]);
 
+  // --- Aggregate context value (same shape as the original) ---
   const contextValue = useMemo<MarketplaceContextType>(() => ({
-    items, bids, itemsById, bidsById, feedIds, involvedIds,
+    items,
+    bids: bidCtx.bids,
+    itemsById,
+    bidsById: bidCtx.bidsById,
+    feedIds,
+    involvedIds,
     isLoading, isLoadingMore, isRevalidating, hasMore, loadMore, addItem,
-    updateItem, deleteItem, placeBid, toggleWatch, watchedItemIds,
-    rejectBid, acceptBid, confirmExchange, filters, setFilter,
-    updateFilters, lastBidTimestamp, setLastBidTimestamp, refreshInvolvedItems,
+    updateItem, deleteItem,
+    placeBid: bidCtx.placeBid,
+    toggleWatch: watchCtx.toggleWatch,
+    watchedItemIds: watchCtx.watchedItemIds,
+    rejectBid: bidCtx.rejectBid,
+    acceptBid: bidCtx.acceptBid,
+    confirmExchange: bidCtx.confirmExchange,
+    filters, setFilter,
+    updateFilters,
+    lastBidTimestamp: bidCtx.lastBidTimestamp,
+    setLastBidTimestamp: bidCtx.setLastBidTimestamp,
+    refreshInvolvedItems,
     refresh,
-    liveFeed
+    liveFeed,
   }), [
-    items, bids, itemsById, bidsById, feedIds, involvedIds,
-    isLoading, isLoadingMore, isRevalidating, hasMore, watchedItemIds, filters, lastBidTimestamp,
-    // All functions now stable via useCallback
-    loadMore, addItem, updateItem, deleteItem, placeBid, toggleWatch,
-    rejectBid, acceptBid, confirmExchange, setFilter, updateFilters,
-    setLastBidTimestamp, refreshInvolvedItems, refresh, liveFeed
+    items, bidCtx.bids, itemsById, bidCtx.bidsById, feedIds, involvedIds,
+    isLoading, isLoadingMore, isRevalidating, hasMore,
+    watchCtx.watchedItemIds, filters, bidCtx.lastBidTimestamp,
+    loadMore, addItem, updateItem, deleteItem,
+    bidCtx.placeBid, watchCtx.toggleWatch,
+    bidCtx.rejectBid, bidCtx.acceptBid, bidCtx.confirmExchange,
+    setFilter, updateFilters,
+    bidCtx.setLastBidTimestamp, refreshInvolvedItems, refresh, liveFeed,
   ]);
 
   return (
@@ -981,6 +692,93 @@ export function MarketplaceProvider({ children }: { children: React.ReactNode })
   );
 }
 
+
+// ---------------------------------------------------------------------------
+// Public Provider — sets up: Watchlist → Bid → Core
+// ---------------------------------------------------------------------------
+
+export function MarketplaceProvider({ children }: { children: React.ReactNode }) {
+  // Watchlist and Bid providers wrap MarketplaceCore so it can use their hooks
+  return (
+    <WatchlistProviderBridge>
+      <BidProviderBridge>
+        <MarketplaceCore>{children}</MarketplaceCore>
+      </BidProviderBridge>
+    </WatchlistProviderBridge>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Bridge wrappers — thin shells that pass cross-context callbacks
+// ---------------------------------------------------------------------------
+
+import { WatchlistProvider } from "./WatchlistContext";
+import { BidProvider, type BidItemBridge } from "./BidContext";
+
+function WatchlistProviderBridge({ children }: { children: React.ReactNode }) {
+  // onInvolvedChange: Forward to MarketplaceCore via globalThis ref
+  const onInvolvedChange = useCallback((action: 'add' | 'remove', itemId: string) => {
+    const bridge = (globalThis as Record<string, unknown>).__marketplaceBridge as {
+      onInvolvedChange?: React.RefObject<(action: 'add' | 'remove', itemId: string) => void>;
+    } | undefined;
+    bridge?.onInvolvedChange?.current?.(action, itemId);
+  }, []);
+
+  return (
+    <WatchlistProvider onInvolvedChange={onInvolvedChange}>
+      {children}
+    </WatchlistProvider>
+  );
+}
+
+function BidProviderBridge({ children }: { children: React.ReactNode }) {
+  const watchCtx = useWatchlist();
+
+  // Bridge: forward bid events to MarketplaceCore via globalThis ref
+  const bridge = useMemo<BidItemBridge>(() => ({
+    onBidLanded: (bid: Bid) => {
+      const mBridge = (globalThis as Record<string, unknown>).__bidBridge as {
+        onBidLanded?: React.RefObject<(bid: Bid) => void>;
+      } | undefined;
+      mBridge?.onBidLanded?.current?.(bid);
+    },
+    onBidPlacedSuccess: (itemId: string) => {
+      const mBridge = (globalThis as Record<string, unknown>).__bidBridge as {
+        onBidPlacedSuccess?: React.RefObject<(itemId: string) => void>;
+      } | undefined;
+      mBridge?.onBidPlacedSuccess?.current?.(itemId);
+    },
+    onBidRollback: (itemId: string) => {
+      const mBridge = (globalThis as Record<string, unknown>).__bidBridge as {
+        onBidRollback?: React.RefObject<(itemId: string) => void>;
+      } | undefined;
+      mBridge?.onBidRollback?.current?.(itemId);
+    },
+  }), []);
+
+  // Active IDs for realtime: get from viewport + involved (MarketplaceCore manages)
+  // Since MarketplaceCore computes activeIds from visibleIds + involvedIds,
+  // we need a way to pass them. Use a shared ref set by MarketplaceCore.
+  const [activeIds] = useState(() => new Set<string>());
+
+  useEffect(() => {
+    (globalThis as Record<string, unknown>).__activeBidIds = activeIds;
+    return () => {
+      delete (globalThis as Record<string, unknown>).__activeBidIds;
+    };
+  }, [activeIds]);
+
+  return (
+    <BidProvider bridge={bridge} activeIds={activeIds} watchedItemIdsRef={watchCtx.watchedItemIdsRef}>
+      {children}
+    </BidProvider>
+  );
+}
+
+
+// ---------------------------------------------------------------------------
+// Hook
+// ---------------------------------------------------------------------------
 
 export function useMarketplace() {
   const context = useContext(MarketplaceContext);
