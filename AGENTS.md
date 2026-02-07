@@ -111,6 +111,9 @@ Core Tenet: "Subtract before you add. If a visual cue works, delete the text."
 3. Verify animations: ensure Framer Motion transitions are smooth and avoid layout shifts.
 4. SQL first: DDL changes must be reflected in `packages/database/schema.sql`.
 5. Pre-flight requirement: always run `just checks` before finishing a task.
+6. **No duplicate code**: before adding any new function, handler, or component to an existing file, always run `view_file_outline` on the target file first and verify no symbol with the same name already exists. Never assume a function is missing without checking.
+7. **Build before commit**: never commit mobile (`apps/mobile`) changes without confirming the Metro bundler compiles successfully (zero errors). For web changes, run `just typecheck` at minimum.
+8. **Verify search results**: if a `grep_search` returns no results for something you expect to exist, double-check by viewing the file outline or the relevant section of the file directly. Search tools can miss results due to timing or encoding.
 
 ## PROJECT MANIFESTO
 D:\VSCode\Boliyan\MANIFESTO.md
