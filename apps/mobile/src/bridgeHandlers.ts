@@ -102,16 +102,21 @@ async function handleGetLocation(request: NativeBridgeRequest) {
     ? Location.Accuracy.Highest
     : Location.Accuracy.Balanced;
   
-  console.log('[NativeBridge] Getting position with accuracy:', accuracy);
-  const position = await Location.getCurrentPositionAsync({ accuracy });
-  console.log('[NativeBridge] Got position:', position.coords);
+  try {
+    console.log('[NativeBridge] Getting position with accuracy:', accuracy);
+    const position = await Location.getCurrentPositionAsync({ accuracy });
+    console.log('[NativeBridge] Got position:', position.coords);
 
-  return buildSuccessResponse(request, {
-    lat: position.coords.latitude,
-    lng: position.coords.longitude,
-    accuracy: position.coords.accuracy ?? null,
-    source: payload?.highAccuracy ? 'gps' : 'network'
-  });
+    return buildSuccessResponse(request, {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      accuracy: position.coords.accuracy ?? null,
+      source: payload?.highAccuracy ? 'gps' : 'network'
+    });
+  } catch (err) {
+    console.warn('[NativeBridge] Location fetch failed:', err);
+    return buildErrorResponse(request, buildError('unknown', 'Failed to get location'));
+  }
 }
 
 async function handleRequestNotificationPermission(request: NativeBridgeRequest) {
@@ -304,8 +309,10 @@ async function handleTriggerHaptic(request: NativeBridgeRequest) {
   }
 }
 
+
 async function handlePlaySound(request: NativeBridgeRequest) {
-  return buildErrorResponse(request, buildError('unsupported', 'Sound bridge not configured'));
+  // No-op: sound bridge not yet configured. Return success to avoid web-side errors.
+  return buildSuccessResponse(request, { ok: true });
 }
 
 async function handleSecureStorageGet(request: NativeBridgeRequest) {

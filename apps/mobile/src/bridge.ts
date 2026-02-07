@@ -18,29 +18,33 @@ export function createBridgeScript(): string {
   const readyFlag = NativeBridgeReadyFlag;
   const timeoutMs = BRIDGE_RESPONSE_TIMEOUT_MS;
 
+  const isDev = __DEV__;
+
   return `(() => {
-  // Forward console logs to Native
-  const levels = ['log', 'warn', 'error', 'info', 'debug'];
-  levels.forEach(level => {
-    const original = console[level];
-    console[level] = (...args) => {
-      original(...args);
-      try {
-        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'CONSOLE_LOG',
-            level,
-            args: args.map(arg => {
-              if (typeof arg === 'object') {
-                try { return JSON.stringify(arg); } catch(e) { return String(arg); }
-              }
-              return String(arg);
-            })
-          }));
-        }
-      } catch (e) {}
-    };
-  });
+  // Forward console logs to Native (dev only)
+  if (${isDev}) {
+    const levels = ['log', 'warn', 'error', 'info', 'debug'];
+    levels.forEach(level => {
+      const original = console[level];
+      console[level] = (...args) => {
+        original(...args);
+        try {
+          if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'CONSOLE_LOG',
+              level,
+              args: args.map(arg => {
+                if (typeof arg === 'object') {
+                  try { return JSON.stringify(arg); } catch(e) { return String(arg); }
+                }
+                return String(arg);
+              })
+            }));
+          }
+        } catch (e) {}
+      };
+    });
+  }
 
   if (window.${globalName}) {
     return;

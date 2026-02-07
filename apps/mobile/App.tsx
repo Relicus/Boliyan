@@ -18,6 +18,8 @@ import { handleBridgeRequest } from './src/bridgeHandlers';
 import { ErrorScreen } from './src/screens/ErrorScreen';
 import { LoadingScreen } from './src/screens/LoadingScreen';
 import { OfflineScreen } from './src/screens/OfflineScreen';
+import { UpdateScreen } from './src/screens/UpdateScreen';
+import { useVersionCheck } from './src/hooks/useVersionCheck';
 
 const INTERNAL_SCHEME_PREFIX = LINK_PREFIX;
 
@@ -66,6 +68,9 @@ export default function App() {
   const [loadStartAt, setLoadStartAt] = useState<number | null>(null);
   const bridgeScript = useMemo(createBridgeScript, []);
   const userAgent = Platform.OS === 'ios' ? undefined : 'BoliyanMobile';
+
+  // Version gating
+  const { needsForceUpdate, needsSoftUpdate, updateUrl, dismiss: dismissUpdate } = useVersionCheck();
 
   const handleRetry = useCallback(() => {
     setHasError(false);
@@ -194,12 +199,21 @@ export default function App() {
     return () => clearTimeout(timeout);
   }, [isLoaded, loadStartAt]);
 
+  // Screen priority: offline > force update > error > soft update > app
   if (!isOnline) {
     return <OfflineScreen onRetry={handleRetry} />;
   }
 
+  if (needsForceUpdate) {
+    return <UpdateScreen isForced updateUrl={updateUrl} onDismiss={dismissUpdate} />;
+  }
+
   if (hasError) {
     return <ErrorScreen onRetry={handleRetry} />;
+  }
+
+  if (needsSoftUpdate) {
+    return <UpdateScreen isForced={false} updateUrl={updateUrl} onDismiss={dismissUpdate} />;
   }
 
   return (
@@ -239,6 +253,10 @@ export default function App() {
               domStorageEnabled
               mediaPlaybackRequiresUserAction
               userAgent={userAgent}
+              // WebView caching — keep pages cached for faster back/forward
+              cacheEnabled
+              cacheMode="LOAD_DEFAULT"
+              incognito={false}
             />
           </ScrollView>
         ) : (
@@ -261,6 +279,10 @@ export default function App() {
               domStorageEnabled
               mediaPlaybackRequiresUserAction
               userAgent={userAgent}
+              // WebView caching — keep pages cached for faster back/forward
+              cacheEnabled
+              cacheMode="LOAD_DEFAULT"
+              incognito={false}
             />
           </View>
         )}
