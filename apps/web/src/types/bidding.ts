@@ -5,13 +5,6 @@
  * Shared base properties + variant-specific overrides.
  */
 
-/**
- * Bidding Configuration Types
- * 
- * OOP-style type system for bidding behavior.
- * Shared base properties + variant-specific overrides.
- */
-
 import { Item, User, Bid } from './index';
 
 // ============================================

@@ -4,7 +4,7 @@ import { Item, User, Bid, Conversation } from '@/types';
 type ListingRow = Database['public']['Tables']['listings']['Row'];
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 
-import { CITY_COORDINATES } from './locations';
+import { CITY_COORDINATES } from './constants/locations';
 
 // We need a joined type because we will fetch listings with their sellers
 export type ListingWithSeller = ListingRow & {

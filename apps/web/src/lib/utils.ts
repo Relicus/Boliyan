@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { format, isToday, isYesterday } from "date-fns";
 import { twMerge } from "tailwind-merge"
+import { calculateDistance } from "@/lib/searchUtils";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -96,22 +97,8 @@ export function calculatePrivacySafeDistance(
     return { distance: 0, duration: 0, isOutside: true };
   }
 
-  // If no user location, default to a generic "Far" distance or specific center
-  // For this mock, we'll assume a fixed user location if undefined
-  const userLat = from.lat;
-  const userLng = from.lng;
-
-  const R = 6371; // Earth's radius in km
-  const dLat = (to.lat - userLat) * Math.PI / 180;
-  const dLon = (to.lng - userLng) * Math.PI / 180;
-  
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(userLat * Math.PI / 180) * Math.cos(to.lat * Math.PI / 180) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  const rawDist = R * c;
+  // Delegate raw Haversine to the single shared implementation
+  const rawDist = calculateDistance(from.lat, from.lng, to.lat, to.lng);
 
   // PRIVACY STEP: Round to nearest 200m (0.2km) as per user request
   // This gives an "area" estimation without pinning exact house
@@ -350,38 +337,6 @@ export function getListingShortCode(slug?: string): string | undefined {
   return trimmed.slice(lastDash + 1);
 }
 
-/**
- * Centralized condition configuration - SINGLE SOURCE OF TRUTH
- * 
- * Use this everywhere: badges, filters, dropdowns, active filters.
- * Structure:
- * - id: Database value ('new', 'like_new', 'used', 'fair')
- * - label: Display label for filters/dropdowns
- * - badgeLabel: Short label for badges (with emoji)
- * - icon: Lucide icon name for filter UI
- */
-export const CONDITION_OPTIONS = [
-  { id: 'new', label: 'New', badgeLabel: '🌟 New', icon: 'Sparkles' },
-  { id: 'like_new', label: 'Like New', badgeLabel: '✨ Mint', icon: 'Star' },
-  { id: 'used', label: 'Used', badgeLabel: '👌 Used', icon: 'ThumbsUp' },
-  { id: 'fair', label: 'Fair', badgeLabel: '🔨 Fair', icon: 'Wrench' },
-] as const;
-
-export type ConditionId = typeof CONDITION_OPTIONS[number]['id'];
-
-/**
- * Maps database condition strings to badge display labels.
- */
-export function getConditionLabel(condition: string): string {
-  const found = CONDITION_OPTIONS.find(c => c.id === condition);
-  return found?.badgeLabel ?? '👌 Used';
-}
-
-/**
- * Maps database condition strings to filter display labels.
- */
-export function getConditionFilterLabel(condition: string): string {
-  const found = CONDITION_OPTIONS.find(c => c.id === condition);
-  return found?.label ?? 'Used';
-}
+// Re-exported from constants.ts for backwards compatibility
+export { CONDITION_OPTIONS, type ConditionId, getConditionLabel, getConditionFilterLabel } from './constants';
 
