@@ -16,6 +16,11 @@ type ListingMeta = {
   title: string | null;
   description: string | null;
   images: string[] | null;
+  asked_price?: number | null;
+  condition?: string | null;
+  category?: string | null;
+  seller_name?: string | null;
+  status?: string | null;
 };
 
 const resolveImageUrl = (image?: string | null) => {
@@ -34,7 +39,7 @@ const fetchListingMeta = async (slugOrId: string): Promise<ListingMeta | null> =
 
   let query = supabaseServer
     .from("marketplace_listings")
-    .select("id, slug, title, description, images");
+    .select("id, slug, title, description, images, asked_price, condition, category, seller_name, status");
 
   if (isUuid(slugOrId)) {
     query = query.eq("id", slugOrId);
@@ -98,7 +103,62 @@ export async function generateMetadata({
   };
 }
 
+/** Map DB condition values to schema.org OfferItemCondition */
+function mapConditionToSchema(condition?: string | null): string {
+  switch (condition) {
+    case "new": return "https://schema.org/NewCondition";
+    case "like_new": return "https://schema.org/UsedCondition";
+    case "used": return "https://schema.org/UsedCondition";
+    case "fair": return "https://schema.org/UsedCondition";
+    default: return "https://schema.org/UsedCondition";
+  }
+}
+
+function buildProductJsonLd(listing: ListingMeta) {
+  const productSlug = listing.slug || listing.id || "";
+  const productUrl = `${baseUrl}/product/${productSlug}`;
+  const imageUrl = resolveImageUrl(listing.images?.[0]);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: listing.title || "Listing",
+    description: listing.description || undefined,
+    url: productUrl,
+    image: imageUrl || undefined,
+    category: listing.category || undefined,
+    offers: {
+      "@type": "Offer",
+      price: listing.asked_price ?? undefined,
+      priceCurrency: "PKR",
+      availability: listing.status === "active"
+        ? "https://schema.org/InStock"
+        : "https://schema.org/SoldOut",
+      itemCondition: mapConditionToSchema(listing.condition),
+      seller: listing.seller_name ? {
+        "@type": "Person",
+        name: listing.seller_name,
+      } : undefined,
+    },
+  };
+}
+
 export default async function ProductPage({ params }: { params: Promise<{ id?: string; slug?: string }> }) {
   const resolvedParams = await params;
-  return <ProductPageClient params={resolvedParams} />;
+  const slugOrId = resolvedParams.slug || resolvedParams.id || "";
+
+  // Fetch listing for JSON-LD (the client component fetches its own data too)
+  const listing = slugOrId ? await fetchListingMeta(slugOrId) : null;
+
+  return (
+    <>
+      {listing && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildProductJsonLd(listing)) }}
+        />
+      )}
+      <ProductPageClient params={resolvedParams} />
+    </>
+  );
 }
