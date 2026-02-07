@@ -67,9 +67,14 @@ const notoUrdu = localFont({
 export const metadata: Metadata = {
   title: "Boliyan - Sell Fast. Buy Fair.",
   description: "Bid smart, sell faster. The no-nonsense marketplace.",
+  manifest: "/manifest.json",
   icons: {
-    icon: "/logo.svg",
-    apple: "/logo.svg",
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/icon-192.png",
   },
 };
 
