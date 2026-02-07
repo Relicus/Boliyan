@@ -71,7 +71,7 @@ export default function SignUpClient() {
     setIsLoading(true);
     
     try {
-      console.log("[SignUp] Attempting signup for:", email);
+
       // Create user with metadata
       const { data, error } = await supabase.auth.signUp({ 
         email, 
@@ -85,7 +85,7 @@ export default function SignUpClient() {
         }
       });
 
-      console.log("[SignUp] Result:", { session: !!data?.session, user: !!data?.user, error: error?.message });
+
 
       if (error) {
          console.error("Signup error:", error.message);
@@ -94,10 +94,10 @@ export default function SignUpClient() {
       } else if (!data.session) {
          // Success! But email verification is enabled
          setNeedsVerification(true);
-         console.log("[SignUp] Success! Verification required.");
+
       } else {
          // Success!
-         console.log("[SignUp] Success! Redirecting...");
+
          const target = redirect && redirect.startsWith('/') ? redirect : '/';
          router.push(target);
          router.refresh();

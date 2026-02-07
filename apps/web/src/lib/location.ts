@@ -65,7 +65,7 @@ export async function getCurrentLocation(
       console.warn('[Location] Native location failed, falling back to browser:', err);
     }
   } else {
-    console.log('[Location] Native bridge not available, using browser geolocation');
+    // Native bridge not available — use browser geolocation
   }
 
   // Fallback to browser geolocation

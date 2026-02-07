@@ -170,22 +170,13 @@ export function BidProvider({
     // Bridge: let MarketplaceContext do optimistic item update
     bridgeRef.current.onBidLanded(optimisticBid);
 
-    // Debug: Check auth state before making the call
-    const { data: sessionData } = await supabase.auth.getSession();
-    console.log('[placeBid] Auth state:', {
-      hasSession: !!sessionData.session,
-      authUid: sessionData.session?.user?.id,
-      appUserId: user.id,
-      idsMatch: sessionData.session?.user?.id === user.id
-    });
-
     const { data, error } = await supabase.rpc('place_bid', {
       p_listing_id: itemId,
       p_amount: amount,
       p_message: type === 'private' ? 'Private Bid' : 'Public Bid'
     });
 
-    console.log('[placeBid] Supabase response:', { hasData: !!data, error });
+
 
     if (error || !data) {
       console.error("Failed to place bid:", {

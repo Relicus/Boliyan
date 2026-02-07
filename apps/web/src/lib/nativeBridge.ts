@@ -45,10 +45,10 @@ export async function requestNative<T extends NativeBridgeMethodType>(
     return null;
   }
 
-  console.log(`[NativeBridge] Sending request: ${method}`, payload);
+
   try {
     const result = await bridge[method](payload);
-    console.log(`[NativeBridge] Got response for ${method}:`, result);
+
     return result;
   } catch (err) {
     console.error(`[NativeBridge] Error calling ${method}:`, err);

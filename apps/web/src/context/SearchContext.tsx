@@ -99,9 +99,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
          if (!isStale) {
              return;
          }
-        console.log(`[Search] Cache stale for ${cacheKey}, revalidating...`);
     }
-
     try {
             let query = supabase
         .from('marketplace_listings')

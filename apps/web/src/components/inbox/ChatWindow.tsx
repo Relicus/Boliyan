@@ -275,12 +275,12 @@ export function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
   const handleRetryFetch = async () => {
     setShowMissing(false);
     if (fetchConversation && conversationId) {
-        console.log("Manual retry fetching conversation:", conversationId);
+
         const fetched = await fetchConversation(conversationId);
         if (fetched) {
             setLocalConversation(fetched);
         } else {
-            console.error("Manual retry failed to find conversation");
+
             toast.error("Could not find conversation. It may have been deleted.");
             setTimeout(() => setShowMissing(true), 500);
         }

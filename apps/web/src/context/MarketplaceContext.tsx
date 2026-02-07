@@ -560,8 +560,8 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isLoadingMore, hasMore]);
 
-  const addItem = useCallback((newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => {
-    console.log("addItem - logic pending refactor in selling phase", newItem);
+  const addItem = useCallback((_newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => {
+    // TODO: Implement in selling phase
   }, []);
 
   const updateItem = useCallback(async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>>) => {

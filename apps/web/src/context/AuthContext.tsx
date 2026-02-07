@@ -146,7 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .then(async (position) => {
                     if (!mounted) return;
                     const { lat: latitude, lng: longitude, source } = position;
-                    console.log(`[AuthContext] Got location from ${source}:`, latitude, longitude);
+
                     try {
                         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
                         const data = await res.json();
@@ -180,7 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     type ProfileExtras = { is_verified?: boolean; review_count?: number; rating?: number; rating_count?: number; phone?: string; whatsapp?: string; name?: string };
 
     const fetchProfile = useCallback(async (supabaseUser: SupabaseUser) => {
-        console.log("[AuthContext] Fetching profile for:", supabaseUser.id);
+
         setIsLoading(true); // Ensure loading is true while fetching
         try {
             const { data: fetchedData, error } = await supabase
@@ -191,7 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             let data = fetchedData as ProfileRow | null;
 
-            console.log("[AuthContext] Profile fetch result:", { hasData: !!data, error });
+
 
       // Handle 'Row not found' (PGRST116) or null data
       if (!data && (error?.code === 'PGRST116' || !error)) {
@@ -285,21 +285,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("[AuthContext] Auth state change:", _event, session?.user?.id);
+
 
       if (session?.user) {
          // Check against Ref to strictly deduplicate fetches
          if (session.user.id !== lastProcessedUserId.current) {
-            console.log("[AuthContext] New user detected, fetching profile...");
+
             lastProcessedUserId.current = session.user.id;
             setIsLoading(true);
             fetchProfile(session.user);
          } else {
             // Same user, no action needed unless we want to silent re-validate
-            console.log("[AuthContext] User already processed, skipping fetch");
+
          }
       } else {
-        console.log("[AuthContext] No session user, clearing state");
+
         lastProcessedUserId.current = null;
         setUser(null);
         setIsLoading(false);

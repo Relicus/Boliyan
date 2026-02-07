@@ -280,10 +280,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
 
       getCurrentLocation({ highAccuracy: true, timeout: 10000 })
           .then((position) => {
-              const lat = position.lat;
-              const lng = position.lng;
-              console.log(`[MapPicker] Got location from ${position.source}:`, lat, lng);
-              setCenter([lat, lng]);
+              setCenter([position.lat, position.lng]);
           })
           .catch((error) => {
               console.error("Location error:", error);

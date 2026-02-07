@@ -107,20 +107,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (!data) {
-        // 2. Debug: Check if raw conversation exists (Diagnose RLS vs Missing Join Data)
-        const { data: rawData, error: rawError } = await supabase
+        // Fallback: Check if raw conversation exists (Diagnose RLS vs Missing Join Data)
+        const { data: rawData } = await supabase
             .from('conversations')
             .select('*')
             .eq('id', conversationId)
             .single();
-            
-        console.log("[fetchHydratedConversation] Fallback check:", {
-            id: conversationId,
-            rawFound: !!rawData,
-            rawError,
-            details: rawData
-        });
         
+        if (!rawData) return undefined;
         return undefined;
     }
     
