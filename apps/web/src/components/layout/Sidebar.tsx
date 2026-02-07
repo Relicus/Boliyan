@@ -14,13 +14,14 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useApp } from "@/lib/store";
+import { CONDITION_OPTIONS } from "@/lib/constants";
 import { motion } from "framer-motion";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import BannerAd from "@/components/ads/BannerAd";
 
 import { cn } from "@/lib/utils";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Select,
   SelectContent,
@@ -33,35 +34,78 @@ import { Button } from "@/components/ui/button";
 
 import { usePathname } from "next/navigation";
 
-export default function Sidebar() {
-  const { filters, setFilter } = useApp();
-  const pathname = usePathname();
-  
-  // Infinite Scroll Ads State
-  const [adCount, setAdCount] = useState(0);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-  
-  // We need to know if there are more items to load in the main feed.
-  // Ideally, the parent should pass this down or we access it from store.
-  // For now, we'll access the marketplace state to check loading status or item count.
-  const { items, isMarketplaceLoading } = useApp();
+const SIDEBAR_AD_VISIBILITY_LIMIT = 3;
+const SIDEBAR_AD_SESSION_LOAD_LIMIT = 5;
+const SIDEBAR_AD_SESSION_STORAGE_KEY = "boliyan_sidebar_ad_loads";
 
-  const entry = useIntersectionObserver(loadMoreRef, {
-    threshold: 0.1,
-    rootMargin: '100px',
+export default function Sidebar() {
+  const { filters, setFilter, resetFilters } = useApp();
+  const pathname = usePathname();
+
+  const [visibleAdSlots, setVisibleAdSlots] = useState(0);
+  const [sessionAdLoads, setSessionAdLoads] = useState<number | null>(null);
+  const previousVisibleAdSlotsRef = useRef(0);
+  const secondAdTriggerRef = useRef<HTMLDivElement>(null);
+  const thirdAdTriggerRef = useRef<HTMLDivElement>(null);
+
+  const secondAdTriggerEntry = useIntersectionObserver(secondAdTriggerRef, {
+    threshold: 0.15,
+    rootMargin: "120px",
+    freezeOnceVisible: true,
   });
-  
-  // Logic: Only add ad if we intersect AND we likely have enough content to justify scrolling.
-  // If marketplace is loading or has very few items (end of list), we stop adding ads.
-  // A simple heuristic: if we have fewer than (adCount * 5) items, we might be over-spamming.
+
+  const thirdAdTriggerEntry = useIntersectionObserver(thirdAdTriggerRef, {
+    threshold: 0.15,
+    rootMargin: "120px",
+    freezeOnceVisible: true,
+  });
+
+  const maxVisibleAdsForSession = useMemo(() => {
+    if (sessionAdLoads === null) return 0;
+    const remainingLoads = Math.max(0, SIDEBAR_AD_SESSION_LOAD_LIMIT - sessionAdLoads);
+    return Math.min(SIDEBAR_AD_VISIBILITY_LIMIT, remainingLoads);
+  }, [sessionAdLoads]);
+
   useEffect(() => {
-    if (entry?.isIntersecting && !isMarketplaceLoading && items.length > (adCount * 4)) {
-      const timer = setTimeout(() => {
-        setAdCount(prev => prev + 1);
-      }, 300);
-      return () => clearTimeout(timer);
+    if (typeof window === "undefined") return;
+    const storedValue = Number(window.sessionStorage.getItem(SIDEBAR_AD_SESSION_STORAGE_KEY) ?? 0);
+    const safeStoredValue = Number.isFinite(storedValue) ? Math.max(0, storedValue) : 0;
+    const remainingLoads = Math.max(0, SIDEBAR_AD_SESSION_LOAD_LIMIT - safeStoredValue);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSessionAdLoads(safeStoredValue);
+    setVisibleAdSlots(remainingLoads > 0 ? 1 : 0);
+  }, []);
+
+  useEffect(() => {
+    if (!secondAdTriggerEntry?.isIntersecting) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVisibleAdSlots((previous) => Math.min(maxVisibleAdsForSession, Math.max(previous, 2)));
+  }, [maxVisibleAdsForSession, secondAdTriggerEntry?.isIntersecting]);
+
+  useEffect(() => {
+    if (!thirdAdTriggerEntry?.isIntersecting) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVisibleAdSlots((previous) => Math.min(maxVisibleAdsForSession, Math.max(previous, 3)));
+  }, [maxVisibleAdsForSession, thirdAdTriggerEntry?.isIntersecting]);
+
+  useEffect(() => {
+    if (sessionAdLoads === null || typeof window === "undefined") return;
+    const previousVisibleSlots = previousVisibleAdSlotsRef.current;
+
+    if (visibleAdSlots <= previousVisibleSlots) {
+      previousVisibleAdSlotsRef.current = visibleAdSlots;
+      return;
     }
-  }, [entry?.isIntersecting, adCount, isMarketplaceLoading, items.length]);
+
+    const newlyLoadedSlots = visibleAdSlots - previousVisibleSlots;
+    const nextSessionLoads = Math.min(SIDEBAR_AD_SESSION_LOAD_LIMIT, sessionAdLoads + newlyLoadedSlots);
+    previousVisibleAdSlotsRef.current = visibleAdSlots;
+
+    if (nextSessionLoads === sessionAdLoads) return;
+
+    setSessionAdLoads(nextSessionLoads);
+    window.sessionStorage.setItem(SIDEBAR_AD_SESSION_STORAGE_KEY, String(nextSessionLoads));
+  }, [sessionAdLoads, visibleAdSlots]);
 
   // Only show sidebar on home page
   if (pathname !== "/") {
@@ -90,7 +134,7 @@ export default function Sidebar() {
             )}
             <span className="relative z-20 flex items-center gap-1.5">
               <LayoutGrid className="h-3.5 w-3.5" />
-              All
+              Feed
             </span>
           </button>
 
@@ -202,24 +246,17 @@ export default function Sidebar() {
               onValueChange={(val) => setFilter('condition', val)}
             >
               <SelectTrigger id="sidebar-condition-select" className="w-full bg-white border-slate-200 focus:ring-blue-500/20 rounded-xl">
-                <SelectValue placeholder="📦 All" />
+                <SelectValue placeholder="Any Condition" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-slate-200 shadow-xl">
                 <SelectItem value="all" className="rounded-lg">
-                  <span className="font-medium">📦 All</span>
+                  <span className="font-medium">Any Condition</span>
                 </SelectItem>
-                <SelectItem value="new" className="rounded-lg text-blue-600 font-bold">
-                  <span>🌟 New</span>
-                </SelectItem>
-                <SelectItem value="like_new" className="rounded-lg">
-                  <span>✨ Mint</span>
-                </SelectItem>
-                <SelectItem value="used" className="rounded-lg">
-                  <span>👌 Used</span>
-                </SelectItem>
-                <SelectItem value="fair" className="rounded-lg">
-                  <span>🔨 Fair</span>
-                </SelectItem>
+                {CONDITION_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.id} value={opt.id} className="rounded-lg">
+                    <span>{opt.badgeLabel}</span>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -231,39 +268,50 @@ export default function Sidebar() {
             <Button 
               id="sidebar-reset-filters-btn"
               variant="ghost"
-              onClick={() => {
-                setFilter('category', null);
-                setFilter('search', "");
-                setFilter('radius', 15);
-                setFilter('minPrice', null);
-                setFilter('maxPrice', null);
-                setFilter('listingType', 'all');
-              }}
+              onClick={resetFilters}
               className="w-full justify-center gap-2 text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl"
             >
               <RefreshCcw className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform duration-500" />
-              Reset All Filters
+              Clear Filters
             </Button>
           </div>
 
           <Separator className="bg-slate-100" />
 
-          {/* Banner Ad */}
-          <div className="px-1 pt-1 pb-1">
-             <BannerAd variant="sidebar" />
-          </div>
+          {visibleAdSlots > 0 && (
+            <>
+              {/* Sidebar Ad Slot 1 */}
+              <div className="px-1 pt-1 pb-1">
+                <BannerAd variant="sidebar" index={1} />
+              </div>
 
-          <Separator className="bg-slate-100" />
+              <div id="sidebar-ad-trigger-2" ref={secondAdTriggerRef} className="h-2 w-full" />
+            </>
+          )}
 
-          {/* Infinite Scroll Ads */}
-          {Array.from({ length: adCount }).map((_, i) => (
-             <div key={`infinite-ad-${i}`} className="px-1 pt-1 pb-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
-               <BannerAd variant="sidebar" index={i + 1} />
-             </div>
-          ))}
+          {visibleAdSlots > 1 && (
+            <>
+              <Separator className="bg-slate-100" />
 
-          {/* Load More Trigger */}
-          <div ref={loadMoreRef} className="h-4 w-full" />
+              {/* Sidebar Ad Slot 2 */}
+              <div className="px-1 pt-1 pb-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <BannerAd variant="sidebar" index={2} />
+              </div>
+
+              <div id="sidebar-ad-trigger-3" ref={thirdAdTriggerRef} className="h-2 w-full" />
+            </>
+          )}
+
+          {visibleAdSlots > 2 && (
+            <>
+              <Separator className="bg-slate-100" />
+
+              {/* Sidebar Ad Slot 3 */}
+              <div className="px-1 pt-1 pb-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <BannerAd variant="sidebar" index={3} />
+              </div>
+            </>
+          )}
         </div>
       </ScrollArea>
     </aside>

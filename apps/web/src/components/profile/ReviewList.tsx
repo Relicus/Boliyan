@@ -8,7 +8,7 @@ import StarRating from './StarRating';
 import { formatShortTimestamp } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import { BoliyanLogomarkLoader } from '@/components/branding/BoliyanLogomarkLoader';
 
 interface ReviewListProps {
   userId: string;
@@ -36,7 +36,7 @@ export default function ReviewList({ userId, className }: ReviewListProps) {
   }, [userId, fetchUserReviews]);
 
   if (loading) {
-    return <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>;
+    return <div className="flex justify-center p-8"><BoliyanLogomarkLoader size="md" className="text-muted-foreground" /></div>;
   }
 
   if (reviews.length === 0) {

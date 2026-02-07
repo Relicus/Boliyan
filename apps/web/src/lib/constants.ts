@@ -93,7 +93,7 @@ export const CONDITION_OPTIONS = [
   { id: 'new', label: 'New', badgeLabel: '🌟 New', icon: 'Sparkles' },
   { id: 'like_new', label: 'Like New', badgeLabel: '✨ Mint', icon: 'Star' },
   { id: 'used', label: 'Used', badgeLabel: '👌 Used', icon: 'ThumbsUp' },
-  { id: 'fair', label: 'Fair', badgeLabel: '🔨 Fair', icon: 'Wrench' },
+  { id: 'fair', label: 'Fair', badgeLabel: '⚡ Fair', icon: 'Wrench' },
 ] as const;
 
 export type ConditionId = typeof CONDITION_OPTIONS[number]['id'];

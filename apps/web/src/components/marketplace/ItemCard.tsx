@@ -250,7 +250,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover object-center"
-                  fallbackSrc="/images/placeholder.jpg"
+                  fallbackSrc="/images/placeholder.svg"
                 />
               </div>
 

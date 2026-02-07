@@ -5,7 +5,8 @@ import { useApp } from "@/lib/store";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Globe, Navigation, Map, Loader2, Radar } from "lucide-react";
+import { MapPin, Globe, Navigation, Map, Radar } from "lucide-react";
+import { BoliyanLogomarkLoader } from "@/components/branding/BoliyanLogomarkLoader";
 import { cn, isLocationInCountry } from "@/lib/utils";
 import { MapPicker } from "@/components/common/MapPicker";
 
@@ -248,7 +249,7 @@ function LocationSelectorContent({ onSelect, mode }: { onSelect: () => void, mod
         >
           {isMapLoading ? (
             <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <BoliyanLogomarkLoader size="xs" />
               Calculating...
             </>
           ) : mode === "user" ? (

@@ -25,8 +25,8 @@ interface ClearFiltersButtonProps {
  * - search query: empty
  */
 function ClearFiltersButton({ className, variant = "inline" }: ClearFiltersButtonProps) {
-  const { filters: mpFilters, updateFilters } = useMarketplace();
-  const { filters: searchFilters, setFilters: setSearchFilters } = useSearch();
+  const { filters: mpFilters, resetFilters } = useMarketplace();
+  const { filters: searchFilters } = useSearch();
 
   // Calculate active filter count
   const activeFilterCount = useMemo(() => {
@@ -56,21 +56,11 @@ function ClearFiltersButton({ className, variant = "inline" }: ClearFiltersButto
 
   const hasActiveFilters = activeFilterCount > 0;
 
+  const { clearFilters: clearSearchFilters } = useSearch();
+
   const handleClear = () => {
-    // Reset marketplace filters
-    updateFilters({
-      category: null,
-      sortBy: 'trending',
-      minPrice: null,
-      maxPrice: null,
-      condition: 'all',
-      listingType: 'all',
-    });
-    
-    // Clear search query
-    if (searchFilters.query) {
-      setSearchFilters({ ...searchFilters, query: '' });
-    }
+    resetFilters();
+    clearSearchFilters();
   };
 
   const isMobile = variant === "mobile";

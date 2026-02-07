@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, MapPin, Clock, Bookmark, Maximize2, Share2, ArrowLeft, BadgeCheck } from "lucide-react";
+import { BoliyanLogomarkLoader } from "@/components/branding/BoliyanLogomarkLoader";
 import { useApp } from "@/lib/store";
 import { shareContent } from "@/lib/nativeShare";
 import { useBidding } from "@/hooks/useBidding";
@@ -421,7 +422,7 @@ export default function ProductPageClient({ params }: { params: { id?: string; s
   if (isLoading) {
     return (
        <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
+         <BoliyanLogomarkLoader size="xl" className="text-slate-400" />
          <p className="text-slate-500 font-medium">Loading details...</p>
        </div>
     );

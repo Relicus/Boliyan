@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, LayoutGroup } from "framer-motion";
-import { useRef, useState, useEffect, useSyncExternalStore } from "react";
+import { useRef, useState, useEffect, useSyncExternalStore, useMemo, useCallback } from "react";
 import type { SearchFilters } from "@/types";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useSearch } from "@/context/SearchContext";
@@ -23,7 +23,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
-import { LayoutGrid, Grid3x3, Grid2x2, Gavel } from "lucide-react";
+import { LayoutGrid, Grid3x3, Grid2x2, Gavel, Sparkles } from "lucide-react";
 import PriceSelector from "./PriceSelector";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -41,6 +41,7 @@ const LISTING_TYPES = [
 
 type ViewMode = 'compact' | 'comfortable' | 'spacious';
 type FilterId = typeof FILTERS[number]['id'];
+type SmartRecoveryAction = 'clear_search' | 'expand_radius' | 'reset_filters';
 
 
 const subscribeToViewport = (callback: () => void) => {
@@ -70,8 +71,26 @@ const getServerSnapshot = () => false;
 export default function MarketplaceGrid() {
   const isNativeWebView =
     typeof navigator !== "undefined" && navigator.userAgent.includes("BoliyanMobile");
-  const { items: marketplaceItems, filters: mpFilters, setFilter: setMpFilter, isLoading: mpLoading, isLoadingMore, isRevalidating, hasMore, loadMore, liveFeed, refresh } = useMarketplace();
-  const { searchResults, isSearching, filters: searchFilters, setFilters: setSearchFilters } = useSearch();
+  const {
+    items: marketplaceItems,
+    filters: mpFilters,
+    setFilter: setMpFilter,
+    resetFilters: resetMarketplaceFilters,
+    isLoading: mpLoading,
+    isLoadingMore,
+    isRevalidating,
+    hasMore,
+    loadMore,
+    liveFeed,
+    refresh,
+  } = useMarketplace();
+  const {
+    searchResults,
+    isSearching,
+    filters: searchFilters,
+    setFilters: setSearchFilters,
+    clearFilters: clearSearchFilters,
+  } = useSearch();
   
   // Live feed toast dismiss state
   const [toastDismissed, setToastDismissed] = useState(false);
@@ -101,12 +120,73 @@ export default function MarketplaceGrid() {
   const isSearchActive = (searchFilters.query?.trim().length ?? 0) > 0;
   const displayItems = isSearchActive ? searchResults : marketplaceItems;
   const currentSortId = isSearchActive ? getSearchSortFilterId(searchFilters.sortBy) : mpFilters.sortBy;
+  const hasMarketplaceFilters = useMemo(() => {
+    return (
+      mpFilters.category !== null ||
+      mpFilters.minPrice !== null ||
+      mpFilters.maxPrice !== null ||
+      mpFilters.condition !== 'all' ||
+      mpFilters.listingType !== 'all' ||
+      mpFilters.sortBy !== 'trending' ||
+      mpFilters.radius < 500
+    );
+  }, [mpFilters]);
   
   // Toast shows when: pending items exist AND user hasn't dismissed
   // After loading pending items, pendingCount goes to 0 which hides toast
   // Effective loading state: 
   // We want to show skeletons if we're REALLY loading or if we're briefly transitioning viewMode
   const isLoading = (isSearchActive ? isSearching : mpLoading) || isChangingView;
+
+  const smartRecoveryConfig = useMemo(() => {
+    if (isLoading || displayItems.length === 0 || displayItems.length >= 10) return null;
+
+    const activeQuery = searchFilters.query?.trim();
+    if (activeQuery) {
+      return {
+        action: 'clear_search' as SmartRecoveryAction,
+        buttonLabel: 'Clear Search',
+        title: 'Search is narrowing your feed',
+        description: `You are searching for "${activeQuery}". Clear it to widen your results in one tap.`,
+      };
+    }
+
+    if (mpFilters.radius < 500) {
+      return {
+        action: 'expand_radius' as SmartRecoveryAction,
+        buttonLabel: 'Expand Distance',
+        title: 'Distance range is restrictive',
+        description: `Your current radius is ${mpFilters.radius} km. Expand to all distances for a wider feed.`,
+      };
+    }
+
+    if (hasMarketplaceFilters) {
+      return {
+        action: 'reset_filters' as SmartRecoveryAction,
+        buttonLabel: 'Reset Filters',
+        title: 'Filters are limiting results',
+        description: 'One tap resets active filters while preserving your saved location.',
+      };
+    }
+
+    return null;
+  }, [displayItems.length, hasMarketplaceFilters, isLoading, mpFilters.radius, searchFilters.query]);
+
+  const handleSmartRecovery = useCallback(() => {
+    if (!smartRecoveryConfig) return;
+
+    if (smartRecoveryConfig.action === 'clear_search') {
+      clearSearchFilters();
+      return;
+    }
+
+    if (smartRecoveryConfig.action === 'expand_radius') {
+      setMpFilter('radius', 500);
+      return;
+    }
+
+    resetMarketplaceFilters();
+  }, [clearSearchFilters, resetMarketplaceFilters, setMpFilter, smartRecoveryConfig]);
 
   // Handle view mode changes with a clean "blink" to skeletons
   const handleViewModeChange = (newMode: ViewMode) => {
@@ -488,6 +568,33 @@ export default function MarketplaceGrid() {
           </>
         )}
       </div>
+
+      {smartRecoveryConfig && (
+        <motion.div
+          id="smart-recovery-card"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="mt-4 rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 to-slate-50 p-4 shadow-sm"
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 text-sm font-black text-slate-900">
+                <Sparkles className="h-4 w-4 text-blue-600" />
+                {smartRecoveryConfig.title}
+              </p>
+              <p className="mt-1 text-xs font-medium text-slate-600">{smartRecoveryConfig.description}</p>
+            </div>
+            <Button
+              id="smart-recovery-btn"
+              onClick={handleSmartRecovery}
+              className="h-9 rounded-xl bg-slate-900 px-4 text-xs font-bold text-white hover:bg-slate-800"
+            >
+              {smartRecoveryConfig.buttonLabel}
+            </Button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Sentinel for Infinite Scroll - Always render so Ref attaches, but logic handles trigger */}
       <div 

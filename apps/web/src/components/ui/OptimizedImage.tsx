@@ -19,7 +19,7 @@ interface OptimizedImageProps extends Omit<ImageProps, "onError" | "onLoad"> {
   
   /**
    * Custom fallback image on error
-   * Falls back to /images/placeholder.jpg if not provided
+   * Falls back to /images/placeholder.svg if not provided
    */
   fallbackSrc?: string;
   

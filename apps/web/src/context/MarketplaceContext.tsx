@@ -32,6 +32,20 @@ export interface MarketplaceFilters {
   listingType: 'all' | 'public' | 'hidden';
 }
 
+export const DEFAULT_MARKETPLACE_FILTERS: MarketplaceFilters = {
+  category: null,
+  search: "",
+  radius: 500,
+  locationMode: 'country',
+  city: "",
+  currentCoords: null,
+  sortBy: 'trending',
+  minPrice: null,
+  maxPrice: null,
+  condition: 'all',
+  listingType: 'all',
+};
+
 export interface MarketplaceContextType {
   items: Item[];
   bids: Bid[];
@@ -56,6 +70,7 @@ export interface MarketplaceContextType {
   filters: MarketplaceFilters;
   setFilter: <K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => void;
   updateFilters: (updates: Partial<MarketplaceFilters>) => void;
+  resetFilters: () => void;
   lastBidTimestamp: number | null;
   setLastBidTimestamp: (ts: number | null) => void;
   refreshInvolvedItems: () => Promise<void>;
@@ -204,23 +219,18 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
   const pageRef = useRef(1);
   const [hasMore, setHasMore] = useState(true);
   const loadingLockRef = React.useRef(false);
+  const inFlightFetchesRef = useRef(0);
+  const fetchIntentIdRef = useRef(0);
   const ITEMS_PER_PAGE = 12;
   const NEWEST_CACHE_TTL_MS = 90_000;
 
   // --- Filters ---
-  const [filters, setFilters] = useState<MarketplaceFilters>({
-    category: null,
-    search: "",
-    radius: 500,
-    locationMode: 'country',
-    city: "",
-    currentCoords: null,
-    sortBy: 'trending',
-    minPrice: null,
-    maxPrice: null,
-    condition: 'all',
-    listingType: 'all',
-  });
+  const [filters, setFilters] = useState<MarketplaceFilters>(DEFAULT_MARKETPLACE_FILTERS);
+  const filtersRef = useRef(filters);
+
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
 
   // 1. Initial Load: Restore saved browsing filters
   useEffect(() => {
@@ -277,18 +287,27 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
 
   // --- FETCH ITEMS ---
   const fetchItems = useCallback(async (targetPage: number, reset: boolean = false, force: boolean = false) => {
-    if (loadingLockRef.current) return;
+    const intentId = ++fetchIntentIdRef.current;
+    const isSuperseded = () => fetchIntentIdRef.current !== intentId;
+
+    if (loadingLockRef.current && !reset) {
+      return;
+    }
+
+    inFlightFetchesRef.current += 1;
     loadingLockRef.current = true;
 
-    const cacheKey = generateCacheKey('marketplace', { ...filters, page: targetPage });
+    const activeFilters = filtersRef.current;
+    const cacheKey = generateCacheKey('marketplace', { ...activeFilters, page: targetPage });
     let usedCache = false;
 
     // --- 1. CHECK CACHE (L1/L2) ---
     if (reset && !force) {
-      const cacheOptions = filters.sortBy === 'newest' ? { ttl: NEWEST_CACHE_TTL_MS } : undefined;
+      const cacheOptions = activeFilters.sortBy === 'newest' ? { ttl: NEWEST_CACHE_TTL_MS } : undefined;
       const { data: cachedItems, isStale } = await getFromCache<Item[]>(cacheKey, cacheOptions);
 
       if (cachedItems) {
+        if (isSuperseded()) return;
         setItemsById(prev => upsertEntities(prev, cachedItems));
         setFeedIds(cachedItems.map(i => i.id));
         setIsLoading(false);
@@ -300,19 +319,20 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
           .eq('status', 'active')
           .lte('go_live_at', new Date().toISOString());
 
-        if (filters.category && filters.category !== "All Items") {
-          serverQuery = serverQuery.eq('category', filters.category);
+        if (activeFilters.category && activeFilters.category !== "All Items") {
+          serverQuery = serverQuery.eq('category', activeFilters.category);
         }
-        if (filters.condition && filters.condition !== 'all') {
-          serverQuery = serverQuery.eq('condition', filters.condition);
+        if (activeFilters.condition && activeFilters.condition !== 'all') {
+          serverQuery = serverQuery.eq('condition', activeFilters.condition);
         }
-        if (filters.listingType === 'public') {
+        if (activeFilters.listingType === 'public') {
           serverQuery = serverQuery.eq('auction_mode', 'visible');
-        } else if (filters.listingType === 'hidden') {
+        } else if (activeFilters.listingType === 'hidden') {
           serverQuery = serverQuery.in('auction_mode', ['hidden', 'sealed']);
         }
 
         const { count: serverCount } = await serverQuery;
+        if (isSuperseded()) return;
 
         if (serverCount !== null && serverCount > cachedItems.length) {
           setHasMore(true);
@@ -321,7 +341,6 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
         }
 
         if (!isStale && (serverCount === null || serverCount <= cachedItems.length)) {
-          loadingLockRef.current = false;
           return;
         }
         setIsRevalidating(true);
@@ -370,34 +389,34 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
       query = query.lte('go_live_at', new Date().toISOString());
 
       // --- APPLY FILTERS ---
-      if (filters.category && filters.category !== "All Items") {
-        query = query.eq('category', filters.category);
+      if (activeFilters.category && activeFilters.category !== "All Items") {
+        query = query.eq('category', activeFilters.category);
       }
 
-      if (filters.search) {
-        const searchTerm = `%${filters.search}%`;
+      if (activeFilters.search) {
+        const searchTerm = `%${activeFilters.search}%`;
         query = query.or(`title.ilike.${searchTerm},description.ilike.${searchTerm}`);
       }
 
-      if (filters.minPrice !== null) {
-        query = query.gte('asked_price', filters.minPrice);
+      if (activeFilters.minPrice !== null) {
+        query = query.gte('asked_price', activeFilters.minPrice);
       }
-      if (filters.maxPrice !== null) {
-        query = query.lte('asked_price', filters.maxPrice);
-      }
-
-      if (filters.condition && filters.condition !== 'all') {
-        query = query.eq('condition', filters.condition);
+      if (activeFilters.maxPrice !== null) {
+        query = query.lte('asked_price', activeFilters.maxPrice);
       }
 
-      if (filters.listingType === 'public') {
+      if (activeFilters.condition && activeFilters.condition !== 'all') {
+        query = query.eq('condition', activeFilters.condition);
+      }
+
+      if (activeFilters.listingType === 'public') {
         query = query.eq('auction_mode', 'visible');
-      } else if (filters.listingType === 'hidden') {
+      } else if (activeFilters.listingType === 'hidden') {
         query = query.in('auction_mode', ['hidden', 'sealed']);
       }
 
       // --- APPLY SORT ---
-      switch (filters.sortBy) {
+      switch (activeFilters.sortBy) {
         case 'trending':
           query = query.order('bid_count', { ascending: false })
             .order('created_at', { ascending: false });
@@ -440,6 +459,7 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
       query = query.range(from, to);
 
       const { data: listingsData, error: listingsError, count } = await query;
+      if (isSuperseded()) return;
 
       if (listingsError) throw listingsError;
 
@@ -448,25 +468,29 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
         let fetchedArr = (listingsData as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
 
         // --- CLIENT-SIDE LOCATION FILTERING ---
-        if (filters.currentCoords && filters.radius < 500) {
+        if (activeFilters.currentCoords && activeFilters.radius < 500) {
+          const currentCoords = activeFilters.currentCoords;
+          const isStrictLocationMode = activeFilters.sortBy === 'nearest';
           fetchedArr = fetchedArr.filter(item => {
             const itemLat = item.location?.lat;
             const itemLng = item.location?.lng;
-            if (itemLat === undefined || itemLng === undefined) return false;
+            if (itemLat === undefined || itemLng === undefined) {
+              return !isStrictLocationMode;
+            }
 
             const dist = calculateDistance(
-              filters.currentCoords!.lat,
-              filters.currentCoords!.lng,
+              currentCoords.lat,
+              currentCoords.lng,
               itemLat,
               itemLng
             );
-            return dist <= filters.radius;
+            return dist <= activeFilters.radius;
           });
         }
 
         // --- CLIENT-SIDE SORTING OVERRIDES ---
-        if (filters.sortBy === 'nearest' && filters.currentCoords) {
-          fetchedArr = sortByDistance(fetchedArr, filters.currentCoords.lat, filters.currentCoords.lng);
+        if (activeFilters.sortBy === 'nearest' && activeFilters.currentCoords) {
+          fetchedArr = sortByDistance(fetchedArr, activeFilters.currentCoords.lat, activeFilters.currentCoords.lng);
         }
 
         fetchedItems = fetchedArr;
@@ -494,24 +518,57 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
       }
 
     } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'message' in err) {
-        const supabaseError = err as { message: string; details?: string; hint?: string; code?: string };
-        console.error("[MarketplaceContext] Fetch Items Error:", {
-          message: supabaseError.message,
-          details: supabaseError.details,
-          hint: supabaseError.hint,
-          code: supabaseError.code,
-        });
-      } else {
-        console.error("[MarketplaceContext] Fetch Items Error (unknown):", err);
+      if (isSuperseded()) {
+        return;
       }
+
+      // Stop pagination on any error (e.g., 416 Range Not Satisfiable)
+      setHasMore(false);
+
+      const errorRecord = err && typeof err === 'object' ? err as Record<string, unknown> : null;
+      const status = typeof errorRecord?.status === 'number' ? errorRecord.status : null;
+      const code = typeof errorRecord?.code === 'string' ? errorRecord.code : null;
+      const message = typeof errorRecord?.message === 'string' ? errorRecord.message : null;
+      const details = typeof errorRecord?.details === 'string' ? errorRecord.details : null;
+      const hint = typeof errorRecord?.hint === 'string' ? errorRecord.hint : null;
+      const normalizedMessage = (message ?? '').toLowerCase();
+      const normalizedDetails = (details ?? '').toLowerCase();
+      const isRangeError =
+        status === 416 ||
+        code === 'PGRST103' ||
+        normalizedMessage.includes('range') ||
+        normalizedDetails.includes('range') ||
+        normalizedDetails.includes('offset');
+
+      if (isRangeError) {
+        return;
+      }
+
+      const hasStructuredError = status !== null || Boolean(code || message || details || hint);
+      if (!hasStructuredError) {
+        console.warn("[MarketplaceContext] Fetch Items Error (unstructured):", err);
+        return;
+      }
+
+      console.error("[MarketplaceContext] Fetch Items Error:", {
+        status,
+        code,
+        message,
+        details,
+        hint,
+        raw: err,
+      });
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-      setIsRevalidating(false);
-      loadingLockRef.current = false;
+      inFlightFetchesRef.current = Math.max(0, inFlightFetchesRef.current - 1);
+      loadingLockRef.current = inFlightFetchesRef.current > 0;
+
+      if (!isSuperseded()) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+        setIsRevalidating(false);
+      }
     }
-  }, [filters, ITEMS_PER_PAGE, watchCtx.watchedItemIdsRef]);
+  }, [ITEMS_PER_PAGE, watchCtx.watchedItemIdsRef]);
 
   const refresh = useCallback(async () => {
     await fetchItems(1, true, true);
@@ -522,6 +579,7 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setPage(1);
     pageRef.current = 1;
+    setHasMore(false); // Prevent stale loadMore before new fetch completes
     fetchItems(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtersKey]);
@@ -557,8 +615,7 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
     pageRef.current = nextPage;
     setPage(nextPage);
     fetchItems(nextPage, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isLoadingMore, hasMore]);
+  }, [fetchItems, hasMore, isLoading, isLoadingMore]);
 
   const addItem = useCallback((_newItem: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => {
     // TODO: Implement in selling phase
@@ -599,6 +656,16 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
 
   const updateFilters = useCallback((updates: Partial<MarketplaceContextType['filters']>) => {
     setFilters(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const resetFilters = useCallback(() => {
+    setFilters(prev => ({
+      ...DEFAULT_MARKETPLACE_FILTERS,
+      // Preserve location identity but clear restrictive radius
+      locationMode: prev.locationMode,
+      city: prev.city,
+      currentCoords: prev.currentCoords,
+    }));
   }, []);
 
   const refreshInvolvedItems = React.useCallback(async () => {
@@ -668,7 +735,7 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
     acceptBid: bidCtx.acceptBid,
     confirmExchange: bidCtx.confirmExchange,
     filters, setFilter,
-    updateFilters,
+    updateFilters, resetFilters,
     lastBidTimestamp: bidCtx.lastBidTimestamp,
     setLastBidTimestamp: bidCtx.setLastBidTimestamp,
     refreshInvolvedItems,
@@ -681,7 +748,7 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
     loadMore, addItem, updateItem, deleteItem,
     bidCtx.placeBid, watchCtx.toggleWatch,
     bidCtx.rejectBid, bidCtx.acceptBid, bidCtx.confirmExchange,
-    setFilter, updateFilters,
+    setFilter, updateFilters, resetFilters,
     bidCtx.setLastBidTimestamp, refreshInvolvedItems, refresh, liveFeed,
   ]);
 

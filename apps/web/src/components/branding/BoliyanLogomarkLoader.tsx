@@ -5,11 +5,29 @@ import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { BOLIYAN_LOGOMARK_DOT, BOLIYAN_LOGOMARK_PATH } from "@/components/branding/BoliyanLogo";
 
+/**
+ * Size presets for the loader:
+ *  - xs:  14px — inline text / tiny indicators
+ *  - sm:  18px — buttons, badges, tight rows
+ *  - md:  24px — default, general purpose
+ *  - lg:  32px — section / card-level loaders
+ *  - xl:  48px — full-page loading states
+ */
+const SIZE_MAP: Record<string, string> = {
+  xs: "h-3.5 w-3.5 min-h-3.5 min-w-3.5",
+  sm: "h-[18px] w-[18px] min-h-[18px] min-w-[18px]",
+  md: "h-6 w-6 min-h-6 min-w-6",
+  lg: "h-8 w-8 min-h-8 min-w-8",
+  xl: "h-12 w-12 min-h-12 min-w-12",
+};
+
 interface BoliyanLogomarkLoaderProps {
   className?: string;
+  /** Preset size: xs | sm | md | lg | xl (default: md) */
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
 
-export const BoliyanLogomarkLoader = ({ className }: BoliyanLogomarkLoaderProps) => {
+export const BoliyanLogomarkLoader = ({ className, size = "md" }: BoliyanLogomarkLoaderProps) => {
   const maskId = useId();
   const shouldReduceMotion = useReducedMotion();
   const fillHeight = 32;
@@ -18,7 +36,7 @@ export const BoliyanLogomarkLoader = ({ className }: BoliyanLogomarkLoaderProps)
   return (
     <motion.svg
       viewBox="0 0 40 40"
-      className={cn("h-6 w-6 min-h-6 min-w-6", className)}
+      className={cn(SIZE_MAP[size], className)}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="Loading"

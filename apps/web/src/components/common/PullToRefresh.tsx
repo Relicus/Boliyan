@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect, ReactNode } from "react";
 import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from "framer-motion";
-import { Loader2, ArrowDown } from "lucide-react";
+import { ArrowDown } from "lucide-react";
+import { BoliyanLogomarkLoader } from "@/components/branding/BoliyanLogomarkLoader";
 import { useHaptic } from "@/hooks/useHaptic";
 import { cn } from "@/lib/utils";
 
@@ -195,7 +196,7 @@ export function PullToRefresh({
           }}
         >
           {isRefreshing ? (
-            <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+            <BoliyanLogomarkLoader size="sm" className="text-blue-600" />
           ) : (
             <motion.div style={isTouchMode ? undefined : { rotate }}>
               <ArrowDown className="w-5 h-5 text-slate-500" />

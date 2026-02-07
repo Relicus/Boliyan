@@ -113,17 +113,7 @@ export function useApp() {
   }, [marketplace, search]);
 
   const resetFilters = useCallback(() => {
-        // Reset Marketplace Filters matches Sidebar reset logic
-        marketplace.updateFilters({
-            category: null,
-            search: "",
-            minPrice: null,
-            maxPrice: null,
-            listingType: 'all',
-            condition: 'all',
-            sortBy: 'trending',
-            // We keep location settings as they are usually persistent user preferences
-        });
+        marketplace.resetFilters();
         search.clearFilters();
     }, [marketplace, search]);
 

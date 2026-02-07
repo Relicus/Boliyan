@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { Search, MapPin, Loader2, Navigation, Crosshair } from "lucide-react";
+import { Search, MapPin, Navigation, Crosshair } from "lucide-react";
+import { BoliyanLogomarkLoader } from "@/components/branding/BoliyanLogomarkLoader";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { PAKISTAN_CITIES, CITY_COORDINATES } from "@/lib/constants/locations";
@@ -17,7 +18,7 @@ const LeafletMap = dynamic(
     ssr: false,
     loading: () => (
       <div className="h-full w-full flex items-center justify-center bg-slate-100 text-slate-400">
-        <Loader2 className="h-6 w-6 animate-spin" />
+        <BoliyanLogomarkLoader size="md" className="text-slate-400" />
       </div>
     )
   }
@@ -302,7 +303,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
             className="pl-9 bg-white shadow-sm border-slate-200"
           />
           {isSearching && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-blue-600" />
+            <BoliyanLogomarkLoader size="xs" className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-600" />
           )}
         </div>
 
@@ -364,7 +365,7 @@ export function MapPicker({ initialLocation, onLocationSelect, onGeocodingChange
           <div className="flex items-start gap-3">
             <div className="mt-1 bg-blue-50 p-1.5 rounded-full">
                {isGeocoding ? (
-                 <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                 <BoliyanLogomarkLoader size="xs" className="text-blue-600" />
                ) : (
                  <Navigation className="h-4 w-4 text-blue-600 fill-blue-600/20" />
                )}

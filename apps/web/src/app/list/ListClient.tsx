@@ -13,7 +13,8 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Gavel, EyeOff, Camera, Image as ImageIcon, X, Save, Check, Loader2, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone, RotateCcw } from "lucide-react";
+import { Gavel, EyeOff, Camera, Image as ImageIcon, X, Save, Check, ArrowLeft, ArrowRight, Star, Calendar, DollarSign, CreditCard, Clock, Calculator, Plus, Minus, Tag, Shapes, BadgeCheck, AlignLeft, Phone, RotateCcw } from "lucide-react";
+import { BoliyanLogomarkLoader } from "@/components/branding/BoliyanLogomarkLoader";
 import { Switch } from "@/components/ui/switch";
 import { CATEGORIES, LISTING_IMAGE_ACCEPT, LISTING_LIMITS, isAllowedListingImageInput } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -636,7 +637,7 @@ function ListForm() {
   if (isAuthLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+        <BoliyanLogomarkLoader size="lg" className="text-slate-400" />
       </div>
     );
   }
@@ -736,7 +737,7 @@ function ListForm() {
           </Dialog>
           {isLoadingItem ? (
             <div className="flex flex-col items-center justify-center py-12 gap-4">
-              <Loader2 className="h-12 w-12 animate-spin text-blue-600 opacity-20" />
+              <BoliyanLogomarkLoader size="xl" className="text-blue-600 opacity-40" />
               <p className="text-slate-400 font-medium text-sm">Securing details...</p>
             </div>
           ) : (
@@ -1305,7 +1306,7 @@ function ListForm() {
               disabled={isUploading || isProcessingImages || isLoadingItem || isEditCooldown || isMapGeocoding}
             >
               {(isUploading || isProcessingImages || isMapGeocoding) ? (
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  <BoliyanLogomarkLoader size="sm" className="mr-2" />
               ) : editingItem ? (
                   <Save className="h-5 w-5 mr-2" />
               ) : (

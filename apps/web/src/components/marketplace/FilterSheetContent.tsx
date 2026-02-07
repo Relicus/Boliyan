@@ -1,6 +1,6 @@
 "use client";
 
-import { useMarketplace } from "@/context/MarketplaceContext";
+import { useApp } from "@/lib/store";
 import { CATEGORIES } from "@/lib/constants";
 import { FILTERS } from "./SmartFilterBar";
 import { cn } from "@/lib/utils";
@@ -27,15 +27,10 @@ type SortFilterId = typeof FILTERS[number]['id'];
 type ConditionFilter = 'all' | 'new' | 'like_new' | 'used' | 'fair';
 
 export default function FilterSheetContent({ onClose }: { onClose?: () => void }) {
-  const { filters, setFilter } = useMarketplace();
+  const { filters, setFilter, resetFilters } = useApp();
 
-  const resetFilters = () => {
-    setFilter('category', null);
-    setFilter('sortBy', 'trending');
-    setFilter('minPrice', null);
-    setFilter('maxPrice', null);
-    setFilter('condition', 'all');
-    setFilter('listingType', 'all');
+  const handleResetFilters = () => {
+    resetFilters();
     if (onClose) onClose();
   };
 
@@ -43,7 +38,7 @@ export default function FilterSheetContent({ onClose }: { onClose?: () => void }
     <div id="filter-sheet-root" className="flex flex-col h-full bg-white">
       <div className="flex items-center justify-between px-4 py-4 border-b">
         <h2 className="text-xl font-black font-outfit text-slate-900">Filters</h2>
-        <Button variant="ghost" size="sm" onClick={resetFilters} className="text-blue-600 font-bold hover:bg-blue-50">
+        <Button variant="ghost" size="sm" onClick={handleResetFilters} className="text-blue-600 font-bold hover:bg-blue-50">
           Reset All
         </Button>
       </div>
