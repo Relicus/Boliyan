@@ -7,87 +7,21 @@ import { supabase } from "@/lib/supabase";
 import { transformListingToItem, ListingWithSeller } from "@/lib/transform";
 import { generateCacheKey, getFromCache, setCache } from "@/lib/cache";
 import { useListingsPolling } from "@/hooks/useListingsPolling";
-import type { Database } from "@/types/database.types";
 import { upsertEntities, upsertEntity, removeEntity } from "@/lib/store-helpers";
 import { useViewport } from "./ViewportContext";
 import { calculateDistance, sortByDistance } from "@/lib/searchUtils";
 import { useBids } from "./BidContext";
 import { useWatchlist } from "./WatchlistContext";
+import { WatchlistProviderBridge, BidProviderBridge } from "./marketplace-bridges";
+import { MARKETPLACE_SELECT_COLUMNS, transformRows } from "./marketplace-fetcher";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export interface MarketplaceFilters {
-  category: string | null;
-  search: string;
-  radius: number;
-  locationMode: 'current' | 'city' | 'country';
-  city: string;
-  currentCoords: { lat: number; lng: number } | null;
-  sortBy: 'trending' | 'nearest' | 'ending_soon' | 'luxury' | 'newest' | 'watchlist';
-  minPrice: number | null;
-  maxPrice: number | null;
-  condition: 'new' | 'like_new' | 'used' | 'fair' | 'all';
-  listingType: 'all' | 'public' | 'hidden';
-}
-
-export const DEFAULT_MARKETPLACE_FILTERS: MarketplaceFilters = {
-  category: null,
-  search: "",
-  radius: 500,
-  locationMode: 'country',
-  city: "",
-  currentCoords: null,
-  sortBy: 'trending',
-  minPrice: null,
-  maxPrice: null,
-  condition: 'all',
-  listingType: 'all',
-};
-
-export interface MarketplaceContextType {
-  items: Item[];
-  bids: Bid[];
-  itemsById: Record<string, Item>;
-  bidsById: Record<string, Bid>;
-  feedIds: string[];
-  involvedIds: string[];
-  isLoading: boolean;
-  isLoadingMore: boolean;
-  isRevalidating: boolean;
-  hasMore: boolean;
-  loadMore: () => void;
-  addItem: (item: Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>) => void;
-  updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'bidCount' | 'bidAttemptsCount'>>) => void;
-  deleteItem: (id: string) => void;
-  placeBid: (itemId: string, amount: number, type: 'public' | 'private') => Promise<boolean>;
-  toggleWatch: (itemId: string) => void;
-  watchedItemIds: string[];
-  rejectBid: (bidId: string) => void;
-  acceptBid: (bidId: string) => Promise<string | undefined>;
-  confirmExchange: (conversationId: string, role: 'buyer' | 'seller') => Promise<boolean>;
-  filters: MarketplaceFilters;
-  setFilter: <K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) => void;
-  updateFilters: (updates: Partial<MarketplaceFilters>) => void;
-  resetFilters: () => void;
-  lastBidTimestamp: number | null;
-  setLastBidTimestamp: (ts: number | null) => void;
-  refreshInvolvedItems: () => Promise<void>;
-  refresh: () => Promise<void>;
-  liveFeed: {
-    pendingCount: number;
-    loadPending: () => void;
-    isPollingActive: boolean;
-    showContinuePrompt: boolean;
-    continueWatching: () => void;
-    pauseUpdates: () => void;
-  };
-}
+// Re-export types so existing consumers don't break
+export type { MarketplaceFilters, MarketplaceContextType } from "./marketplace-types";
+export { DEFAULT_MARKETPLACE_FILTERS } from "./marketplace-types";
+import type { MarketplaceFilters, MarketplaceContextType } from "./marketplace-types";
+import { DEFAULT_MARKETPLACE_FILTERS } from "./marketplace-types";
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
-
-type MarketplaceListingRow = Database['public']['Views']['marketplace_listings']['Row'];
 
 // ---------------------------------------------------------------------------
 // MarketplaceCore — the actual provider logic
@@ -356,35 +290,9 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      let query = supabase.from('marketplace_listings').select(`
-                id,
-                title,
-                description,
-                images,
-                seller_id,
-                asked_price,
-                category,
-                auction_mode,
-                created_at,
-                ends_at,
-                go_live_at,
-                search_vector,
-                status,
-                seller_name,
-                seller_avatar,
-                seller_rating,
-                seller_rating_count,
-                seller_location,
-                bid_count,
-                high_bid,
-                high_bidder_id,
-                condition,
-                slug,
-                contact_phone,
-                location_lat,
-                location_lng,
-                location_address
-            `, { count: 'exact' }).eq('status', 'active');
+      let query = supabase.from('marketplace_listings').select(
+        MARKETPLACE_SELECT_COLUMNS, { count: 'exact' }
+      ).eq('status', 'active');
 
       query = query.lte('go_live_at', new Date().toISOString());
 
@@ -465,7 +373,7 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
 
       let fetchedItems: Item[] = [];
       if (listingsData) {
-        let fetchedArr = (listingsData as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
+        let fetchedArr = transformRows(listingsData);
 
         // --- CLIENT-SIDE LOCATION FILTERING ---
         if (activeFilters.currentCoords && activeFilters.radius < 500) {
@@ -695,7 +603,7 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
       if (error) throw error;
 
       if (data) {
-        const transformedItems = data.map(row => transformListingToItem(row as unknown as ListingWithSeller));
+        const transformedItems = transformRows(data);
         setItemsById(prev => upsertEntities(prev, transformedItems));
         setInvolvedIds(allInvolvedIds);
       }
@@ -765,80 +673,12 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
 // ---------------------------------------------------------------------------
 
 export function MarketplaceProvider({ children }: { children: React.ReactNode }) {
-  // Watchlist and Bid providers wrap MarketplaceCore so it can use their hooks
   return (
     <WatchlistProviderBridge>
       <BidProviderBridge>
         <MarketplaceCore>{children}</MarketplaceCore>
       </BidProviderBridge>
     </WatchlistProviderBridge>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Bridge wrappers — thin shells that pass cross-context callbacks
-// ---------------------------------------------------------------------------
-
-import { WatchlistProvider } from "./WatchlistContext";
-import { BidProvider, type BidItemBridge } from "./BidContext";
-
-function WatchlistProviderBridge({ children }: { children: React.ReactNode }) {
-  // onInvolvedChange: Forward to MarketplaceCore via globalThis ref
-  const onInvolvedChange = useCallback((action: 'add' | 'remove', itemId: string) => {
-    const bridge = (globalThis as Record<string, unknown>).__marketplaceBridge as {
-      onInvolvedChange?: React.RefObject<(action: 'add' | 'remove', itemId: string) => void>;
-    } | undefined;
-    bridge?.onInvolvedChange?.current?.(action, itemId);
-  }, []);
-
-  return (
-    <WatchlistProvider onInvolvedChange={onInvolvedChange}>
-      {children}
-    </WatchlistProvider>
-  );
-}
-
-function BidProviderBridge({ children }: { children: React.ReactNode }) {
-  const watchCtx = useWatchlist();
-
-  // Bridge: forward bid events to MarketplaceCore via globalThis ref
-  const bridge = useMemo<BidItemBridge>(() => ({
-    onBidLanded: (bid: Bid) => {
-      const mBridge = (globalThis as Record<string, unknown>).__bidBridge as {
-        onBidLanded?: React.RefObject<(bid: Bid) => void>;
-      } | undefined;
-      mBridge?.onBidLanded?.current?.(bid);
-    },
-    onBidPlacedSuccess: (itemId: string) => {
-      const mBridge = (globalThis as Record<string, unknown>).__bidBridge as {
-        onBidPlacedSuccess?: React.RefObject<(itemId: string) => void>;
-      } | undefined;
-      mBridge?.onBidPlacedSuccess?.current?.(itemId);
-    },
-    onBidRollback: (itemId: string) => {
-      const mBridge = (globalThis as Record<string, unknown>).__bidBridge as {
-        onBidRollback?: React.RefObject<(itemId: string) => void>;
-      } | undefined;
-      mBridge?.onBidRollback?.current?.(itemId);
-    },
-  }), []);
-
-  // Active IDs for realtime: get from viewport + involved (MarketplaceCore manages)
-  // Since MarketplaceCore computes activeIds from visibleIds + involvedIds,
-  // we need a way to pass them. Use a shared ref set by MarketplaceCore.
-  const [activeIds] = useState(() => new Set<string>());
-
-  useEffect(() => {
-    (globalThis as Record<string, unknown>).__activeBidIds = activeIds;
-    return () => {
-      delete (globalThis as Record<string, unknown>).__activeBidIds;
-    };
-  }, [activeIds]);
-
-  return (
-    <BidProvider bridge={bridge} activeIds={activeIds} watchedItemIdsRef={watchCtx.watchedItemIdsRef}>
-      {children}
-    </BidProvider>
   );
 }
 

@@ -13,11 +13,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { transformListingToItem, ListingWithSeller } from '@/lib/transform';
 import { Item } from '@/types';
-import type { Database } from '@/types/database.types';
-
-type MarketplaceListingRow = Database['public']['Views']['marketplace_listings']['Row'];
+import { MARKETPLACE_SELECT_COLUMNS, transformRows } from '@/context/marketplace-fetcher';
 
 // Configuration
 const POLL_INTERVAL_MS = 30_000; // 30 seconds
@@ -92,13 +89,7 @@ export function useListingsPolling({
     try {
       const { data, error } = await supabase
         .from('marketplace_listings')
-        .select(`
-          id, title, description, images, seller_id, asked_price, category,
-          auction_mode, created_at, ends_at, go_live_at, status,
-          seller_name, seller_avatar, seller_rating, seller_rating_count, seller_location,
-          bid_count, high_bid, high_bidder_id, condition, slug, contact_phone,
-          location_lat, location_lng, location_address
-        `)
+        .select(MARKETPLACE_SELECT_COLUMNS)
         .eq('status', 'active')
         .gt('created_at', lastFetchRef.current)
         .lte('go_live_at', new Date().toISOString())
@@ -115,9 +106,7 @@ export function useListingsPolling({
       }
 
       // Transform to Item type
-      const items = (data as unknown as MarketplaceListingRow[]).map(row =>
-        transformListingToItem(row as unknown as ListingWithSeller)
-      );
+      const items = transformRows(data);
 
       return items;
     } catch (err) {

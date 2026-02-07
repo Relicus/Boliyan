@@ -11,6 +11,8 @@ import { useBidRealtime } from '@/hooks/useBidRealtime';
 import { useViewport } from './ViewportContext';
 import type { Database } from '@/types/database.types';
 import { transformListingToItem, ListingWithSeller } from '@/lib/transform';
+import { MarketplaceListingRow } from '@/context/marketplace-types';
+import { MARKETPLACE_SELECT_COLUMNS, transformRows } from '@/context/marketplace-fetcher';
 
 interface SearchContextType {
 
@@ -46,7 +48,7 @@ const defaultFilters: SearchFilters = {
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
-type MarketplaceListingRow = Database['public']['Views']['marketplace_listings']['Row'];
+
 type ListingRow = Database['public']['Tables']['listings']['Row'];
 type CategoryRow = Database['public']['Tables']['categories']['Row'];
 type SearchHistoryRow = Database['public']['Tables']['search_history']['Row'];
@@ -103,35 +105,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     try {
             let query = supabase
         .from('marketplace_listings')
-        .select(`
-            id,
-            title,
-            description,
-            images,
-            seller_id,
-            asked_price,
-            category,
-            auction_mode,
-            created_at,
-            ends_at,
-            go_live_at,
-            search_vector,
-            status,
-            seller_name,
-            seller_avatar,
-            seller_rating,
-            seller_rating_count,
-            seller_location,
-            bid_count,
-            high_bid,
-            high_bidder_id,
-            condition,
-            slug,
-            contact_phone,
-            location_lat,
-            location_lng,
-            location_address
-        `, { count: 'exact' });
+        .select(MARKETPLACE_SELECT_COLUMNS, { count: 'exact' });
         
       if (filters.status !== 'all') {
           query = query.eq('status', 'active'); // defaulting to active if not all? or use filters.status? 
@@ -196,7 +170,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         // Transform
         // Need to cast to unknown first to match ListingWithSeller interface structure expectations
         // Transform database rows to items
-        let items = (data as unknown as MarketplaceListingRow[]).map((row) => transformListingToItem(row as unknown as ListingWithSeller));
+        let items = transformRows(data);
 
         // --- CLIENT-SIDE LOCATION FILTERING ---
         if (filters.location && filters.location.radiusKm < 500) {
