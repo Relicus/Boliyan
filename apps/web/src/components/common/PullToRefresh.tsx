@@ -24,7 +24,7 @@ export function PullToRefresh({
   className,
   disabled = false,
   mode = "drag",
-  pullZone = 0.3
+  pullZone = 0.4
 }: PullToRefreshProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPulling, setIsPulling] = useState(false);
