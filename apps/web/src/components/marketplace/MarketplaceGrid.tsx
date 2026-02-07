@@ -479,8 +479,8 @@ export default function MarketplaceGrid() {
               );
             })}
 
-            {/* Infinite Scroll Skeletons */}
-            {isLoadingMore && !isSearchActive && Array.from({ length: 4 }).map((_, i) => (
+            {/* Infinite Scroll Skeletons — always visible when more data exists */}
+            {hasMore && !isSearchActive && Array.from({ length: 4 }).map((_, i) => (
               <div key={`skeleton-more-${i}`}>
                 <ItemCardSkeleton viewMode={viewMode} />
               </div>
