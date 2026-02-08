@@ -240,7 +240,7 @@ export default function MarketplaceGrid() {
     const handleScroll = () => {
       if (isLoadingMore || isLoading || !hasMore) return;
       const scrollBottom = window.scrollY + window.innerHeight;
-      const threshold = document.body.scrollHeight - 1500;
+      const threshold = document.body.scrollHeight - 600; // Tuned down from 1500px
       if (scrollBottom >= threshold) {
         loadMore();
       }
@@ -487,7 +487,6 @@ export default function MarketplaceGrid() {
             </LayoutGroup>
 
             {/* View Toggle Controls (Desktop) */}
-            {/* View Toggle Controls (Desktop) */}
             <ToggleGroup 
               id="view-mode-toggles"
               type="single" 
@@ -577,8 +576,8 @@ export default function MarketplaceGrid() {
               );
             })}
 
-            {/* Infinite Scroll Skeletons — shown when more items exist */}
-            {(hasMore || isLoadingMore) && !isSearchActive && Array.from({ length: 4 }).map((_, i) => (
+            {/* Infinite Scroll Skeletons — only shown during active loading */}
+            {isLoadingMore && !isSearchActive && Array.from({ length: 4 }).map((_, i) => (
               <div key={`skeleton-more-${i}`}>
                 <ItemCardSkeleton viewMode={viewMode} />
               </div>
@@ -586,6 +585,18 @@ export default function MarketplaceGrid() {
           </>
         )}
       </div>
+
+      {hasMore && !isLoadingMore && !isLoading && !isSearchActive && (
+        <div className="py-8 flex justify-center">
+           <Button 
+              variant="outline" 
+              onClick={loadMore}
+              className="rounded-full px-8 bg-white border-slate-200 shadow-sm hover:bg-slate-50"
+            >
+              Load more
+            </Button>
+        </div>
+      )}
 
       {smartRecoveryConfig && (
         <motion.div
