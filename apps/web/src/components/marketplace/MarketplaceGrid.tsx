@@ -227,13 +227,31 @@ export default function MarketplaceGrid() {
     rootMargin: '800px', // Aggressive prefetch: Trigger when 800px from bottom (approx 3 screen heights)
   });
 
+  // --- Primary: IntersectionObserver trigger ---
   useEffect(() => {
-    // Only load more for MP feed. Search pagination not yet implemented in this phase plan (limited to 50)
     if (!isSearchActive && entry?.isIntersecting && hasMore && !isLoadingMore && !isLoading) {
       loadMore();
     }
   }, [entry, hasMore, isLoadingMore, isLoading, loadMore, isSearchActive]);
 
+  // --- Fallback: Scroll listener (IO can miss in some browsers) ---
+  useEffect(() => {
+    if (isSearchActive || !hasMore) return;
+    const handleScroll = () => {
+      if (isLoadingMore || isLoading || !hasMore) return;
+      const scrollBottom = window.scrollY + window.innerHeight;
+      const threshold = document.body.scrollHeight - 1500;
+      if (scrollBottom >= threshold) {
+        loadMore();
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Also check immediately (covers cases where page is short)
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, isLoading, isLoadingMore, isSearchActive, loadMore]);
+
+  // --- Auto-fill: ensure grid fills viewport on initial load ---
   useEffect(() => {
     if (isSearchActive || isLoading || isLoadingMore || !hasMore) {
       return;
@@ -559,8 +577,8 @@ export default function MarketplaceGrid() {
               );
             })}
 
-            {/* Infinite Scroll Skeletons — only shown during active loading */}
-            {isLoadingMore && !isSearchActive && Array.from({ length: 4 }).map((_, i) => (
+            {/* Infinite Scroll Skeletons — shown when more items exist */}
+            {(hasMore || isLoadingMore) && !isSearchActive && Array.from({ length: 4 }).map((_, i) => (
               <div key={`skeleton-more-${i}`}>
                 <ItemCardSkeleton viewMode={viewMode} />
               </div>
