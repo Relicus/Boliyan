@@ -470,7 +470,11 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
       inFlightFetchesRef.current = Math.max(0, inFlightFetchesRef.current - 1);
       loadingLockRef.current = inFlightFetchesRef.current > 0;
 
-      if (!isSuperseded()) {
+      // Always clear loading flags when no fetches remain in-flight.
+      // The isSuperseded guard correctly protects DATA writes (items, feedIds,
+      // hasMore) higher up, but loading indicators must always resolve to
+      // avoid stuck skeletons when multiple fetches race on mobile.
+      if (!isSuperseded() || inFlightFetchesRef.current === 0) {
         setIsLoading(false);
         setIsLoadingMore(false);
         setIsRevalidating(false);
