@@ -28,6 +28,8 @@ export const ProductInfo = memo(function ProductInfo({
   onCategoryClick,
   onConditionClick
 }: ProductInfoProps) {
+  const listingOrSellerAddress = item.location?.address || seller.location?.address;
+
   return (
     <div id={`product-details-left-${item.id}`} className="flex flex-col gap-3 min-w-0 h-full">
       <div className="flex justify-between items-start gap-2">
@@ -65,7 +67,7 @@ export const ProductInfo = memo(function ProductInfo({
 
                  <div className="text-[11px] text-slate-500 flex items-center gap-1 leading-none mt-1">
                   <MapPin className="h-3 w-3 text-red-500" />
-                  <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
+                  <span className="truncate">{getFuzzyLocationString(listingOrSellerAddress || "Unknown Location")}</span>
                   {!isOutside && (
                      <span className="font-medium text-slate-600 border-l border-slate-300 pl-1 ml-1 flex items-center gap-1">
                        <DistanceBadge 

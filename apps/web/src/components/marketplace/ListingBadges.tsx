@@ -37,6 +37,7 @@ export function ListingBadges({
 }: ListingBadgesProps) {
   const badgeStyle = "px-3 py-1.5";
   const itemId = item.id;
+  const listingOrSellerAddress = item.location?.address || seller?.location?.address;
   
   // Check if item was listed within the last 24 hours
   const isJustListed = checkIsJustListed(item.createdAt);
@@ -68,7 +69,7 @@ export function ListingBadges({
       />
       
       {/* Location Badge */}
-      {showLocation && seller?.location && (
+      {showLocation && listingOrSellerAddress && (
         <Badge 
           id={`location-badge-${itemId}`} 
           variant="outline" 
@@ -76,7 +77,7 @@ export function ListingBadges({
           onClick={onLocationClick ? (e) => { e.stopPropagation(); onLocationClick(); } : undefined}
         >
           <MapPin className="h-3.5 w-3.5" />
-          {getFuzzyLocationString(seller.location.address)}
+          {getFuzzyLocationString(listingOrSellerAddress)}
         </Badge>
       )}
 

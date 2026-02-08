@@ -258,7 +258,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               <div id={`item-card-${item.id}-left-stack`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
                 {/* 1. Location (Geography First) */}
                 <LocationBadge 
-                  address={seller?.location?.address}
+                  address={item.location?.address || seller?.location?.address}
                   variant="glass-light"
                 />
                 {/* 2. Category Identity */}
