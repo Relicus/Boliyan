@@ -12,16 +12,13 @@ import {
   ArrowUpNarrowWide
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useApp } from "@/lib/store";
 import { CONDITION_OPTIONS } from "@/lib/constants";
 import { motion } from "framer-motion";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
-import BannerAd from "@/components/ads/BannerAd";
+import SidebarAdDock from "@/components/layout/SidebarAdDock";
 
 import { cn } from "@/lib/utils";
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Select,
   SelectContent,
@@ -34,78 +31,9 @@ import { Button } from "@/components/ui/button";
 
 import { usePathname } from "next/navigation";
 
-const SIDEBAR_AD_VISIBILITY_LIMIT = 3;
-const SIDEBAR_AD_SESSION_LOAD_LIMIT = 5;
-const SIDEBAR_AD_SESSION_STORAGE_KEY = "boliyan_sidebar_ad_loads";
-
 export default function Sidebar() {
   const { filters, setFilter, resetFilters } = useApp();
   const pathname = usePathname();
-
-  const [visibleAdSlots, setVisibleAdSlots] = useState(0);
-  const [sessionAdLoads, setSessionAdLoads] = useState<number | null>(null);
-  const previousVisibleAdSlotsRef = useRef(0);
-  const secondAdTriggerRef = useRef<HTMLDivElement>(null);
-  const thirdAdTriggerRef = useRef<HTMLDivElement>(null);
-
-  const secondAdTriggerEntry = useIntersectionObserver(secondAdTriggerRef, {
-    threshold: 0.15,
-    rootMargin: "120px",
-    freezeOnceVisible: true,
-  });
-
-  const thirdAdTriggerEntry = useIntersectionObserver(thirdAdTriggerRef, {
-    threshold: 0.15,
-    rootMargin: "120px",
-    freezeOnceVisible: true,
-  });
-
-  const maxVisibleAdsForSession = useMemo(() => {
-    if (sessionAdLoads === null) return 0;
-    const remainingLoads = Math.max(0, SIDEBAR_AD_SESSION_LOAD_LIMIT - sessionAdLoads);
-    return Math.min(SIDEBAR_AD_VISIBILITY_LIMIT, remainingLoads);
-  }, [sessionAdLoads]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const storedValue = Number(window.sessionStorage.getItem(SIDEBAR_AD_SESSION_STORAGE_KEY) ?? 0);
-    const safeStoredValue = Number.isFinite(storedValue) ? Math.max(0, storedValue) : 0;
-    const remainingLoads = Math.max(0, SIDEBAR_AD_SESSION_LOAD_LIMIT - safeStoredValue);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSessionAdLoads(safeStoredValue);
-    setVisibleAdSlots(remainingLoads > 0 ? 1 : 0);
-  }, []);
-
-  useEffect(() => {
-    if (!secondAdTriggerEntry?.isIntersecting) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setVisibleAdSlots((previous) => Math.min(maxVisibleAdsForSession, Math.max(previous, 2)));
-  }, [maxVisibleAdsForSession, secondAdTriggerEntry?.isIntersecting]);
-
-  useEffect(() => {
-    if (!thirdAdTriggerEntry?.isIntersecting) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setVisibleAdSlots((previous) => Math.min(maxVisibleAdsForSession, Math.max(previous, 3)));
-  }, [maxVisibleAdsForSession, thirdAdTriggerEntry?.isIntersecting]);
-
-  useEffect(() => {
-    if (sessionAdLoads === null || typeof window === "undefined") return;
-    const previousVisibleSlots = previousVisibleAdSlotsRef.current;
-
-    if (visibleAdSlots <= previousVisibleSlots) {
-      previousVisibleAdSlotsRef.current = visibleAdSlots;
-      return;
-    }
-
-    const newlyLoadedSlots = visibleAdSlots - previousVisibleSlots;
-    const nextSessionLoads = Math.min(SIDEBAR_AD_SESSION_LOAD_LIMIT, sessionAdLoads + newlyLoadedSlots);
-    previousVisibleAdSlotsRef.current = visibleAdSlots;
-
-    if (nextSessionLoads === sessionAdLoads) return;
-
-    setSessionAdLoads(nextSessionLoads);
-    window.sessionStorage.setItem(SIDEBAR_AD_SESSION_STORAGE_KEY, String(nextSessionLoads));
-  }, [sessionAdLoads, visibleAdSlots]);
 
   // Only show sidebar on home page
   if (pathname !== "/") {
@@ -113,8 +41,9 @@ export default function Sidebar() {
   }
 
   return (
-    <aside id="sidebar-01" className="w-72 border-r border-slate-200/60 bg-white hidden lg:flex flex-col h-fit min-h-[calc(100vh-64px)] overflow-hidden shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.02)]">
-      <div className="p-4 pb-0">
+    <div id="sidebar-rail-01" className="w-72 border-r border-slate-200/60 bg-white hidden lg:flex flex-col shadow-[inset_-1px_0_0_0_rgba(0,0,0,0.02)]">
+      <aside id="sidebar-01" className="flex flex-col">
+        <div className="p-4 pb-0">
         <div className="flex bg-slate-100/80 p-1.5 rounded-2xl isolate">
           {/* All Toggle */}
           <button
@@ -182,11 +111,11 @@ export default function Sidebar() {
             </span>
           </button>
         </div>
-      </div>
+        </div>
 
 
-      <ScrollArea id="sidebar-scroll-area-02" className="flex-1 px-4 min-h-0">
-        <div className="space-y-6 py-4 pb-8">
+        <ScrollArea id="sidebar-scroll-area-02" className="px-4">
+          <div className="space-y-6 py-4 pb-4">
           
           {/* Location (Standalone Dropdown) */}
           <div className="px-1">
@@ -267,53 +196,21 @@ export default function Sidebar() {
           <div className="px-1 pt-2">
             <Button 
               id="sidebar-reset-filters-btn"
-              variant="ghost"
+              variant="outline"
               onClick={resetFilters}
-              className="w-full justify-center gap-2 text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl"
+              className="group h-10 w-full justify-center gap-2 rounded-xl border-slate-200 bg-white text-xs font-bold text-slate-600 shadow-sm shadow-slate-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:text-rose-600 hover:shadow-md active:translate-y-0"
             >
-              <RefreshCcw className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform duration-500" />
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-slate-500 transition-colors group-hover:bg-rose-100 group-hover:text-rose-600">
+                <RefreshCcw className="h-3.5 w-3.5 transition-transform duration-500 group-hover:rotate-180" />
+              </span>
               Clear Filters
             </Button>
           </div>
 
-          <Separator className="bg-slate-100" />
-
-          {visibleAdSlots > 0 && (
-            <>
-              {/* Sidebar Ad Slot 1 */}
-              <div className="px-1 pt-1 pb-1">
-                <BannerAd variant="sidebar" index={1} />
-              </div>
-
-              <div id="sidebar-ad-trigger-2" ref={secondAdTriggerRef} className="h-2 w-full" />
-            </>
-          )}
-
-          {visibleAdSlots > 1 && (
-            <>
-              <Separator className="bg-slate-100" />
-
-              {/* Sidebar Ad Slot 2 */}
-              <div className="px-1 pt-1 pb-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <BannerAd variant="sidebar" index={2} />
-              </div>
-
-              <div id="sidebar-ad-trigger-3" ref={thirdAdTriggerRef} className="h-2 w-full" />
-            </>
-          )}
-
-          {visibleAdSlots > 2 && (
-            <>
-              <Separator className="bg-slate-100" />
-
-              {/* Sidebar Ad Slot 3 */}
-              <div className="px-1 pt-1 pb-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <BannerAd variant="sidebar" index={3} />
-              </div>
-            </>
-          )}
-        </div>
-      </ScrollArea>
-    </aside>
+          </div>
+        </ScrollArea>
+      </aside>
+      <SidebarAdDock />
+    </div>
   );
 }
