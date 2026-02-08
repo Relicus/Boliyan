@@ -4,7 +4,7 @@ import { Item, User } from "@/types";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { ConditionBadge } from "@/components/common/ConditionBadge";
 import { TimerBadge } from "@/components/common/TimerBadge";
-import { getFuzzyLocationString } from "@/lib/utils";
+import { getFuzzyLocationString, getPreferredAddress } from "@/lib/utils";
 
 // Helper function to check if item was listed within last 24 hours
 function checkIsJustListed(createdAt: string | null | undefined): boolean {
@@ -37,7 +37,7 @@ export function ListingBadges({
 }: ListingBadgesProps) {
   const badgeStyle = "px-3 py-1.5";
   const itemId = item.id;
-  const listingOrSellerAddress = item.location?.address || seller?.location?.address;
+  const listingOrSellerAddress = getPreferredAddress(item.location, seller?.location);
   
   // Check if item was listed within the last 24 hours
   const isJustListed = checkIsJustListed(item.createdAt);

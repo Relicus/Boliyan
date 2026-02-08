@@ -7,7 +7,7 @@ import { BoliyanLogomarkLoader } from "@/components/branding/BoliyanLogomarkLoad
 import { useApp } from "@/lib/store";
 import { shareContent } from "@/lib/nativeShare";
 import { useBidding } from "@/hooks/useBidding";
-import { getFuzzyLocationString, calculatePrivacySafeDistance } from "@/lib/utils";
+import { getPreferredFuzzyLocation, calculatePrivacySafeDistance } from "@/lib/utils";
 import { RatingBadge } from "@/components/common/RatingBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
 import { Button } from "@/components/ui/button";
@@ -62,14 +62,24 @@ function ProductContent({ item, seller }: ProductContentProps) {
     }
   }, [isSuccess, bidAmount, item?.title]);
 
+  const displayLocation = useMemo(
+    () => getPreferredFuzzyLocation(item.location, seller.location),
+    [item.location, seller.location]
+  );
+
+  const listingOrSellerLocation = useMemo(
+    () => item.location || seller.location,
+    [item.location, seller.location]
+  );
+
   const { duration } = useMemo(() => {
-    const { duration: dur } = (user?.location && seller?.location) 
-      ? calculatePrivacySafeDistance(user.location, seller.location) 
+    const { duration: dur } = (user?.location && listingOrSellerLocation)
+      ? calculatePrivacySafeDistance(user.location, listingOrSellerLocation)
       : { duration: 0 };
     return { 
       duration: dur
     };
-  }, [seller, user]);
+  }, [listingOrSellerLocation, user]);
 
   const biddingConfig = useMemo(() => 
     createBiddingConfig(item, user, bids),
@@ -310,7 +320,7 @@ function ProductContent({ item, seller }: ProductContentProps) {
                   <div className="p-3 bg-slate-50/50 flex items-center justify-between text-xs font-bold text-slate-600">
                       <div className="flex items-center gap-1.5 truncate pr-2">
                         <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate">{getFuzzyLocationString(seller.location.address)}</span>
+                        <span className="truncate">{displayLocation}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-blue-600 shrink-0 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
                         <Clock className="w-3 h-3" />

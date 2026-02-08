@@ -57,6 +57,34 @@ export function getFuzzyLocationString(address: string): string {
   return address;
 }
 
+interface AddressSource {
+  address?: string | null;
+}
+
+export function getPreferredAddress(
+  primary?: AddressSource | null,
+  fallback?: AddressSource | null
+): string | undefined {
+  const primaryAddress = primary?.address?.trim();
+  if (primaryAddress) {
+    return primaryAddress;
+  }
+
+  const fallbackAddress = fallback?.address?.trim();
+  if (fallbackAddress) {
+    return fallbackAddress;
+  }
+
+  return undefined;
+}
+
+export function getPreferredFuzzyLocation(
+  primary?: AddressSource | null,
+  fallback?: AddressSource | null
+): string {
+  return getFuzzyLocationString(getPreferredAddress(primary, fallback) ?? "Unknown Location");
+}
+
 /**
  * Checks if a given address is within the primary operating country (Pakistan).
  * This is used to hide distance metrics for users outside the country.

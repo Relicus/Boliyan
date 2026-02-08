@@ -145,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             getCurrentLocation({ highAccuracy: true, timeout: 10000 })
                 .then(async (position) => {
                     if (!mounted) return;
-                    const { lat: latitude, lng: longitude, source } = position;
+                    const { lat: latitude, lng: longitude } = position;
 
                     try {
                         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);

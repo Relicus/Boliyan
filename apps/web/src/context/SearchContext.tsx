@@ -11,7 +11,6 @@ import { useBidRealtime } from '@/hooks/useBidRealtime';
 import { useViewport } from './ViewportContext';
 import type { Database } from '@/types/database.types';
 import { transformListingToItem, ListingWithSeller } from '@/lib/transform';
-import { MarketplaceListingRow } from '@/context/marketplace-types';
 import { MARKETPLACE_SELECT_COLUMNS, transformRows } from '@/context/marketplace-fetcher';
 
 interface SearchContextType {

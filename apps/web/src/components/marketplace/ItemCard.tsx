@@ -8,7 +8,7 @@ import { useBidding } from "@/hooks/useBidding";
 import { GamificationBadge } from "@/components/common/GamificationBadge";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { BiddingControls } from "@/components/common/BiddingControls";
-import { calculatePrivacySafeDistance } from "@/lib/utils";
+import { calculatePrivacySafeDistance, cn, getPreferredAddress } from "@/lib/utils";
 import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { createBiddingConfig } from "@/types/bidding";
 import ProductDetailsModal from "./ProductDetailsModal";
@@ -29,7 +29,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 interface ItemCardProps {
@@ -99,6 +98,8 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
     visibilityRef.current = node;
     cardRef.current = node;
   }, [visibilityRef]);
+
+  const listingOrSellerAddress = getPreferredAddress(item.location, seller?.location);
 
   useEffect(() => {
     if (!user || !item.isPublicBid) return;
@@ -258,7 +259,7 @@ const ItemCard = memo(({ item, seller, viewMode = 'compact' }: ItemCardProps) =>
               <div id={`item-card-${item.id}-left-stack`} className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1">
                 {/* 1. Location (Geography First) */}
                 <LocationBadge 
-                  address={item.location?.address || seller?.location?.address}
+                  address={listingOrSellerAddress}
                   variant="glass-light"
                 />
                 {/* 2. Category Identity */}

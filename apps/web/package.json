@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "audit:unused": "node scripts/audit-unused-files.mjs",
     "validate-features": "node scripts/validate-features.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "checks": "npm run lint && npm run typecheck && npm run build",
+    "checks": "npm run lint && npm run typecheck && npm run audit:unused && npm run build",
     "test:e2e": "SET TEST_MODE=production&& npx playwright test",
     "test:e2e:dev": "npx playwright test",
     "cleanup": "node scripts/cleanup.js"
