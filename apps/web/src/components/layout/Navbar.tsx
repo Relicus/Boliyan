@@ -18,7 +18,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { LocationSelector } from "@/components/marketplace/LocationSelector";
 import { VerifiedBadge } from "@/components/common/VerifiedBadge";
 import { NotificationBadge } from "@/components/common/NotificationBadge";
-// import { SearchDropdown } from "./SearchDropdown";
 import SearchBar from "@/components/search/SearchBar";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useNotifications } from "@/context/NotificationContext";

@@ -15,7 +15,7 @@
 - **`ProductDetailsModal.tsx`**: The **Transaction Hub**.
   - **Sticky Bidding**: The bidding controls stay visible on mobile.
   - **Immersive Gallery**: Fullscreen image viewing.
-- **`SmartFilterBar.tsx`** & **`CategoryBar.tsx`**: Discovery tools.
+- **`SmartFilterBar.tsx`** & **`FilterSheetContent.tsx`**: Discovery tools.
   - Validates active filters against the store.
 
 ## CONVENTIONS

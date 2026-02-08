@@ -1,7 +1,7 @@
 /**
  * Card Size Constants
  * 
- * Standard dimensions for ItemCard, AdCard, and AdSenseCard
+ * Standard dimensions for ItemCard and AdCard
  * to ensure uniform grid layout across all view modes.
  */
 
