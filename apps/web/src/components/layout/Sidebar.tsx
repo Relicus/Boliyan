@@ -200,9 +200,7 @@ export default function Sidebar() {
               onClick={resetFilters}
               className="group h-10 w-full justify-center gap-2 rounded-xl border-slate-200 bg-white text-xs font-bold text-slate-600 shadow-sm shadow-slate-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:text-rose-600 hover:shadow-md active:translate-y-0"
             >
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-slate-500 transition-colors group-hover:bg-rose-100 group-hover:text-rose-600">
-                <RefreshCcw className="h-3.5 w-3.5 transition-transform duration-500 group-hover:rotate-180" />
-              </span>
+              <RefreshCcw className="h-3.5 w-3.5 text-slate-500 transition-all duration-500 group-hover:rotate-180 group-hover:text-rose-600" />
               Clear Filters
             </Button>
           </div>
