@@ -1,5 +1,7 @@
 # Boliyan: The Anti-Platform Manifesto & Launch Architecture
 
+> Note: This is a vision and positioning document. For current execution priorities, use the practical plans in this folder (`UNIFICATION_PLAN.md`, `PERFORMANCE_OPTIMIZATION_PLAN.md`, `wrapper-waterfall-plan.md`, and `SIDEBAR_ADS_STORE_COMPAT_PLAN.md`).
+
 ## 1. The Core Philosophy: "Greed-Free" As A Weapon
 **The survival of Boliyan depends on one truth:**
 OLX, Uber, and Airbnb have become "Toll Booths". They started as connectors, but now they extract value. They hide phone numbers, block links, & charge "Safety Fees".

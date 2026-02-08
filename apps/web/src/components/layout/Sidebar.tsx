@@ -9,7 +9,8 @@ import {
   Banknote, 
   Sparkles,
   ArrowDownWideNarrow,
-  ArrowUpNarrowWide
+  ArrowUpNarrowWide,
+  ListFilter
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useApp } from "@/lib/store";
@@ -179,7 +180,7 @@ export default function Sidebar() {
               </SelectTrigger>
               <SelectContent className="rounded-xl border-slate-200 shadow-xl">
                 <SelectItem value="all" className="rounded-lg">
-                  <span className="font-medium">Any Condition</span>
+                  <span className="font-medium flex items-center gap-1.5"><ListFilter className="h-3.5 w-3.5" /> Any Condition</span>
                 </SelectItem>
                 {CONDITION_OPTIONS.map((opt) => (
                   <SelectItem key={opt.id} value={opt.id} className="rounded-lg">

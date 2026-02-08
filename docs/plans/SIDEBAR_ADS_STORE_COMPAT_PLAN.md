@@ -1,6 +1,6 @@
 # Sidebar Ads + Store Compatibility Plan
 
-> Status: Draft (implementation-ready)
+> Status: Parked (foundation exists, monetization rollout intentionally deferred)
 > Scope lock: Sidebar ads only (desktop web), no listing/in-feed changes
 > Last updated: 2026-02-08
 
@@ -24,6 +24,15 @@
 - Mobile app is a WebView wrapper in `apps/mobile/App.tsx`.
 - Desktop sidebar is hidden on mobile breakpoints (`lg` only), so current sidebar ads are web-desktop focused.
 
+## 3.1) Practical Rollout Decision (Current)
+
+This track is intentionally paused until two gates are met:
+
+1. Product stability gate: marketplace/discovery core flows remain stable over the last release window.
+2. Measurement gate: ad telemetry ingest and daily rollup are in place before enabling paid provider traffic.
+
+Reason: revenue tests without stable telemetry create noise and can hurt UX without clear decision data.
+
 ## 4) Architecture Decision (Locked)
 
 Use a hybrid control model:
@@ -39,6 +48,14 @@ Sidebar slots (client) -> provider fill (AdSense/other) -> batched counters -> d
 ```
 
 ## 5) Phase Plan
+
+Current status by phase:
+
+- Phase A (Sidebar Slot System): mostly done
+- Phase B (Provider Adapter): not started
+- Phase C (Script + Compliance Surface): not started
+- Phase D (Consolidated Telemetry): not started
+- Phase E (Policy Controls): optional, not started
 
 ### Phase A - Sidebar Slot System (Web)
 
