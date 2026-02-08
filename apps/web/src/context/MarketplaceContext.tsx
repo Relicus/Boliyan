@@ -268,9 +268,11 @@ function MarketplaceCore({ children }: { children: React.ReactNode }) {
         const { count: serverCount } = await serverQuery;
         if (isSuperseded()) return;
 
-        if (serverCount !== null && serverCount > cachedItems.length) {
-          setHasMore(true);
+        if (serverCount !== null) {
+          // Server count is authoritative — use it directly
+          setHasMore(serverCount > cachedItems.length);
         } else {
+          // Fallback heuristic only when count is unavailable
           setHasMore(cachedItems.length === ITEMS_PER_PAGE);
         }
 
